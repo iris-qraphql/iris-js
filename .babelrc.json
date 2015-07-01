@@ -1,0 +1,9 @@
+{
+  "plugins": ["@babel/plugin-transform-typescript"],
+  "presets": [
+    [
+      "@babel/preset-env",
+      { "bugfixes": true, "targets": { "node": "current" } }
+    ]
+  ]
+}
