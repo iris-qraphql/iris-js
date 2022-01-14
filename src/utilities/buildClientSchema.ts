@@ -12,17 +12,14 @@ import type {
   GraphQLType,
 } from '../type/definition';
 import {
-  assertInterfaceType,
   assertNullableType,
   assertObjectType,
-  GraphQLEnumType,
-  GraphQLInputObjectType,
-  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
-  GraphQLUnionType,
+  IrisDataType,
+  IrisResolverType,
   isInputType,
   isOutputType,
 } from '../type/definition';
@@ -162,12 +159,6 @@ export function buildClientSchema(
     return assertObjectType(getNamedType(typeRef));
   }
 
-  function getInterfaceType(
-    typeRef: IntrospectionNamedTypeRef<IntrospectionInterfaceType>,
-  ): GraphQLInterfaceType {
-    return assertInterfaceType(getNamedType(typeRef));
-  }
-
   // Given a type's introspection result, construct the correct
   // GraphQLType instance.
   function buildType(type: IntrospectionType): GraphQLNamedType {
@@ -180,8 +171,6 @@ export function buildClientSchema(
           return buildScalarDef(type);
         case TypeKind.OBJECT:
           return buildObjectDef(type);
-        case TypeKind.INTERFACE:
-          return buildInterfaceDef(type);
         case TypeKind.UNION:
           return buildUnionDef(type);
         case TypeKind.ENUM:
@@ -206,62 +195,26 @@ export function buildClientSchema(
     });
   }
 
-  function buildImplementationsList(
-    implementingIntrospection:
-      | IntrospectionObjectType
-      | IntrospectionInterfaceType,
-  ): Array<GraphQLInterfaceType> {
-    // TODO: Temporary workaround until GraphQL ecosystem will fully support
-    // 'interfaces' on interface types.
-    if (
-      implementingIntrospection.interfaces === null &&
-      implementingIntrospection.kind === TypeKind.INTERFACE
-    ) {
-      return [];
-    }
-
-    if (!implementingIntrospection.interfaces) {
-      const implementingIntrospectionStr = inspect(implementingIntrospection);
-      throw new Error(
-        `Introspection result missing interfaces: ${implementingIntrospectionStr}.`,
-      );
-    }
-
-    return implementingIntrospection.interfaces.map(getInterfaceType);
-  }
-
   function buildObjectDef(
     objectIntrospection: IntrospectionObjectType,
   ): GraphQLObjectType {
     return new GraphQLObjectType({
       name: objectIntrospection.name,
       description: objectIntrospection.description,
-      interfaces: () => buildImplementationsList(objectIntrospection),
       fields: () => buildFieldDefMap(objectIntrospection),
-    });
-  }
-
-  function buildInterfaceDef(
-    interfaceIntrospection: IntrospectionInterfaceType,
-  ): GraphQLInterfaceType {
-    return new GraphQLInterfaceType({
-      name: interfaceIntrospection.name,
-      description: interfaceIntrospection.description,
-      interfaces: () => buildImplementationsList(interfaceIntrospection),
-      fields: () => buildFieldDefMap(interfaceIntrospection),
     });
   }
 
   function buildUnionDef(
     unionIntrospection: IntrospectionUnionType,
-  ): GraphQLUnionType {
+  ): IrisResolverType {
     if (!unionIntrospection.possibleTypes) {
       const unionIntrospectionStr = inspect(unionIntrospection);
       throw new Error(
         `Introspection result missing possibleTypes: ${unionIntrospectionStr}.`,
       );
     }
-    return new GraphQLUnionType({
+    return new IrisResolverType({
       name: unionIntrospection.name,
       description: unionIntrospection.description,
       types: () => unionIntrospection.possibleTypes.map(getObjectType),
@@ -270,37 +223,34 @@ export function buildClientSchema(
 
   function buildEnumDef(
     enumIntrospection: IntrospectionEnumType,
-  ): GraphQLEnumType {
+  ): IrisDataType {
     if (!enumIntrospection.enumValues) {
       const enumIntrospectionStr = inspect(enumIntrospection);
       throw new Error(
         `Introspection result missing enumValues: ${enumIntrospectionStr}.`,
       );
     }
-    return new GraphQLEnumType({
+    return new IrisDataType({
       name: enumIntrospection.name,
       description: enumIntrospection.description,
-      values: keyValMap(
-        enumIntrospection.enumValues,
-        (valueIntrospection) => valueIntrospection.name,
-        (valueIntrospection) => ({
-          description: valueIntrospection.description,
-          deprecationReason: valueIntrospection.deprecationReason,
-        }),
-      ),
+      variants: enumIntrospection.enumValues.map((valueIntrospection) => ({
+        name: valueIntrospection.name,
+        description: valueIntrospection.description,
+        deprecationReason: valueIntrospection.deprecationReason,
+      })),
     });
   }
 
   function buildInputObjectDef(
     inputObjectIntrospection: IntrospectionInputObjectType,
-  ): GraphQLInputObjectType {
+  ): IrisDataType {
     if (!inputObjectIntrospection.inputFields) {
       const inputObjectIntrospectionStr = inspect(inputObjectIntrospection);
       throw new Error(
         `Introspection result missing inputFields: ${inputObjectIntrospectionStr}.`,
       );
     }
-    return new GraphQLInputObjectType({
+    return new IrisDataType({
       name: inputObjectIntrospection.name,
       description: inputObjectIntrospection.description,
       fields: () => buildInputValueDefMap(inputObjectIntrospection.inputFields),

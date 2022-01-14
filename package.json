@@ -1,6 +1,6 @@
 {
-  "name": "graphql",
-  "version": "16.2.0",
+  "name": "iris",
+  "version": "0.1.0",
   "description": "A Query Language and Runtime which can target any service.",
   "license": "MIT",
   "private": true,
@@ -23,22 +23,24 @@
     "url": "https://github.com/graphql/graphql-js.git"
   },
   "keywords": [
-    "graphql",
-    "graphql-js"
+    "iris",
+    "graphql"
   ],
   "engines": {
     "node": "^12.22.0 || ^14.16.0 || >=16.0.0"
   },
   "scripts": {
+    "test": "npm run check && jest && npm run testonly",
     "preversion": ". ./resources/checkgit.sh && npm ci --ignore-scripts",
     "version": "node resources/gen-version.js && npm test && git add src/version.ts",
     "fuzzonly": "mocha --full-trace src/**/__tests__/**/*-fuzz.ts",
     "changelog": "node resources/gen-changelog.js",
     "benchmark": "node benchmark/benchmark.js",
-    "test": "npm run lint && npm run check && npm run testonly && npm run prettier:check && npm run check:spelling && npm run check:integrations",
+    "test:lite": "npm run check && npm run testonly",
+    "test:old": "npm run lint && npm run check && jest && npm run testonly && npm run prettier:check && npm run check:spelling",
     "lint": "eslint --cache --max-warnings 0 .",
     "check": "tsc --pretty",
-    "testonly": "mocha --full-trace src/**/__tests__/**/*-test.ts",
+    "testonly": "mocha --full-trace src/**/__mocha__/**/*-test.ts",
     "testonly:cover": "c8 npm run testonly",
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
@@ -55,9 +57,9 @@
     "@babel/plugin-transform-typescript": "7.16.1",
     "@babel/preset-env": "7.16.5",
     "@babel/register": "7.16.5",
-    "@types/chai": "4.3.0",
-    "@types/mocha": "9.0.0",
+    "@types/jest": "^27.4.0",
     "@types/node": "17.0.5",
+    "@types/ramda": "^0.27.63",
     "@typescript-eslint/eslint-plugin": "5.8.0",
     "@typescript-eslint/parser": "5.8.0",
     "c8": "7.10.0",
@@ -69,11 +71,45 @@
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-simple-import-sort": "7.0.0",
     "eslint-plugin-tsdoc": "0.2.14",
+    "jest": "24.9.0",
+    "jest-environment-node": "24.9.0",
+    "jest-matcher-utils": "24.9.0",
     "mocha": "9.1.3",
     "prettier": "2.5.1",
+    "ts-jest": "24.3.0",
     "typescript": "4.5.4"
   },
   "publishConfig": {
     "tag": "latest"
+  },
+  "dependencies": {
+    "@types/chai": "^4.3.0",
+    "ramda": "^0.27.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "transformIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/*.(js|ts)"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/lib/",
+      "<rootDir>/test/fixtures/",
+      "<rootDir>/test/test-utils"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "<rootDir>/tsconfig.test.json",
+        "diagnostics": false
+      }
+    }
   }
 }

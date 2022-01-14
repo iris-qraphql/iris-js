@@ -31,7 +31,6 @@ import { NoUnusedVariablesRule } from './rules/NoUnusedVariablesRule';
 import { OverlappingFieldsCanBeMergedRule } from './rules/OverlappingFieldsCanBeMergedRule';
 // Spec Section: "Fragment spread is possible"
 import { PossibleFragmentSpreadsRule } from './rules/PossibleFragmentSpreadsRule';
-import { PossibleTypeExtensionsRule } from './rules/PossibleTypeExtensionsRule';
 // Spec Section: "Argument Optionality"
 import {
   ProvidedRequiredArgumentsOnDirectivesRule,
@@ -47,18 +46,16 @@ import { UniqueArgumentNamesRule } from './rules/UniqueArgumentNamesRule';
 import { UniqueDirectiveNamesRule } from './rules/UniqueDirectiveNamesRule';
 // Spec Section: "Directives Are Unique Per Location"
 import { UniqueDirectivesPerLocationRule } from './rules/UniqueDirectivesPerLocationRule';
-import { UniqueEnumValueNamesRule } from './rules/UniqueEnumValueNamesRule';
-import { UniqueFieldDefinitionNamesRule } from './rules/UniqueFieldDefinitionNamesRule';
 // Spec Section: "Fragment Name Uniqueness"
 import { UniqueFragmentNamesRule } from './rules/UniqueFragmentNamesRule';
 // Spec Section: "Input Object Field Uniqueness"
 import { UniqueInputFieldNamesRule } from './rules/UniqueInputFieldNamesRule';
 // Spec Section: "Operation Name Uniqueness"
 import { UniqueOperationNamesRule } from './rules/UniqueOperationNamesRule';
-import { UniqueOperationTypesRule } from './rules/UniqueOperationTypesRule';
 import { UniqueTypeNamesRule } from './rules/UniqueTypeNamesRule';
 // Spec Section: "Variable Uniqueness"
 import { UniqueVariableNamesRule } from './rules/UniqueVariableNamesRule';
+import { UniqueVariantAndFieldDefinitionNamesRule } from './rules/UniqueVariantAndFieldDefinitionNamesRule';
 // Spec Section: "Value Type Correctness"
 import { ValuesOfCorrectTypeRule } from './rules/ValuesOfCorrectTypeRule';
 // Spec Section: "Variables are Input Types"
@@ -108,16 +105,13 @@ export const specifiedRules: ReadonlyArray<ValidationRule> = Object.freeze([
 export const specifiedSDLRules: ReadonlyArray<SDLValidationRule> =
   Object.freeze([
     LoneSchemaDefinitionRule,
-    UniqueOperationTypesRule,
     UniqueTypeNamesRule,
-    UniqueEnumValueNamesRule,
-    UniqueFieldDefinitionNamesRule,
+    UniqueVariantAndFieldDefinitionNamesRule,
     UniqueArgumentDefinitionNamesRule,
     UniqueDirectiveNamesRule,
     KnownTypeNamesRule,
     KnownDirectivesRule,
     UniqueDirectivesPerLocationRule,
-    PossibleTypeExtensionsRule,
     KnownArgumentNamesOnDirectivesRule,
     UniqueArgumentNamesRule,
     UniqueInputFieldNamesRule,

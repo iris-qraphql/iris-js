@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { invariant } from '../../jsutils/invariant';
 
 import { parse, parseValue } from '../../language/parser';
@@ -14,34 +11,30 @@ import { buildSchema } from '../buildASTSchema';
 import { TypeInfo, visitWithTypeInfo } from '../TypeInfo';
 
 const testSchema = buildSchema(`
-  interface Pet {
+  resolver Pet = {
     name: String
   }
 
-  type Dog implements Pet {
+  resolver Dog = {
     name: String
   }
 
-  type Cat implements Pet {
+  resolver Cat = {
     name: String
   }
 
-  type Human {
+  resolver Human = {
     name: String
     pets: [Pet]
   }
 
-  type Alien {
+  resolver Alien = {
     name(surname: Boolean): String
   }
 
-  type QueryRoot {
+  resolver Query = {
     human(id: ID): Human
     alien: Alien
-  }
-
-  schema {
-    query: QueryRoot
   }
 `);
 
@@ -51,7 +44,7 @@ describe('TypeInfo', () => {
   it('can be Object.toStringified', () => {
     const typeInfo = new TypeInfo(schema);
 
-    expect(Object.prototype.toString.call(typeInfo)).to.equal(
+    expect(Object.prototype.toString.call(typeInfo)).toEqual(
       '[object TypeInfo]',
     );
   });
@@ -59,36 +52,30 @@ describe('TypeInfo', () => {
   it('allow all methods to be called before entering any node', () => {
     const typeInfo = new TypeInfo(schema);
 
-    expect(typeInfo.getType()).to.equal(undefined);
-    expect(typeInfo.getParentType()).to.equal(undefined);
-    expect(typeInfo.getInputType()).to.equal(undefined);
-    expect(typeInfo.getParentInputType()).to.equal(undefined);
-    expect(typeInfo.getFieldDef()).to.equal(undefined);
-    expect(typeInfo.getDefaultValue()).to.equal(undefined);
-    expect(typeInfo.getDirective()).to.equal(null);
-    expect(typeInfo.getArgument()).to.equal(null);
-    expect(typeInfo.getEnumValue()).to.equal(null);
+    expect(typeInfo.getType()).toEqual(undefined);
+    expect(typeInfo.getParentType()).toEqual(undefined);
+    expect(typeInfo.getInputType()).toEqual(undefined);
+    expect(typeInfo.getParentInputType()).toEqual(undefined);
+    expect(typeInfo.getFieldDef()).toEqual(undefined);
+    expect(typeInfo.getDefaultValue()).toEqual(undefined);
+    expect(typeInfo.getDirective()).toEqual(null);
+    expect(typeInfo.getArgument()).toEqual(null);
+    expect(typeInfo.getEnumValue()).toEqual(null);
   });
 });
 
 describe('visitWithTypeInfo', () => {
   it('supports different operation types', () => {
     const schema = buildSchema(`
-      schema {
-        query: QueryRoot
-        mutation: MutationRoot
-        subscription: SubscriptionRoot
-      }
-
-      type QueryRoot {
+      resolver Query = {
         foo: String
       }
 
-      type MutationRoot {
+      resolver Mutation = {
         bar: String
       }
 
-      type SubscriptionRoot {
+      resolver Subscription = {
         baz: String
       }
     `);
@@ -109,10 +96,10 @@ describe('visitWithTypeInfo', () => {
       }),
     );
 
-    expect(rootTypes).to.deep.equal({
-      query: 'QueryRoot',
-      mutation: 'MutationRoot',
-      subscription: 'SubscriptionRoot',
+    expect(rootTypes).toEqual({
+      query: 'Query',
+      mutation: 'Mutation',
+      subscription: 'Subscription',
     });
   });
 
@@ -145,7 +132,7 @@ describe('visitWithTypeInfo', () => {
       }),
     );
 
-    expect(visitorArgs).to.deep.equal(wrappedVisitorArgs);
+    expect(visitorArgs).toEqual(wrappedVisitorArgs);
   });
 
   it('maintains type info during visit', () => {
@@ -189,19 +176,19 @@ describe('visitWithTypeInfo', () => {
       }),
     );
 
-    expect(visited).to.deep.equal([
+    expect(visited).toEqual([
       ['enter', 'Document', null, null, null, null],
-      ['enter', 'OperationDefinition', null, null, 'QueryRoot', null],
-      ['enter', 'SelectionSet', null, 'QueryRoot', 'QueryRoot', null],
-      ['enter', 'Field', null, 'QueryRoot', 'Human', null],
-      ['enter', 'Name', 'human', 'QueryRoot', 'Human', null],
-      ['leave', 'Name', 'human', 'QueryRoot', 'Human', null],
-      ['enter', 'Argument', null, 'QueryRoot', 'Human', 'ID'],
-      ['enter', 'Name', 'id', 'QueryRoot', 'Human', 'ID'],
-      ['leave', 'Name', 'id', 'QueryRoot', 'Human', 'ID'],
-      ['enter', 'IntValue', null, 'QueryRoot', 'Human', 'ID'],
-      ['leave', 'IntValue', null, 'QueryRoot', 'Human', 'ID'],
-      ['leave', 'Argument', null, 'QueryRoot', 'Human', 'ID'],
+      ['enter', 'OperationDefinition', null, null, 'Query', null],
+      ['enter', 'SelectionSet', null, 'Query', 'Query', null],
+      ['enter', 'Field', null, 'Query', 'Human', null],
+      ['enter', 'Name', 'human', 'Query', 'Human', null],
+      ['leave', 'Name', 'human', 'Query', 'Human', null],
+      ['enter', 'Argument', null, 'Query', 'Human', 'ID'],
+      ['enter', 'Name', 'id', 'Query', 'Human', 'ID'],
+      ['leave', 'Name', 'id', 'Query', 'Human', 'ID'],
+      ['enter', 'IntValue', null, 'Query', 'Human', 'ID'],
+      ['leave', 'IntValue', null, 'Query', 'Human', 'ID'],
+      ['leave', 'Argument', null, 'Query', 'Human', 'ID'],
       ['enter', 'SelectionSet', null, 'Human', 'Human', null],
       ['enter', 'Field', null, 'Human', 'String', null],
       ['enter', 'Name', 'name', 'Human', 'String', null],
@@ -226,9 +213,9 @@ describe('visitWithTypeInfo', () => {
       ['leave', 'Name', 'unknown', 'Human', null, null],
       ['leave', 'Field', null, 'Human', null, null],
       ['leave', 'SelectionSet', null, 'Human', 'Human', null],
-      ['leave', 'Field', null, 'QueryRoot', 'Human', null],
-      ['leave', 'SelectionSet', null, 'QueryRoot', 'QueryRoot', null],
-      ['leave', 'OperationDefinition', null, null, 'QueryRoot', null],
+      ['leave', 'Field', null, 'Query', 'Human', null],
+      ['leave', 'SelectionSet', null, 'Query', 'Query', null],
+      ['leave', 'OperationDefinition', null, null, 'Query', null],
       ['leave', 'Document', null, null, null, null],
     ]);
   });
@@ -290,11 +277,11 @@ describe('visitWithTypeInfo', () => {
       }),
     );
 
-    expect(print(ast)).to.deep.equal(
+    expect(print(ast)).toEqual(
       print(parse('{ human(id: 4) { name, pets }, alien }')),
     );
 
-    expect(print(editedAST)).to.deep.equal(
+    expect(print(editedAST)).toEqual(
       print(
         parse(
           '{ human(id: 4) { name, pets { __typename } }, alien { __typename } }',
@@ -302,19 +289,19 @@ describe('visitWithTypeInfo', () => {
       ),
     );
 
-    expect(visited).to.deep.equal([
+    expect(visited).toEqual([
       ['enter', 'Document', null, null, null, null],
-      ['enter', 'OperationDefinition', null, null, 'QueryRoot', null],
-      ['enter', 'SelectionSet', null, 'QueryRoot', 'QueryRoot', null],
-      ['enter', 'Field', null, 'QueryRoot', 'Human', null],
-      ['enter', 'Name', 'human', 'QueryRoot', 'Human', null],
-      ['leave', 'Name', 'human', 'QueryRoot', 'Human', null],
-      ['enter', 'Argument', null, 'QueryRoot', 'Human', 'ID'],
-      ['enter', 'Name', 'id', 'QueryRoot', 'Human', 'ID'],
-      ['leave', 'Name', 'id', 'QueryRoot', 'Human', 'ID'],
-      ['enter', 'IntValue', null, 'QueryRoot', 'Human', 'ID'],
-      ['leave', 'IntValue', null, 'QueryRoot', 'Human', 'ID'],
-      ['leave', 'Argument', null, 'QueryRoot', 'Human', 'ID'],
+      ['enter', 'OperationDefinition', null, null, 'Query', null],
+      ['enter', 'SelectionSet', null, 'Query', 'Query', null],
+      ['enter', 'Field', null, 'Query', 'Human', null],
+      ['enter', 'Name', 'human', 'Query', 'Human', null],
+      ['leave', 'Name', 'human', 'Query', 'Human', null],
+      ['enter', 'Argument', null, 'Query', 'Human', 'ID'],
+      ['enter', 'Name', 'id', 'Query', 'Human', 'ID'],
+      ['leave', 'Name', 'id', 'Query', 'Human', 'ID'],
+      ['enter', 'IntValue', null, 'Query', 'Human', 'ID'],
+      ['leave', 'IntValue', null, 'Query', 'Human', 'ID'],
+      ['leave', 'Argument', null, 'Query', 'Human', 'ID'],
       ['enter', 'SelectionSet', null, 'Human', 'Human', null],
       ['enter', 'Field', null, 'Human', 'String', null],
       ['enter', 'Name', 'name', 'Human', 'String', null],
@@ -331,26 +318,26 @@ describe('visitWithTypeInfo', () => {
       ['leave', 'SelectionSet', null, 'Pet', '[Pet]', null],
       ['leave', 'Field', null, 'Human', '[Pet]', null],
       ['leave', 'SelectionSet', null, 'Human', 'Human', null],
-      ['leave', 'Field', null, 'QueryRoot', 'Human', null],
-      ['enter', 'Field', null, 'QueryRoot', 'Alien', null],
-      ['enter', 'Name', 'alien', 'QueryRoot', 'Alien', null],
-      ['leave', 'Name', 'alien', 'QueryRoot', 'Alien', null],
+      ['leave', 'Field', null, 'Query', 'Human', null],
+      ['enter', 'Field', null, 'Query', 'Alien', null],
+      ['enter', 'Name', 'alien', 'Query', 'Alien', null],
+      ['leave', 'Name', 'alien', 'Query', 'Alien', null],
       ['enter', 'SelectionSet', null, 'Alien', 'Alien', null],
       ['enter', 'Field', null, 'Alien', 'String!', null],
       ['enter', 'Name', '__typename', 'Alien', 'String!', null],
       ['leave', 'Name', '__typename', 'Alien', 'String!', null],
       ['leave', 'Field', null, 'Alien', 'String!', null],
       ['leave', 'SelectionSet', null, 'Alien', 'Alien', null],
-      ['leave', 'Field', null, 'QueryRoot', 'Alien', null],
-      ['leave', 'SelectionSet', null, 'QueryRoot', 'QueryRoot', null],
-      ['leave', 'OperationDefinition', null, null, 'QueryRoot', null],
+      ['leave', 'Field', null, 'Query', 'Alien', null],
+      ['leave', 'SelectionSet', null, 'Query', 'Query', null],
+      ['leave', 'OperationDefinition', null, null, 'Query', null],
       ['leave', 'Document', null, null, null, null],
     ]);
   });
 
   it('supports traversals of input values', () => {
     const schema = buildSchema(`
-      input ComplexInput {
+      data  ComplexInput {
         stringListField: [String]
       }
     `);
@@ -385,7 +372,7 @@ describe('visitWithTypeInfo', () => {
       }),
     );
 
-    expect(visited).to.deep.equal([
+    expect(visited).toEqual([
       ['enter', 'ObjectValue', null, 'ComplexInput'],
       ['enter', 'ObjectField', null, '[String]'],
       ['enter', 'Name', 'stringListField', '[String]'],
@@ -438,7 +425,7 @@ describe('visitWithTypeInfo', () => {
       }),
     );
 
-    expect(visited).to.deep.equal([
+    expect(visited).toEqual([
       ['enter', 'SelectionSet', null, 'Human', 'Human'],
       ['enter', 'Field', null, 'Human', 'String'],
       ['enter', 'Name', 'name', 'Human', 'String'],

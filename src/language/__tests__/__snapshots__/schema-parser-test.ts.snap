@@ -1,0 +1,1063 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Schema Parser Double value Enum 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "kind": "DataTypeDefinition",
+      "loc": Object {
+        "end": 21,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 10,
+          "start": 5,
+        },
+        "value": "Hello",
+      },
+      "variants": Array [
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": Array [],
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 15,
+            "start": 13,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 15,
+              "start": 13,
+            },
+            "value": "WO",
+          },
+        },
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": Array [],
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 21,
+            "start": 18,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 21,
+              "start": 18,
+            },
+            "value": "RLD",
+          },
+        },
+      ],
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 21,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Scalar 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "kind": "ScalarTypeDefinition",
+      "loc": Object {
+        "end": 12,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 12,
+          "start": 7,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 12,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Simple data object 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "kind": "DataTypeDefinition",
+      "loc": Object {
+        "end": 43,
+        "start": 5,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 15,
+          "start": 10,
+        },
+        "value": "Hello",
+      },
+      "variants": Array [
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": Array [
+            Object {
+              "defaultValue": undefined,
+              "description": undefined,
+              "directives": Array [],
+              "kind": "InputValueDefinition",
+              "loc": Object {
+                "end": 37,
+                "start": 24,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 29,
+                  "start": 24,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 37,
+                  "start": 31,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 37,
+                    "start": 31,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 43,
+            "start": 16,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 15,
+              "start": 10,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 43,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Simple field with arg 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "fields": Array [
+        Object {
+          "arguments": Array [
+            Object {
+              "defaultValue": undefined,
+              "description": undefined,
+              "directives": Array [],
+              "kind": "InputValueDefinition",
+              "loc": Object {
+                "end": 40,
+                "start": 27,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 31,
+                  "start": 27,
+                },
+                "value": "flag",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 40,
+                  "start": 33,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 40,
+                    "start": 33,
+                  },
+                  "value": "Boolean",
+                },
+              },
+            },
+          ],
+          "description": undefined,
+          "directives": Array [],
+          "kind": "FieldDefinition",
+          "loc": Object {
+            "end": 49,
+            "start": 21,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 26,
+              "start": 21,
+            },
+            "value": "world",
+          },
+          "type": Object {
+            "kind": "NamedType",
+            "loc": Object {
+              "end": 49,
+              "start": 43,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": Object {
+                "end": 49,
+                "start": 43,
+              },
+              "value": "String",
+            },
+          },
+        },
+      ],
+      "kind": "ObjectTypeDefinition",
+      "loc": Object {
+        "end": 51,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 14,
+          "start": 9,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 51,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Simple field with arg with default value 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "fields": Array [
+        Object {
+          "arguments": Array [
+            Object {
+              "defaultValue": Object {
+                "kind": "BooleanValue",
+                "loc": Object {
+                  "end": 47,
+                  "start": 43,
+                },
+                "value": true,
+              },
+              "description": undefined,
+              "directives": Array [],
+              "kind": "InputValueDefinition",
+              "loc": Object {
+                "end": 47,
+                "start": 27,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 31,
+                  "start": 27,
+                },
+                "value": "flag",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 40,
+                  "start": 33,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 40,
+                    "start": 33,
+                  },
+                  "value": "Boolean",
+                },
+              },
+            },
+          ],
+          "description": undefined,
+          "directives": Array [],
+          "kind": "FieldDefinition",
+          "loc": Object {
+            "end": 56,
+            "start": 21,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 26,
+              "start": 21,
+            },
+            "value": "world",
+          },
+          "type": Object {
+            "kind": "NamedType",
+            "loc": Object {
+              "end": 56,
+              "start": 50,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": Object {
+                "end": 56,
+                "start": 50,
+              },
+              "value": "String",
+            },
+          },
+        },
+      ],
+      "kind": "ObjectTypeDefinition",
+      "loc": Object {
+        "end": 58,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 14,
+          "start": 9,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 58,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Simple field with list arg 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "fields": Array [
+        Object {
+          "arguments": Array [
+            Object {
+              "defaultValue": undefined,
+              "description": undefined,
+              "directives": Array [],
+              "kind": "InputValueDefinition",
+              "loc": Object {
+                "end": 43,
+                "start": 27,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 33,
+                  "start": 27,
+                },
+                "value": "things",
+              },
+              "type": Object {
+                "kind": "ListType",
+                "loc": Object {
+                  "end": 43,
+                  "start": 35,
+                },
+                "type": Object {
+                  "kind": "NamedType",
+                  "loc": Object {
+                    "end": 42,
+                    "start": 36,
+                  },
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": Object {
+                      "end": 42,
+                      "start": 36,
+                    },
+                    "value": "String",
+                  },
+                },
+              },
+            },
+          ],
+          "description": undefined,
+          "directives": Array [],
+          "kind": "FieldDefinition",
+          "loc": Object {
+            "end": 52,
+            "start": 21,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 26,
+              "start": 21,
+            },
+            "value": "world",
+          },
+          "type": Object {
+            "kind": "NamedType",
+            "loc": Object {
+              "end": 52,
+              "start": 46,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": Object {
+                "end": 52,
+                "start": 46,
+              },
+              "value": "String",
+            },
+          },
+        },
+      ],
+      "kind": "ObjectTypeDefinition",
+      "loc": Object {
+        "end": 54,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 14,
+          "start": 9,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 54,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Simple field with two args 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "fields": Array [
+        Object {
+          "arguments": Array [
+            Object {
+              "defaultValue": undefined,
+              "description": undefined,
+              "directives": Array [],
+              "kind": "InputValueDefinition",
+              "loc": Object {
+                "end": 42,
+                "start": 27,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 33,
+                  "start": 27,
+                },
+                "value": "argOne",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 42,
+                  "start": 35,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 42,
+                    "start": 35,
+                  },
+                  "value": "Boolean",
+                },
+              },
+            },
+            Object {
+              "defaultValue": undefined,
+              "description": undefined,
+              "directives": Array [],
+              "kind": "InputValueDefinition",
+              "loc": Object {
+                "end": 55,
+                "start": 44,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 50,
+                  "start": 44,
+                },
+                "value": "argTwo",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 55,
+                  "start": 52,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 55,
+                    "start": 52,
+                  },
+                  "value": "Int",
+                },
+              },
+            },
+          ],
+          "description": undefined,
+          "directives": Array [],
+          "kind": "FieldDefinition",
+          "loc": Object {
+            "end": 64,
+            "start": 21,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 26,
+              "start": 21,
+            },
+            "value": "world",
+          },
+          "type": Object {
+            "kind": "NamedType",
+            "loc": Object {
+              "end": 64,
+              "start": 58,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": Object {
+                "end": 64,
+                "start": 58,
+              },
+              "value": "String",
+            },
+          },
+        },
+      ],
+      "kind": "ObjectTypeDefinition",
+      "loc": Object {
+        "end": 66,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 14,
+          "start": 9,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 66,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Simple non-null resolver 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "fields": Array [
+        Object {
+          "arguments": Array [],
+          "description": undefined,
+          "directives": Array [],
+          "kind": "FieldDefinition",
+          "loc": Object {
+            "end": 35,
+            "start": 21,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 26,
+              "start": 21,
+            },
+            "value": "world",
+          },
+          "type": Object {
+            "kind": "NonNullType",
+            "loc": Object {
+              "end": 35,
+              "start": 28,
+            },
+            "type": Object {
+              "kind": "NamedType",
+              "loc": Object {
+                "end": 34,
+                "start": 28,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 34,
+                  "start": 28,
+                },
+                "value": "String",
+              },
+            },
+          },
+        },
+      ],
+      "kind": "ObjectTypeDefinition",
+      "loc": Object {
+        "end": 37,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 14,
+          "start": 9,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 37,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Simple resolver 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "fields": Array [
+        Object {
+          "arguments": Array [],
+          "description": undefined,
+          "directives": Array [],
+          "kind": "FieldDefinition",
+          "loc": Object {
+            "end": 34,
+            "start": 21,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 26,
+              "start": 21,
+            },
+            "value": "world",
+          },
+          "type": Object {
+            "kind": "NamedType",
+            "loc": Object {
+              "end": 34,
+              "start": 28,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": Object {
+                "end": 34,
+                "start": 28,
+              },
+              "value": "String",
+            },
+          },
+        },
+      ],
+      "kind": "ObjectTypeDefinition",
+      "loc": Object {
+        "end": 36,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 14,
+          "start": 9,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 36,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Simple resolver 2`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "kind": "ResolverTypeDefinition",
+      "loc": Object {
+        "end": 22,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 14,
+          "start": 9,
+        },
+        "value": "Hello",
+      },
+      "variants": Array [
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": undefined,
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 22,
+            "start": 17,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 22,
+              "start": 17,
+            },
+            "value": "World",
+          },
+        },
+      ],
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 22,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Single value Enum 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "kind": "DataTypeDefinition",
+      "loc": Object {
+        "end": 18,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 10,
+          "start": 5,
+        },
+        "value": "Hello",
+      },
+      "variants": Array [
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": Array [],
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 18,
+            "start": 13,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 18,
+              "start": 13,
+            },
+            "value": "WORLD",
+          },
+        },
+      ],
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 18,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser Union with two resolvers 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "kind": "ResolverTypeDefinition",
+      "loc": Object {
+        "end": 25,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 14,
+          "start": 9,
+        },
+        "value": "Hello",
+      },
+      "variants": Array [
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": undefined,
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 19,
+            "start": 17,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 19,
+              "start": 17,
+            },
+            "value": "Wo",
+          },
+        },
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": undefined,
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 25,
+            "start": 22,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 25,
+              "start": 22,
+            },
+            "value": "Rld",
+          },
+        },
+      ],
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 25,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser parses resolver with description multi-line string 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": Object {
+        "block": true,
+        "kind": "StringValue",
+        "loc": Object {
+          "end": 19,
+          "start": 0,
+        },
+        "value": "Description",
+      },
+      "directives": Array [],
+      "fields": Array [
+        Object {
+          "arguments": Array [],
+          "description": undefined,
+          "directives": Array [],
+          "kind": "FieldDefinition",
+          "loc": Object {
+            "end": 88,
+            "start": 75,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 80,
+              "start": 75,
+            },
+            "value": "world",
+          },
+          "type": Object {
+            "kind": "NamedType",
+            "loc": Object {
+              "end": 88,
+              "start": 82,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": Object {
+                "end": 88,
+                "start": 82,
+              },
+              "value": "String",
+            },
+          },
+        },
+      ],
+      "kind": "ObjectTypeDefinition",
+      "loc": Object {
+        "end": 90,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 68,
+          "start": 63,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 90,
+    "start": 0,
+  },
+}
+`;
+
+exports[`Schema Parser parses resolver with description string 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": Object {
+        "block": false,
+        "kind": "StringValue",
+        "loc": Object {
+          "end": 13,
+          "start": 0,
+        },
+        "value": "Description",
+      },
+      "directives": Array [],
+      "fields": Array [
+        Object {
+          "arguments": Array [],
+          "description": undefined,
+          "directives": Array [],
+          "kind": "FieldDefinition",
+          "loc": Object {
+            "end": 48,
+            "start": 35,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 40,
+              "start": 35,
+            },
+            "value": "world",
+          },
+          "type": Object {
+            "kind": "NamedType",
+            "loc": Object {
+              "end": 48,
+              "start": 42,
+            },
+            "name": Object {
+              "kind": "Name",
+              "loc": Object {
+                "end": 48,
+                "start": 42,
+              },
+              "value": "String",
+            },
+          },
+        },
+      ],
+      "kind": "ObjectTypeDefinition",
+      "loc": Object {
+        "end": 50,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 28,
+          "start": 23,
+        },
+        "value": "Hello",
+      },
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 50,
+    "start": 0,
+  },
+}
+`;

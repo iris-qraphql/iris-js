@@ -1,6 +1,5 @@
 import { GraphQLError } from '../../error/GraphQLError';
 
-import { Kind } from '../../language/kinds';
 import { isExecutableDefinitionNode } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
@@ -21,14 +20,9 @@ export function ExecutableDefinitionsRule(
     Document(node) {
       for (const definition of node.definitions) {
         if (!isExecutableDefinitionNode(definition)) {
-          const defName =
-            definition.kind === Kind.SCHEMA_DEFINITION ||
-            definition.kind === Kind.SCHEMA_EXTENSION
-              ? 'schema'
-              : '"' + definition.name.value + '"';
           context.reportError(
             new GraphQLError(
-              `The ${defName} definition is not executable.`,
+              `The "${definition.name.value}" definition is not executable.`,
               definition,
             ),
           );

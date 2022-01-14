@@ -28,10 +28,7 @@ export function UniqueArgumentDefinitionNamesRule(
 
       return checkArgUniqueness(`@${directiveNode.name.value}`, argumentNodes);
     },
-    InterfaceTypeDefinition: checkArgUniquenessPerField,
-    InterfaceTypeExtension: checkArgUniquenessPerField,
     ObjectTypeDefinition: checkArgUniquenessPerField,
-    ObjectTypeExtension: checkArgUniquenessPerField,
   };
 
   function checkArgUniquenessPerField(typeNode: {

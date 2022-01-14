@@ -27,7 +27,6 @@ import { OperationTypeNode } from '../language/ast';
 import { Kind } from '../language/kinds';
 
 import type {
-  GraphQLAbstractType,
   GraphQLField,
   GraphQLFieldResolver,
   GraphQLLeafType,
@@ -36,6 +35,7 @@ import type {
   GraphQLOutputType,
   GraphQLResolveInfo,
   GraphQLTypeResolver,
+  IrisResolverType,
 } from '../type/definition';
 import {
   isAbstractType,
@@ -800,7 +800,7 @@ function completeLeafValue(
  */
 function completeAbstractValue(
   exeContext: ExecutionContext,
-  returnType: GraphQLAbstractType,
+  returnType: IrisResolverType,
   fieldNodes: ReadonlyArray<FieldNode>,
   info: GraphQLResolveInfo,
   path: Path,
@@ -850,7 +850,7 @@ function completeAbstractValue(
 function ensureValidRuntimeType(
   runtimeTypeName: unknown,
   exeContext: ExecutionContext,
-  returnType: GraphQLAbstractType,
+  returnType: IrisResolverType,
   fieldNodes: ReadonlyArray<FieldNode>,
   info: GraphQLResolveInfo,
   result: unknown,

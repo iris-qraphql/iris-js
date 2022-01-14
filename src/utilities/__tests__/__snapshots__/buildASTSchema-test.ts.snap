@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Schema Builder Allows to reference introspection types 1`] = `
+Object {
+  "introspectionField": Object {
+    "args": Array [],
+    "astNode": Object {
+      "arguments": Array [],
+      "description": undefined,
+      "directives": Array [],
+      "kind": "FieldDefinition",
+      "loc": Object {
+        "end": 65,
+        "start": 34,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 52,
+          "start": 34,
+        },
+        "value": "introspectionField",
+      },
+      "type": Object {
+        "kind": "NamedType",
+        "loc": Object {
+          "end": 65,
+          "start": 54,
+        },
+        "name": Object {
+          "kind": "Name",
+          "loc": Object {
+            "end": 65,
+            "start": 54,
+          },
+          "value": "__EnumValue",
+        },
+      },
+    },
+    "deprecationReason": undefined,
+    "description": undefined,
+    "name": "introspectionField",
+    "resolve": undefined,
+    "subscribe": undefined,
+    "type": "__EnumValue",
+  },
+}
+`;

@@ -18,7 +18,7 @@ import { visit } from '../language/visitor';
 import type {
   GraphQLArgument,
   GraphQLCompositeType,
-  GraphQLEnumValue,
+  IrisDataVariant,
   GraphQLField,
   GraphQLInputType,
   GraphQLOutputType,
@@ -29,7 +29,7 @@ import type { GraphQLSchema } from '../type/schema';
 import { TypeInfo, visitWithTypeInfo } from '../utilities/TypeInfo';
 
 type NodeWithSelectionSet = OperationDefinitionNode | FragmentDefinitionNode;
-interface VariableUsage {
+type VariableUsage = {
   readonly node: VariableNode;
   readonly type: Maybe<GraphQLInputType>;
   readonly defaultValue: Maybe<unknown>;
@@ -261,7 +261,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getArgument();
   }
 
-  getEnumValue(): Maybe<GraphQLEnumValue> {
+  getEnumValue(): Maybe<IrisDataVariant> {
     return this._typeInfo.getEnumValue();
   }
 }

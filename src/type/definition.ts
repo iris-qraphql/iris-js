@@ -1,10 +1,11 @@
+import { isNil, pluck } from 'ramda';
+
 import { devAssert } from '../jsutils/devAssert';
 import { didYouMean } from '../jsutils/didYouMean';
 import { identityFunc } from '../jsutils/identityFunc';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 import { isObjectLike } from '../jsutils/isObjectLike';
-import { keyMap } from '../jsutils/keyMap';
 import { keyValMap } from '../jsutils/keyValMap';
 import { mapValue } from '../jsutils/mapValue';
 import type { Maybe } from '../jsutils/Maybe';
@@ -12,37 +13,28 @@ import type { ObjMap } from '../jsutils/ObjMap';
 import type { Path } from '../jsutils/Path';
 import type { PromiseOrValue } from '../jsutils/PromiseOrValue';
 import { suggestionList } from '../jsutils/suggestionList';
-import { toObjMap } from '../jsutils/toObjMap';
 
 import { GraphQLError } from '../error/GraphQLError';
 
 import type {
-  EnumTypeDefinitionNode,
-  EnumTypeExtensionNode,
-  EnumValueDefinitionNode,
+  DataTypeDefinitionNode,
   FieldDefinitionNode,
   FieldNode,
   FragmentDefinitionNode,
-  InputObjectTypeDefinitionNode,
-  InputObjectTypeExtensionNode,
   InputValueDefinitionNode,
-  InterfaceTypeDefinitionNode,
-  InterfaceTypeExtensionNode,
   ObjectTypeDefinitionNode,
-  ObjectTypeExtensionNode,
   OperationDefinitionNode,
+  ResolverTypeDefinitionNode,
   ScalarTypeDefinitionNode,
-  ScalarTypeExtensionNode,
-  UnionTypeDefinitionNode,
-  UnionTypeExtensionNode,
   ValueNode,
+  VariantDefinitionNode,
 } from '../language/ast';
 import { Kind } from '../language/kinds';
 import { print } from '../language/printer';
 
 import { valueFromASTUntyped } from '../utilities/valueFromASTUntyped';
 
-import { assertEnumValueName, assertName } from './assertName';
+import { assertName } from './assertName';
 import type { GraphQLSchema } from './schema';
 
 // Predicates & Assertions
@@ -53,18 +45,14 @@ import type { GraphQLSchema } from './schema';
 export type GraphQLType =
   | GraphQLScalarType
   | GraphQLObjectType
-  | GraphQLInterfaceType
   | GraphQLUnionType
-  | GraphQLEnumType
-  | GraphQLInputObjectType
+  | IrisDataType
   | GraphQLList<GraphQLType>
   | GraphQLNonNull<
       | GraphQLScalarType
       | GraphQLObjectType
-      | GraphQLInterfaceType
       | GraphQLUnionType
-      | GraphQLEnumType
-      | GraphQLInputObjectType
+      | IrisDataType
       | GraphQLList<GraphQLType>
     >;
 
@@ -72,10 +60,8 @@ export function isType(type: unknown): type is GraphQLType {
   return (
     isScalarType(type) ||
     isObjectType(type) ||
-    isInterfaceType(type) ||
     isUnionType(type) ||
-    isEnumType(type) ||
-    isInputObjectType(type) ||
+    isDataType(type) ||
     isListType(type) ||
     isNonNullType(type)
   );
@@ -113,21 +99,8 @@ export function assertObjectType(type: unknown): GraphQLObjectType {
   return type;
 }
 
-export function isInterfaceType(type: unknown): type is GraphQLInterfaceType {
-  return instanceOf(type, GraphQLInterfaceType);
-}
-
-export function assertInterfaceType(type: unknown): GraphQLInterfaceType {
-  if (!isInterfaceType(type)) {
-    throw new Error(
-      `Expected ${inspect(type)} to be a GraphQL Interface type.`,
-    );
-  }
-  return type;
-}
-
 export function isUnionType(type: unknown): type is GraphQLUnionType {
-  return instanceOf(type, GraphQLUnionType);
+  return instanceOf(type, IrisResolverType);
 }
 
 export function assertUnionType(type: unknown): GraphQLUnionType {
@@ -137,30 +110,23 @@ export function assertUnionType(type: unknown): GraphQLUnionType {
   return type;
 }
 
-export function isEnumType(type: unknown): type is GraphQLEnumType {
-  return instanceOf(type, GraphQLEnumType);
+export function isEnumType(type: unknown): type is IrisDataType {
+  return isDataType(type) && Boolean(type.getValues().length > 0);
 }
 
-export function assertEnumType(type: unknown): GraphQLEnumType {
-  if (!isEnumType(type)) {
+export function isDataType(type: unknown): type is IrisDataType {
+  return instanceOf(type, IrisDataType);
+}
+
+export function assertDataType(type: unknown): IrisDataType {
+  if (!isDataType(type)) {
     throw new Error(`Expected ${inspect(type)} to be a GraphQL Enum type.`);
   }
   return type;
 }
 
-export function isInputObjectType(
-  type: unknown,
-): type is GraphQLInputObjectType {
-  return instanceOf(type, GraphQLInputObjectType);
-}
-
-export function assertInputObjectType(type: unknown): GraphQLInputObjectType {
-  if (!isInputObjectType(type)) {
-    throw new Error(
-      `Expected ${inspect(type)} to be a GraphQL Input Object type.`,
-    );
-  }
-  return type;
+export function isInputObjectType(type: unknown): type is IrisDataType {
+  return isDataType(type) && Boolean(type.getValues().length === 0);
 }
 
 export function isListType(
@@ -203,53 +169,33 @@ export function assertNonNullType(type: unknown): GraphQLNonNull<GraphQLType> {
   return type;
 }
 
-/**
- * These types may be used as input types for arguments and directives.
- */
 export type GraphQLInputType =
   | GraphQLScalarType
-  | GraphQLEnumType
-  | GraphQLInputObjectType
+  | IrisDataType
   | GraphQLList<GraphQLInputType>
   | GraphQLNonNull<
-      | GraphQLScalarType
-      | GraphQLEnumType
-      | GraphQLInputObjectType
-      | GraphQLList<GraphQLInputType>
+      GraphQLScalarType | IrisDataType | GraphQLList<GraphQLInputType>
     >;
 
 export function isInputType(type: unknown): type is GraphQLInputType {
   return (
     isScalarType(type) ||
-    isEnumType(type) ||
-    isInputObjectType(type) ||
+    isDataType(type) ||
     (isWrappingType(type) && isInputType(type.ofType))
   );
 }
 
-export function assertInputType(type: unknown): GraphQLInputType {
-  if (!isInputType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL input type.`);
-  }
-  return type;
-}
-
-/**
- * These types may be used as output types as the result of fields.
- */
 export type GraphQLOutputType =
   | GraphQLScalarType
   | GraphQLObjectType
-  | GraphQLInterfaceType
   | GraphQLUnionType
-  | GraphQLEnumType
+  | IrisDataType
   | GraphQLList<GraphQLOutputType>
   | GraphQLNonNull<
       | GraphQLScalarType
       | GraphQLObjectType
-      | GraphQLInterfaceType
       | GraphQLUnionType
-      | GraphQLEnumType
+      | IrisDataType
       | GraphQLList<GraphQLOutputType>
     >;
 
@@ -257,24 +203,13 @@ export function isOutputType(type: unknown): type is GraphQLOutputType {
   return (
     isScalarType(type) ||
     isObjectType(type) ||
-    isInterfaceType(type) ||
     isUnionType(type) ||
     isEnumType(type) ||
     (isWrappingType(type) && isOutputType(type.ofType))
   );
 }
 
-export function assertOutputType(type: unknown): GraphQLOutputType {
-  if (!isOutputType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL output type.`);
-  }
-  return type;
-}
-
-/**
- * These types may describe types which may be leaf values.
- */
-export type GraphQLLeafType = GraphQLScalarType | GraphQLEnumType;
+export type GraphQLLeafType = GraphQLScalarType | IrisDataType;
 
 export function isLeafType(type: unknown): type is GraphQLLeafType {
   return isScalarType(type) || isEnumType(type);
@@ -290,13 +225,10 @@ export function assertLeafType(type: unknown): GraphQLLeafType {
 /**
  * These types may describe the parent context of a selection set.
  */
-export type GraphQLCompositeType =
-  | GraphQLObjectType
-  | GraphQLInterfaceType
-  | GraphQLUnionType;
+export type GraphQLCompositeType = GraphQLObjectType | GraphQLUnionType;
 
 export function isCompositeType(type: unknown): type is GraphQLCompositeType {
-  return isObjectType(type) || isInterfaceType(type) || isUnionType(type);
+  return isObjectType(type) || isUnionType(type);
 }
 
 export function assertCompositeType(type: unknown): GraphQLCompositeType {
@@ -308,41 +240,16 @@ export function assertCompositeType(type: unknown): GraphQLCompositeType {
   return type;
 }
 
-/**
- * These types may describe the parent context of a selection set.
- */
-export type GraphQLAbstractType = GraphQLInterfaceType | GraphQLUnionType;
+export const isAbstractType = (type: unknown): type is IrisResolverType =>
+  isUnionType(type);
 
-export function isAbstractType(type: unknown): type is GraphQLAbstractType {
-  return isInterfaceType(type) || isUnionType(type);
-}
-
-export function assertAbstractType(type: unknown): GraphQLAbstractType {
+export function assertAbstractType(type: unknown): IrisResolverType {
   if (!isAbstractType(type)) {
     throw new Error(`Expected ${inspect(type)} to be a GraphQL abstract type.`);
   }
   return type;
 }
 
-/**
- * List Type Wrapper
- *
- * A list is a wrapping type which points to another type.
- * Lists are often created within the context of defining the fields of
- * an object type.
- *
- * Example:
- *
- * ```ts
- * const PersonType = new GraphQLObjectType({
- *   name: 'Person',
- *   fields: () => ({
- *     parents: { type: new GraphQLList(PersonType) },
- *     children: { type: new GraphQLList(PersonType) },
- *   })
- * })
- * ```
- */
 export class GraphQLList<T extends GraphQLType> {
   readonly ofType: T;
 
@@ -368,27 +275,6 @@ export class GraphQLList<T extends GraphQLType> {
   }
 }
 
-/**
- * Non-Null Type Wrapper
- *
- * A non-null is a wrapping type which points to another type.
- * Non-null types enforce that their values are never null and can ensure
- * an error is raised if this ever occurs during a request. It is useful for
- * fields which you can make a strong guarantee on non-nullability, for example
- * usually the id field of a database row will never be null.
- *
- * Example:
- *
- * ```ts
- * const RowType = new GraphQLObjectType({
- *   name: 'Row',
- *   fields: () => ({
- *     id: { type: new GraphQLNonNull(GraphQLString) },
- *   })
- * })
- * ```
- * Note: the enforcement of non-nullability occurs within the executor.
- */
 export class GraphQLNonNull<T extends GraphQLNullableType> {
   readonly ofType: T;
 
@@ -439,10 +325,8 @@ export function assertWrappingType(type: unknown): GraphQLWrappingType {
 export type GraphQLNullableType =
   | GraphQLScalarType
   | GraphQLObjectType
-  | GraphQLInterfaceType
   | GraphQLUnionType
-  | GraphQLEnumType
-  | GraphQLInputObjectType
+  | IrisDataType
   | GraphQLList<GraphQLType>;
 
 export function isNullableType(type: unknown): type is GraphQLNullableType {
@@ -476,23 +360,18 @@ export function getNullableType(
  */
 export type GraphQLNamedType = GraphQLNamedInputType | GraphQLNamedOutputType;
 
-export type GraphQLNamedInputType =
-  | GraphQLScalarType
-  | GraphQLEnumType
-  | GraphQLInputObjectType;
+export type GraphQLNamedInputType = GraphQLScalarType | IrisDataType;
 
 export type GraphQLNamedOutputType =
   | GraphQLScalarType
   | GraphQLObjectType
-  | GraphQLInterfaceType
   | GraphQLUnionType
-  | GraphQLEnumType;
+  | IrisDataType;
 
 export function isNamedType(type: unknown): type is GraphQLNamedType {
   return (
     isScalarType(type) ||
     isObjectType(type) ||
-    isInterfaceType(type) ||
     isUnionType(type) ||
     isEnumType(type) ||
     isInputObjectType(type)
@@ -542,44 +421,6 @@ export function resolveObjMapThunk<T>(thunk: ThunkObjMap<T>): ObjMap<T> {
   return typeof thunk === 'function' ? thunk() : thunk;
 }
 
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLScalarTypeExtensions {
-  [attributeName: string]: unknown;
-}
-
-/**
- * Scalar Type Definition
- *
- * The leaf values of any request and input values to arguments are
- * Scalars (or Enums) and are defined with a name and a series of functions
- * used to parse input from ast or variables and to ensure validity.
- *
- * If a type's serialize function does not return a value (i.e. it returns
- * `undefined`) then an error will be raised and a `null` value will be returned
- * in the response. If the serialize function returns `null`, then no error will
- * be included in the response.
- *
- * Example:
- *
- * ```ts
- * const OddType = new GraphQLScalarType({
- *   name: 'Odd',
- *   serialize(value) {
- *     if (value % 2 === 1) {
- *       return value;
- *     }
- *   }
- * });
- * ```
- */
 export class GraphQLScalarType<TInternal = unknown, TExternal = TInternal> {
   name: string;
   description: Maybe<string>;
@@ -587,9 +428,7 @@ export class GraphQLScalarType<TInternal = unknown, TExternal = TInternal> {
   serialize: GraphQLScalarSerializer<TExternal>;
   parseValue: GraphQLScalarValueParser<TInternal>;
   parseLiteral: GraphQLScalarLiteralParser<TInternal>;
-  extensions: Readonly<GraphQLScalarTypeExtensions>;
   astNode: Maybe<ScalarTypeDefinitionNode>;
-  extensionASTNodes: ReadonlyArray<ScalarTypeExtensionNode>;
 
   constructor(config: Readonly<GraphQLScalarTypeConfig<TInternal, TExternal>>) {
     const parseValue =
@@ -605,9 +444,7 @@ export class GraphQLScalarType<TInternal = unknown, TExternal = TInternal> {
     this.parseLiteral =
       config.parseLiteral ??
       ((node, variables) => parseValue(valueFromASTUntyped(node, variables)));
-    this.extensions = toObjMap(config.extensions);
     this.astNode = config.astNode;
-    this.extensionASTNodes = config.extensionASTNodes ?? [];
 
     devAssert(
       config.specifiedByURL == null ||
@@ -632,20 +469,6 @@ export class GraphQLScalarType<TInternal = unknown, TExternal = TInternal> {
 
   get [Symbol.toStringTag]() {
     return 'GraphQLScalarType';
-  }
-
-  toConfig(): GraphQLScalarTypeNormalizedConfig<TInternal, TExternal> {
-    return {
-      name: this.name,
-      description: this.description,
-      specifiedByURL: this.specifiedByURL,
-      serialize: this.serialize,
-      parseValue: this.parseValue,
-      parseLiteral: this.parseLiteral,
-      extensions: this.extensions,
-      astNode: this.astNode,
-      extensionASTNodes: this.extensionASTNodes,
-    };
   }
 
   toString(): string {
@@ -680,97 +503,29 @@ export interface GraphQLScalarTypeConfig<TInternal, TExternal> {
   parseValue?: GraphQLScalarValueParser<TInternal>;
   /** Parses an externally provided literal value to use as an input. */
   parseLiteral?: GraphQLScalarLiteralParser<TInternal>;
-  extensions?: Maybe<Readonly<GraphQLScalarTypeExtensions>>;
   astNode?: Maybe<ScalarTypeDefinitionNode>;
-  extensionASTNodes?: Maybe<ReadonlyArray<ScalarTypeExtensionNode>>;
 }
 
-interface GraphQLScalarTypeNormalizedConfig<TInternal, TExternal>
-  extends GraphQLScalarTypeConfig<TInternal, TExternal> {
-  serialize: GraphQLScalarSerializer<TExternal>;
-  parseValue: GraphQLScalarValueParser<TInternal>;
-  parseLiteral: GraphQLScalarLiteralParser<TInternal>;
-  extensions: Readonly<GraphQLScalarTypeExtensions>;
-  extensionASTNodes: ReadonlyArray<ScalarTypeExtensionNode>;
-}
+export type GraphQLObjectTypeExtensions<
+  _TSource = any,
+  _TContext = any,
+> = Record<string, unknown>;
 
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- *
- * We've provided these template arguments because this is an open type and
- * you may find them useful.
- */
-export interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
-  [attributeName: string]: unknown;
-}
-
-/**
- * Object Type Definition
- *
- * Almost all of the GraphQL types you define will be object types. Object types
- * have a name, but most importantly describe their fields.
- *
- * Example:
- *
- * ```ts
- * const AddressType = new GraphQLObjectType({
- *   name: 'Address',
- *   fields: {
- *     street: { type: GraphQLString },
- *     number: { type: GraphQLInt },
- *     formatted: {
- *       type: GraphQLString,
- *       resolve(obj) {
- *         return obj.number + ' ' + obj.street
- *       }
- *     }
- *   }
- * });
- * ```
- *
- * When two types need to refer to each other, or a type needs to refer to
- * itself in a field, you can use a function expression (aka a closure or a
- * thunk) to supply the fields lazily.
- *
- * Example:
- *
- * ```ts
- * const PersonType = new GraphQLObjectType({
- *   name: 'Person',
- *   fields: () => ({
- *     name: { type: GraphQLString },
- *     bestFriend: { type: PersonType },
- *   })
- * });
- * ```
- */
 export class GraphQLObjectType<TSource = any, TContext = any> {
   name: string;
   description: Maybe<string>;
   isTypeOf: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
-  extensions: Readonly<GraphQLObjectTypeExtensions<TSource, TContext>>;
   astNode: Maybe<ObjectTypeDefinitionNode>;
-  extensionASTNodes: ReadonlyArray<ObjectTypeExtensionNode>;
 
   private _fields: ThunkObjMap<GraphQLField<TSource, TContext>>;
-  private _interfaces: ThunkReadonlyArray<GraphQLInterfaceType>;
 
   constructor(config: Readonly<GraphQLObjectTypeConfig<TSource, TContext>>) {
     this.name = assertName(config.name);
     this.description = config.description;
     this.isTypeOf = config.isTypeOf;
-    this.extensions = toObjMap(config.extensions);
     this.astNode = config.astNode;
-    this.extensionASTNodes = config.extensionASTNodes ?? [];
 
     this._fields = () => defineFieldMap(config);
-    this._interfaces = () => defineInterfaces(config);
     devAssert(
       config.isTypeOf == null || typeof config.isTypeOf === 'function',
       `${this.name} must provide "isTypeOf" as a function, ` +
@@ -789,26 +544,6 @@ export class GraphQLObjectType<TSource = any, TContext = any> {
     return this._fields;
   }
 
-  getInterfaces(): ReadonlyArray<GraphQLInterfaceType> {
-    if (typeof this._interfaces === 'function') {
-      this._interfaces = this._interfaces();
-    }
-    return this._interfaces;
-  }
-
-  toConfig(): GraphQLObjectTypeNormalizedConfig<TSource, TContext> {
-    return {
-      name: this.name,
-      description: this.description,
-      interfaces: this.getInterfaces(),
-      fields: fieldsToFieldsConfig(this.getFields()),
-      isTypeOf: this.isTypeOf,
-      extensions: this.extensions,
-      astNode: this.astNode,
-      extensionASTNodes: this.extensionASTNodes,
-    };
-  }
-
   toString(): string {
     return this.name;
   }
@@ -818,24 +553,8 @@ export class GraphQLObjectType<TSource = any, TContext = any> {
   }
 }
 
-function defineInterfaces(
-  config: Readonly<
-    GraphQLObjectTypeConfig<any, any> | GraphQLInterfaceTypeConfig<any, any>
-  >,
-): ReadonlyArray<GraphQLInterfaceType> {
-  const interfaces = resolveReadonlyArrayThunk(config.interfaces ?? []);
-  devAssert(
-    Array.isArray(interfaces),
-    `${config.name} interfaces must be an Array or a function which returns an Array.`,
-  );
-  return interfaces;
-}
-
 function defineFieldMap<TSource, TContext>(
-  config: Readonly<
-    | GraphQLObjectTypeConfig<TSource, TContext>
-    | GraphQLInterfaceTypeConfig<TSource, TContext>
-  >,
+  config: Readonly<GraphQLObjectTypeConfig<TSource, TContext>>,
 ): GraphQLFieldMap<TSource, TContext> {
   const fieldMap = resolveObjMapThunk(config.fields);
   devAssert(
@@ -854,57 +573,33 @@ function defineFieldMap<TSource, TContext>(
         `provided, but got: ${inspect(fieldConfig.resolve)}.`,
     );
 
-    const argsConfig = fieldConfig.args ?? {};
-    devAssert(
-      isPlainObj(argsConfig),
-      `${config.name}.${fieldName} args must be an object with argument names as keys.`,
-    );
-
     return {
       name: assertName(fieldName),
       description: fieldConfig.description,
       type: fieldConfig.type,
-      args: defineArguments(argsConfig),
+      args: defineArguments(fieldConfig.args ?? {}),
       resolve: fieldConfig.resolve,
       subscribe: fieldConfig.subscribe,
       deprecationReason: fieldConfig.deprecationReason,
-      extensions: toObjMap(fieldConfig.extensions),
       astNode: fieldConfig.astNode,
     };
   });
 }
 
-export function defineArguments(
+export const defineArguments = (
   config: GraphQLFieldConfigArgumentMap,
-): ReadonlyArray<GraphQLArgument> {
-  return Object.entries(config).map(([argName, argConfig]) => ({
+): ReadonlyArray<GraphQLArgument> =>
+  Object.entries(config).map(([argName, argConfig]) => ({
     name: assertName(argName),
     description: argConfig.description,
     type: argConfig.type,
     defaultValue: argConfig.defaultValue,
     deprecationReason: argConfig.deprecationReason,
-    extensions: toObjMap(argConfig.extensions),
     astNode: argConfig.astNode,
   }));
-}
 
 function isPlainObj(obj: unknown): boolean {
   return isObjectLike(obj) && !Array.isArray(obj);
-}
-
-function fieldsToFieldsConfig<TSource, TContext>(
-  fields: GraphQLFieldMap<TSource, TContext>,
-): GraphQLFieldConfigMap<TSource, TContext> {
-  return mapValue(fields, (field) => ({
-    description: field.description,
-    type: field.type,
-    args: argsToArgsConfig(field.args),
-    resolve: field.resolve,
-    subscribe: field.subscribe,
-    deprecationReason: field.deprecationReason,
-    extensions: field.extensions,
-    astNode: field.astNode,
-  }));
 }
 
 /**
@@ -921,7 +616,6 @@ export function argsToArgsConfig(
       type: arg.type,
       defaultValue: arg.defaultValue,
       deprecationReason: arg.deprecationReason,
-      extensions: arg.extensions,
       astNode: arg.astNode,
     }),
   );
@@ -930,27 +624,16 @@ export function argsToArgsConfig(
 export interface GraphQLObjectTypeConfig<TSource, TContext> {
   name: string;
   description?: Maybe<string>;
-  interfaces?: ThunkReadonlyArray<GraphQLInterfaceType>;
   fields: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>;
   isTypeOf?: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
-  extensions?: Maybe<Readonly<GraphQLObjectTypeExtensions<TSource, TContext>>>;
   astNode?: Maybe<ObjectTypeDefinitionNode>;
-  extensionASTNodes?: Maybe<ReadonlyArray<ObjectTypeExtensionNode>>;
-}
-
-interface GraphQLObjectTypeNormalizedConfig<TSource, TContext>
-  extends GraphQLObjectTypeConfig<any, any> {
-  interfaces: ReadonlyArray<GraphQLInterfaceType>;
-  fields: GraphQLFieldConfigMap<any, any>;
-  extensions: Readonly<GraphQLObjectTypeExtensions<TSource, TContext>>;
-  extensionASTNodes: ReadonlyArray<ObjectTypeExtensionNode>;
 }
 
 export type GraphQLTypeResolver<TSource, TContext> = (
   value: TSource,
   context: TContext,
   info: GraphQLResolveInfo,
-  abstractType: GraphQLAbstractType,
+  abstractType: IrisResolverType,
 ) => PromiseOrValue<string | undefined>;
 
 export type GraphQLIsTypeOfFn<TSource, TContext> = (
@@ -981,23 +664,7 @@ export interface GraphQLResolveInfo {
   readonly fragments: ObjMap<FragmentDefinitionNode>;
   readonly rootValue: unknown;
   readonly operation: OperationDefinitionNode;
-  readonly variableValues: { [variable: string]: unknown };
-}
-
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- *
- * We've provided these template arguments because this is an open type and
- * you may find them useful.
- */
-export interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
-  [attributeName: string]: unknown;
+  readonly variableValues: Record<string, unknown>;
 }
 
 export interface GraphQLFieldConfig<TSource, TContext, TArgs = any> {
@@ -1007,33 +674,16 @@ export interface GraphQLFieldConfig<TSource, TContext, TArgs = any> {
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   deprecationReason?: Maybe<string>;
-  extensions?: Maybe<
-    Readonly<GraphQLFieldExtensions<TSource, TContext, TArgs>>
-  >;
   astNode?: Maybe<FieldDefinitionNode>;
 }
 
 export type GraphQLFieldConfigArgumentMap = ObjMap<GraphQLArgumentConfig>;
-
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLArgumentExtensions {
-  [attributeName: string]: unknown;
-}
 
 export interface GraphQLArgumentConfig {
   description?: Maybe<string>;
   type: GraphQLInputType;
   defaultValue?: unknown;
   deprecationReason?: Maybe<string>;
-  extensions?: Maybe<Readonly<GraphQLArgumentExtensions>>;
   astNode?: Maybe<InputValueDefinitionNode>;
 }
 
@@ -1049,7 +699,6 @@ export interface GraphQLField<TSource, TContext, TArgs = any> {
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   deprecationReason: Maybe<string>;
-  extensions: Readonly<GraphQLFieldExtensions<TSource, TContext, TArgs>>;
   astNode: Maybe<FieldDefinitionNode>;
 }
 
@@ -1059,7 +708,6 @@ export interface GraphQLArgument {
   type: GraphQLInputType;
   defaultValue: unknown;
   deprecationReason: Maybe<string>;
-  extensions: Readonly<GraphQLArgumentExtensions>;
   astNode: Maybe<InputValueDefinitionNode>;
 }
 
@@ -1071,174 +719,13 @@ export type GraphQLFieldMap<TSource, TContext> = ObjMap<
   GraphQLField<TSource, TContext>
 >;
 
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLInterfaceTypeExtensions {
-  [attributeName: string]: unknown;
-}
+export type GraphQLUnionType = IrisResolverType;
 
-/**
- * Interface Type Definition
- *
- * When a field can return one of a heterogeneous set of types, a Interface type
- * is used to describe what types are possible, what fields are in common across
- * all types, as well as a function to determine which type is actually used
- * when the field is resolved.
- *
- * Example:
- *
- * ```ts
- * const EntityType = new GraphQLInterfaceType({
- *   name: 'Entity',
- *   fields: {
- *     name: { type: GraphQLString }
- *   }
- * });
- * ```
- */
-export class GraphQLInterfaceType {
+export class IrisResolverType {
   name: string;
   description: Maybe<string>;
   resolveType: Maybe<GraphQLTypeResolver<any, any>>;
-  extensions: Readonly<GraphQLInterfaceTypeExtensions>;
-  astNode: Maybe<InterfaceTypeDefinitionNode>;
-  extensionASTNodes: ReadonlyArray<InterfaceTypeExtensionNode>;
-
-  private _fields: ThunkObjMap<GraphQLField<any, any>>;
-  private _interfaces: ThunkReadonlyArray<GraphQLInterfaceType>;
-
-  constructor(config: Readonly<GraphQLInterfaceTypeConfig<any, any>>) {
-    this.name = assertName(config.name);
-    this.description = config.description;
-    this.resolveType = config.resolveType;
-    this.extensions = toObjMap(config.extensions);
-    this.astNode = config.astNode;
-    this.extensionASTNodes = config.extensionASTNodes ?? [];
-
-    this._fields = defineFieldMap.bind(undefined, config);
-    this._interfaces = defineInterfaces.bind(undefined, config);
-    devAssert(
-      config.resolveType == null || typeof config.resolveType === 'function',
-      `${this.name} must provide "resolveType" as a function, ` +
-        `but got: ${inspect(config.resolveType)}.`,
-    );
-  }
-
-  get [Symbol.toStringTag]() {
-    return 'GraphQLInterfaceType';
-  }
-
-  getFields(): GraphQLFieldMap<any, any> {
-    if (typeof this._fields === 'function') {
-      this._fields = this._fields();
-    }
-    return this._fields;
-  }
-
-  getInterfaces(): ReadonlyArray<GraphQLInterfaceType> {
-    if (typeof this._interfaces === 'function') {
-      this._interfaces = this._interfaces();
-    }
-    return this._interfaces;
-  }
-
-  toConfig(): GraphQLInterfaceTypeNormalizedConfig {
-    return {
-      name: this.name,
-      description: this.description,
-      interfaces: this.getInterfaces(),
-      fields: fieldsToFieldsConfig(this.getFields()),
-      resolveType: this.resolveType,
-      extensions: this.extensions,
-      astNode: this.astNode,
-      extensionASTNodes: this.extensionASTNodes,
-    };
-  }
-
-  toString(): string {
-    return this.name;
-  }
-
-  toJSON(): string {
-    return this.toString();
-  }
-}
-
-export interface GraphQLInterfaceTypeConfig<TSource, TContext> {
-  name: string;
-  description?: Maybe<string>;
-  interfaces?: ThunkReadonlyArray<GraphQLInterfaceType>;
-  fields: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>;
-  /**
-   * Optionally provide a custom type resolver function. If one is not provided,
-   * the default implementation will call `isTypeOf` on each implementing
-   * Object type.
-   */
-  resolveType?: Maybe<GraphQLTypeResolver<TSource, TContext>>;
-  extensions?: Maybe<Readonly<GraphQLInterfaceTypeExtensions>>;
-  astNode?: Maybe<InterfaceTypeDefinitionNode>;
-  extensionASTNodes?: Maybe<ReadonlyArray<InterfaceTypeExtensionNode>>;
-}
-
-export interface GraphQLInterfaceTypeNormalizedConfig
-  extends GraphQLInterfaceTypeConfig<any, any> {
-  interfaces: ReadonlyArray<GraphQLInterfaceType>;
-  fields: GraphQLFieldConfigMap<any, any>;
-  extensions: Readonly<GraphQLInterfaceTypeExtensions>;
-  extensionASTNodes: ReadonlyArray<InterfaceTypeExtensionNode>;
-}
-
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLUnionTypeExtensions {
-  [attributeName: string]: unknown;
-}
-
-/**
- * Union Type Definition
- *
- * When a field can return one of a heterogeneous set of types, a Union type
- * is used to describe what types are possible as well as providing a function
- * to determine which type is actually used when the field is resolved.
- *
- * Example:
- *
- * ```ts
- * const PetType = new GraphQLUnionType({
- *   name: 'Pet',
- *   types: [ DogType, CatType ],
- *   resolveType(value) {
- *     if (value instanceof Dog) {
- *       return DogType;
- *     }
- *     if (value instanceof Cat) {
- *       return CatType;
- *     }
- *   }
- * });
- * ```
- */
-export class GraphQLUnionType {
-  name: string;
-  description: Maybe<string>;
-  resolveType: Maybe<GraphQLTypeResolver<any, any>>;
-  extensions: Readonly<GraphQLUnionTypeExtensions>;
-  astNode: Maybe<UnionTypeDefinitionNode>;
-  extensionASTNodes: ReadonlyArray<UnionTypeExtensionNode>;
+  astNode: Maybe<ResolverTypeDefinitionNode>;
 
   private _types: ThunkReadonlyArray<GraphQLObjectType>;
 
@@ -1246,11 +733,8 @@ export class GraphQLUnionType {
     this.name = assertName(config.name);
     this.description = config.description;
     this.resolveType = config.resolveType;
-    this.extensions = toObjMap(config.extensions);
     this.astNode = config.astNode;
-    this.extensionASTNodes = config.extensionASTNodes ?? [];
-
-    this._types = defineTypes.bind(undefined, config);
+    this._types = () => resolveReadonlyArrayThunk(config.types);
     devAssert(
       config.resolveType == null || typeof config.resolveType === 'function',
       `${this.name} must provide "resolveType" as a function, ` +
@@ -1269,18 +753,6 @@ export class GraphQLUnionType {
     return this._types;
   }
 
-  toConfig(): GraphQLUnionTypeNormalizedConfig {
-    return {
-      name: this.name,
-      description: this.description,
-      types: this.getTypes(),
-      resolveType: this.resolveType,
-      extensions: this.extensions,
-      astNode: this.astNode,
-      extensionASTNodes: this.extensionASTNodes,
-    };
-  }
-
   toString(): string {
     return this.name;
   }
@@ -1290,119 +762,126 @@ export class GraphQLUnionType {
   }
 }
 
-function defineTypes(
-  config: Readonly<GraphQLUnionTypeConfig<unknown, unknown>>,
-): ReadonlyArray<GraphQLObjectType> {
-  const types = resolveReadonlyArrayThunk(config.types);
-  devAssert(
-    Array.isArray(types),
-    `Must provide Array of types or a function which returns such an array for Union ${config.name}.`,
-  );
-  return types;
-}
-
 export interface GraphQLUnionTypeConfig<TSource, TContext> {
   name: string;
   description?: Maybe<string>;
   types: ThunkReadonlyArray<GraphQLObjectType>;
-  /**
-   * Optionally provide a custom type resolver function. If one is not provided,
-   * the default implementation will call `isTypeOf` on each implementing
-   * Object type.
-   */
   resolveType?: Maybe<GraphQLTypeResolver<TSource, TContext>>;
-  extensions?: Maybe<Readonly<GraphQLUnionTypeExtensions>>;
-  astNode?: Maybe<UnionTypeDefinitionNode>;
-  extensionASTNodes?: Maybe<ReadonlyArray<UnionTypeExtensionNode>>;
+  astNode?: Maybe<ResolverTypeDefinitionNode>;
 }
 
-interface GraphQLUnionTypeNormalizedConfig
-  extends GraphQLUnionTypeConfig<any, any> {
-  types: ReadonlyArray<GraphQLObjectType>;
-  extensions: Readonly<GraphQLUnionTypeExtensions>;
-  extensionASTNodes: ReadonlyArray<UnionTypeExtensionNode>;
-}
+export type IrisDataVariantFieldFields = ObjMap<IrisDataVariantField>;
 
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLEnumTypeExtensions {
-  [attributeName: string]: unknown;
-}
-
-/**
- * Enum Type Definition
- *
- * Some leaf values of requests and input values are Enums. GraphQL serializes
- * Enum values as strings, however internally Enums can be represented by any
- * kind of type, often integers.
- *
- * Example:
- *
- * ```ts
- * const RGBType = new GraphQLEnumType({
- *   name: 'RGB',
- *   values: {
- *     RED: { value: 0 },
- *     GREEN: { value: 1 },
- *     BLUE: { value: 2 }
- *   }
- * });
- * ```
- *
- * Note: If a value is not provided in a definition, the name of the enum value
- * will be used as its internal value.
- */
-export class GraphQLEnumType /* <T> */ {
+export interface GraphQLInputField {
   name: string;
   description: Maybe<string>;
-  extensions: Readonly<GraphQLEnumTypeExtensions>;
-  astNode: Maybe<EnumTypeDefinitionNode>;
-  extensionASTNodes: ReadonlyArray<EnumTypeExtensionNode>;
+  type: GraphQLInputType;
+  defaultValue: unknown;
+  deprecationReason: Maybe<string>;
+  astNode: Maybe<InputValueDefinitionNode>;
+}
 
-  private _values: ReadonlyArray<GraphQLEnumValue /* <T> */>;
-  private _valueLookup: ReadonlyMap<any /* T */, GraphQLEnumValue>;
-  private _nameLookup: ObjMap<GraphQLEnumValue>;
+export type IrisDataVariantField = {
+  description?: Maybe<string>;
+  type: GraphQLInputType;
+  defaultValue?: unknown;
+  deprecationReason?: Maybe<string>;
+  astNode?: Maybe<InputValueDefinitionNode>;
+};
 
-  constructor(config: Readonly<GraphQLEnumTypeConfig /* <T> */>) {
+export type IrisDataVariant = {
+  name: string;
+  description?: Maybe<string>;
+  deprecationReason?: Maybe<string>;
+  astNode?: VariantDefinitionNode;
+  fields?: ObjMap<IrisDataVariantField>;
+};
+
+type IrisDataTypeConfig = {
+  name: string;
+  description?: Maybe<string>;
+  variants?: ReadonlyArray<IrisDataVariant>;
+  fields?: ThunkObjMap<IrisDataVariantField>;
+  astNode?: Maybe<DataTypeDefinitionNode>;
+};
+
+
+// FIXME: String value are serialized with "\"ABC\"". that why we need something like that
+class Literal {
+  name;
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  toJSON() {
+    return this.name;
+  }
+}
+
+export class IrisDataType {
+  name: string;
+  description: Maybe<string>;
+  astNode: Maybe<DataTypeDefinitionNode>;
+
+  private _variants: ReadonlyArray<IrisDataVariant>;
+  private _fields: () => ObjMap<GraphQLInputField>;
+
+  constructor(config: Readonly<IrisDataTypeConfig>) {
+    this.astNode = config.astNode;
     this.name = assertName(config.name);
     this.description = config.description;
-    this.extensions = toObjMap(config.extensions);
-    this.astNode = config.astNode;
-    this.extensionASTNodes = config.extensionASTNodes ?? [];
+    // input
+    this._fields = () =>
+      mapValue(
+        resolveObjMapThunk(config.fields ?? {}),
+        (fieldConfig, fieldName) => ({
+          name: assertName(fieldName),
+          description: fieldConfig.description,
+          type: fieldConfig.type,
+          defaultValue: fieldConfig.defaultValue,
+          deprecationReason: fieldConfig.deprecationReason,
+          astNode: fieldConfig.astNode,
+        }),
+      );
 
-    this._values = defineEnumValues(this.name, config.values);
-    this._valueLookup = new Map(
-      this._values.map((enumValue) => [enumValue.value, enumValue]),
-    );
-    this._nameLookup = keyMap(this._values, (value) => value.name);
+    // enum
+    this._variants =
+      config.variants?.map((valueConfig) => ({
+        name: valueConfig.name,
+        description: valueConfig.description,
+        deprecationReason: valueConfig.deprecationReason,
+        astNode: valueConfig.astNode,
+      })) ?? [];
   }
 
   get [Symbol.toStringTag]() {
-    return 'GraphQLEnumType';
+    return 'IrisDataType';
   }
 
-  getValues(): ReadonlyArray<GraphQLEnumValue /* <T> */> {
-    return this._values;
+  getVariants(): ReadonlyArray<VariantDefinitionNode> {
+    return this.astNode?.variants ?? [];
   }
 
-  getValue(name: string): Maybe<GraphQLEnumValue> {
-    return this._nameLookup[name];
+  getFields(): ObjMap<GraphQLInputField> {
+    return this._fields();
   }
 
-  serialize(outputValue: unknown /* T */): Maybe<string> {
-    const enumValue = this._valueLookup.get(outputValue);
-    if (enumValue === undefined) {
+  getValues(): ReadonlyArray<IrisDataVariant> {
+    return this._variants;
+  }
+
+  getValue(name: string): Maybe<IrisDataVariant> {
+    return this._variants.find((x) => x.name === name);
+  }
+
+  serialize(value: unknown): Maybe<any> {
+    const enumValue = this.getValue((value as any)?.name ?? value);
+    if (isNil(enumValue)) {
       throw new GraphQLError(
-        `Enum "${this.name}" cannot represent value: ${inspect(outputValue)}`,
+        `Enum "${this.name}" cannot represent value: ${inspect(value)}`,
       );
     }
+
     return enumValue.name;
   }
 
@@ -1422,7 +901,7 @@ export class GraphQLEnumType /* <T> */ {
           didYouMeanEnumValue(this, inputValue),
       );
     }
-    return enumValue.value;
+    return enumValue.name;
   }
 
   parseLiteral(
@@ -1448,30 +927,8 @@ export class GraphQLEnumType /* <T> */ {
         valueNode,
       );
     }
-    return enumValue.value;
-  }
 
-  toConfig(): GraphQLEnumTypeNormalizedConfig {
-    const values = keyValMap(
-      this.getValues(),
-      (value) => value.name,
-      (value) => ({
-        description: value.description,
-        value: value.value,
-        deprecationReason: value.deprecationReason,
-        extensions: value.extensions,
-        astNode: value.astNode,
-      }),
-    );
-
-    return {
-      name: this.name,
-      description: this.description,
-      values,
-      extensions: this.extensions,
-      astNode: this.astNode,
-      extensionASTNodes: this.extensionASTNodes,
-    };
+    return new Literal(enumValue.name);
   }
 
   toString(): string {
@@ -1484,258 +941,16 @@ export class GraphQLEnumType /* <T> */ {
 }
 
 function didYouMeanEnumValue(
-  enumType: GraphQLEnumType,
+  enumType: IrisDataType,
   unknownValueStr: string,
 ): string {
-  const allNames = enumType.getValues().map((value) => value.name);
-  const suggestedValues = suggestionList(unknownValueStr, allNames);
-
+  const suggestedValues = suggestionList(
+    unknownValueStr,
+    pluck('name', enumType.getValues()),
+  );
   return didYouMean('the enum value', suggestedValues);
-}
-
-function defineEnumValues(
-  typeName: string,
-  valueMap: GraphQLEnumValueConfigMap /* <T> */,
-): ReadonlyArray<GraphQLEnumValue /* <T> */> {
-  devAssert(
-    isPlainObj(valueMap),
-    `${typeName} values must be an object with value names as keys.`,
-  );
-  return Object.entries(valueMap).map(([valueName, valueConfig]) => {
-    devAssert(
-      isPlainObj(valueConfig),
-      `${typeName}.${valueName} must refer to an object with a "value" key ` +
-        `representing an internal value but got: ${inspect(valueConfig)}.`,
-    );
-    return {
-      name: assertEnumValueName(valueName),
-      description: valueConfig.description,
-      value: valueConfig.value !== undefined ? valueConfig.value : valueName,
-      deprecationReason: valueConfig.deprecationReason,
-      extensions: toObjMap(valueConfig.extensions),
-      astNode: valueConfig.astNode,
-    };
-  });
-}
-
-export interface GraphQLEnumTypeConfig {
-  name: string;
-  description?: Maybe<string>;
-  values: GraphQLEnumValueConfigMap /* <T> */;
-  extensions?: Maybe<Readonly<GraphQLEnumTypeExtensions>>;
-  astNode?: Maybe<EnumTypeDefinitionNode>;
-  extensionASTNodes?: Maybe<ReadonlyArray<EnumTypeExtensionNode>>;
-}
-
-interface GraphQLEnumTypeNormalizedConfig extends GraphQLEnumTypeConfig {
-  extensions: Readonly<GraphQLEnumTypeExtensions>;
-  extensionASTNodes: ReadonlyArray<EnumTypeExtensionNode>;
-}
-
-export type GraphQLEnumValueConfigMap /* <T> */ =
-  ObjMap<GraphQLEnumValueConfig /* <T> */>;
-
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLEnumValueExtensions {
-  [attributeName: string]: unknown;
-}
-
-export interface GraphQLEnumValueConfig {
-  description?: Maybe<string>;
-  value?: any /* T */;
-  deprecationReason?: Maybe<string>;
-  extensions?: Maybe<Readonly<GraphQLEnumValueExtensions>>;
-  astNode?: Maybe<EnumValueDefinitionNode>;
-}
-
-export interface GraphQLEnumValue {
-  name: string;
-  description: Maybe<string>;
-  value: any /* T */;
-  deprecationReason: Maybe<string>;
-  extensions: Readonly<GraphQLEnumValueExtensions>;
-  astNode: Maybe<EnumValueDefinitionNode>;
-}
-
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLInputObjectTypeExtensions {
-  [attributeName: string]: unknown;
-}
-
-/**
- * Input Object Type Definition
- *
- * An input object defines a structured collection of fields which may be
- * supplied to a field argument.
- *
- * Using `NonNull` will ensure that a value must be provided by the query
- *
- * Example:
- *
- * ```ts
- * const GeoPoint = new GraphQLInputObjectType({
- *   name: 'GeoPoint',
- *   fields: {
- *     lat: { type: new GraphQLNonNull(GraphQLFloat) },
- *     lon: { type: new GraphQLNonNull(GraphQLFloat) },
- *     alt: { type: GraphQLFloat, defaultValue: 0 },
- *   }
- * });
- * ```
- */
-export class GraphQLInputObjectType {
-  name: string;
-  description: Maybe<string>;
-  extensions: Readonly<GraphQLInputObjectTypeExtensions>;
-  astNode: Maybe<InputObjectTypeDefinitionNode>;
-  extensionASTNodes: ReadonlyArray<InputObjectTypeExtensionNode>;
-
-  private _fields: ThunkObjMap<GraphQLInputField>;
-
-  constructor(config: Readonly<GraphQLInputObjectTypeConfig>) {
-    this.name = assertName(config.name);
-    this.description = config.description;
-    this.extensions = toObjMap(config.extensions);
-    this.astNode = config.astNode;
-    this.extensionASTNodes = config.extensionASTNodes ?? [];
-
-    this._fields = defineInputFieldMap.bind(undefined, config);
-  }
-
-  get [Symbol.toStringTag]() {
-    return 'GraphQLInputObjectType';
-  }
-
-  getFields(): GraphQLInputFieldMap {
-    if (typeof this._fields === 'function') {
-      this._fields = this._fields();
-    }
-    return this._fields;
-  }
-
-  toConfig(): GraphQLInputObjectTypeNormalizedConfig {
-    const fields = mapValue(this.getFields(), (field) => ({
-      description: field.description,
-      type: field.type,
-      defaultValue: field.defaultValue,
-      deprecationReason: field.deprecationReason,
-      extensions: field.extensions,
-      astNode: field.astNode,
-    }));
-
-    return {
-      name: this.name,
-      description: this.description,
-      fields,
-      extensions: this.extensions,
-      astNode: this.astNode,
-      extensionASTNodes: this.extensionASTNodes,
-    };
-  }
-
-  toString(): string {
-    return this.name;
-  }
-
-  toJSON(): string {
-    return this.toString();
-  }
-}
-
-function defineInputFieldMap(
-  config: Readonly<GraphQLInputObjectTypeConfig>,
-): GraphQLInputFieldMap {
-  const fieldMap = resolveObjMapThunk(config.fields);
-  devAssert(
-    isPlainObj(fieldMap),
-    `${config.name} fields must be an object with field names as keys or a function which returns such an object.`,
-  );
-  return mapValue(fieldMap, (fieldConfig, fieldName) => {
-    devAssert(
-      !('resolve' in fieldConfig),
-      `${config.name}.${fieldName} field has a resolve property, but Input Types cannot define resolvers.`,
-    );
-
-    return {
-      name: assertName(fieldName),
-      description: fieldConfig.description,
-      type: fieldConfig.type,
-      defaultValue: fieldConfig.defaultValue,
-      deprecationReason: fieldConfig.deprecationReason,
-      extensions: toObjMap(fieldConfig.extensions),
-      astNode: fieldConfig.astNode,
-    };
-  });
-}
-
-export interface GraphQLInputObjectTypeConfig {
-  name: string;
-  description?: Maybe<string>;
-  fields: ThunkObjMap<GraphQLInputFieldConfig>;
-  extensions?: Maybe<Readonly<GraphQLInputObjectTypeExtensions>>;
-  astNode?: Maybe<InputObjectTypeDefinitionNode>;
-  extensionASTNodes?: Maybe<ReadonlyArray<InputObjectTypeExtensionNode>>;
-}
-
-interface GraphQLInputObjectTypeNormalizedConfig
-  extends GraphQLInputObjectTypeConfig {
-  fields: GraphQLInputFieldConfigMap;
-  extensions: Readonly<GraphQLInputObjectTypeExtensions>;
-  extensionASTNodes: ReadonlyArray<InputObjectTypeExtensionNode>;
-}
-
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLInputFieldExtensions {
-  [attributeName: string]: unknown;
-}
-
-export interface GraphQLInputFieldConfig {
-  description?: Maybe<string>;
-  type: GraphQLInputType;
-  defaultValue?: unknown;
-  deprecationReason?: Maybe<string>;
-  extensions?: Maybe<Readonly<GraphQLInputFieldExtensions>>;
-  astNode?: Maybe<InputValueDefinitionNode>;
-}
-
-export type GraphQLInputFieldConfigMap = ObjMap<GraphQLInputFieldConfig>;
-
-export interface GraphQLInputField {
-  name: string;
-  description: Maybe<string>;
-  type: GraphQLInputType;
-  defaultValue: unknown;
-  deprecationReason: Maybe<string>;
-  extensions: Readonly<GraphQLInputFieldExtensions>;
-  astNode: Maybe<InputValueDefinitionNode>;
 }
 
 export function isRequiredInputField(field: GraphQLInputField): boolean {
   return isNonNullType(field.type) && field.defaultValue === undefined;
 }
-
-export type GraphQLInputFieldMap = ObjMap<GraphQLInputField>;

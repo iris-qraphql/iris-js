@@ -1,5 +1,5 @@
 /**
- * An exported enum describing the different kinds of tokens that the
+ * An exported Enum describing the different kinds of tokens that the
  * lexer emits.
  */
 export enum TokenKind {
@@ -28,7 +28,7 @@ export enum TokenKind {
 }
 
 /**
- * The enum type representing the token kinds values.
+ * The Enum type representing the token kinds values.
  *
  * @deprecated Please use `TokenKind`. Will be remove in v17.
  */

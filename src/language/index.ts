@@ -75,21 +75,9 @@ export type {
   ObjectTypeDefinitionNode,
   FieldDefinitionNode,
   InputValueDefinitionNode,
-  InterfaceTypeDefinitionNode,
-  UnionTypeDefinitionNode,
-  EnumTypeDefinitionNode,
-  EnumValueDefinitionNode,
-  InputObjectTypeDefinitionNode,
+  ResolverTypeDefinitionNode,
+  DataTypeDefinitionNode,
   DirectiveDefinitionNode,
-  TypeSystemExtensionNode,
-  SchemaExtensionNode,
-  TypeExtensionNode,
-  ScalarTypeExtensionNode,
-  ObjectTypeExtensionNode,
-  InterfaceTypeExtensionNode,
-  UnionTypeExtensionNode,
-  EnumTypeExtensionNode,
-  InputObjectTypeExtensionNode,
 } from './ast';
 
 export {
@@ -101,8 +89,6 @@ export {
   isTypeNode,
   isTypeSystemDefinitionNode,
   isTypeDefinitionNode,
-  isTypeSystemExtensionNode,
-  isTypeExtensionNode,
 } from './predicates';
 
 export { DirectiveLocation } from './directiveLocation';

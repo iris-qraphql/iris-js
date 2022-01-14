@@ -8,13 +8,11 @@ import type { FieldNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
 import type {
-  GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLOutputType,
 } from '../../type/definition';
 import {
   isAbstractType,
-  isInterfaceType,
   isObjectType,
 } from '../../type/definition';
 import type { GraphQLSchema } from '../../type/schema';
@@ -82,7 +80,7 @@ function getSuggestedTypeNames(
     return [];
   }
 
-  const suggestedTypes: Set<GraphQLObjectType | GraphQLInterfaceType> =
+  const suggestedTypes: Set<GraphQLObjectType> =
     new Set();
   const usageCount = Object.create(null);
   for (const possibleType of schema.getPossibleTypes(type)) {
@@ -93,17 +91,6 @@ function getSuggestedTypeNames(
     // This object type defines this field.
     suggestedTypes.add(possibleType);
     usageCount[possibleType.name] = 1;
-
-    for (const possibleInterface of possibleType.getInterfaces()) {
-      if (!possibleInterface.getFields()[fieldName]) {
-        continue;
-      }
-
-      // This interface type defines this field.
-      suggestedTypes.add(possibleInterface);
-      usageCount[possibleInterface.name] =
-        (usageCount[possibleInterface.name] ?? 0) + 1;
-    }
   }
 
   return [...suggestedTypes]
@@ -112,14 +99,6 @@ function getSuggestedTypeNames(
       const usageCountDiff = usageCount[typeB.name] - usageCount[typeA.name];
       if (usageCountDiff !== 0) {
         return usageCountDiff;
-      }
-
-      // Suggest super types first followed by subtypes
-      if (isInterfaceType(typeA) && schema.isSubType(typeA, typeB)) {
-        return -1;
-      }
-      if (isInterfaceType(typeB) && schema.isSubType(typeB, typeA)) {
-        return 1;
       }
 
       return naturalCompare(typeA.name, typeB.name);
@@ -135,7 +114,7 @@ function getSuggestedFieldNames(
   type: GraphQLOutputType,
   fieldName: string,
 ): Array<string> {
-  if (isObjectType(type) || isInterfaceType(type)) {
+  if (isObjectType(type)) {
     const possibleFieldNames = Object.keys(type.getFields());
     return suggestionList(fieldName, possibleFieldNames);
   }

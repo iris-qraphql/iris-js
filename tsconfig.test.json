@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.base",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node", "apollo-env", "jest"]
+  },
+  "include": ["**/__tests__/*"]
+}

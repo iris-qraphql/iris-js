@@ -3,7 +3,6 @@ import { GraphQLError } from '../../error/GraphQLError';
 import { Kind } from '../../language/kinds';
 import {
   isTypeDefinitionNode,
-  isTypeExtensionNode,
 } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
@@ -56,11 +55,10 @@ export function UniqueDirectivesPerLocationRule(
 
       let seenDirectives;
       if (
-        node.kind === Kind.SCHEMA_DEFINITION ||
-        node.kind === Kind.SCHEMA_EXTENSION
+        node.kind === Kind.SCHEMA_DEFINITION 
       ) {
         seenDirectives = schemaDirectives;
-      } else if (isTypeDefinitionNode(node) || isTypeExtensionNode(node)) {
+      } else if (isTypeDefinitionNode(node)) {
         const typeName = node.name.value;
         seenDirectives = typeDirectivesMap[typeName];
         if (seenDirectives === undefined) {

@@ -22,7 +22,6 @@ import type {
 } from '../../type/definition';
 import {
   getNamedType,
-  isInterfaceType,
   isLeafType,
   isListType,
   isNonNullType,
@@ -750,7 +749,7 @@ function _collectFieldsAndFragmentNames(
       case Kind.FIELD: {
         const fieldName = selection.name.value;
         let fieldDef;
-        if (isObjectType(parentType) || isInterfaceType(parentType)) {
+        if (isObjectType(parentType)) {
           fieldDef = parentType.getFields()[fieldName];
         }
         const responseName = selection.alias

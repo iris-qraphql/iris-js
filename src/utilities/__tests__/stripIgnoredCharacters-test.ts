@@ -1,16 +1,10 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { dedent } from '../../__testUtils__/dedent';
 import { inspectStr } from '../../__testUtils__/inspectStr';
-import { kitchenSinkQuery } from '../../__testUtils__/kitchenSinkQuery';
-import { kitchenSinkSDL } from '../../__testUtils__/kitchenSinkSDL';
 
 import { invariant } from '../../jsutils/invariant';
 import type { Maybe } from '../../jsutils/Maybe';
 
 import { Lexer } from '../../language/lexer';
-import { parse } from '../../language/parser';
 import { Source } from '../../language/source';
 
 import { stripIgnoredCharacters } from '../stripIgnoredCharacters';
@@ -112,13 +106,13 @@ describe('stripIgnoredCharacters', () => {
       }
     `;
 
-    expect(stripIgnoredCharacters(query)).to.equal(
+    expect(stripIgnoredCharacters(query)).toEqual(
       'query SomeQuery($foo:String!$bar:String){someField(foo:$foo bar:$bar){a b{c d}}}',
     );
   });
 
   it('accepts Source object', () => {
-    expect(stripIgnoredCharacters(new Source('{ a }'))).to.equal('{a}');
+    expect(stripIgnoredCharacters(new Source('{ a }'))).toEqual('{a}');
   });
 
   it('strips ignored characters from GraphQL SDL document', () => {
@@ -134,7 +128,7 @@ describe('stripIgnoredCharacters', () => {
       }
     `;
 
-    expect(stripIgnoredCharacters(sdl)).to.equal(
+    expect(stripIgnoredCharacters(sdl)).toEqual(
       '"""Type description""" type Foo{"""Field description""" bar:String}',
     );
   });
@@ -148,7 +142,7 @@ describe('stripIgnoredCharacters', () => {
       caughtError = e;
     }
 
-    expect(String(caughtError)).to.equal(dedent`
+    expect(String(caughtError)).toEqual(dedent`
       Syntax Error: Unterminated string.
 
       GraphQL request:1:13
@@ -426,21 +420,4 @@ describe('stripIgnoredCharacters', () => {
     expectStrippedString('"""\na\n b\nc"""').toEqual('"""a\n b\nc"""');
   });
 
-  it('strips kitchen sink query but maintains the exact same AST', () => {
-    const strippedQuery = stripIgnoredCharacters(kitchenSinkQuery);
-    expect(stripIgnoredCharacters(strippedQuery)).to.equal(strippedQuery);
-
-    const queryAST = parse(kitchenSinkQuery, { noLocation: true });
-    const strippedAST = parse(strippedQuery, { noLocation: true });
-    expect(strippedAST).to.deep.equal(queryAST);
-  });
-
-  it('strips kitchen sink SDL but maintains the exact same AST', () => {
-    const strippedSDL = stripIgnoredCharacters(kitchenSinkSDL);
-    expect(stripIgnoredCharacters(strippedSDL)).to.equal(strippedSDL);
-
-    const sdlAST = parse(kitchenSinkSDL, { noLocation: true });
-    const strippedAST = parse(strippedSDL, { noLocation: true });
-    expect(strippedAST).to.deep.equal(sdlAST);
-  });
 });

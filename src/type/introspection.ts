@@ -7,7 +7,6 @@ import { print } from '../language/printer';
 import { astFromValue } from '../utilities/astFromValue';
 
 import type {
-  GraphQLEnumValue,
   GraphQLField,
   GraphQLFieldConfigMap,
   GraphQLInputField,
@@ -15,14 +14,13 @@ import type {
   GraphQLType,
 } from './definition';
 import {
-  GraphQLEnumType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
+  IrisDataType,
   isAbstractType,
   isEnumType,
   isInputObjectType,
-  isInterfaceType,
   isListType,
   isNonNullType,
   isObjectType,
@@ -120,88 +118,88 @@ export const __Directive: GraphQLObjectType = new GraphQLObjectType({
     } as GraphQLFieldConfigMap<GraphQLDirective, unknown>),
 });
 
-export const __DirectiveLocation: GraphQLEnumType = new GraphQLEnumType({
+export const __DirectiveLocation: IrisDataType = new IrisDataType({
   name: '__DirectiveLocation',
   description:
     'A Directive can be adjacent to many parts of the GraphQL language, a __DirectiveLocation describes one such possible adjacencies.',
-  values: {
-    QUERY: {
-      value: DirectiveLocation.QUERY,
+  variants: [
+    {
+      name: DirectiveLocation.QUERY,
       description: 'Location adjacent to a query operation.',
     },
-    MUTATION: {
-      value: DirectiveLocation.MUTATION,
+    {
+      name: DirectiveLocation.MUTATION,
       description: 'Location adjacent to a mutation operation.',
     },
-    SUBSCRIPTION: {
-      value: DirectiveLocation.SUBSCRIPTION,
+    {
+      name: DirectiveLocation.SUBSCRIPTION,
       description: 'Location adjacent to a subscription operation.',
     },
-    FIELD: {
-      value: DirectiveLocation.FIELD,
+    {
+      name: DirectiveLocation.FIELD,
       description: 'Location adjacent to a field.',
     },
-    FRAGMENT_DEFINITION: {
-      value: DirectiveLocation.FRAGMENT_DEFINITION,
+    {
+      name: DirectiveLocation.FRAGMENT_DEFINITION,
       description: 'Location adjacent to a fragment definition.',
     },
-    FRAGMENT_SPREAD: {
-      value: DirectiveLocation.FRAGMENT_SPREAD,
+    {
+      name: DirectiveLocation.FRAGMENT_SPREAD,
       description: 'Location adjacent to a fragment spread.',
     },
-    INLINE_FRAGMENT: {
-      value: DirectiveLocation.INLINE_FRAGMENT,
+    {
+      name: DirectiveLocation.INLINE_FRAGMENT,
       description: 'Location adjacent to an inline fragment.',
     },
-    VARIABLE_DEFINITION: {
-      value: DirectiveLocation.VARIABLE_DEFINITION,
+    {
+      name: DirectiveLocation.VARIABLE_DEFINITION,
       description: 'Location adjacent to a variable definition.',
     },
-    SCHEMA: {
-      value: DirectiveLocation.SCHEMA,
+    {
+      name: DirectiveLocation.SCHEMA,
       description: 'Location adjacent to a schema definition.',
     },
-    SCALAR: {
-      value: DirectiveLocation.SCALAR,
+    {
+      name: DirectiveLocation.SCALAR,
       description: 'Location adjacent to a scalar definition.',
     },
-    OBJECT: {
-      value: DirectiveLocation.OBJECT,
+    {
+      name: DirectiveLocation.OBJECT,
       description: 'Location adjacent to an object type definition.',
     },
-    FIELD_DEFINITION: {
-      value: DirectiveLocation.FIELD_DEFINITION,
+    {
+      name: DirectiveLocation.FIELD_DEFINITION,
       description: 'Location adjacent to a field definition.',
     },
-    ARGUMENT_DEFINITION: {
-      value: DirectiveLocation.ARGUMENT_DEFINITION,
+    {
+      name: DirectiveLocation.ARGUMENT_DEFINITION,
       description: 'Location adjacent to an argument definition.',
     },
-    INTERFACE: {
-      value: DirectiveLocation.INTERFACE,
+    {
+      name: DirectiveLocation.INTERFACE,
       description: 'Location adjacent to an interface definition.',
     },
-    UNION: {
-      value: DirectiveLocation.UNION,
+    {
+      name: DirectiveLocation.UNION,
       description: 'Location adjacent to a union definition.',
     },
-    ENUM: {
-      value: DirectiveLocation.ENUM,
+    {
+      name: DirectiveLocation.ENUM,
       description: 'Location adjacent to an enum definition.',
     },
-    ENUM_VALUE: {
-      value: DirectiveLocation.ENUM_VALUE,
+    {
+      name: DirectiveLocation.ENUM_VALUE,
       description: 'Location adjacent to an enum value definition.',
     },
-    INPUT_OBJECT: {
-      value: DirectiveLocation.INPUT_OBJECT,
+    {
+      name: DirectiveLocation.INPUT_OBJECT,
       description: 'Location adjacent to an input object type definition.',
     },
-    INPUT_FIELD_DEFINITION: {
-      value: DirectiveLocation.INPUT_FIELD_DEFINITION,
+    {
+      name: DirectiveLocation.INPUT_FIELD_DEFINITION,
       description: 'Location adjacent to an input object field definition.',
     },
-  },
+  ],
 });
 
 export const __Type: GraphQLObjectType = new GraphQLObjectType({
@@ -218,9 +216,6 @@ export const __Type: GraphQLObjectType = new GraphQLObjectType({
           }
           if (isObjectType(type)) {
             return TypeKind.OBJECT;
-          }
-          if (isInterfaceType(type)) {
-            return TypeKind.INTERFACE;
           }
           if (isUnionType(type)) {
             return TypeKind.UNION;
@@ -264,19 +259,11 @@ export const __Type: GraphQLObjectType = new GraphQLObjectType({
           includeDeprecated: { type: GraphQLBoolean, defaultValue: false },
         },
         resolve(type, { includeDeprecated }) {
-          if (isObjectType(type) || isInterfaceType(type)) {
+          if (isObjectType(type)) {
             const fields = Object.values(type.getFields());
             return includeDeprecated
               ? fields
               : fields.filter((field) => field.deprecationReason == null);
-          }
-        },
-      },
-      interfaces: {
-        type: new GraphQLList(new GraphQLNonNull(__Type)),
-        resolve(type) {
-          if (isObjectType(type) || isInterfaceType(type)) {
-            return type.getInterfaces();
           }
         },
       },
@@ -432,7 +419,7 @@ export const __EnumValue: GraphQLObjectType = new GraphQLObjectType({
         type: GraphQLString,
         resolve: (enumValue) => enumValue.deprecationReason,
       },
-    } as GraphQLFieldConfigMap<GraphQLEnumValue, unknown>),
+    } as GraphQLFieldConfigMap<any, unknown>),
 });
 
 export enum TypeKind {
@@ -446,49 +433,49 @@ export enum TypeKind {
   NON_NULL = 'NON_NULL',
 }
 
-export const __TypeKind: GraphQLEnumType = new GraphQLEnumType({
+export const __TypeKind: IrisDataType = new IrisDataType({
   name: '__TypeKind',
   description: 'An enum describing what kind of type a given `__Type` is.',
-  values: {
-    SCALAR: {
-      value: TypeKind.SCALAR,
+  variants: [
+    {
+      name: TypeKind.SCALAR,
       description: 'Indicates this type is a scalar.',
     },
-    OBJECT: {
-      value: TypeKind.OBJECT,
+    {
+      name: TypeKind.OBJECT,
       description:
         'Indicates this type is an object. `fields` and `interfaces` are valid fields.',
     },
-    INTERFACE: {
-      value: TypeKind.INTERFACE,
+    {
+      name: TypeKind.INTERFACE,
       description:
         'Indicates this type is an interface. `fields`, `interfaces`, and `possibleTypes` are valid fields.',
     },
-    UNION: {
-      value: TypeKind.UNION,
+    {
+      name: TypeKind.UNION,
       description:
         'Indicates this type is a union. `possibleTypes` is a valid field.',
     },
-    ENUM: {
-      value: TypeKind.ENUM,
+    {
+      name: TypeKind.ENUM,
       description:
         'Indicates this type is an enum. `enumValues` is a valid field.',
     },
-    INPUT_OBJECT: {
-      value: TypeKind.INPUT_OBJECT,
+    {
+      name: TypeKind.INPUT_OBJECT,
       description:
         'Indicates this type is an input object. `inputFields` is a valid field.',
     },
-    LIST: {
-      value: TypeKind.LIST,
+    {
+      name: TypeKind.LIST,
       description: 'Indicates this type is a list. `ofType` is a valid field.',
     },
-    NON_NULL: {
-      value: TypeKind.NON_NULL,
+    {
+      name: TypeKind.NON_NULL,
       description:
         'Indicates this type is a non-null. `ofType` is a valid field.',
     },
-  },
+  ],
 });
 
 /**
@@ -503,7 +490,6 @@ export const SchemaMetaFieldDef: GraphQLField<unknown, unknown> = {
   args: [],
   resolve: (_source, _args, _context, { schema }) => schema,
   deprecationReason: undefined,
-  extensions: Object.create(null),
   astNode: undefined,
 };
 
@@ -518,13 +504,11 @@ export const TypeMetaFieldDef: GraphQLField<unknown, unknown> = {
       type: new GraphQLNonNull(GraphQLString),
       defaultValue: undefined,
       deprecationReason: undefined,
-      extensions: Object.create(null),
       astNode: undefined,
     },
   ],
   resolve: (_source, { name }, _context, { schema }) => schema.getType(name),
   deprecationReason: undefined,
-  extensions: Object.create(null),
   astNode: undefined,
 };
 
@@ -535,7 +519,6 @@ export const TypeNameMetaFieldDef: GraphQLField<unknown, unknown> = {
   args: [],
   resolve: (_source, _args, _context, { parentType }) => parentType.name,
   deprecationReason: undefined,
-  extensions: Object.create(null),
   astNode: undefined,
 };
 

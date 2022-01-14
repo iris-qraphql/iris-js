@@ -1,35 +1,17 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { graphqlSync } from '../../iris';
+import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
-import { expectJSON } from '../../__testUtils__/expectJSON';
-
-import { introspectionFromSchema } from '../../utilities/introspectionFromSchema';
-
-import { graphqlSync } from '../../graphql';
-
-import { GraphQLEnumType, GraphQLObjectType } from '../definition';
-import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../scalars';
+import { GraphQLObjectType, IrisDataType } from '../definition';
+import { GraphQLInt } from '../scalars';
 import { GraphQLSchema } from '../schema';
 
-const ColorType = new GraphQLEnumType({
+const ColorType = new IrisDataType({
   name: 'Color',
-  values: {
-    RED: { value: 0 },
-    GREEN: { value: 1 },
-    BLUE: { value: 2 },
-  },
+  variants: [{ name: 'RED' }, { name: 'GREEN' }, { name: 'BLUE' }],
 });
 
-const Complex1 = { someRandomObject: new Date() };
-const Complex2 = { someRandomValue: 123 };
-
-const ComplexEnum = new GraphQLEnumType({
-  name: 'Complex',
-  values: {
-    ONE: { value: Complex1 },
-    TWO: { value: Complex2 },
-  },
-});
+const expectResult = (result: unknown, value: unknown) =>
+  expect(toJSONDeep(result)).toEqual(value);
 
 const QueryType = new GraphQLObjectType({
   name: 'Query',
@@ -38,52 +20,12 @@ const QueryType = new GraphQLObjectType({
       type: ColorType,
       args: {
         fromEnum: { type: ColorType },
-        fromInt: { type: GraphQLInt },
-        fromString: { type: GraphQLString },
       },
-      resolve(_source, { fromEnum, fromInt, fromString }) {
-        return fromInt !== undefined
-          ? fromInt
-          : fromString !== undefined
-          ? fromString
-          : fromEnum;
-      },
+      resolve: (_source, { fromEnum }) => fromEnum,
     },
-    colorInt: {
-      type: GraphQLInt,
-      args: {
-        fromEnum: { type: ColorType },
-      },
-      resolve(_source, { fromEnum }) {
-        return fromEnum;
-      },
-    },
-    complexEnum: {
-      type: ComplexEnum,
-      args: {
-        fromEnum: {
-          type: ComplexEnum,
-          // Note: defaultValue is provided an *internal* representation for
-          // Enums, rather than the string name.
-          defaultValue: Complex1,
-        },
-        provideGoodValue: { type: GraphQLBoolean },
-        provideBadValue: { type: GraphQLBoolean },
-      },
-      resolve(_source, { fromEnum, provideGoodValue, provideBadValue }) {
-        if (provideGoodValue) {
-          // Note: this is one of the references of the internal values which
-          // ComplexEnum allows.
-          return Complex2;
-        }
-        if (provideBadValue) {
-          // Note: similar shape, but not the same *reference*
-          // as Complex2 above. Enum internal values require === equality.
-          return { someRandomValue: 123 };
-        }
-        return fromEnum;
-      },
-    },
+    count: {
+      type: GraphQLInt
+    }
   },
 });
 
@@ -117,32 +59,16 @@ const schema = new GraphQLSchema({
 
 function executeQuery(
   source: string,
-  variableValues?: { readonly [variable: string]: unknown },
+  variableValues?: Record<string, unknown>,
 ) {
   return graphqlSync({ schema, source, variableValues });
 }
 
 describe('Type System: Enum Values', () => {
-  it('accepts enum literals as input', () => {
-    const result = executeQuery('{ colorInt(fromEnum: GREEN) }');
-
-    expect(result).to.deep.equal({
-      data: { colorInt: 1 },
-    });
-  });
-
-  it('enum may be output type', () => {
-    const result = executeQuery('{ colorEnum(fromInt: 1) }');
-
-    expect(result).to.deep.equal({
-      data: { colorEnum: 'GREEN' },
-    });
-  });
-
-  it('enum may be both input and output type', () => {
+  it('Enum may be both input and output type', () => {
     const result = executeQuery('{ colorEnum(fromEnum: GREEN) }');
 
-    expect(result).to.deep.equal({
+    expect(result).toEqual({
       data: { colorEnum: 'GREEN' },
     });
   });
@@ -150,7 +76,7 @@ describe('Type System: Enum Values', () => {
   it('does not accept string literals', () => {
     const result = executeQuery('{ colorEnum(fromEnum: "GREEN") }');
 
-    expectJSON(result).toDeepEqual({
+    expectResult(result, {
       errors: [
         {
           message:
@@ -164,7 +90,7 @@ describe('Type System: Enum Values', () => {
   it('does not accept values not in the enum', () => {
     const result = executeQuery('{ colorEnum(fromEnum: GREENISH) }');
 
-    expectJSON(result).toDeepEqual({
+    expectResult(result, {
       errors: [
         {
           message:
@@ -178,7 +104,7 @@ describe('Type System: Enum Values', () => {
   it('does not accept values with incorrect casing', () => {
     const result = executeQuery('{ colorEnum(fromEnum: green) }');
 
-    expectJSON(result).toDeepEqual({
+    expectResult(result, {
       errors: [
         {
           message:
@@ -189,25 +115,10 @@ describe('Type System: Enum Values', () => {
     });
   });
 
-  it('does not accept incorrect internal value', () => {
-    const result = executeQuery('{ colorEnum(fromString: "GREEN") }');
-
-    expectJSON(result).toDeepEqual({
-      data: { colorEnum: null },
-      errors: [
-        {
-          message: 'Enum "Color" cannot represent value: "GREEN"',
-          locations: [{ line: 1, column: 3 }],
-          path: ['colorEnum'],
-        },
-      ],
-    });
-  });
-
   it('does not accept internal value in place of enum literal', () => {
     const result = executeQuery('{ colorEnum(fromEnum: 1) }');
 
-    expectJSON(result).toDeepEqual({
+    expectResult(result, {
       errors: [
         {
           message: 'Enum "Color" cannot represent non-enum value: 1.',
@@ -217,24 +128,11 @@ describe('Type System: Enum Values', () => {
     });
   });
 
-  it('does not accept enum literal in place of int', () => {
-    const result = executeQuery('{ colorEnum(fromInt: GREEN) }');
-
-    expectJSON(result).toDeepEqual({
-      errors: [
-        {
-          message: 'Int cannot represent non-integer value: GREEN',
-          locations: [{ line: 1, column: 22 }],
-        },
-      ],
-    });
-  });
-
   it('accepts JSON string as enum variable', () => {
     const doc = 'query ($color: Color!) { colorEnum(fromEnum: $color) }';
     const result = executeQuery(doc, { color: 'BLUE' });
 
-    expect(result).to.deep.equal({
+    expect(result).toEqual({
       data: { colorEnum: 'BLUE' },
     });
   });
@@ -243,7 +141,7 @@ describe('Type System: Enum Values', () => {
     const doc = 'mutation ($color: Color!) { favoriteEnum(color: $color) }';
     const result = executeQuery(doc, { color: 'GREEN' });
 
-    expect(result).to.deep.equal({
+    expect(result).toEqual({
       data: { favoriteEnum: 'GREEN' },
     });
   });
@@ -253,7 +151,7 @@ describe('Type System: Enum Values', () => {
       'subscription ($color: Color!) { subscribeToEnum(color: $color) }';
     const result = executeQuery(doc, { color: 'GREEN' });
 
-    expect(result).to.deep.equal({
+    expect(result).toEqual({
       data: { subscribeToEnum: 'GREEN' },
     });
   });
@@ -262,7 +160,7 @@ describe('Type System: Enum Values', () => {
     const doc = 'query ($color: Color!) { colorEnum(fromEnum: $color) }';
     const result = executeQuery(doc, { color: 2 });
 
-    expectJSON(result).toDeepEqual({
+    expectResult(result, {
       errors: [
         {
           message:
@@ -273,11 +171,11 @@ describe('Type System: Enum Values', () => {
     });
   });
 
-  it('does not accept string variables as enum input', () => {
+  it('does not accept string variables as Enum input', () => {
     const doc = 'query ($color: String!) { colorEnum(fromEnum: $color) }';
     const result = executeQuery(doc, { color: 'BLUE' });
 
-    expectJSON(result).toDeepEqual({
+    expectResult(result, {
       errors: [
         {
           message:
@@ -291,11 +189,11 @@ describe('Type System: Enum Values', () => {
     });
   });
 
-  it('does not accept internal value variable as enum input', () => {
+  it('does not accept internal value variable as Enum input', () => {
     const doc = 'query ($color: Int!) { colorEnum(fromEnum: $color) }';
     const result = executeQuery(doc, { color: 2 });
 
-    expectJSON(result).toDeepEqual({
+    expectResult(result, {
       errors: [
         {
           message:
@@ -309,98 +207,31 @@ describe('Type System: Enum Values', () => {
     });
   });
 
-  it('enum value may have an internal value of 0', () => {
+  it('Enum value may have an internal value of 0', () => {
     const result = executeQuery(`
       {
         colorEnum(fromEnum: RED)
-        colorInt(fromEnum: RED)
       }
     `);
 
-    expect(result).to.deep.equal({
+    expect(result).toEqual({
       data: {
         colorEnum: 'RED',
-        colorInt: 0,
       },
     });
   });
 
-  it('enum inputs may be nullable', () => {
+  it('Enum inputs may be nullable', () => {
     const result = executeQuery(`
       {
         colorEnum
-        colorInt
       }
     `);
 
-    expect(result).to.deep.equal({
+    expect(result).toEqual({
       data: {
         colorEnum: null,
-        colorInt: null,
       },
     });
-  });
-
-  it('presents a getValues() API for complex enums', () => {
-    const values = ComplexEnum.getValues();
-    expect(values).to.have.deep.ordered.members([
-      {
-        name: 'ONE',
-        description: undefined,
-        value: Complex1,
-        deprecationReason: undefined,
-        extensions: {},
-        astNode: undefined,
-      },
-      {
-        name: 'TWO',
-        description: undefined,
-        value: Complex2,
-        deprecationReason: undefined,
-        extensions: {},
-        astNode: undefined,
-      },
-    ]);
-  });
-
-  it('presents a getValue() API for complex enums', () => {
-    const oneValue = ComplexEnum.getValue('ONE');
-    expect(oneValue).to.include({ name: 'ONE', value: Complex1 });
-
-    // @ts-expect-error
-    const badUsage = ComplexEnum.getValue(Complex1);
-    expect(badUsage).to.equal(undefined);
-  });
-
-  it('may be internally represented with complex values', () => {
-    const result = executeQuery(`
-      {
-        first: complexEnum
-        second: complexEnum(fromEnum: TWO)
-        good: complexEnum(provideGoodValue: true)
-        bad: complexEnum(provideBadValue: true)
-      }
-    `);
-
-    expectJSON(result).toDeepEqual({
-      data: {
-        first: 'ONE',
-        second: 'TWO',
-        good: 'TWO',
-        bad: null,
-      },
-      errors: [
-        {
-          message:
-            'Enum "Complex" cannot represent value: { someRandomValue: 123 }',
-          locations: [{ line: 6, column: 9 }],
-          path: ['bad'],
-        },
-      ],
-    });
-  });
-
-  it('can be introspected without error', () => {
-    expect(() => introspectionFromSchema(schema)).to.not.throw();
   });
 });

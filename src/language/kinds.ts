@@ -47,11 +47,8 @@ export enum Kind {
   OBJECT_TYPE_DEFINITION = 'ObjectTypeDefinition',
   FIELD_DEFINITION = 'FieldDefinition',
   INPUT_VALUE_DEFINITION = 'InputValueDefinition',
-  INTERFACE_TYPE_DEFINITION = 'InterfaceTypeDefinition',
-  UNION_TYPE_DEFINITION = 'UnionTypeDefinition',
-  ENUM_TYPE_DEFINITION = 'EnumTypeDefinition',
-  ENUM_VALUE_DEFINITION = 'EnumValueDefinition',
-  INPUT_OBJECT_TYPE_DEFINITION = 'InputObjectTypeDefinition',
+  RESOLVER_TYPE_DEFINITION = 'ResolverTypeDefinition',
+  DATA_TYPE_DEFINITION = 'DataTypeDefinition',
 
   /** Directive Definitions */
   DIRECTIVE_DEFINITION = 'DirectiveDefinition',
@@ -66,10 +63,11 @@ export enum Kind {
   UNION_TYPE_EXTENSION = 'UnionTypeExtension',
   ENUM_TYPE_EXTENSION = 'EnumTypeExtension',
   INPUT_OBJECT_TYPE_EXTENSION = 'InputObjectTypeExtension',
+  VARIANT_DEFINITION = 'VariantDefinition'
 }
 
 /**
- * The enum type representing the possible kind values of AST nodes.
+ * The Enum type representing the possible kind values of AST nodes.
  *
  * @deprecated Please use `Kind`. Will be remove in v17.
  */

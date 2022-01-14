@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { parse } from '../../language/parser';
 
 import {
@@ -146,7 +143,7 @@ describe('Execute: Handles execution with a complex schema', () => {
 
     // Note: this is intentionally not validating to ensure appropriate
     // behavior occurs when executing an invalid query.
-    expect(executeSync({ schema: BlogSchema, document })).to.deep.equal({
+    expect(executeSync({ schema: BlogSchema, document })).toEqual({
       data: {
         feed: [
           { id: '1', title: 'My Article 1' },

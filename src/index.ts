@@ -30,45 +30,34 @@
 export { version, versionInfo } from './version';
 
 // The primary entry point into fulfilling a GraphQL request.
-export type { GraphQLArgs } from './graphql';
-export { graphql, graphqlSync } from './graphql';
+export type { GraphQLArgs } from './iris';
+export { graphql, graphqlSync } from './iris';
 
-// Create and operate on GraphQL type definitions and schema.
+export type { GraphQLUnionType } from './type/index';
 export {
   resolveObjMapThunk,
   resolveReadonlyArrayThunk,
-  // Definitions
   GraphQLSchema,
   GraphQLDirective,
   GraphQLScalarType,
   GraphQLObjectType,
-  GraphQLInterfaceType,
-  GraphQLUnionType,
-  GraphQLEnumType,
-  GraphQLInputObjectType,
   GraphQLList,
   GraphQLNonNull,
-  // Standard GraphQL Scalars
   specifiedScalarTypes,
   GraphQLInt,
   GraphQLFloat,
   GraphQLString,
   GraphQLBoolean,
   GraphQLID,
-  // Int boundaries constants
   GRAPHQL_MAX_INT,
   GRAPHQL_MIN_INT,
-  // Built-in Directives defined by the Spec
   specifiedDirectives,
   GraphQLIncludeDirective,
   GraphQLSkipDirective,
   GraphQLDeprecatedDirective,
   GraphQLSpecifiedByDirective,
-  // "Enum" of Type Kinds
   TypeKind,
-  // Constant Deprecation Reason
   DEFAULT_DEPRECATION_REASON,
-  // GraphQL Types for introspection.
   introspectionTypes,
   __Schema,
   __Directive,
@@ -78,17 +67,14 @@ export {
   __InputValue,
   __EnumValue,
   __TypeKind,
-  // Meta-field definitions.
   SchemaMetaFieldDef,
   TypeMetaFieldDef,
   TypeNameMetaFieldDef,
-  // Predicates
   isSchema,
   isDirective,
   isType,
   isScalarType,
   isObjectType,
-  isInterfaceType,
   isUnionType,
   isEnumType,
   isInputObjectType,
@@ -107,33 +93,24 @@ export {
   isSpecifiedScalarType,
   isIntrospectionType,
   isSpecifiedDirective,
-  // Assertions
   assertSchema,
   assertDirective,
   assertType,
   assertScalarType,
   assertObjectType,
-  assertInterfaceType,
   assertUnionType,
-  assertEnumType,
-  assertInputObjectType,
   assertListType,
   assertNonNullType,
-  assertInputType,
-  assertOutputType,
   assertLeafType,
   assertCompositeType,
   assertAbstractType,
   assertWrappingType,
   assertNullableType,
   assertNamedType,
-  // Un-modifiers
   getNullableType,
   getNamedType,
-  // Validate GraphQL schema.
   validateSchema,
   assertValidSchema,
-  // Upholds the spec rules about naming.
   assertName,
   assertEnumValueName,
 } from './type/index';
@@ -144,7 +121,7 @@ export type {
   GraphQLOutputType,
   GraphQLLeafType,
   GraphQLCompositeType,
-  GraphQLAbstractType,
+  IrisResolverType,
   GraphQLWrappingType,
   GraphQLNullableType,
   GraphQLNamedType,
@@ -158,39 +135,22 @@ export type {
   GraphQLDirectiveExtensions,
   GraphQLArgument,
   GraphQLArgumentConfig,
-  GraphQLArgumentExtensions,
-  GraphQLEnumTypeConfig,
-  GraphQLEnumTypeExtensions,
-  GraphQLEnumValue,
-  GraphQLEnumValueConfig,
-  GraphQLEnumValueConfigMap,
-  GraphQLEnumValueExtensions,
   GraphQLField,
   GraphQLFieldConfig,
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
-  GraphQLFieldExtensions,
   GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLInputField,
-  GraphQLInputFieldConfig,
-  GraphQLInputFieldConfigMap,
-  GraphQLInputFieldExtensions,
-  GraphQLInputFieldMap,
-  GraphQLInputObjectTypeConfig,
-  GraphQLInputObjectTypeExtensions,
-  GraphQLInterfaceTypeConfig,
-  GraphQLInterfaceTypeExtensions,
+  IrisDataVariantFieldFields,
   GraphQLIsTypeOfFn,
   GraphQLObjectTypeConfig,
   GraphQLObjectTypeExtensions,
   GraphQLResolveInfo,
   ResponsePath,
   GraphQLScalarTypeConfig,
-  GraphQLScalarTypeExtensions,
   GraphQLTypeResolver,
   GraphQLUnionTypeConfig,
-  GraphQLUnionTypeExtensions,
   GraphQLScalarSerializer,
   GraphQLScalarValueParser,
   GraphQLScalarLiteralParser,
@@ -233,8 +193,6 @@ export {
   isTypeNode,
   isTypeSystemDefinitionNode,
   isTypeDefinitionNode,
-  isTypeSystemExtensionNode,
-  isTypeExtensionNode,
 } from './language/index';
 
 export type {
@@ -294,21 +252,8 @@ export type {
   ObjectTypeDefinitionNode,
   FieldDefinitionNode,
   InputValueDefinitionNode,
-  InterfaceTypeDefinitionNode,
-  UnionTypeDefinitionNode,
-  EnumTypeDefinitionNode,
-  EnumValueDefinitionNode,
-  InputObjectTypeDefinitionNode,
+  ResolverTypeDefinitionNode,
   DirectiveDefinitionNode,
-  TypeSystemExtensionNode,
-  SchemaExtensionNode,
-  TypeExtensionNode,
-  ScalarTypeExtensionNode,
-  ObjectTypeExtensionNode,
-  InterfaceTypeExtensionNode,
-  UnionTypeExtensionNode,
-  EnumTypeExtensionNode,
-  InputObjectTypeExtensionNode,
 } from './language/index';
 
 // Execute GraphQL queries.
@@ -366,13 +311,10 @@ export {
   VariablesInAllowedPositionRule,
   // SDL-specific validation rules
   LoneSchemaDefinitionRule,
-  UniqueOperationTypesRule,
   UniqueTypeNamesRule,
-  UniqueEnumValueNamesRule,
-  UniqueFieldDefinitionNamesRule,
+  UniqueVariantAndFieldDefinitionNamesRule,
   UniqueArgumentDefinitionNamesRule,
   UniqueDirectiveNamesRule,
-  PossibleTypeExtensionsRule,
   // Custom validation rules
   NoDeprecatedCustomRule,
   NoSchemaIntrospectionCustomRule,
@@ -403,18 +345,11 @@ export {
   getOperationAST,
   // Gets the Type for the target Operation AST.
   getOperationRootType,
-  // Convert a GraphQLSchema to an IntrospectionQuery.
-  introspectionFromSchema,
   // Build a GraphQLSchema from an introspection result.
-  buildClientSchema,
   // Build a GraphQLSchema from a parsed GraphQL Schema language AST.
   buildASTSchema,
   // Build a GraphQLSchema from a GraphQL schema language document.
   buildSchema,
-  // Extends an existing GraphQLSchema from a parsed GraphQL Schema language AST.
-  extendSchema,
-  // Sort a GraphQLSchema.
-  lexicographicSortSchema,
   // Print a GraphQLSchema to GraphQL Schema language.
   printSchema,
   // Print a GraphQLType to GraphQL Schema language.
@@ -448,11 +383,6 @@ export {
   assertValidName,
   // Determine if a string is a valid GraphQL name.
   isValidNameError,
-  // Compares two GraphQLSchemas and detects breaking changes.
-  BreakingChangeType,
-  DangerousChangeType,
-  findBreakingChanges,
-  findDangerousChanges,
 } from './utilities/index';
 
 export type {
@@ -479,7 +409,5 @@ export type {
   IntrospectionEnumValue,
   IntrospectionDirective,
   BuildSchemaOptions,
-  BreakingChange,
-  DangerousChange,
   TypedQueryDocumentNode,
 } from './utilities/index';

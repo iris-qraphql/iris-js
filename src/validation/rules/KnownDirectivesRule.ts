@@ -89,34 +89,23 @@ function getDirectiveLocationForASTPath(
     case Kind.VARIABLE_DEFINITION:
       return DirectiveLocation.VARIABLE_DEFINITION;
     case Kind.SCHEMA_DEFINITION:
-    case Kind.SCHEMA_EXTENSION:
       return DirectiveLocation.SCHEMA;
     case Kind.SCALAR_TYPE_DEFINITION:
-    case Kind.SCALAR_TYPE_EXTENSION:
       return DirectiveLocation.SCALAR;
     case Kind.OBJECT_TYPE_DEFINITION:
-    case Kind.OBJECT_TYPE_EXTENSION:
       return DirectiveLocation.OBJECT;
     case Kind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
-    case Kind.INTERFACE_TYPE_DEFINITION:
-    case Kind.INTERFACE_TYPE_EXTENSION:
-      return DirectiveLocation.INTERFACE;
-    case Kind.UNION_TYPE_DEFINITION:
-    case Kind.UNION_TYPE_EXTENSION:
+    case Kind.RESOLVER_TYPE_DEFINITION:
       return DirectiveLocation.UNION;
-    case Kind.ENUM_TYPE_DEFINITION:
-    case Kind.ENUM_TYPE_EXTENSION:
-      return DirectiveLocation.ENUM;
-    case Kind.ENUM_VALUE_DEFINITION:
-      return DirectiveLocation.ENUM_VALUE;
-    case Kind.INPUT_OBJECT_TYPE_DEFINITION:
-    case Kind.INPUT_OBJECT_TYPE_EXTENSION:
+    case Kind.DATA_TYPE_DEFINITION:
       return DirectiveLocation.INPUT_OBJECT;
     case Kind.INPUT_VALUE_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
-      return parentNode.kind === Kind.INPUT_OBJECT_TYPE_DEFINITION
+      return [Kind.DATA_TYPE_DEFINITION, Kind.VARIANT_DEFINITION].includes(
+        parentNode.kind,
+      )
         ? DirectiveLocation.INPUT_FIELD_DEFINITION
         : DirectiveLocation.ARGUMENT_DEFINITION;
     }

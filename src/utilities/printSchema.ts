@@ -8,19 +8,17 @@ import { print } from '../language/printer';
 
 import type {
   GraphQLArgument,
-  GraphQLEnumType,
+  GraphQLFieldMap,
   GraphQLInputField,
-  GraphQLInputObjectType,
-  GraphQLInterfaceType,
   GraphQLNamedType,
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLUnionType,
+  IrisDataType,
 } from '../type/definition';
 import {
   isEnumType,
   isInputObjectType,
-  isInterfaceType,
   isObjectType,
   isScalarType,
   isUnionType,
@@ -61,71 +59,11 @@ function printFilteredSchema(
   const types = Object.values(schema.getTypeMap()).filter(typeFilter);
 
   return [
-    printSchemaDefinition(schema),
     ...directives.map((directive) => printDirective(directive)),
     ...types.map((type) => printType(type)),
   ]
     .filter(Boolean)
     .join('\n\n');
-}
-
-function printSchemaDefinition(schema: GraphQLSchema): Maybe<string> {
-  if (schema.description == null && isSchemaOfCommonNames(schema)) {
-    return;
-  }
-
-  const operationTypes = [];
-
-  const queryType = schema.getQueryType();
-  if (queryType) {
-    operationTypes.push(`  query: ${queryType.name}`);
-  }
-
-  const mutationType = schema.getMutationType();
-  if (mutationType) {
-    operationTypes.push(`  mutation: ${mutationType.name}`);
-  }
-
-  const subscriptionType = schema.getSubscriptionType();
-  if (subscriptionType) {
-    operationTypes.push(`  subscription: ${subscriptionType.name}`);
-  }
-
-  return printDescription(schema) + `schema {\n${operationTypes.join('\n')}\n}`;
-}
-
-/**
- * GraphQL schema define root types for each type of operation. These types are
- * the same as any other type and can be named in any manner, however there is
- * a common naming convention:
- *
- * ```graphql
- *   schema {
- *     query: Query
- *     mutation: Mutation
- *     subscription: Subscription
- *   }
- * ```
- *
- * When using this naming convention, the schema description can be omitted.
- */
-function isSchemaOfCommonNames(schema: GraphQLSchema): boolean {
-  const queryType = schema.getQueryType();
-  if (queryType && queryType.name !== 'Query') {
-    return false;
-  }
-
-  const mutationType = schema.getMutationType();
-  if (mutationType && mutationType.name !== 'Mutation') {
-    return false;
-  }
-
-  const subscriptionType = schema.getSubscriptionType();
-  if (subscriptionType && subscriptionType.name !== 'Subscription') {
-    return false;
-  }
-
-  return true;
 }
 
 export function printType(type: GraphQLNamedType): string {
@@ -135,17 +73,11 @@ export function printType(type: GraphQLNamedType): string {
   if (isObjectType(type)) {
     return printObject(type);
   }
-  if (isInterfaceType(type)) {
-    return printInterface(type);
-  }
   if (isUnionType(type)) {
     return printUnion(type);
   }
-  if (isEnumType(type)) {
-    return printEnum(type);
-  }
-  if (isInputObjectType(type)) {
-    return printInputObject(type);
+  if (isEnumType(type) || isInputObjectType(type)) {
+    return printDATA(type);
   }
   /* c8 ignore next 3 */
   // Not reachable, all possible types have been considered.
@@ -158,62 +90,54 @@ function printScalar(type: GraphQLScalarType): string {
   );
 }
 
-function printImplementedInterfaces(
-  type: GraphQLObjectType | GraphQLInterfaceType,
-): string {
-  const interfaces = type.getInterfaces();
-  return interfaces.length
-    ? ' implements ' + interfaces.map((i) => i.name).join(' & ')
-    : '';
-}
-
 function printObject(type: GraphQLObjectType): string {
+  const fields = type.getFields();
   return (
     printDescription(type) +
-    `type ${type.name}` +
-    printImplementedInterfaces(type) +
-    printFields(type)
-  );
-}
-
-function printInterface(type: GraphQLInterfaceType): string {
-  return (
-    printDescription(type) +
-    `interface ${type.name}` +
-    printImplementedInterfaces(type) +
-    printFields(type)
+    `resolver ${type.name}${Object.keys(fields).length > 0 ? ' =' : ''}${printFields(fields)}`
   );
 }
 
 function printUnion(type: GraphQLUnionType): string {
   const types = type.getTypes();
   const possibleTypes = types.length ? ' = ' + types.join(' | ') : '';
-  return printDescription(type) + 'union ' + type.name + possibleTypes;
+  return printDescription(type) + 'resolver ' + type.name + possibleTypes;
 }
 
-function printEnum(type: GraphQLEnumType): string {
-  const values = type
+function printDATA(type: IrisDataType): string {
+  const start = printDescription(type) + `data ${type.name}`;
+
+  if (type.getValues().length === 0) {
+    return (
+      start +
+      printBlock(
+        Object.values(type.getFields()).map(
+          (f, i) => printDescription(f, '  ', !i) + '  ' + printInputValue(f),
+        ),
+      )
+    );
+  }
+
+  const possibleTypes = type
     .getValues()
     .map(
-      (value, i) =>
-        printDescription(value, '  ', !i) +
-        '  ' +
+      (value) =>
+        printDescription(value) +
         value.name +
         printDeprecated(value.deprecationReason),
     );
 
-  return printDescription(type) + `enum ${type.name}` + printBlock(values);
-}
+  if (possibleTypes.length === 1 && possibleTypes[0] === type.name) {
+    return start;
+  }
 
-function printInputObject(type: GraphQLInputObjectType): string {
-  const fields = Object.values(type.getFields()).map(
-    (f, i) => printDescription(f, '  ', !i) + '  ' + printInputValue(f),
+  return (
+    start + (possibleTypes.length ? ' = ' + possibleTypes.join(' | ') : '')
   );
-  return printDescription(type) + `input ${type.name}` + printBlock(fields);
 }
 
-function printFields(type: GraphQLObjectType | GraphQLInterfaceType): string {
-  const fields = Object.values(type.getFields()).map(
+function printFields(fs: GraphQLFieldMap<any, any>): string {
+  const fields = Object.values(fs).map(
     (f, i) =>
       printDescription(f, '  ', !i) +
       '  ' +
@@ -304,7 +228,7 @@ function printSpecifiedByURL(scalar: GraphQLScalarType): string {
 }
 
 function printDescription(
-  def: { readonly description: Maybe<string> },
+  def: { readonly description?: Maybe<string> },
   indentation: string = '',
   firstInBlock: boolean = true,
 ): string {

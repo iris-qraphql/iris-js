@@ -1,6 +1,6 @@
 import type { Maybe } from './Maybe';
 
-export interface Path {
+export type Path = {
   readonly prev: Path | undefined;
   readonly key: string | number;
   readonly typename: string | undefined;

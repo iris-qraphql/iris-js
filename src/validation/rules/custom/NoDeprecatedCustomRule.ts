@@ -11,7 +11,7 @@ import type { ValidationContext } from '../../ValidationContext';
 /**
  * No deprecated
  *
- * A GraphQL document is only valid if all selected fields and all used enum values have not been
+ * A GraphQL document is only valid if all selected fields and all used data values have not been
  * deprecated.
  *
  * Note: This rule is optional and is not part of the Validation section of the GraphQL
@@ -82,7 +82,7 @@ export function NoDeprecatedCustomRule(context: ValidationContext): ASTVisitor {
         invariant(enumTypeDef != null);
         context.reportError(
           new GraphQLError(
-            `The enum value "${enumTypeDef.name}.${enumValueDef.name}" is deprecated. ${deprecationReason}`,
+            `The Variant "${enumTypeDef.name}.${enumValueDef.name}" is deprecated. ${deprecationReason}`,
             node,
           ),
         );

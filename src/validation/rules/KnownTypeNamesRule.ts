@@ -7,7 +7,6 @@ import type { ASTNode } from '../../language/ast';
 import {
   isTypeDefinitionNode,
   isTypeSystemDefinitionNode,
-  isTypeSystemExtensionNode,
 } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
@@ -67,7 +66,34 @@ export function KnownTypeNamesRule(
         );
       }
     },
+    VariantDefinition(node, _1, parent, _2, ancestors) {
+
+      if(node.fields){
+        return undefined;
+      }
+
+      const typeName = node.name.value;
+      if (!existingTypesMap[typeName] && !definedTypes[typeName]) {
+        const definitionNode = ancestors[2] ?? parent;
+        const isSDL = definitionNode != null && isSDLNode(definitionNode);
+        if (isSDL && standardTypeNames.includes(typeName)) {
+          return;
+        }
+
+        const suggestedTypes = suggestionList(
+          typeName,
+          isSDL ? standardTypeNames.concat(typeNames) : typeNames,
+        );
+        context.reportError(
+          new GraphQLError(
+            `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
+            node,
+          ),
+        );
+      }
+    },
   };
+  
 }
 
 const standardTypeNames = [...specifiedScalarTypes, ...introspectionTypes].map(
@@ -75,8 +101,5 @@ const standardTypeNames = [...specifiedScalarTypes, ...introspectionTypes].map(
 );
 
 function isSDLNode(value: ASTNode | ReadonlyArray<ASTNode>): boolean {
-  return (
-    'kind' in value &&
-    (isTypeSystemDefinitionNode(value) || isTypeSystemExtensionNode(value))
-  );
+  return 'kind' in value && isTypeSystemDefinitionNode(value);
 }

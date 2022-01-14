@@ -114,7 +114,9 @@ const printDocASTReducer: ASTReducer<string> = {
   },
   BooleanValue: { leave: ({ value }) => (value ? 'true' : 'false') },
   NullValue: { leave: () => 'null' },
-  EnumValue: { leave: ({ value }) => value },
+  EnumValue: {
+    leave: ({ value }) => value,
+  },
   ListValue: { leave: ({ values }) => '[' + join(values, ', ') + ']' },
   ObjectValue: { leave: ({ fields }) => '{' + join(fields, ', ') + '}' },
   ObjectField: { leave: ({ name, value }) => name + ': ' + value },
@@ -151,18 +153,9 @@ const printDocASTReducer: ASTReducer<string> = {
   },
 
   ObjectTypeDefinition: {
-    leave: ({ description, name, interfaces, directives, fields }) =>
+    leave: ({ description, name, directives, fields }) =>
       wrap('', description, '\n') +
-      join(
-        [
-          'type',
-          name,
-          wrap('implements ', join(interfaces, ' & ')),
-          join(directives, ' '),
-          block(fields),
-        ],
-        ' ',
-      ),
+      join(['type', name, join(directives, ' '), block(fields)], ' '),
   },
 
   FieldDefinition: {
@@ -186,45 +179,22 @@ const printDocASTReducer: ASTReducer<string> = {
       ),
   },
 
-  InterfaceTypeDefinition: {
-    leave: ({ description, name, interfaces, directives, fields }) =>
+  ResolverTypeDefinition: {
+    leave: ({ description, name, directives, variants }) =>
       wrap('', description, '\n') +
       join(
-        [
-          'interface',
-          name,
-          wrap('implements ', join(interfaces, ' & ')),
-          join(directives, ' '),
-          block(fields),
-        ],
+        ['resolver', name, join(directives, ' '), wrap('= ', join(variants, ' | '))],
         ' ',
       ),
   },
 
-  UnionTypeDefinition: {
-    leave: ({ description, name, directives, types }) =>
-      wrap('', description, '\n') +
-      join(
-        ['union', name, join(directives, ' '), wrap('= ', join(types, ' | '))],
-        ' ',
-      ),
-  },
+  // TODO: consider variants with fields
+  VariantDefinition: { leave: ({ name }) => name },
 
-  EnumTypeDefinition: {
-    leave: ({ description, name, directives, values }) =>
+  DataTypeDefinition: {
+    leave: ({ description, name, directives, variants }) =>
       wrap('', description, '\n') +
-      join(['enum', name, join(directives, ' '), block(values)], ' '),
-  },
-
-  EnumValueDefinition: {
-    leave: ({ description, name, directives }) =>
-      wrap('', description, '\n') + join([name, join(directives, ' ')], ' '),
-  },
-
-  InputObjectTypeDefinition: {
-    leave: ({ description, name, directives, fields }) =>
-      wrap('', description, '\n') +
-      join(['input', name, join(directives, ' '), block(fields)], ' '),
+      join(['data', name, join(directives, ' '), block(variants)], ' '),
   },
 
   DirectiveDefinition: {
@@ -238,70 +208,6 @@ const printDocASTReducer: ASTReducer<string> = {
       (repeatable ? ' repeatable' : '') +
       ' on ' +
       join(locations, ' | '),
-  },
-
-  SchemaExtension: {
-    leave: ({ directives, operationTypes }) =>
-      join(
-        ['extend schema', join(directives, ' '), block(operationTypes)],
-        ' ',
-      ),
-  },
-
-  ScalarTypeExtension: {
-    leave: ({ name, directives }) =>
-      join(['extend scalar', name, join(directives, ' ')], ' '),
-  },
-
-  ObjectTypeExtension: {
-    leave: ({ name, interfaces, directives, fields }) =>
-      join(
-        [
-          'extend type',
-          name,
-          wrap('implements ', join(interfaces, ' & ')),
-          join(directives, ' '),
-          block(fields),
-        ],
-        ' ',
-      ),
-  },
-
-  InterfaceTypeExtension: {
-    leave: ({ name, interfaces, directives, fields }) =>
-      join(
-        [
-          'extend interface',
-          name,
-          wrap('implements ', join(interfaces, ' & ')),
-          join(directives, ' '),
-          block(fields),
-        ],
-        ' ',
-      ),
-  },
-
-  UnionTypeExtension: {
-    leave: ({ name, directives, types }) =>
-      join(
-        [
-          'extend union',
-          name,
-          join(directives, ' '),
-          wrap('= ', join(types, ' | ')),
-        ],
-        ' ',
-      ),
-  },
-
-  EnumTypeExtension: {
-    leave: ({ name, directives, values }) =>
-      join(['extend enum', name, join(directives, ' '), block(values)], ' '),
-  },
-
-  InputObjectTypeExtension: {
-    leave: ({ name, directives, fields }) =>
-      join(['extend input', name, join(directives, ' '), block(fields)], ' '),
   },
 };
 
@@ -341,7 +247,6 @@ function indent(str: string): string {
 }
 
 function hasMultilineItems(maybeArray: Maybe<ReadonlyArray<string>>): boolean {
-  // FIXME: https://github.com/graphql/graphql-js/issues/2203
   /* c8 ignore next */
   return maybeArray?.some((str) => str.includes('\n')) ?? false;
 }

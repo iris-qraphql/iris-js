@@ -86,13 +86,10 @@ export { VariablesInAllowedPositionRule } from './rules/VariablesInAllowedPositi
 
 // SDL-specific validation rules
 export { LoneSchemaDefinitionRule } from './rules/LoneSchemaDefinitionRule';
-export { UniqueOperationTypesRule } from './rules/UniqueOperationTypesRule';
 export { UniqueTypeNamesRule } from './rules/UniqueTypeNamesRule';
-export { UniqueEnumValueNamesRule } from './rules/UniqueEnumValueNamesRule';
-export { UniqueFieldDefinitionNamesRule } from './rules/UniqueFieldDefinitionNamesRule';
+export { UniqueVariantAndFieldDefinitionNamesRule } from './rules/UniqueVariantAndFieldDefinitionNamesRule';
 export { UniqueArgumentDefinitionNamesRule } from './rules/UniqueArgumentDefinitionNamesRule';
 export { UniqueDirectiveNamesRule } from './rules/UniqueDirectiveNamesRule';
-export { PossibleTypeExtensionsRule } from './rules/PossibleTypeExtensionsRule';
 
 // Optional rules not defined by the GraphQL Specification
 export { NoDeprecatedCustomRule } from './rules/custom/NoDeprecatedCustomRule';

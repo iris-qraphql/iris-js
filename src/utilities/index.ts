@@ -32,21 +32,12 @@ export { getOperationAST } from './getOperationAST';
 // Gets the Type for the target Operation AST.
 export { getOperationRootType } from './getOperationRootType';
 
-// Convert a GraphQLSchema to an IntrospectionQuery.
-export { introspectionFromSchema } from './introspectionFromSchema';
-
 // Build a GraphQLSchema from an introspection result.
 export { buildClientSchema } from './buildClientSchema';
 
 // Build a GraphQLSchema from GraphQL Schema language.
 export { buildASTSchema, buildSchema } from './buildASTSchema';
 export type { BuildSchemaOptions } from './buildASTSchema';
-
-// Extends an existing GraphQLSchema from a parsed GraphQL Schema language AST.
-export { extendSchema } from './extendSchema';
-
-// Sort a GraphQLSchema.
-export { lexicographicSortSchema } from './lexicographicSortSchema';
 
 // Print a GraphQLSchema to GraphQL Schema language.
 export {
@@ -93,13 +84,6 @@ export {
 export { assertValidName, isValidNameError } from './assertValidName';
 
 // Compares two GraphQLSchemas and detects breaking changes.
-export {
-  BreakingChangeType,
-  DangerousChangeType,
-  findBreakingChanges,
-  findDangerousChanges,
-} from './findBreakingChanges';
-export type { BreakingChange, DangerousChange } from './findBreakingChanges';
 
 // Wrapper type that contains DocumentNode and types that can be deduced from it.
 export type { TypedQueryDocumentNode } from './typedQueryDocumentNode';

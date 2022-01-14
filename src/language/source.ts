@@ -2,7 +2,7 @@ import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 
-interface Location {
+type Location = {
   line: number;
   column: number;
 }

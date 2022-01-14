@@ -12,8 +12,7 @@ import type { ValidationContext } from '../ValidationContext';
 /**
  * Scalar leafs
  *
- * A GraphQL document is valid only if all leaf fields (fields without
- * sub selections) are of scalar or enum types.
+ * A GraphQL document is valid only if all leaf fields are of scalar or data types.
  */
 export function ScalarLeafsRule(context: ValidationContext): ASTVisitor {
   return {

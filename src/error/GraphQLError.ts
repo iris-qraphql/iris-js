@@ -16,7 +16,7 @@ import type { Source } from '../language/source';
  * the risk of conflicts. We recommend you add at most one extension field,
  * an object which can contain all the values you need.
  */
-export interface GraphQLErrorExtensions {
+export type GraphQLErrorExtensions = {
   [attributeName: string]: unknown;
 }
 

@@ -33,7 +33,7 @@ export function assertName(name: string): string {
 }
 
 /**
- * Upholds the spec rules about naming enum values.
+ * Upholds the spec rules about naming Enum values.
  *
  * @internal
  */

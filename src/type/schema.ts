@@ -4,27 +4,21 @@ import { instanceOf } from '../jsutils/instanceOf';
 import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
-import { toObjMap } from '../jsutils/toObjMap';
 
 import type { GraphQLError } from '../error/GraphQLError';
 
-import type {
-  SchemaDefinitionNode,
-  SchemaExtensionNode,
-} from '../language/ast';
+import type { SchemaDefinitionNode } from '../language/ast';
 import { OperationTypeNode } from '../language/ast';
 
 import type {
-  GraphQLAbstractType,
-  GraphQLInterfaceType,
   GraphQLNamedType,
   GraphQLObjectType,
   GraphQLType,
+  IrisResolverType,
 } from './definition';
 import {
   getNamedType,
   isInputObjectType,
-  isInterfaceType,
   isObjectType,
   isUnionType,
 } from './definition';
@@ -82,14 +76,9 @@ export interface GraphQLSchemaExtensions {
  * Example:
  *
  * ```ts
- * const characterInterface = new GraphQLInterfaceType({
- *   name: 'Character',
- *   ...
- * });
- *
  * const humanType = new GraphQLObjectType({
  *   name: 'Human',
- *   interfaces: [characterInterface],
+ *   interfaces: [],
  *   ...
  * });
  *
@@ -131,7 +120,6 @@ export class GraphQLSchema {
   description: Maybe<string>;
   extensions: Readonly<GraphQLSchemaExtensions>;
   astNode: Maybe<SchemaDefinitionNode>;
-  extensionASTNodes: ReadonlyArray<SchemaExtensionNode>;
 
   // Used as a cache for validateSchema().
   __validationErrors: Maybe<ReadonlyArray<GraphQLError>>;
@@ -144,7 +132,6 @@ export class GraphQLSchema {
   private _subTypeMap: ObjMap<ObjMap<boolean>>;
   private _implementationsMap: ObjMap<{
     objects: Array<GraphQLObjectType>;
-    interfaces: Array<GraphQLInterfaceType>;
   }>;
 
   constructor(config: Readonly<GraphQLSchemaConfig>) {
@@ -165,9 +152,8 @@ export class GraphQLSchema {
     );
 
     this.description = config.description;
-    this.extensions = toObjMap(config.extensions);
+    this.extensions = {...config.extensions};
     this.astNode = config.astNode;
-    this.extensionASTNodes = config.extensionASTNodes ?? [];
 
     this._queryType = config.query;
     this._mutationType = config.mutation;
@@ -229,38 +215,6 @@ export class GraphQLSchema {
         );
       }
       this._typeMap[typeName] = namedType;
-
-      if (isInterfaceType(namedType)) {
-        // Store implementations by interface.
-        for (const iface of namedType.getInterfaces()) {
-          if (isInterfaceType(iface)) {
-            let implementations = this._implementationsMap[iface.name];
-            if (implementations === undefined) {
-              implementations = this._implementationsMap[iface.name] = {
-                objects: [],
-                interfaces: [],
-              };
-            }
-
-            implementations.interfaces.push(namedType);
-          }
-        }
-      } else if (isObjectType(namedType)) {
-        // Store implementations by objects.
-        for (const iface of namedType.getInterfaces()) {
-          if (isInterfaceType(iface)) {
-            let implementations = this._implementationsMap[iface.name];
-            if (implementations === undefined) {
-              implementations = this._implementationsMap[iface.name] = {
-                objects: [],
-                interfaces: [],
-              };
-            }
-
-            implementations.objects.push(namedType);
-          }
-        }
-      }
     }
   }
 
@@ -300,24 +254,16 @@ export class GraphQLSchema {
   }
 
   getPossibleTypes(
-    abstractType: GraphQLAbstractType,
+    abstractType: IrisResolverType,
   ): ReadonlyArray<GraphQLObjectType> {
     return isUnionType(abstractType)
       ? abstractType.getTypes()
-      : this.getImplementations(abstractType).objects;
-  }
-
-  getImplementations(interfaceType: GraphQLInterfaceType): {
-    objects: ReadonlyArray<GraphQLObjectType>;
-    interfaces: ReadonlyArray<GraphQLInterfaceType>;
-  } {
-    const implementations = this._implementationsMap[interfaceType.name];
-    return implementations ?? { objects: [], interfaces: [] };
+      : [];
   }
 
   isSubType(
-    abstractType: GraphQLAbstractType,
-    maybeSubType: GraphQLObjectType | GraphQLInterfaceType,
+    abstractType: IrisResolverType,
+    maybeSubType: GraphQLObjectType ,
   ): boolean {
     let map = this._subTypeMap[abstractType.name];
     if (map === undefined) {
@@ -328,13 +274,13 @@ export class GraphQLSchema {
           map[type.name] = true;
         }
       } else {
-        const implementations = this.getImplementations(abstractType);
-        for (const type of implementations.objects) {
-          map[type.name] = true;
-        }
-        for (const type of implementations.interfaces) {
-          map[type.name] = true;
-        }
+        // const implementations = this.getImplementations(abstractType);
+        // for (const type of implementations.objects) {
+        //   map[type.name] = true;
+        // }
+        // for (const type of implementations.interfaces) {
+        //   map[type.name] = true;
+        // }
       }
 
       this._subTypeMap[abstractType.name] = map;
@@ -348,21 +294,6 @@ export class GraphQLSchema {
 
   getDirective(name: string): Maybe<GraphQLDirective> {
     return this.getDirectives().find((directive) => directive.name === name);
-  }
-
-  toConfig(): GraphQLSchemaNormalizedConfig {
-    return {
-      description: this.description,
-      query: this.getQueryType(),
-      mutation: this.getMutationType(),
-      subscription: this.getSubscriptionType(),
-      types: Object.values(this.getTypeMap()),
-      directives: this.getDirectives(),
-      extensions: this.extensions,
-      astNode: this.astNode,
-      extensionASTNodes: this.extensionASTNodes,
-      assumeValid: this.__validationErrors !== undefined,
-    };
   }
 }
 
@@ -388,7 +319,6 @@ export interface GraphQLSchemaConfig extends GraphQLSchemaValidationOptions {
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
   extensions?: Maybe<Readonly<GraphQLSchemaExtensions>>;
   astNode?: Maybe<SchemaDefinitionNode>;
-  extensionASTNodes?: Maybe<ReadonlyArray<SchemaExtensionNode>>;
 }
 
 /**
@@ -399,7 +329,6 @@ export interface GraphQLSchemaNormalizedConfig extends GraphQLSchemaConfig {
   types: ReadonlyArray<GraphQLNamedType>;
   directives: ReadonlyArray<GraphQLDirective>;
   extensions: Readonly<GraphQLSchemaExtensions>;
-  extensionASTNodes: ReadonlyArray<SchemaExtensionNode>;
   assumeValid: boolean;
 }
 
@@ -415,11 +344,7 @@ function collectReferencedTypes(
       for (const memberType of namedType.getTypes()) {
         collectReferencedTypes(memberType, typeSet);
       }
-    } else if (isObjectType(namedType) || isInterfaceType(namedType)) {
-      for (const interfaceType of namedType.getInterfaces()) {
-        collectReferencedTypes(interfaceType, typeSet);
-      }
-
+    } else if (isObjectType(namedType)) {
       for (const field of Object.values(namedType.getFields())) {
         collectReferencedTypes(field.type, typeSet);
         for (const arg of field.args) {

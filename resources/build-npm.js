@@ -68,7 +68,6 @@ if (require.main === module) {
     supportedTSVersions.length === 1,
     'Property "typesVersions" should have exactly one key.',
   );
-  // TODO: revisit once TS implements https://github.com/microsoft/TypeScript/issues/32166
   const notSupportedTSVersionFile = 'NotSupportedTSVersion.d.ts';
   fs.writeFileSync(
     path.join('./npmDist', notSupportedTSVersionFile),

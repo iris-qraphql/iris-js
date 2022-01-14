@@ -4,6 +4,7 @@ parserOptions:
 env:
   es6: true
   node: true
+  jest/globals: true
 reportUnusedDisableDirectives: true
 plugins:
   - internal-rules
@@ -500,9 +501,8 @@ overrides:
       '@typescript-eslint/ban-types': off # TODO temporarily disabled
       '@typescript-eslint/class-literal-property-style': off # TODO enable after TS conversion
       '@typescript-eslint/consistent-indexed-object-style':
-        [error, index-signature]
+        [error, record]
       '@typescript-eslint/consistent-type-assertions': off # TODO temporarily disable
-      '@typescript-eslint/consistent-type-definitions': error
       '@typescript-eslint/consistent-type-exports': error
       '@typescript-eslint/consistent-type-imports': error
       '@typescript-eslint/explicit-function-return-type': off # TODO consider
@@ -515,7 +515,6 @@ overrides:
       '@typescript-eslint/no-confusing-non-null-assertion': error
       '@typescript-eslint/no-confusing-void-expression': off # TODO enable with ignoreArrowShorthand
       '@typescript-eslint/no-dynamic-delete': off
-      '@typescript-eslint/no-empty-interface': error
       '@typescript-eslint/no-explicit-any': off # TODO error
       '@typescript-eslint/no-extra-non-null-assertion': error
       '@typescript-eslint/no-extraneous-class': off # TODO consider
