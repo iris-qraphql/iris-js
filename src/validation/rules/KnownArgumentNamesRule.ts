@@ -1,12 +1,10 @@
-import { didYouMean } from '../../jsutils/didYouMean';
-import { suggestionList } from '../../jsutils/suggestionList';
-
-import { GraphQLError } from '../../error/GraphQLError';
-
-import { Kind } from '../../language/kinds';
+import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
+
+import { irisError } from '../../error';
+import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type {
   SDLValidationContext,
@@ -36,10 +34,10 @@ export function KnownArgumentNamesRule(context: ValidationContext): ASTVisitor {
         const knownArgsNames = fieldDef.args.map((arg) => arg.name);
         const suggestions = suggestionList(argName, knownArgsNames);
         context.reportError(
-          new GraphQLError(
+          irisError(
             `Unknown argument "${argName}" on field "${parentType.name}.${fieldDef.name}".` +
               didYouMean(suggestions),
-            argNode,
+            { node: argNode },
           ),
         );
       }
@@ -56,18 +54,14 @@ export function KnownArgumentNamesOnDirectivesRule(
   const directiveArgs = Object.create(null);
 
   const schema = context.getSchema();
-  const definedDirectives = schema
-    ? schema.getDirectives()
-    : specifiedDirectives;
+  const definedDirectives = schema ? schema.directives : specifiedDirectives;
   for (const directive of definedDirectives) {
     directiveArgs[directive.name] = directive.args.map((arg) => arg.name);
   }
 
   const astDefinitions = context.getDocument().definitions;
   for (const def of astDefinitions) {
-    if (def.kind === Kind.DIRECTIVE_DEFINITION) {
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
-      /* c8 ignore next */
+    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       const argsNodes = def.arguments ?? [];
 
       directiveArgs[def.name.value] = argsNodes.map((arg) => arg.name.value);
@@ -85,10 +79,10 @@ export function KnownArgumentNamesOnDirectivesRule(
           if (!knownArgs.includes(argName)) {
             const suggestions = suggestionList(argName, knownArgs);
             context.reportError(
-              new GraphQLError(
+              irisError(
                 `Unknown argument "${argName}" on directive "@${directiveName}".` +
                   didYouMean(suggestions),
-                argNode,
+                { node: argNode },
               ),
             );
           }

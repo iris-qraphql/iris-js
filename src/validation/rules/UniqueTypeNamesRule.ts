@@ -1,7 +1,7 @@
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { TypeDefinitionNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
+
+import { irisNodeError } from '../../error';
 
 import type { SDLValidationContext } from '../ValidationContext';
 
@@ -15,12 +15,7 @@ export function UniqueTypeNamesRule(context: SDLValidationContext): ASTVisitor {
   const schema = context.getSchema();
 
   return {
-    ScalarTypeDefinition: checkTypeName,
-    ObjectTypeDefinition: checkTypeName,
-    InterfaceTypeDefinition: checkTypeName,
-    UnionTypeDefinition: checkTypeName,
-    EnumTypeDefinition: checkTypeName,
-    InputObjectTypeDefinition: checkTypeName,
+    TypeDefinition: checkTypeName,
   };
 
   function checkTypeName(node: TypeDefinitionNode) {
@@ -28,7 +23,7 @@ export function UniqueTypeNamesRule(context: SDLValidationContext): ASTVisitor {
 
     if (schema?.getType(typeName)) {
       context.reportError(
-        new GraphQLError(
+        irisNodeError(
           `Type "${typeName}" already exists in the schema. It cannot also be defined in this type definition.`,
           node.name,
         ),
@@ -38,7 +33,7 @@ export function UniqueTypeNamesRule(context: SDLValidationContext): ASTVisitor {
 
     if (knownTypeNames[typeName]) {
       context.reportError(
-        new GraphQLError(`There can be only one type named "${typeName}".`, [
+        irisNodeError(`There can be only one type named "${typeName}".`, [
           knownTypeNames[typeName],
           node.name,
         ]),

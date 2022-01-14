@@ -1,13 +1,14 @@
-import { groupBy } from '../../jsutils/groupBy';
-
-import { GraphQLError } from '../../error/GraphQLError';
+import { forEachObjIndexed, groupBy } from 'ramda';
 
 import type {
+  ArgumentDefinitionNode,
   FieldDefinitionNode,
-  InputValueDefinitionNode,
   NameNode,
+  Role,
 } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
+
+import { irisNodeError } from '../../error';
 
 import type { SDLValidationContext } from '../ValidationContext';
 
@@ -22,57 +23,42 @@ export function UniqueArgumentDefinitionNamesRule(
 ): ASTVisitor {
   return {
     DirectiveDefinition(directiveNode) {
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
-      /* c8 ignore next */
       const argumentNodes = directiveNode.arguments ?? [];
-
       return checkArgUniqueness(`@${directiveNode.name.value}`, argumentNodes);
     },
-    InterfaceTypeDefinition: checkArgUniquenessPerField,
-    InterfaceTypeExtension: checkArgUniquenessPerField,
-    ObjectTypeDefinition: checkArgUniquenessPerField,
-    ObjectTypeExtension: checkArgUniquenessPerField,
+    VariantDefinition: checkArgUniquenessPerField,
   };
 
   function checkArgUniquenessPerField(typeNode: {
     readonly name: NameNode;
-    readonly fields?: ReadonlyArray<FieldDefinitionNode>;
+    readonly fields?: ReadonlyArray<FieldDefinitionNode<Role>>;
   }) {
     const typeName = typeNode.name.value;
-
-    // FIXME: https://github.com/graphql/graphql-js/issues/2203
-    /* c8 ignore next */
     const fieldNodes = typeNode.fields ?? [];
-
     for (const fieldDef of fieldNodes) {
       const fieldName = fieldDef.name.value;
-
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
-      /* c8 ignore next */
       const argumentNodes = fieldDef.arguments ?? [];
-
       checkArgUniqueness(`${typeName}.${fieldName}`, argumentNodes);
     }
-
     return false;
   }
 
   function checkArgUniqueness(
     parentName: string,
-    argumentNodes: ReadonlyArray<InputValueDefinitionNode>,
+    argumentNodes: ReadonlyArray<ArgumentDefinitionNode>,
   ) {
-    const seenArgs = groupBy(argumentNodes, (arg) => arg.name.value);
+    const seenArgs = groupBy((arg) => arg.name.value, argumentNodes);
 
-    for (const [argName, argNodes] of seenArgs) {
+    forEachObjIndexed((argNodes, argName) => {
       if (argNodes.length > 1) {
         context.reportError(
-          new GraphQLError(
+          irisNodeError(
             `Argument "${parentName}(${argName}:)" can only be defined once.`,
             argNodes.map((node) => node.name),
           ),
         );
       }
-    }
+    }, seenArgs);
 
     return false;
   }

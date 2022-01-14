@@ -1,9 +1,9 @@
-import { groupBy } from '../../jsutils/groupBy';
-
-import { GraphQLError } from '../../error/GraphQLError';
+import { forEachObjIndexed, groupBy } from 'ramda';
 
 import type { ArgumentNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
+
+import { irisError } from '../../error';
 
 import type { ASTValidationContext } from '../ValidationContext';
 
@@ -19,28 +19,24 @@ export function UniqueArgumentNamesRule(
   context: ASTValidationContext,
 ): ASTVisitor {
   return {
-    Field: checkArgUniqueness,
     Directive: checkArgUniqueness,
   };
 
   function checkArgUniqueness(parentNode: {
     arguments?: ReadonlyArray<ArgumentNode>;
   }) {
-    // FIXME: https://github.com/graphql/graphql-js/issues/2203
-    /* c8 ignore next */
     const argumentNodes = parentNode.arguments ?? [];
 
-    const seenArgs = groupBy(argumentNodes, (arg) => arg.name.value);
+    const seenArgs = groupBy((arg) => arg.name.value, argumentNodes);
 
-    for (const [argName, argNodes] of seenArgs) {
+    forEachObjIndexed((argNodes, argName) => {
       if (argNodes.length > 1) {
         context.reportError(
-          new GraphQLError(
-            `There can be only one argument named "${argName}".`,
-            argNodes.map((node) => node.name),
-          ),
+          irisError(`There can be only one argument named "${argName}".`, {
+            node: argNodes.map((node) => node.name),
+          }),
         );
       }
-    }
+    }, seenArgs);
   }
 }

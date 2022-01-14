@@ -1,0 +1,641 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`circular data types accept circular types 1`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Leaf",
+      "name": "xyz",
+    },
+  ],
+}
+`;
+
+exports[`circular data types accept circular types 2`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Leaf",
+      "name": "abc",
+    },
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Leaf",
+          "name": "xyz",
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`circular data types accept circular types 3`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Leaf",
+          "name": "xyz",
+        },
+      ],
+    },
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Leaf",
+          "name": "abc",
+        },
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Leaf",
+              "name": "xyz",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`circular data types accept circular types 4`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Leaf",
+          "name": "xyz",
+        },
+      ],
+    },
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Leaf",
+              "name": "abc",
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+          ],
+        },
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "abc",
+                },
+                Object {
+                  "__typename": "Node",
+                  "children": Array [
+                    Object {
+                      "__typename": "Leaf",
+                      "name": "xyz",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`circular data types accept circular types 5`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Leaf",
+              "name": "xyz",
+            },
+          ],
+        },
+      ],
+    },
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Leaf",
+              "name": "abc",
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+          ],
+        },
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "abc",
+                },
+                Object {
+                  "__typename": "Node",
+                  "children": Array [
+                    Object {
+                      "__typename": "Leaf",
+                      "name": "xyz",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Node",
+                  "children": Array [
+                    Object {
+                      "__typename": "Leaf",
+                      "name": "abc",
+                    },
+                    Object {
+                      "__typename": "Node",
+                      "children": Array [
+                        Object {
+                          "__typename": "Leaf",
+                          "name": "xyz",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "__typename": "Node",
+                  "children": Array [
+                    Object {
+                      "__typename": "Node",
+                      "children": Array [
+                        Object {
+                          "__typename": "Leaf",
+                          "name": "xyz",
+                        },
+                      ],
+                    },
+                    Object {
+                      "__typename": "Node",
+                      "children": Array [
+                        Object {
+                          "__typename": "Leaf",
+                          "name": "abc",
+                        },
+                        Object {
+                          "__typename": "Node",
+                          "children": Array [
+                            Object {
+                              "__typename": "Leaf",
+                              "name": "xyz",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`circular data types accept simple leaf 1`] = `
+Object {
+  "__typename": "Leaf",
+  "name": "abcd",
+}
+`;
+
+exports[`circular data types must provide required fields on variants 1`] = `"type [NodeType] cannot represent value: undefined."`;
+
+exports[`circular data types reject invalid circular types 1`] = `"type NodeType cannot represent value: 3."`;
+
+exports[`circular data types reject invalid circular types 2`] = `"type NodeType cannot represent value: [{ __typename: \\"Leaf\\", name: \\"abc\\" }]."`;
+
+exports[`circular data types reject invalid circular types 3`] = `"type NodeType cannot represent value: 3."`;
+
+exports[`circular data types reject invalid circular types 4`] = `"type NodeType cannot represent value: 3."`;
+
+exports[`circular data types reject invalid circular types 5`] = `"type NodeType cannot represent value: 3."`;
+
+exports[`parse simple data variants accept recursive nodes 1`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Leaf",
+      "name": "xyz",
+    },
+  ],
+}
+`;
+
+exports[`parse simple data variants accept recursive nodes 2`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Leaf",
+      "name": "abc",
+    },
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Leaf",
+          "name": "xyz",
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`parse simple data variants accept recursive nodes 3`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Leaf",
+          "name": "xyz",
+        },
+      ],
+    },
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Leaf",
+          "name": "abc",
+        },
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Leaf",
+              "name": "xyz",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`parse simple data variants accept recursive nodes 4`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Leaf",
+          "name": "xyz",
+        },
+      ],
+    },
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Leaf",
+              "name": "abc",
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+          ],
+        },
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "abc",
+                },
+                Object {
+                  "__typename": "Node",
+                  "children": Array [
+                    Object {
+                      "__typename": "Leaf",
+                      "name": "xyz",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`parse simple data variants accept recursive nodes 5`] = `
+Object {
+  "__typename": "Node",
+  "children": Array [
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Leaf",
+              "name": "xyz",
+            },
+          ],
+        },
+      ],
+    },
+    Object {
+      "__typename": "Node",
+      "children": Array [
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Leaf",
+              "name": "abc",
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+          ],
+        },
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "abc",
+                },
+                Object {
+                  "__typename": "Node",
+                  "children": Array [
+                    Object {
+                      "__typename": "Leaf",
+                      "name": "xyz",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        Object {
+          "__typename": "Node",
+          "children": Array [
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Leaf",
+                  "name": "xyz",
+                },
+              ],
+            },
+            Object {
+              "__typename": "Node",
+              "children": Array [
+                Object {
+                  "__typename": "Node",
+                  "children": Array [
+                    Object {
+                      "__typename": "Leaf",
+                      "name": "abc",
+                    },
+                    Object {
+                      "__typename": "Node",
+                      "children": Array [
+                        Object {
+                          "__typename": "Leaf",
+                          "name": "xyz",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                Object {
+                  "__typename": "Node",
+                  "children": Array [
+                    Object {
+                      "__typename": "Node",
+                      "children": Array [
+                        Object {
+                          "__typename": "Leaf",
+                          "name": "xyz",
+                        },
+                      ],
+                    },
+                    Object {
+                      "__typename": "Node",
+                      "children": Array [
+                        Object {
+                          "__typename": "Leaf",
+                          "name": "abc",
+                        },
+                        Object {
+                          "__typename": "Node",
+                          "children": Array [
+                            Object {
+                              "__typename": "Leaf",
+                              "name": "xyz",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}
+`;
+
+exports[`parse simple data variants accept simple leaf 1`] = `
+Object {
+  "__typename": "Leaf",
+  "name": "abcd",
+}
+`;
+
+exports[`parse simple data variants don't accept non data values 1`] = `"type NodeType cannot represent value: [\\"Leaf\\"]."`;
+
+exports[`parse simple data variants don't accept non data values 2`] = `"type NodeType cannot represent value: [{ __typename: \\"Leaf\\", name: \\"abcd\\" }]."`;
+
+exports[`parse simple data variants reject invalid recursive nodes 1`] = `"type NodeType cannot represent value: 3."`;
+
+exports[`parse simple data variants reject invalid recursive nodes 2`] = `"type NodeType cannot represent value: [{ __typename: \\"Leaf\\", name: \\"abc\\" }]."`;
+
+exports[`parse simple data variants reject invalid recursive nodes 3`] = `"type NodeType cannot represent value: 3."`;
+
+exports[`parse simple data variants reject invalid recursive nodes 4`] = `"type NodeType cannot represent value: 3."`;
+
+exports[`parse simple data variants reject invalid recursive nodes 5`] = `"type NodeType cannot represent value: 3."`;
+
+exports[`parse simple data variants require field names for non-empty variants 1`] = `"type String cannot represent value: undefined."`;
+
+exports[`parse simple data variants require field names for non-empty variants 2`] = `"type String cannot represent value: undefined."`;
+
+exports[`parse simple data variants require field names for non-empty variants 3`] = `"type [NodeType] cannot represent value: undefined."`;
+
+exports[`serializeValue converts ID values to Int/String ASTs 1`] = `"ID cannot represent value: false"`;
+
+exports[`serializeValue converts ID values to Int/String ASTs 2`] = `"type ID cannot represent value: undefined."`;
+
+exports[`serializeValue converts ID values to Int/String ASTs 3`] = `"type ID cannot represent value: null."`;
+
+exports[`serializeValue converts String values to String ASTs 1`] = `"type String cannot represent value: undefined."`;
+
+exports[`serializeValue converts String values to String ASTs 2`] = `"type String cannot represent value: null."`;
+
+exports[`serializeValue converts using serialize from a custom scalar type 1`] = `"type PassthroughScalar cannot represent value: NaN."`;
+
+exports[`serializeValue converts using serialize from a custom scalar type 2`] = `"type PassthroughScalar cannot represent value: Infinity."`;
+
+exports[`serializeValue does not converts NonNull values to NullValue 1`] = `"type Boolean cannot represent value: null."`;
+
+exports[`serializeValue does not converts non-object values as input objects 1`] = `"type MyInputObj cannot represent value: 5."`;
+
+exports[`serializeValue reject invalid lists 1`] = `"type String cannot represent value: null."`;
+
+exports[`serializeValue reject invalid lists 2`] = `"type [String] cannot represent value: \\"FOO\\"."`;

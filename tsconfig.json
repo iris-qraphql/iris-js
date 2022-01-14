@@ -1,6 +1,8 @@
 {
-  "include": ["src/**/*"],
+  "testEnvironment": "node",
+  "include": ["src/**/*", "tsconfig.base.json"],
   "compilerOptions": {
+    "types": ["node", "jest"],
     "module": "commonjs",
     "lib": ["es2019", "es2020.promise", "es2020.bigint", "es2020.string"],
     "target": "es2019",

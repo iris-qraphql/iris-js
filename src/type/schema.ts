@@ -1,437 +1,294 @@
-import { devAssert } from '../jsutils/devAssert';
-import { inspect } from '../jsutils/inspect';
-import { instanceOf } from '../jsutils/instanceOf';
-import { isObjectLike } from '../jsutils/isObjectLike';
-import type { Maybe } from '../jsutils/Maybe';
-import type { ObjMap } from '../jsutils/ObjMap';
-import { toObjMap } from '../jsutils/toObjMap';
-
-import type { GraphQLError } from '../error/GraphQLError';
+import type { ParseOptions, Source } from 'graphql';
+import { uniqBy } from 'ramda';
 
 import type {
-  SchemaDefinitionNode,
-  SchemaExtensionNode,
+  ArgumentDefinitionNode,
+  DirectiveDefinitionNode,
+  DocumentNode,
+  FieldDefinitionNode,
+  NamedTypeNode,
+  Role,
+  TypeDefinitionNode,
+  TypeNode,
+  VariantDefinitionNode,
 } from '../language/ast';
-import { OperationTypeNode } from '../language/ast';
+import { IrisKind } from '../language/kinds';
+import { parse } from '../language/parser';
+import { isTypeDefinitionNode } from '../language/predicates';
 
+import { validateSDL } from '../validation/validate';
+
+import { valueFromAST } from '../conversion/valueFromAST';
+import { getDirectiveValues } from '../conversion/values';
+import type { IrisError } from '../error';
+import { inspect, instanceOf } from '../utils/legacy';
+import type { ObjMap } from '../utils/ObjMap';
+import { keyMap } from '../utils/ObjMap';
+import type { ConfigMap, IrisMaybe, Maybe } from '../utils/type-level';
+import { notNill } from '../utils/type-level';
+
+import { collectAllReferencedTypes } from './collectAllReferencedTypes';
 import type {
-  GraphQLAbstractType,
-  GraphQLInterfaceType,
-  GraphQLNamedType,
-  GraphQLObjectType,
-  GraphQLType,
+  IrisArgument,
+  IrisFieldConfig,
+  IrisNamedType,
+  IrisType,
+  IrisVariantConfig,
 } from './definition';
+import { IrisTypeDefinition, IrisTypeRef } from './definition';
 import {
-  getNamedType,
-  isInputObjectType,
-  isInterfaceType,
-  isObjectType,
-  isUnionType,
-} from './definition';
-import type { GraphQLDirective } from './directives';
-import { isDirective, specifiedDirectives } from './directives';
-import { __Schema } from './introspection';
+  GraphQLDeprecatedDirective,
+  GraphQLDirective,
+  specifiedDirectives,
+} from './directives';
+import { specifiedScalarTypes } from './scalars';
 
 /**
  * Test if the given value is a GraphQL schema.
  */
-export function isSchema(schema: unknown): schema is GraphQLSchema {
-  return instanceOf(schema, GraphQLSchema);
+export function isSchema(schema: unknown): schema is IrisSchema {
+  return instanceOf(schema, IrisSchema);
 }
 
-export function assertSchema(schema: unknown): GraphQLSchema {
+export function assertSchema(schema: unknown): IrisSchema {
   if (!isSchema(schema)) {
     throw new Error(`Expected ${inspect(schema)} to be a GraphQL schema.`);
   }
   return schema;
 }
 
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export interface GraphQLSchemaExtensions {
-  [attributeName: string]: unknown;
-}
-
-/**
- * Schema Definition
- *
- * A Schema is created by supplying the root types of each type of operation,
- * query and mutation (optional). A schema definition is then supplied to the
- * validator and executor.
- *
- * Example:
- *
- * ```ts
- * const MyAppSchema = new GraphQLSchema({
- *   query: MyAppQueryRootType,
- *   mutation: MyAppMutationRootType,
- * })
- * ```
- *
- * Note: When the schema is constructed, by default only the types that are
- * reachable by traversing the root types are included, other types must be
- * explicitly referenced.
- *
- * Example:
- *
- * ```ts
- * const characterInterface = new GraphQLInterfaceType({
- *   name: 'Character',
- *   ...
- * });
- *
- * const humanType = new GraphQLObjectType({
- *   name: 'Human',
- *   interfaces: [characterInterface],
- *   ...
- * });
- *
- * const droidType = new GraphQLObjectType({
- *   name: 'Droid',
- *   interfaces: [characterInterface],
- *   ...
- * });
- *
- * const schema = new GraphQLSchema({
- *   query: new GraphQLObjectType({
- *     name: 'Query',
- *     fields: {
- *       hero: { type: characterInterface, ... },
- *     }
- *   }),
- *   ...
- *   // Since this schema references only the `Character` interface it's
- *   // necessary to explicitly list the types that implement it if
- *   // you want them to be included in the final schema.
- *   types: [humanType, droidType],
- * })
- * ```
- *
- * Note: If an array of `directives` are provided to GraphQLSchema, that will be
- * the exact list of directives represented and allowed. If `directives` is not
- * provided then a default set of the specified directives (e.g. `@include` and
- * `@skip`) will be used. If you wish to provide *additional* directives to these
- * specified directives, you must explicitly declare them. Example:
- *
- * ```ts
- * const MyAppSchema = new GraphQLSchema({
- *   ...
- *   directives: specifiedDirectives.concat([ myCustomDirective ]),
- * })
- * ```
- */
-export class GraphQLSchema {
+export class IrisSchema {
   description: Maybe<string>;
-  extensions: Readonly<GraphQLSchemaExtensions>;
-  astNode: Maybe<SchemaDefinitionNode>;
-  extensionASTNodes: ReadonlyArray<SchemaExtensionNode>;
+
+  readonly query?: IrisTypeDefinition<'resolver'>;
+  readonly mutation?: IrisTypeDefinition<'resolver'>;
+  readonly subscription?: IrisTypeDefinition<'resolver'>;
+  readonly directives: ReadonlyArray<GraphQLDirective>;
+  readonly typeMap: TypeMap;
 
   // Used as a cache for validateSchema().
-  __validationErrors: Maybe<ReadonlyArray<GraphQLError>>;
+  __validationErrors: Maybe<ReadonlyArray<IrisError>>;
 
-  private _queryType: Maybe<GraphQLObjectType>;
-  private _mutationType: Maybe<GraphQLObjectType>;
-  private _subscriptionType: Maybe<GraphQLObjectType>;
-  private _directives: ReadonlyArray<GraphQLDirective>;
-  private _typeMap: TypeMap;
-  private _subTypeMap: ObjMap<ObjMap<boolean>>;
-  private _implementationsMap: ObjMap<{
-    objects: Array<GraphQLObjectType>;
-    interfaces: Array<GraphQLInterfaceType>;
-  }>;
-
-  constructor(config: Readonly<GraphQLSchemaConfig>) {
-    // If this schema was built from a source known to be valid, then it may be
-    // marked with assumeValid to avoid an additional type system validation.
+  constructor(config: Readonly<IrisSchemaConfig>) {
     this.__validationErrors = config.assumeValid === true ? [] : undefined;
-
-    // Check for common mistakes during construction to produce early errors.
-    devAssert(isObjectLike(config), 'Must provide configuration object.');
-    devAssert(
-      !config.types || Array.isArray(config.types),
-      `"types" must be Array if provided but got: ${inspect(config.types)}.`,
-    );
-    devAssert(
-      !config.directives || Array.isArray(config.directives),
-      '"directives" must be Array if provided but got: ' +
-        `${inspect(config.directives)}.`,
-    );
-
     this.description = config.description;
-    this.extensions = toObjMap(config.extensions);
-    this.astNode = config.astNode;
-    this.extensionASTNodes = config.extensionASTNodes ?? [];
+    this.query = config.query ?? undefined;
+    this.mutation = config.mutation ?? undefined;
+    this.subscription = config.subscription ?? undefined;
+    this.directives = uniqBy(
+      ({ name }) => name,
+      [...(config.directives ?? []), ...specifiedDirectives],
+    );
 
-    this._queryType = config.query;
-    this._mutationType = config.mutation;
-    this._subscriptionType = config.subscription;
-    // Provide specified directives (e.g. @include and @skip) by default.
-    this._directives = config.directives ?? specifiedDirectives;
+    const types: Array<IrisNamedType> = [
+      this.query,
+      this.mutation,
+      this.subscription,
+      ...(config.types ?? []),
+    ].filter(notNill);
 
-    // To preserve order of user-provided types, we add first to add them to
-    // the set of "collected" types, so `collectReferencedTypes` ignore them.
-    const allReferencedTypes: Set<GraphQLNamedType> = new Set(config.types);
-    if (config.types != null) {
-      for (const type of config.types) {
-        // When we ready to process this type, we remove it from "collected" types
-        // and then add it together with all dependent types in the correct position.
-        allReferencedTypes.delete(type);
-        collectReferencedTypes(type, allReferencedTypes);
-      }
-    }
+    const typeMap: TypeMap = {};
 
-    if (this._queryType != null) {
-      collectReferencedTypes(this._queryType, allReferencedTypes);
-    }
-    if (this._mutationType != null) {
-      collectReferencedTypes(this._mutationType, allReferencedTypes);
-    }
-    if (this._subscriptionType != null) {
-      collectReferencedTypes(this._subscriptionType, allReferencedTypes);
-    }
+    collectAllReferencedTypes(types, this.directives).forEach((namedType) => {
+      const { name } = namedType;
 
-    for (const directive of this._directives) {
-      // Directives are not validated until validateSchema() is called.
-      if (isDirective(directive)) {
-        for (const arg of directive.args) {
-          collectReferencedTypes(arg.type, allReferencedTypes);
-        }
-      }
-    }
-    collectReferencedTypes(__Schema, allReferencedTypes);
-
-    // Storing the resulting map for reference by the schema.
-    this._typeMap = Object.create(null);
-    this._subTypeMap = Object.create(null);
-    // Keep track of all implementations by interface name.
-    this._implementationsMap = Object.create(null);
-
-    for (const namedType of allReferencedTypes) {
-      if (namedType == null) {
-        continue;
-      }
-
-      const typeName = namedType.name;
-      devAssert(
-        typeName,
-        'One of the provided types for building the Schema is missing a name.',
-      );
-      if (this._typeMap[typeName] !== undefined) {
+      if (!name) {
         throw new Error(
-          `Schema must contain uniquely named types but contains multiple types named "${typeName}".`,
+          'One of the provided types for building the Schema is missing a name.',
         );
       }
-      this._typeMap[typeName] = namedType;
 
-      if (isInterfaceType(namedType)) {
-        // Store implementations by interface.
-        for (const iface of namedType.getInterfaces()) {
-          if (isInterfaceType(iface)) {
-            let implementations = this._implementationsMap[iface.name];
-            if (implementations === undefined) {
-              implementations = this._implementationsMap[iface.name] = {
-                objects: [],
-                interfaces: [],
-              };
-            }
-
-            implementations.interfaces.push(namedType);
-          }
-        }
-      } else if (isObjectType(namedType)) {
-        // Store implementations by objects.
-        for (const iface of namedType.getInterfaces()) {
-          if (isInterfaceType(iface)) {
-            let implementations = this._implementationsMap[iface.name];
-            if (implementations === undefined) {
-              implementations = this._implementationsMap[iface.name] = {
-                objects: [],
-                interfaces: [],
-              };
-            }
-
-            implementations.objects.push(namedType);
-          }
-        }
+      if (typeMap[name] !== undefined) {
+        throw new Error(
+          `Iris Schema must contain uniquely named types but contains multiple types named "${name}".`,
+        );
       }
-    }
+
+      typeMap[name] = namedType;
+    });
+
+    this.typeMap = typeMap;
   }
 
   get [Symbol.toStringTag]() {
-    return 'GraphQLSchema';
+    return 'IrisSchema';
   }
 
-  getQueryType(): Maybe<GraphQLObjectType> {
-    return this._queryType;
-  }
+  getType = (name: string): IrisMaybe<IrisNamedType> => this.typeMap[name];
 
-  getMutationType(): Maybe<GraphQLObjectType> {
-    return this._mutationType;
-  }
-
-  getSubscriptionType(): Maybe<GraphQLObjectType> {
-    return this._subscriptionType;
-  }
-
-  getRootType(operation: OperationTypeNode): Maybe<GraphQLObjectType> {
-    switch (operation) {
-      case OperationTypeNode.QUERY:
-        return this.getQueryType();
-      case OperationTypeNode.MUTATION:
-        return this.getMutationType();
-      case OperationTypeNode.SUBSCRIPTION:
-        return this.getSubscriptionType();
-    }
-  }
-
-  getTypeMap(): TypeMap {
-    return this._typeMap;
-  }
-
-  getType(name: string): GraphQLNamedType | undefined {
-    return this.getTypeMap()[name];
-  }
-
-  getPossibleTypes(
-    abstractType: GraphQLAbstractType,
-  ): ReadonlyArray<GraphQLObjectType> {
-    return isUnionType(abstractType)
-      ? abstractType.getTypes()
-      : this.getImplementations(abstractType).objects;
-  }
-
-  getImplementations(interfaceType: GraphQLInterfaceType): {
-    objects: ReadonlyArray<GraphQLObjectType>;
-    interfaces: ReadonlyArray<GraphQLInterfaceType>;
-  } {
-    const implementations = this._implementationsMap[interfaceType.name];
-    return implementations ?? { objects: [], interfaces: [] };
-  }
-
-  isSubType(
-    abstractType: GraphQLAbstractType,
-    maybeSubType: GraphQLObjectType | GraphQLInterfaceType,
-  ): boolean {
-    let map = this._subTypeMap[abstractType.name];
-    if (map === undefined) {
-      map = Object.create(null);
-
-      if (isUnionType(abstractType)) {
-        for (const type of abstractType.getTypes()) {
-          map[type.name] = true;
-        }
-      } else {
-        const implementations = this.getImplementations(abstractType);
-        for (const type of implementations.objects) {
-          map[type.name] = true;
-        }
-        for (const type of implementations.interfaces) {
-          map[type.name] = true;
-        }
-      }
-
-      this._subTypeMap[abstractType.name] = map;
-    }
-    return map[maybeSubType.name] !== undefined;
-  }
-
-  getDirectives(): ReadonlyArray<GraphQLDirective> {
-    return this._directives;
-  }
-
-  getDirective(name: string): Maybe<GraphQLDirective> {
-    return this.getDirectives().find((directive) => directive.name === name);
-  }
-
-  toConfig(): GraphQLSchemaNormalizedConfig {
-    return {
-      description: this.description,
-      query: this.getQueryType(),
-      mutation: this.getMutationType(),
-      subscription: this.getSubscriptionType(),
-      types: Object.values(this.getTypeMap()),
-      directives: this.getDirectives(),
-      extensions: this.extensions,
-      astNode: this.astNode,
-      extensionASTNodes: this.extensionASTNodes,
-      assumeValid: this.__validationErrors !== undefined,
-    };
-  }
+  getDirective = (name: string): Maybe<GraphQLDirective> =>
+    this.directives.find((directive) => directive.name === name);
 }
 
-type TypeMap = ObjMap<GraphQLNamedType>;
+type TypeMap = ObjMap<IrisNamedType>;
 
-export interface GraphQLSchemaValidationOptions {
-  /**
-   * When building a schema from a GraphQL service's introspection result, it
-   * might be safe to assume the schema is valid. Set to true to assume the
-   * produced schema is valid.
-   *
-   * Default: false
-   */
+export type IrisSchemaValidationOptions = {
   assumeValid?: boolean;
-}
+  assumeValidSDL?: boolean;
+};
 
-export interface GraphQLSchemaConfig extends GraphQLSchemaValidationOptions {
+export interface IrisSchemaConfig extends IrisSchemaValidationOptions {
   description?: Maybe<string>;
-  query?: Maybe<GraphQLObjectType>;
-  mutation?: Maybe<GraphQLObjectType>;
-  subscription?: Maybe<GraphQLObjectType>;
-  types?: Maybe<ReadonlyArray<GraphQLNamedType>>;
+  query?: Maybe<IrisTypeDefinition<'resolver'>>;
+  mutation?: Maybe<IrisTypeDefinition<'resolver'>>;
+  subscription?: Maybe<IrisTypeDefinition<'resolver'>>;
+  types?: Maybe<ReadonlyArray<IrisNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
-  extensions?: Maybe<Readonly<GraphQLSchemaExtensions>>;
-  astNode?: Maybe<SchemaDefinitionNode>;
-  extensionASTNodes?: Maybe<ReadonlyArray<SchemaExtensionNode>>;
 }
 
-/**
- * @internal
- */
-export interface GraphQLSchemaNormalizedConfig extends GraphQLSchemaConfig {
-  description: Maybe<string>;
-  types: ReadonlyArray<GraphQLNamedType>;
-  directives: ReadonlyArray<GraphQLDirective>;
-  extensions: Readonly<GraphQLSchemaExtensions>;
-  extensionASTNodes: ReadonlyArray<SchemaExtensionNode>;
-  assumeValid: boolean;
+export function buildSchema(
+  source: string | Source,
+  options?: IrisSchemaValidationOptions & ParseOptions,
+): IrisSchema {
+  const document = parse(source, { noLocation: options?.noLocation });
+
+  return buildASTSchema(document, { ...options });
 }
 
-function collectReferencedTypes(
-  type: GraphQLType,
-  typeSet: Set<GraphQLNamedType>,
-): Set<GraphQLNamedType> {
-  const namedType = getNamedType(type);
-
-  if (!typeSet.has(namedType)) {
-    typeSet.add(namedType);
-    if (isUnionType(namedType)) {
-      for (const memberType of namedType.getTypes()) {
-        collectReferencedTypes(memberType, typeSet);
-      }
-    } else if (isObjectType(namedType) || isInterfaceType(namedType)) {
-      for (const interfaceType of namedType.getInterfaces()) {
-        collectReferencedTypes(interfaceType, typeSet);
-      }
-
-      for (const field of Object.values(namedType.getFields())) {
-        collectReferencedTypes(field.type, typeSet);
-        for (const arg of field.args) {
-          collectReferencedTypes(arg.type, typeSet);
-        }
-      }
-    } else if (isInputObjectType(namedType)) {
-      for (const field of Object.values(namedType.getFields())) {
-        collectReferencedTypes(field.type, typeSet);
-      }
+export function buildASTSchema(
+  documentAST: DocumentNode,
+  options?: IrisSchemaValidationOptions,
+): IrisSchema {
+  if (options?.assumeValid !== true && options?.assumeValidSDL !== true) {
+    const errors = validateSDL(documentAST);
+    if (errors.length !== 0) {
+      throw new Error(errors.map((error) => error.message).join('\n\n'));
     }
   }
 
-  return typeSet;
+  const directiveDefs: Array<DirectiveDefinitionNode> = [];
+  const typeMap: Record<string, IrisNamedType> = {};
+
+  function getNamedType<R extends Role>(
+    node: NamedTypeNode | VariantDefinitionNode<R>,
+  ): IrisNamedType<R> {
+    const name = node.name.value;
+    const type = stdTypeMap[name] ?? typeMap[name];
+
+    if (type === undefined) {
+      throw new Error(`Unknown type: "${name}".`);
+    }
+
+    return type as IrisNamedType<R>;
+  }
+
+  function getWrappedType(node: TypeNode): IrisType {
+    if (node.kind === IrisKind.LIST_TYPE) {
+      return new IrisTypeRef('LIST', getWrappedType(node.type));
+    }
+    if (node.kind === IrisKind.MAYBE_TYPE) {
+      return new IrisTypeRef('MAYBE', getWrappedType(node.type));
+    }
+    return getNamedType(node);
+  }
+
+  function buildDirective(node: DirectiveDefinitionNode): GraphQLDirective {
+    return new GraphQLDirective({
+      name: node.name.value,
+      description: node.description?.value,
+      locations: node.locations.map(({ value }) => value as any),
+      isRepeatable: node.repeatable,
+      args: buildArgumentMap(node.arguments),
+      astNode: node,
+    });
+  }
+
+  function buildArgumentMap(
+    argsNodes: IrisMaybe<ReadonlyArray<ArgumentDefinitionNode>> = [],
+  ): ConfigMap<IrisArgument> {
+    const argConfigMap: ConfigMap<IrisArgument> = {};
+    for (const astNode of argsNodes) {
+      const type: any = getWrappedType(astNode.type);
+      argConfigMap[astNode.name.value] = {
+        type,
+        description: astNode.description?.value,
+        defaultValue: valueFromAST(astNode.defaultValue, type),
+        deprecationReason: getDeprecationReason(astNode),
+        astNode,
+      };
+    }
+    return argConfigMap;
+  }
+
+  const buildField = <R extends Role>(
+    field: FieldDefinitionNode<R>,
+  ): IrisFieldConfig<R> =>
+    ({
+      type: getWrappedType(field.type),
+      description: field.description?.value,
+      deprecationReason: getDeprecationReason(field),
+      astNode: field,
+      args: field.arguments ? buildArgumentMap(field.arguments) : undefined,
+    } as IrisFieldConfig<R>);
+
+  const buildVariant = <R extends Role>(
+    astNode: VariantDefinitionNode<R>,
+  ): IrisVariantConfig<R> => {
+    const name = astNode.name.value;
+    const description = astNode.description?.value;
+    const deprecationReason = getDeprecationReason(astNode);
+
+    if (!astNode.fields) {
+      return {
+        name,
+        description,
+        deprecationReason,
+        astNode,
+        type: getNamedType(astNode),
+      };
+    }
+
+    return {
+      name,
+      description,
+      deprecationReason,
+      fields: Object.fromEntries(
+        (astNode.fields ?? []).map((field) => [
+          field.name.value,
+          buildField(field),
+        ]),
+      ),
+      astNode,
+    };
+  };
+
+  const buildType = <R extends Role>(
+    astNode: TypeDefinitionNode<R>,
+  ): IrisTypeDefinition<R> =>
+    new IrisTypeDefinition({
+      role: astNode.role,
+      name: astNode.name.value,
+      description: astNode.description?.value,
+      variants: () => astNode.variants.map(buildVariant),
+      astNode,
+    });
+
+  documentAST.definitions.forEach((def) => {
+    if (isTypeDefinitionNode(def)) {
+      const name = def.name.value;
+      typeMap[name] = stdTypeMap[name] ?? buildType(def);
+    } else if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
+      directiveDefs.push(def);
+    }
+  });
+
+  return new IrisSchema({
+    description: undefined,
+    types: Object.values(typeMap),
+    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
+    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
+    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
+    directives: directiveDefs.map(buildDirective),
+    assumeValid: options?.assumeValid ?? false,
+  });
 }
+
+const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
+
+const getDeprecationReason = (
+  node:
+    | FieldDefinitionNode<Role>
+    | ArgumentDefinitionNode
+    | VariantDefinitionNode<Role>,
+): Maybe<string> =>
+  getDirectiveValues(GraphQLDeprecatedDirective, node)?.reason as string;
