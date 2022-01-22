@@ -2,7 +2,6 @@ import { keyMap } from '../jsutils/keyMap';
 import type { Maybe } from '../jsutils/Maybe';
 
 import type {
-  DataTypeDefinitionNode,
   DirectiveDefinitionNode,
   DocumentNode,
   FieldDefinitionNode,
@@ -24,7 +23,6 @@ import type {
   GraphQLFieldConfigMap,
   GraphQLNamedType,
   GraphQLType,
-  IrisDataVariant,
   IrisDataVariantFieldFields,
 } from '../type/definition';
 import {
@@ -154,7 +152,6 @@ export function extendSchemaImpl(
     const name = node.name.value;
     const type = stdTypeMap[name] ?? typeMap[name];
 
-
     if (type === undefined) {
       throw new Error(`Unknown type: "${name}".`);
     }
@@ -232,32 +229,28 @@ export function extendSchemaImpl(
   }
 
   function buildInputFieldMap(
-    nodes: ReadonlyArray<DataTypeDefinitionNode>,
+    fields: ReadonlyArray<InputValueDefinitionNode>,
   ): IrisDataVariantFieldFields {
-    const inputFieldMap = Object.create(null);
-    for (const node of nodes) {
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
-      const fieldsNodes = /* c8 ignore next */ node.variants[0].fields ?? [];
-
-      for (const field of fieldsNodes) {
-        // Note: While this could make assertions to get the correctly typed
-        // value, that would throw immediately while type system validation
-        // with validateSchema() will produce more actionable results.
-        const type: any = getWrappedType(field.type);
-
-        inputFieldMap[field.name.value] = {
+    const entries = fields.map((field) => {
+      const type: any = getWrappedType(field.type);
+      return [
+        field.name.value,
+        {
           type,
           description: field.description?.value,
           defaultValue: valueFromAST(field.defaultValue, type),
           deprecationReason: getDeprecationReason(field),
           astNode: field,
-        };
-      }
-    }
-    return inputFieldMap;
+        },
+      ];
+    });
+
+    return Object.fromEntries(entries);
   }
 
-  function getVariantType(node: ResolverVariantDefinitionNode): GraphQLObjectType {
+  function getVariantType(
+    node: ResolverVariantDefinitionNode,
+  ): GraphQLObjectType {
     // FIXME: real variant types
     const name = node.name.value;
 
@@ -289,7 +282,7 @@ export function extendSchemaImpl(
       case Kind.RESOLVER_TYPE_DEFINITION: {
         const allNodes = [astNode, ...extensionASTNodes];
 
-        if(allNodes.length === 1 && allNodes[0]?.type){
+        if (allNodes.length === 1 && allNodes[0]?.type) {
           return new GraphQLObjectType({
             name,
             description: astNode.description?.value,
@@ -297,13 +290,15 @@ export function extendSchemaImpl(
             astNode: astNode as any,
           });
         }
-    
+
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
-          types: () => allNodes.flatMap(
-            (node) => /* c8 ignore next */ node.variants?.map(getVariantType) ?? [],
-          ),
+          types: () =>
+            allNodes.flatMap(
+              (node) =>
+                /* c8 ignore next */ node.variants?.map(getVariantType) ?? [],
+            ),
           astNode,
         });
       }
@@ -322,15 +317,20 @@ export function extendSchemaImpl(
           return new IrisDataType({
             name,
             description: astNode.description?.value,
-            fields: () => buildInputFieldMap([astNode]),
             astNode,
+            variants: [
+              {
+                name,
+                fields: () => buildInputFieldMap(astNode.variants[0].fields),
+              },
+            ],
           });
         }
 
         return new IrisDataType({
           name,
           description: astNode.description?.value,
-          variants: (astNode.variants ?? []).map(value => ({
+          variants: (astNode.variants ?? []).map((value) => ({
             name: value.name.value,
             description: value.description?.value,
             deprecationReason: getDeprecationReason(value),
@@ -353,10 +353,7 @@ const stdTypeMap = keyMap(
  * deprecation reason.
  */
 function getDeprecationReason(
-  node:
-    | FieldDefinitionNode
-    | InputValueDefinitionNode
-    | VariantDefinitionNode,
+  node: FieldDefinitionNode | InputValueDefinitionNode | VariantDefinitionNode,
 ): Maybe<string> {
   const deprecated = getDirectiveValues(GraphQLDeprecatedDirective, node);
   // @ts-expect-error validated by `getDirectiveValues`

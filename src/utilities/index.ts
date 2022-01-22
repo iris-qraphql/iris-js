@@ -32,9 +32,6 @@ export { getOperationAST } from './getOperationAST';
 // Gets the Type for the target Operation AST.
 export { getOperationRootType } from './getOperationRootType';
 
-// Build a GraphQLSchema from an introspection result.
-export { buildClientSchema } from './buildClientSchema';
-
 // Build a GraphQLSchema from GraphQL Schema language.
 export { buildASTSchema, buildSchema } from './buildASTSchema';
 export type { BuildSchemaOptions } from './buildASTSchema';

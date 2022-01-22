@@ -75,7 +75,7 @@ describe('Validate: Unique argument definition names', () => {
         ],
       },
       {
-        'message': 'Argument "@someDirective(foo:)" can only be defined once.',
+        message: 'Argument "@someDirective(foo:)" can only be defined once.',
         locations: [
           { line: 11, column: 9 },
           { line: 13, column: 9 },

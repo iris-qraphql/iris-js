@@ -242,7 +242,7 @@ function validateTypes(context: SchemaValidationContext): void {
 
 function validateFields(
   context: SchemaValidationContext,
-  type: GraphQLObjectType ,
+  type: GraphQLObjectType,
 ): void {
   const fields = Object.values(type.getFields());
 
@@ -284,7 +284,6 @@ function validateFields(
     }
   }
 }
-
 
 // function validateTypeImplementsInterface(
 //   context: SchemaValidationContext,
@@ -399,7 +398,7 @@ function validateEnumValues(
   context: SchemaValidationContext,
   enumType: IrisDataType,
 ): void {
-  const enumValues = enumType.getValues();
+  const enumValues = enumType.getVariants();
 
   if (enumValues.length === 0) {
     context.reportError(
@@ -503,9 +502,11 @@ function getResolverVariantNames(
   const nodes: ReadonlyArray<ResolverTypeDefinitionNode> =
     astNode != null ? [astNode] : [];
 
-    
   return nodes
-    .flatMap((unionNode) => /* c8 ignore next */ unionNode.variants?.map(x => x.name) ?? [])
+    .flatMap(
+      (unionNode) =>
+        /* c8 ignore next */ unionNode.variants?.map((x) => x.name) ?? [],
+    )
     .filter((typeNode) => typeNode.value === typeName);
 }
 

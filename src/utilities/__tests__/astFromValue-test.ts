@@ -1,12 +1,9 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLScalarType,
-  IrisDataType,
 } from '../../type/definition';
+import { gqlEnum, gqlInput } from '../../type/make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -19,176 +16,176 @@ import { astFromValue } from '../astFromValue';
 
 describe('astFromValue', () => {
   it('converts boolean values to ASTs', () => {
-    expect(astFromValue(true, GraphQLBoolean)).to.deep.equal({
+    expect(astFromValue(true, GraphQLBoolean)).toEqual({
       kind: 'BooleanValue',
       value: true,
     });
 
-    expect(astFromValue(false, GraphQLBoolean)).to.deep.equal({
+    expect(astFromValue(false, GraphQLBoolean)).toEqual({
       kind: 'BooleanValue',
       value: false,
     });
 
-    expect(astFromValue(undefined, GraphQLBoolean)).to.deep.equal(null);
+    expect(astFromValue(undefined, GraphQLBoolean)).toEqual(null);
 
-    expect(astFromValue(null, GraphQLBoolean)).to.deep.equal({
+    expect(astFromValue(null, GraphQLBoolean)).toEqual({
       kind: 'NullValue',
     });
 
-    expect(astFromValue(0, GraphQLBoolean)).to.deep.equal({
+    expect(astFromValue(0, GraphQLBoolean)).toEqual({
       kind: 'BooleanValue',
       value: false,
     });
 
-    expect(astFromValue(1, GraphQLBoolean)).to.deep.equal({
+    expect(astFromValue(1, GraphQLBoolean)).toEqual({
       kind: 'BooleanValue',
       value: true,
     });
 
     const NonNullBoolean = new GraphQLNonNull(GraphQLBoolean);
-    expect(astFromValue(0, NonNullBoolean)).to.deep.equal({
+    expect(astFromValue(0, NonNullBoolean)).toEqual({
       kind: 'BooleanValue',
       value: false,
     });
   });
 
   it('converts Int values to Int ASTs', () => {
-    expect(astFromValue(-1, GraphQLInt)).to.deep.equal({
+    expect(astFromValue(-1, GraphQLInt)).toEqual({
       kind: 'IntValue',
       value: '-1',
     });
 
-    expect(astFromValue(123.0, GraphQLInt)).to.deep.equal({
+    expect(astFromValue(123.0, GraphQLInt)).toEqual({
       kind: 'IntValue',
       value: '123',
     });
 
-    expect(astFromValue(1e4, GraphQLInt)).to.deep.equal({
+    expect(astFromValue(1e4, GraphQLInt)).toEqual({
       kind: 'IntValue',
       value: '10000',
     });
 
     // GraphQL spec does not allow coercing non-integer values to Int to avoid
     // accidental data loss.
-    expect(() => astFromValue(123.5, GraphQLInt)).to.throw(
+    expect(() => astFromValue(123.5, GraphQLInt)).toThrow(
       'Int cannot represent non-integer value: 123.5',
     );
 
     // Note: outside the bounds of 32bit signed int.
-    expect(() => astFromValue(1e40, GraphQLInt)).to.throw(
+    expect(() => astFromValue(1e40, GraphQLInt)).toThrow(
       'Int cannot represent non 32-bit signed integer value: 1e+40',
     );
 
-    expect(() => astFromValue(NaN, GraphQLInt)).to.throw(
+    expect(() => astFromValue(NaN, GraphQLInt)).toThrow(
       'Int cannot represent non-integer value: NaN',
     );
   });
 
   it('converts Float values to Int/Float ASTs', () => {
-    expect(astFromValue(-1, GraphQLFloat)).to.deep.equal({
+    expect(astFromValue(-1, GraphQLFloat)).toEqual({
       kind: 'IntValue',
       value: '-1',
     });
 
-    expect(astFromValue(123.0, GraphQLFloat)).to.deep.equal({
+    expect(astFromValue(123.0, GraphQLFloat)).toEqual({
       kind: 'IntValue',
       value: '123',
     });
 
-    expect(astFromValue(123.5, GraphQLFloat)).to.deep.equal({
+    expect(astFromValue(123.5, GraphQLFloat)).toEqual({
       kind: 'FloatValue',
       value: '123.5',
     });
 
-    expect(astFromValue(1e4, GraphQLFloat)).to.deep.equal({
+    expect(astFromValue(1e4, GraphQLFloat)).toEqual({
       kind: 'IntValue',
       value: '10000',
     });
 
-    expect(astFromValue(1e40, GraphQLFloat)).to.deep.equal({
+    expect(astFromValue(1e40, GraphQLFloat)).toEqual({
       kind: 'FloatValue',
       value: '1e+40',
     });
   });
 
   it('converts String values to String ASTs', () => {
-    expect(astFromValue('hello', GraphQLString)).to.deep.equal({
+    expect(astFromValue('hello', GraphQLString)).toEqual({
       kind: 'StringValue',
       value: 'hello',
     });
 
-    expect(astFromValue('VALUE', GraphQLString)).to.deep.equal({
+    expect(astFromValue('VALUE', GraphQLString)).toEqual({
       kind: 'StringValue',
       value: 'VALUE',
     });
 
-    expect(astFromValue('VA\nLUE', GraphQLString)).to.deep.equal({
+    expect(astFromValue('VA\nLUE', GraphQLString)).toEqual({
       kind: 'StringValue',
       value: 'VA\nLUE',
     });
 
-    expect(astFromValue(123, GraphQLString)).to.deep.equal({
+    expect(astFromValue(123, GraphQLString)).toEqual({
       kind: 'StringValue',
       value: '123',
     });
 
-    expect(astFromValue(false, GraphQLString)).to.deep.equal({
+    expect(astFromValue(false, GraphQLString)).toEqual({
       kind: 'StringValue',
       value: 'false',
     });
 
-    expect(astFromValue(null, GraphQLString)).to.deep.equal({
+    expect(astFromValue(null, GraphQLString)).toEqual({
       kind: 'NullValue',
     });
 
-    expect(astFromValue(undefined, GraphQLString)).to.deep.equal(null);
+    expect(astFromValue(undefined, GraphQLString)).toEqual(null);
   });
 
   it('converts ID values to Int/String ASTs', () => {
-    expect(astFromValue('hello', GraphQLID)).to.deep.equal({
+    expect(astFromValue('hello', GraphQLID)).toEqual({
       kind: 'StringValue',
       value: 'hello',
     });
 
-    expect(astFromValue('VALUE', GraphQLID)).to.deep.equal({
+    expect(astFromValue('VALUE', GraphQLID)).toEqual({
       kind: 'StringValue',
       value: 'VALUE',
     });
 
     // Note: EnumValues cannot contain non-identifier characters
-    expect(astFromValue('VA\nLUE', GraphQLID)).to.deep.equal({
+    expect(astFromValue('VA\nLUE', GraphQLID)).toEqual({
       kind: 'StringValue',
       value: 'VA\nLUE',
     });
 
     // Note: IntValues are used when possible.
-    expect(astFromValue(-1, GraphQLID)).to.deep.equal({
+    expect(astFromValue(-1, GraphQLID)).toEqual({
       kind: 'IntValue',
       value: '-1',
     });
 
-    expect(astFromValue(123, GraphQLID)).to.deep.equal({
+    expect(astFromValue(123, GraphQLID)).toEqual({
       kind: 'IntValue',
       value: '123',
     });
 
-    expect(astFromValue('123', GraphQLID)).to.deep.equal({
+    expect(astFromValue('123', GraphQLID)).toEqual({
       kind: 'IntValue',
       value: '123',
     });
 
-    expect(astFromValue('01', GraphQLID)).to.deep.equal({
+    expect(astFromValue('01', GraphQLID)).toEqual({
       kind: 'StringValue',
       value: '01',
     });
 
-    expect(() => astFromValue(false, GraphQLID)).to.throw(
+    expect(() => astFromValue(false, GraphQLID)).toThrow(
       'ID cannot represent value: false',
     );
 
-    expect(astFromValue(null, GraphQLID)).to.deep.equal({ kind: 'NullValue' });
+    expect(astFromValue(null, GraphQLID)).toEqual({ kind: 'NullValue' });
 
-    expect(astFromValue(undefined, GraphQLID)).to.deep.equal(null);
+    expect(astFromValue(undefined, GraphQLID)).toEqual(null);
   });
 
   it('converts using serialize from a custom scalar type', () => {
@@ -199,15 +196,15 @@ describe('astFromValue', () => {
       },
     });
 
-    expect(astFromValue('value', passthroughScalar)).to.deep.equal({
+    expect(astFromValue('value', passthroughScalar)).toEqual({
       kind: 'StringValue',
       value: 'value',
     });
 
-    expect(() => astFromValue(NaN, passthroughScalar)).to.throw(
+    expect(() => astFromValue(NaN, passthroughScalar)).toThrow(
       'Cannot convert value to AST: NaN.',
     );
-    expect(() => astFromValue(Infinity, passthroughScalar)).to.throw(
+    expect(() => astFromValue(Infinity, passthroughScalar)).toThrow(
       'Cannot convert value to AST: Infinity.',
     );
 
@@ -218,7 +215,7 @@ describe('astFromValue', () => {
       },
     });
 
-    expect(astFromValue('value', returnNullScalar)).to.equal(null);
+    expect(astFromValue('value', returnNullScalar)).toEqual(null);
 
     class SomeClass {}
 
@@ -229,35 +226,31 @@ describe('astFromValue', () => {
       },
     });
 
-    expect(() => astFromValue('value', returnCustomClassScalar)).to.throw(
+    expect(() => astFromValue('value', returnCustomClassScalar)).toThrow(
       'Cannot convert value to AST: {}.',
     );
   });
 
   it('does not converts NonNull values to NullValue', () => {
     const NonNullBoolean = new GraphQLNonNull(GraphQLBoolean);
-    expect(astFromValue(null, NonNullBoolean)).to.deep.equal(null);
+    expect(astFromValue(null, NonNullBoolean)).toEqual(null);
   });
 
-  const myEnum = new IrisDataType({
-    name: 'MyEnum',
-    variants: [{ name: 'HELLO' }, { name: 'GOODBYE' }],
-  });
+  const myEnum = gqlEnum('MyEnum', ['HELLO', 'GOODBYE']);
 
   it('converts string values to Enum ASTs if possible', () => {
-    expect(astFromValue('HELLO', myEnum)).to.deep.equal({
+    expect(astFromValue('HELLO', myEnum)).toEqual({
       kind: 'EnumValue',
       value: 'HELLO',
     });
 
-
     // Note: case sensitive
-    expect(() => astFromValue('hello', myEnum)).to.throw(
+    expect(() => astFromValue('hello', myEnum)).toThrow(
       'Enum "MyEnum" cannot represent value: "hello"',
     );
 
     // Note: Not a valid enum value
-    expect(() => astFromValue('UNKNOWN_VALUE', myEnum)).to.throw(
+    expect(() => astFromValue('UNKNOWN_VALUE', myEnum)).toThrow(
       'Enum "MyEnum" cannot represent value: "UNKNOWN_VALUE"',
     );
   });
@@ -265,7 +258,7 @@ describe('astFromValue', () => {
   it('converts array values to List ASTs', () => {
     expect(
       astFromValue(['FOO', 'BAR'], new GraphQLList(GraphQLString)),
-    ).to.deep.equal({
+    ).toEqual({
       kind: 'ListValue',
       values: [
         { kind: 'StringValue', value: 'FOO' },
@@ -273,15 +266,15 @@ describe('astFromValue', () => {
       ],
     });
 
-    expect(
-      astFromValue(['HELLO', 'GOODBYE'], new GraphQLList(myEnum)),
-    ).to.deep.equal({
-      kind: 'ListValue',
-      values: [
-        { kind: 'EnumValue', value: 'HELLO' },
-        { kind: 'EnumValue', value: 'GOODBYE' },
-      ],
-    });
+    expect(astFromValue(['HELLO', 'GOODBYE'], new GraphQLList(myEnum))).toEqual(
+      {
+        kind: 'ListValue',
+        values: [
+          { kind: 'EnumValue', value: 'HELLO' },
+          { kind: 'EnumValue', value: 'GOODBYE' },
+        ],
+      },
+    );
 
     function* listGenerator() {
       yield 1;
@@ -289,9 +282,7 @@ describe('astFromValue', () => {
       yield 3;
     }
 
-    expect(
-      astFromValue(listGenerator(), new GraphQLList(GraphQLInt)),
-    ).to.deep.equal({
+    expect(astFromValue(listGenerator(), new GraphQLList(GraphQLInt))).toEqual({
       kind: 'ListValue',
       values: [
         { kind: 'IntValue', value: '1' },
@@ -302,7 +293,7 @@ describe('astFromValue', () => {
   });
 
   it('converts list singletons', () => {
-    expect(astFromValue('FOO', new GraphQLList(GraphQLString))).to.deep.equal({
+    expect(astFromValue('FOO', new GraphQLList(GraphQLString))).toEqual({
       kind: 'StringValue',
       value: 'FOO',
     });
@@ -314,7 +305,7 @@ describe('astFromValue', () => {
       new GraphQLList(new GraphQLNonNull(GraphQLString)),
     );
 
-    expect(ast).to.deep.equal({
+    expect(ast).toEqual({
       kind: 'ListValue',
       values: [
         { kind: 'StringValue', value: 'FOO' },
@@ -323,7 +314,7 @@ describe('astFromValue', () => {
     });
   });
 
-  const inputObj = new IrisDataType({
+  const inputObj = gqlInput({
     name: 'MyInputObj',
     fields: {
       foo: { type: GraphQLFloat },
@@ -332,7 +323,7 @@ describe('astFromValue', () => {
   });
 
   it('converts input objects', () => {
-    expect(astFromValue({ foo: 3, bar: 'HELLO' }, inputObj)).to.deep.equal({
+    expect(astFromValue({ foo: 3, bar: 'HELLO' }, inputObj)).toEqual({
       kind: 'ObjectValue',
       fields: [
         {
@@ -350,7 +341,7 @@ describe('astFromValue', () => {
   });
 
   it('converts input objects with explicit nulls', () => {
-    expect(astFromValue({ foo: null }, inputObj)).to.deep.equal({
+    expect(astFromValue({ foo: null }, inputObj)).toEqual({
       kind: 'ObjectValue',
       fields: [
         {
@@ -363,6 +354,6 @@ describe('astFromValue', () => {
   });
 
   it('does not converts non-object values as input objects', () => {
-    expect(astFromValue(5, inputObj)).to.equal(null);
+    expect(astFromValue(5, inputObj)).toEqual(null);
   });
 });

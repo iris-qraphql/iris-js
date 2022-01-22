@@ -3,17 +3,14 @@ import { dedent } from '../../__testUtils__/dedent';
 import { Kind } from '../../language/kinds';
 import { parse } from '../../language/parser';
 
-import {
-  assertDataType,
-  assertObjectType,
-} from '../../type/definition';
+import { assertDataType, assertObjectType } from '../../type/definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLIncludeDirective,
   GraphQLSkipDirective,
   GraphQLSpecifiedByDirective,
 } from '../../type/directives';
-import { __EnumValue, __Schema } from '../../type/introspection';
+import { __Schema } from '../../type/introspection';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -165,8 +162,6 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
-
-
   it('Overriding directives excludes specified', () => {
     const schema = buildSchema(`
       directive @skip on FIELD
@@ -177,9 +172,7 @@ describe('Schema Builder', () => {
 
     expect(schema.getDirectives()).toHaveLength(4);
     expect(schema.getDirective('skip')).not.toEqual(GraphQLSkipDirective);
-    expect(schema.getDirective('include')).not.toEqual(
-      GraphQLIncludeDirective,
-    );
+    expect(schema.getDirective('include')).not.toEqual(GraphQLIncludeDirective);
     expect(schema.getDirective('deprecated')).not.toEqual(
       GraphQLDeprecatedDirective,
     );
@@ -448,46 +441,59 @@ describe('Schema Builder', () => {
     const myEnum = assertDataType(schema.getType('MyEnum'));
 
     const value = myEnum.getValue('VALUE');
-    expect(value).toEqual(expect.objectContaining({ deprecationReason: undefined }));
+    expect(value).toEqual(
+      expect.objectContaining({ deprecationReason: undefined }),
+    );
 
     const oldValue = myEnum.getValue('OLD_VALUE');
-    expect(oldValue).toEqual(expect.objectContaining({
-      deprecationReason: 'No longer supported',
-    }));
+    expect(oldValue).toEqual(
+      expect.objectContaining({
+        deprecationReason: 'No longer supported',
+      }),
+    );
 
     const otherValue = myEnum.getValue('OTHER_VALUE');
-    expect(otherValue).toEqual(expect.objectContaining({
-      deprecationReason: 'Terrible reasons',
-    }));
+    expect(otherValue).toEqual(
+      expect.objectContaining({
+        deprecationReason: 'Terrible reasons',
+      }),
+    );
 
     const rootFields = assertObjectType(schema.getType('Query')).getFields();
-    expect(rootFields.field1).toEqual(expect.objectContaining({
-      deprecationReason: 'No longer supported',
-    }));
-    expect(rootFields.field2).toEqual(expect.objectContaining({
-      deprecationReason: 'Because I said so',
-    }));
+    expect(rootFields.field1).toEqual(
+      expect.objectContaining({
+        deprecationReason: 'No longer supported',
+      }),
+    );
+    expect(rootFields.field2).toEqual(
+      expect.objectContaining({
+        deprecationReason: 'Because I said so',
+      }),
+    );
 
-    const inputFields = assertDataType(
-      schema.getType('MyInput'),
-    ).getFields();
+    const inputFields = assertDataType(schema.getType('MyInput')).getFields();
 
     const newInput = inputFields.newInput;
-    expect(newInput).toEqual(expect.objectContaining({
-      deprecationReason: undefined,
-    }));
+    expect(newInput).toEqual(
+      expect.objectContaining({
+        deprecationReason: undefined,
+      }),
+    );
 
     const field3OldArg = rootFields.field3.args[0];
-    expect(field3OldArg).toEqual(expect.objectContaining({
-      deprecationReason: 'No longer supported',
-    }));
+    expect(field3OldArg).toEqual(
+      expect.objectContaining({
+        deprecationReason: 'No longer supported',
+      }),
+    );
 
     const field4OldArg = rootFields.field4.args[0];
-    expect(field4OldArg).toEqual(expect.objectContaining({
-      deprecationReason: 'Why not?',
-    }));
+    expect(field4OldArg).toEqual(
+      expect.objectContaining({
+        deprecationReason: 'Why not?',
+      }),
+    );
   });
-
 
   it('can build invalid schema', () => {
     // Invalid schema, because it is missing query root type
@@ -518,7 +524,7 @@ describe('Schema Builder', () => {
     `);
 
     const queryType = assertObjectType(schema.getType('Query'));
-    expect(queryType.getFields()).toMatchSnapshot()
+    expect(queryType.getFields()).toMatchSnapshot();
   });
 
   it('Rejects invalid SDL', () => {
@@ -558,8 +564,6 @@ describe('Schema Builder', () => {
     );
 
     // @ts-expect-error
-    expect(() => buildASTSchema({})).toThrow(
-      'Must provide valid Document AST',
-    );
+    expect(() => buildASTSchema({})).toThrow('Must provide valid Document AST');
   });
 });

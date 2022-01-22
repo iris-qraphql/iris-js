@@ -35,8 +35,6 @@ export { graphql, graphqlSync } from './iris';
 
 export type { GraphQLUnionType } from './type/index';
 export {
-  resolveObjMapThunk,
-  resolveReadonlyArrayThunk,
   GraphQLSchema,
   GraphQLDirective,
   GraphQLScalarType,
@@ -127,7 +125,6 @@ export type {
   GraphQLNamedType,
   GraphQLNamedInputType,
   GraphQLNamedOutputType,
-  ThunkReadonlyArray,
   ThunkObjMap,
   GraphQLSchemaConfig,
   GraphQLSchemaExtensions,

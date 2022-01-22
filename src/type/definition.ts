@@ -34,6 +34,8 @@ import { print } from '../language/printer';
 
 import { valueFromASTUntyped } from '../utilities/valueFromASTUntyped';
 
+import type { Override } from '../utils/type-level';
+
 import { assertName } from './assertName';
 import type { GraphQLSchema } from './schema';
 
@@ -110,10 +112,6 @@ export function assertUnionType(type: unknown): GraphQLUnionType {
   return type;
 }
 
-export function isEnumType(type: unknown): type is IrisDataType {
-  return isDataType(type) && Boolean(type.getValues().length > 0);
-}
-
 export function isDataType(type: unknown): type is IrisDataType {
   return instanceOf(type, IrisDataType);
 }
@@ -125,8 +123,12 @@ export function assertDataType(type: unknown): IrisDataType {
   return type;
 }
 
+export function isEnumType(type: unknown): type is IrisDataType {
+  return isDataType(type) && !type.isVariantType();
+}
+
 export function isInputObjectType(type: unknown): type is IrisDataType {
-  return isDataType(type) && Boolean(type.getValues().length === 0);
+  return isDataType(type) && type.isVariantType();
 }
 
 export function isListType(
@@ -408,18 +410,15 @@ export function getNamedType(
  * Used while defining GraphQL types to allow for circular references in
  * otherwise immutable type definitions.
  */
-export type ThunkReadonlyArray<T> = (() => ReadonlyArray<T>) | ReadonlyArray<T>;
-export type ThunkObjMap<T> = (() => ObjMap<T>) | ObjMap<T>;
+export type ThunkReadonlyArray<T> = Thunk<ReadonlyArray<T>>;
+export type ThunkObjMap<T> = Thunk<ObjMap<T>>;
+export type Thunk<T> = (() => T) | T;
 
-export function resolveReadonlyArrayThunk<T>(
-  thunk: ThunkReadonlyArray<T>,
-): ReadonlyArray<T> {
-  return typeof thunk === 'function' ? thunk() : thunk;
-}
+const isThunk = <T>(thunk: Thunk<T>): thunk is () => T =>
+  typeof thunk === 'function';
 
-export function resolveObjMapThunk<T>(thunk: ThunkObjMap<T>): ObjMap<T> {
-  return typeof thunk === 'function' ? thunk() : thunk;
-}
+const resolveThunk = <T>(thunk: Thunk<T>): T =>
+  isThunk(thunk) ? thunk() : thunk;
 
 export class GraphQLScalarType<TInternal = unknown, TExternal = TInternal> {
   name: string;
@@ -556,7 +555,7 @@ export class GraphQLObjectType<TSource = any, TContext = any> {
 function defineFieldMap<TSource, TContext>(
   config: Readonly<GraphQLObjectTypeConfig<TSource, TContext>>,
 ): GraphQLFieldMap<TSource, TContext> {
-  const fieldMap = resolveObjMapThunk(config.fields);
+  const fieldMap = resolveThunk(config.fields);
   devAssert(
     isPlainObj(fieldMap),
     `${config.name} fields must be an object with field names as keys or a function which returns such an object.`,
@@ -734,7 +733,7 @@ export class IrisResolverType {
     this.description = config.description;
     this.resolveType = config.resolveType;
     this.astNode = config.astNode;
-    this._types = () => resolveReadonlyArrayThunk(config.types);
+    this._types = () => resolveThunk(config.types);
     devAssert(
       config.resolveType == null || typeof config.resolveType === 'function',
       `${this.name} must provide "resolveType" as a function, ` +
@@ -772,19 +771,19 @@ export interface GraphQLUnionTypeConfig<TSource, TContext> {
 
 export type IrisDataVariantFieldFields = ObjMap<IrisDataVariantField>;
 
-export interface GraphQLInputField {
+export type GraphQLInputField = {
   name: string;
-  description: Maybe<string>;
-  type: GraphQLInputType;
-  defaultValue: unknown;
-  deprecationReason: Maybe<string>;
-  astNode: Maybe<InputValueDefinitionNode>;
-}
-
-export type IrisDataVariantField = {
   description?: Maybe<string>;
   type: GraphQLInputType;
   defaultValue?: unknown;
+  deprecationReason?: Maybe<string>;
+  astNode?: Maybe<InputValueDefinitionNode>;
+};
+
+export type IrisDataVariantField = {
+  name: string;
+  description?: Maybe<string>;
+  type: GraphQLInputType;
   deprecationReason?: Maybe<string>;
   astNode?: Maybe<InputValueDefinitionNode>;
 };
@@ -795,83 +794,74 @@ export type IrisDataVariant = {
   deprecationReason?: Maybe<string>;
   astNode?: VariantDefinitionNode;
   fields?: ObjMap<IrisDataVariantField>;
+  toJSON?: () => string;
 };
 
 type IrisDataTypeConfig = {
   name: string;
   description?: Maybe<string>;
-  variants?: ReadonlyArray<IrisDataVariant>;
-  fields?: ThunkObjMap<IrisDataVariantField>;
+  variants?: ReadonlyArray<IrisDataVariantConfig>;
   astNode?: Maybe<DataTypeDefinitionNode>;
 };
 
+type IrisDataVariantConfig = Override<
+  IrisDataVariant,
+  { fields?: ThunkObjMap<Omit<GraphQLInputField, 'name'>> }
+>;
 
-// FIXME: String value are serialized with "\"ABC\"". that why we need something like that
-class Literal {
-  name;
-  constructor(name: string) {
-    this.name = name;
-  }
+const dataVariant = (config: IrisDataVariantConfig): IrisDataVariantConfig => ({
+  ...config,
+  fields: () =>
+    mapValue(resolveThunk(config.fields ?? {}), (fieldConfig, fieldName) => ({
+      name: assertName(fieldName),
+      description: fieldConfig.description,
+      type: fieldConfig.type,
+      defaultValue: fieldConfig.defaultValue,
+      deprecationReason: fieldConfig.deprecationReason,
+      astNode: fieldConfig.astNode,
+    })),
+  toJSON: () => config.name,
+});
 
-  toJSON() {
-    return this.name;
-  }
-}
+const resolveVariant = (v: IrisDataVariantConfig): IrisDataVariant => ({
+  ...v,
+  fields: mapValue(resolveThunk(v.fields ?? {}), (x, name) => ({ ...x, name })),
+});
 
 export class IrisDataType {
   name: string;
   description: Maybe<string>;
   astNode: Maybe<DataTypeDefinitionNode>;
-
-  private _variants: ReadonlyArray<IrisDataVariant>;
-  private _fields: () => ObjMap<GraphQLInputField>;
+  private _variants: ReadonlyArray<IrisDataVariantConfig>;
 
   constructor(config: Readonly<IrisDataTypeConfig>) {
     this.astNode = config.astNode;
     this.name = assertName(config.name);
     this.description = config.description;
-    // input
-    this._fields = () =>
-      mapValue(
-        resolveObjMapThunk(config.fields ?? {}),
-        (fieldConfig, fieldName) => ({
-          name: assertName(fieldName),
-          description: fieldConfig.description,
-          type: fieldConfig.type,
-          defaultValue: fieldConfig.defaultValue,
-          deprecationReason: fieldConfig.deprecationReason,
-          astNode: fieldConfig.astNode,
-        }),
-      );
-
-    // enum
-    this._variants =
-      config.variants?.map((valueConfig) => ({
-        name: valueConfig.name,
-        description: valueConfig.description,
-        deprecationReason: valueConfig.deprecationReason,
-        astNode: valueConfig.astNode,
-      })) ?? [];
+    this._variants = (config.variants ?? []).map(dataVariant);
   }
 
   get [Symbol.toStringTag]() {
     return 'IrisDataType';
   }
 
-  getVariants(): ReadonlyArray<VariantDefinitionNode> {
-    return this.astNode?.variants ?? [];
+  isVariantType = () => {
+    const [variant, ...xs] = this._variants;
+    return variant?.name === this.name && xs.length === 0;
+  };
+
+  getVariants(): ReadonlyArray<IrisDataVariant> {
+    return this._variants.map(resolveVariant);
   }
 
   getFields(): ObjMap<GraphQLInputField> {
-    return this._fields();
-  }
-
-  getValues(): ReadonlyArray<IrisDataVariant> {
-    return this._variants;
+    const fields = resolveVariant(this._variants[0])?.fields;
+    return fields ?? {};
   }
 
   getValue(name: string): Maybe<IrisDataVariant> {
-    return this._variants.find((x) => x.name === name);
+    const variant = this._variants.find((x) => x.name === name);
+    return variant ? resolveVariant(variant) : undefined;
   }
 
   serialize(value: unknown): Maybe<any> {
@@ -918,7 +908,7 @@ export class IrisDataType {
       );
     }
 
-    const enumValue = this.getValue(valueNode.value);
+    const enumValue = this._variants.find((x) => x.name === valueNode.value);
     if (enumValue == null) {
       const valueStr = print(valueNode);
       throw new GraphQLError(
@@ -928,7 +918,7 @@ export class IrisDataType {
       );
     }
 
-    return new Literal(enumValue.name);
+    return enumValue;
   }
 
   toString(): string {
@@ -946,7 +936,7 @@ function didYouMeanEnumValue(
 ): string {
   const suggestedValues = suggestionList(
     unknownValueStr,
-    pluck('name', enumType.getValues()),
+    pluck('name', enumType.getVariants()),
   );
   return didYouMean('the enum value', suggestedValues);
 }

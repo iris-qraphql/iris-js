@@ -907,7 +907,7 @@ export class Parser {
       return token;
     }
 
-    return this.throwExpected(getTokenKindDesc(kind))
+    return this.throwExpected(getTokenKindDesc(kind));
   }
 
   throwExpected(kind: string): Token {

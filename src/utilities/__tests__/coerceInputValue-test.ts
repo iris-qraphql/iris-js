@@ -1,13 +1,10 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import type { GraphQLInputType } from '../../type/definition';
 import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLScalarType,
-  IrisDataType,
 } from '../../type/definition';
+import { gqlEnum, gqlInput } from '../../type/make';
 import { GraphQLInt } from '../../type/scalars';
 
 import { coerceInputValue } from '../coerceInputValue';
@@ -40,7 +37,7 @@ function coerceValue(
 }
 
 function expectValue(result: CoerceResult) {
-  expect(result.errors).to.deep.equal([]);
+  expect(result.errors).toEqual([]);
   return expect(result.value);
 }
 
@@ -54,12 +51,12 @@ describe('coerceInputValue', () => {
 
     it('returns no error for non-null value', () => {
       const result = coerceValue(1, TestNonNull);
-      expectValue(result).to.equal(1);
+      expectValue(result).toEqual(1);
     });
 
     it('returns an error for undefined value', () => {
       const result = coerceValue(undefined, TestNonNull);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Expected non-nullable type "Int!" not to be null.',
           path: [],
@@ -70,7 +67,7 @@ describe('coerceInputValue', () => {
 
     it('returns an error for null value', () => {
       const result = coerceValue(null, TestNonNull);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Expected non-nullable type "Int!" not to be null.',
           path: [],
@@ -93,22 +90,22 @@ describe('coerceInputValue', () => {
 
     it('returns no error for valid input', () => {
       const result = coerceValue({ value: 1 }, TestScalar);
-      expectValue(result).to.equal(1);
+      expectValue(result).toEqual(1);
     });
 
     it('returns no error for null result', () => {
       const result = coerceValue({ value: null }, TestScalar);
-      expectValue(result).to.equal(null);
+      expectValue(result).toEqual(null);
     });
 
     it('returns no error for NaN result', () => {
       const result = coerceValue({ value: NaN }, TestScalar);
-      expectValue(result).to.satisfy(Number.isNaN);
+      expectValue(result).toBeNaN();
     });
 
     it('returns an error for undefined result', () => {
       const result = coerceValue({ value: undefined }, TestScalar);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Expected type "TestScalar".',
           path: [],
@@ -120,7 +117,7 @@ describe('coerceInputValue', () => {
     it('returns an error for undefined result', () => {
       const inputValue = { error: 'Some error message' };
       const result = coerceValue(inputValue, TestScalar);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Expected type "TestScalar". Some error message',
           path: [],
@@ -131,21 +128,15 @@ describe('coerceInputValue', () => {
   });
 
   describe('GraphQLEnum', () => {
-    const TestEnum = new IrisDataType({
-      name: 'TestEnum',
-      variants: [
-        { name: 'FOO' },
-        { name: 'BAR' },
-      ],
-    });
+    const TestEnum = gqlEnum('TestEnum', ['FOO', 'BAR']);
 
     it('returns no error for a known Enum name', () => {
-      expectValue(coerceValue('FOO', TestEnum)).to.equal('FOO');
+      expectValue(coerceValue('FOO', TestEnum)).toEqual('FOO');
     });
 
     it('returns an error for misspelled Enum value', () => {
       const result = coerceValue('foo', TestEnum);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error:
             'Value "foo" does not exist in "TestEnum" enum. Did you mean the enum value "FOO"?',
@@ -157,7 +148,7 @@ describe('coerceInputValue', () => {
 
     it('returns an error for incorrect value type', () => {
       const result1 = coerceValue(123, TestEnum);
-      expectErrors(result1).to.deep.equal([
+      expectErrors(result1).toEqual([
         {
           error: 'Enum "TestEnum" cannot represent non-string value: 123.',
           path: [],
@@ -166,7 +157,7 @@ describe('coerceInputValue', () => {
       ]);
 
       const result2 = coerceValue({ field: 'value' }, TestEnum);
-      expectErrors(result2).to.deep.equal([
+      expectErrors(result2).toEqual([
         {
           error:
             'Enum "TestEnum" cannot represent non-string value: { field: "value" }.',
@@ -178,7 +169,7 @@ describe('coerceInputValue', () => {
   });
 
   describe('for GraphQLInputObject', () => {
-    const TestInputObject = new IrisDataType({
+    const TestInputObject = gqlInput({
       name: 'TestInputObject',
       fields: {
         foo: { type: new GraphQLNonNull(GraphQLInt) },
@@ -188,12 +179,12 @@ describe('coerceInputValue', () => {
 
     it('returns no error for a valid input', () => {
       const result = coerceValue({ foo: 123 }, TestInputObject);
-      expectValue(result).to.deep.equal({ foo: 123 });
+      expectValue(result).toEqual({ foo: 123 });
     });
 
     it('returns an error for a non-object type', () => {
       const result = coerceValue(123, TestInputObject);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Expected type "TestInputObject" to be an object.',
           path: [],
@@ -204,7 +195,7 @@ describe('coerceInputValue', () => {
 
     it('returns an error for an invalid field', () => {
       const result = coerceValue({ foo: NaN }, TestInputObject);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Int cannot represent non-integer value: NaN',
           path: ['foo'],
@@ -215,7 +206,7 @@ describe('coerceInputValue', () => {
 
     it('returns multiple errors for multiple invalid fields', () => {
       const result = coerceValue({ foo: 'abc', bar: 'def' }, TestInputObject);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Int cannot represent non-integer value: "abc"',
           path: ['foo'],
@@ -231,7 +222,7 @@ describe('coerceInputValue', () => {
 
     it('returns error for a missing required field', () => {
       const result = coerceValue({ bar: 123 }, TestInputObject);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Field "foo" of required type "Int!" was not provided.',
           path: [],
@@ -245,7 +236,7 @@ describe('coerceInputValue', () => {
         { foo: 123, unknownField: 123 },
         TestInputObject,
       );
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error:
             'Field "unknownField" is not defined by type "TestInputObject".',
@@ -257,7 +248,7 @@ describe('coerceInputValue', () => {
 
     it('returns error for a misspelled field', () => {
       const result = coerceValue({ foo: 123, bart: 123 }, TestInputObject);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error:
             'Field "bart" is not defined by type "TestInputObject". Did you mean "bar"?',
@@ -268,45 +259,12 @@ describe('coerceInputValue', () => {
     });
   });
 
-  describe('for GraphQLInputObject with default value', () => {
-    const makeTestInputObject = (defaultValue: any) =>
-      new IrisDataType({
-        name: 'TestInputObject',
-        fields: {
-          foo: {
-            type: new GraphQLScalarType({ name: 'TestScalar' }),
-            defaultValue,
-          },
-        },
-      });
-
-    it('returns no errors for valid input value', () => {
-      const result = coerceValue({ foo: 5 }, makeTestInputObject(7));
-      expectValue(result).to.deep.equal({ foo: 5 });
-    });
-
-    it('returns object with default value', () => {
-      const result = coerceValue({}, makeTestInputObject(7));
-      expectValue(result).to.deep.equal({ foo: 7 });
-    });
-
-    it('returns null as value', () => {
-      const result = coerceValue({}, makeTestInputObject(null));
-      expectValue(result).to.deep.equal({ foo: null });
-    });
-
-    it('returns NaN as value', () => {
-      const result = coerceValue({}, makeTestInputObject(NaN));
-      expectValue(result).to.have.property('foo').that.satisfy(Number.isNaN);
-    });
-  });
-
   describe('for GraphQLList', () => {
     const TestList = new GraphQLList(GraphQLInt);
 
     it('returns no error for a valid input', () => {
       const result = coerceValue([1, 2, 3], TestList);
-      expectValue(result).to.deep.equal([1, 2, 3]);
+      expectValue(result).toEqual([1, 2, 3]);
     });
 
     it('returns no error for a valid iterable input', () => {
@@ -317,12 +275,12 @@ describe('coerceInputValue', () => {
       }
 
       const result = coerceValue(listGenerator(), TestList);
-      expectValue(result).to.deep.equal([1, 2, 3]);
+      expectValue(result).toEqual([1, 2, 3]);
     });
 
     it('returns an error for an invalid input', () => {
       const result = coerceValue([1, 'b', true, 4], TestList);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Int cannot represent non-integer value: "b"',
           path: [1],
@@ -338,12 +296,12 @@ describe('coerceInputValue', () => {
 
     it('returns a list for a non-list value', () => {
       const result = coerceValue(42, TestList);
-      expectValue(result).to.deep.equal([42]);
+      expectValue(result).toEqual([42]);
     });
 
     it('returns a list for a non-list object value', () => {
       const TestListOfObjects = new GraphQLList(
-        new IrisDataType({
+        gqlInput({
           name: 'TestObject',
           fields: {
             length: { type: GraphQLInt },
@@ -352,12 +310,12 @@ describe('coerceInputValue', () => {
       );
 
       const result = coerceValue({ length: 100500 }, TestListOfObjects);
-      expectValue(result).to.deep.equal([{ length: 100500 }]);
+      expectValue(result).toEqual([{ length: 100500 }]);
     });
 
     it('returns an error for a non-list invalid value', () => {
       const result = coerceValue('INVALID', TestList);
-      expectErrors(result).to.deep.equal([
+      expectErrors(result).toEqual([
         {
           error: 'Int cannot represent non-integer value: "INVALID"',
           path: [],
@@ -368,7 +326,7 @@ describe('coerceInputValue', () => {
 
     it('returns null for a null value', () => {
       const result = coerceValue(null, TestList);
-      expectValue(result).to.deep.equal(null);
+      expectValue(result).toEqual(null);
     });
   });
 
@@ -377,27 +335,27 @@ describe('coerceInputValue', () => {
 
     it('returns no error for a valid input', () => {
       const result = coerceValue([[1], [2, 3]], TestNestedList);
-      expectValue(result).to.deep.equal([[1], [2, 3]]);
+      expectValue(result).toEqual([[1], [2, 3]]);
     });
 
     it('returns a list for a non-list value', () => {
       const result = coerceValue(42, TestNestedList);
-      expectValue(result).to.deep.equal([[42]]);
+      expectValue(result).toEqual([[42]]);
     });
 
     it('returns null for a null value', () => {
       const result = coerceValue(null, TestNestedList);
-      expectValue(result).to.deep.equal(null);
+      expectValue(result).toEqual(null);
     });
 
     it('returns nested lists for nested non-list values', () => {
       const result = coerceValue([1, 2, 3], TestNestedList);
-      expectValue(result).to.deep.equal([[1], [2], [3]]);
+      expectValue(result).toEqual([[1], [2], [3]]);
     });
 
     it('returns nested null for nested null values', () => {
       const result = coerceValue([42, [null], null], TestNestedList);
-      expectValue(result).to.deep.equal([[42], [null], null]);
+      expectValue(result).toEqual([[42], [null], null]);
     });
   });
 
@@ -405,7 +363,7 @@ describe('coerceInputValue', () => {
     it('throw error without path', () => {
       expect(() =>
         coerceInputValue(null, new GraphQLNonNull(GraphQLInt)),
-      ).to.throw(
+      ).toThrow(
         'Invalid value null: Expected non-nullable type "Int!" not to be null.',
       );
     });
@@ -416,7 +374,7 @@ describe('coerceInputValue', () => {
           [null],
           new GraphQLList(new GraphQLNonNull(GraphQLInt)),
         ),
-      ).to.throw(
+      ).toThrow(
         'Invalid value null at "value[0]": Expected non-nullable type "Int!" not to be null.',
       );
     });

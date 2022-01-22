@@ -282,7 +282,7 @@ export const __Type: GraphQLObjectType = new GraphQLObjectType({
         },
         resolve(type, { includeDeprecated }) {
           if (isEnumType(type)) {
-            const values = type.getValues();
+            const values = type.getVariants();
             return includeDeprecated
               ? values
               : values.filter((field) => field.deprecationReason == null);

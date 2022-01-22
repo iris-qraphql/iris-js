@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 
 import type { GraphQLSchema } from '../../type/schema';
 
-import { expectSDLValidationErrors, expectValidationErrors } from '../__mocha__/harness';
+import { expectSDLValidationErrors, expectValidationErrors } from './harness';
 import {
   ProvidedRequiredArgumentsOnDirectivesRule,
   ProvidedRequiredArgumentsRule,
@@ -253,7 +253,7 @@ describe('Validate: Provided required arguments', () => {
   describe('within SDL', () => {
     it('Missing optional args on directive defined inside SDL', () => {
       expectValidSDL(`
-        type Query {
+        resolver Query = {
           foo: String @test
         }
 
@@ -265,7 +265,7 @@ describe('Validate: Provided required arguments', () => {
       expectSDLErrors(`
         directive @test(arg: String!) on FIELD_DEFINITION
         
-        type Query {
+        resolver Query = {
           foo: String @test
         }
       `).toDeepEqual([
@@ -279,7 +279,7 @@ describe('Validate: Provided required arguments', () => {
 
     it('Missing arg on standard directive', () => {
       expectSDLErrors(`
-        type Query {
+        resolver Query = {
           foo: String @include
         }
       `).toDeepEqual([
@@ -293,7 +293,7 @@ describe('Validate: Provided required arguments', () => {
 
     it('Missing arg on overridden standard directive', () => {
       expectSDLErrors(`
-        type Query {
+        resolver Query = {
           foo: String @deprecated
         }
         directive @deprecated(reason: String!) on FIELD

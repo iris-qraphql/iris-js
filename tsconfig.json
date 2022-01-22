@@ -13,5 +13,5 @@
     "importsNotUsedAsValues": "error",
     "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["**/__mocha__/*", "**/__mocks__/*","**/__fixme__/**"]
+  "exclude": ["**/__mocha__/*", "**/__mocks__/*", "**/__fixme__/**"]
 }

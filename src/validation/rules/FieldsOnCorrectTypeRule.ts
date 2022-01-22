@@ -11,10 +11,7 @@ import type {
   GraphQLObjectType,
   GraphQLOutputType,
 } from '../../type/definition';
-import {
-  isAbstractType,
-  isObjectType,
-} from '../../type/definition';
+import { isAbstractType, isObjectType } from '../../type/definition';
 import type { GraphQLSchema } from '../../type/schema';
 
 import type { ValidationContext } from '../ValidationContext';
@@ -80,8 +77,7 @@ function getSuggestedTypeNames(
     return [];
   }
 
-  const suggestedTypes: Set<GraphQLObjectType> =
-    new Set();
+  const suggestedTypes: Set<GraphQLObjectType> = new Set();
   const usageCount = Object.create(null);
   for (const possibleType of schema.getPossibleTypes(type)) {
     if (!possibleType.getFields()[fieldName]) {

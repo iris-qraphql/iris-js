@@ -7,7 +7,11 @@ import { UniqueVariantAndFieldDefinitionNamesRule } from '../rules/UniqueVariant
 import { expectSDLValidationErrors } from './harness';
 
 function expectSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
-  return expectSDLValidationErrors(schema, UniqueVariantAndFieldDefinitionNamesRule, sdlStr);
+  return expectSDLValidationErrors(
+    schema,
+    UniqueVariantAndFieldDefinitionNamesRule,
+    sdlStr,
+  );
 }
 
 function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {

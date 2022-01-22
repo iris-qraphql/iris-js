@@ -76,9 +76,7 @@ describe('Validate: Unique field definition names', () => {
           { line: 9, column: 9 },
           { line: 11, column: 9 },
         ],
-      }
+      },
     ]);
   });
-
-
 });

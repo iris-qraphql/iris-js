@@ -18,10 +18,10 @@ import { visit } from '../language/visitor';
 import type {
   GraphQLArgument,
   GraphQLCompositeType,
-  IrisDataVariant,
   GraphQLField,
   GraphQLInputType,
   GraphQLOutputType,
+  IrisDataVariant,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import type { GraphQLSchema } from '../type/schema';
@@ -33,7 +33,7 @@ type VariableUsage = {
   readonly node: VariableNode;
   readonly type: Maybe<GraphQLInputType>;
   readonly defaultValue: Maybe<unknown>;
-}
+};
 
 /**
  * An instance of this class is passed as the "this" context to all validators,

@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 
 import type { GraphQLSchema } from '../../type/schema';
 
-import { expectSDLValidationErrors, expectValidationErrors } from '../__mocha__/harness';
+import { expectSDLValidationErrors, expectValidationErrors } from './harness';
 import {
   KnownArgumentNamesOnDirectivesRule,
   KnownArgumentNamesRule,
@@ -215,7 +215,7 @@ describe('Validate: Known argument names', () => {
   describe('within SDL', () => {
     it('known arg on directive defined inside SDL', () => {
       expectValidSDL(`
-        type Query {
+        resolver Query = {
           foo: String @test(arg: "")
         }
 
@@ -225,7 +225,7 @@ describe('Validate: Known argument names', () => {
 
     it('unknown arg on directive defined inside SDL', () => {
       expectSDLErrors(`
-        type Query {
+        resolver Query = {
           foo: String @test(unknown: "")
         }
 
@@ -240,7 +240,7 @@ describe('Validate: Known argument names', () => {
 
     it('misspelled arg name is reported on directive defined inside SDL', () => {
       expectSDLErrors(`
-        type Query {
+        resolver Query = {
           foo: String @test(agr: "")
         }
 
@@ -256,7 +256,7 @@ describe('Validate: Known argument names', () => {
 
     it('unknown arg on standard directive', () => {
       expectSDLErrors(`
-        type Query {
+        resolver Query = {
           foo: String @deprecated(unknown: "")
         }
       `).toDeepEqual([
@@ -269,7 +269,7 @@ describe('Validate: Known argument names', () => {
 
     it('unknown arg on overridden standard directive', () => {
       expectSDLErrors(`
-        type Query {
+        resolver Query = {
           foo: String @deprecated(reason: "")
         }
         directive @deprecated(arg: String) on FIELD

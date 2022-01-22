@@ -25,7 +25,7 @@ import { valueFromAST } from '../utilities/valueFromAST';
 
 type CoercedVariableValues =
   | { errors: ReadonlyArray<GraphQLError>; coerced?: never }
-  | { coerced: { [variable: string]: unknown }; errors?: never };
+  | { coerced: Record<string, unknown>; errors?: never };
 
 /**
  * Prepares an object map of variableValues of the correct type based on the
@@ -41,7 +41,7 @@ type CoercedVariableValues =
 export function getVariableValues(
   schema: GraphQLSchema,
   varDefNodes: ReadonlyArray<VariableDefinitionNode>,
-  inputs: { readonly [variable: string]: unknown },
+  inputs: Readonly<Record<string, unknown>>,
   options?: { maxErrors?: number },
 ): CoercedVariableValues {
   const errors = [];
@@ -74,10 +74,10 @@ export function getVariableValues(
 function coerceVariableValues(
   schema: GraphQLSchema,
   varDefNodes: ReadonlyArray<VariableDefinitionNode>,
-  inputs: { readonly [variable: string]: unknown },
+  inputs: Readonly<Record<string, unknown>>,
   onError: (error: GraphQLError) => void,
-): { [variable: string]: unknown } {
-  const coercedValues: { [variable: string]: unknown } = {};
+): Record<string, unknown> {
+  const coercedValues: Record<string, unknown> = {};
   for (const varDefNode of varDefNodes) {
     const varName = varDefNode.variable.name.value;
     const varType = typeFromAST(schema, varDefNode.type);
@@ -161,8 +161,8 @@ export function getArgumentValues(
   def: GraphQLField<unknown, unknown> | GraphQLDirective,
   node: FieldNode | DirectiveNode,
   variableValues?: Maybe<ObjMap<unknown>>,
-): { [argument: string]: unknown } {
-  const coercedValues: { [argument: string]: unknown } = {};
+): Record<string, unknown> {
+  const coercedValues: Record<string, unknown> = {};
 
   // FIXME: https://github.com/graphql/graphql-js/issues/2203
   /* c8 ignore next */
@@ -248,7 +248,7 @@ export function getDirectiveValues(
   directiveDef: GraphQLDirective,
   node: { readonly directives?: ReadonlyArray<DirectiveNode> },
   variableValues?: Maybe<ObjMap<unknown>>,
-): undefined | { [argument: string]: unknown } {
+): undefined | Record<string, unknown> {
   const directiveNode = node.directives?.find(
     (directive) => directive.name.value === directiveDef.name,
   );

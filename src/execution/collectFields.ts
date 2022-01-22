@@ -33,7 +33,7 @@ import { getDirectiveValues } from './values';
 export function collectFields(
   schema: GraphQLSchema,
   fragments: ObjMap<FragmentDefinitionNode>,
-  variableValues: { [variable: string]: unknown },
+  variableValues: Record<string, unknown>,
   runtimeType: GraphQLObjectType,
   selectionSet: SelectionSetNode,
 ): Map<string, ReadonlyArray<FieldNode>> {
@@ -63,7 +63,7 @@ export function collectFields(
 export function collectSubfields(
   schema: GraphQLSchema,
   fragments: ObjMap<FragmentDefinitionNode>,
-  variableValues: { [variable: string]: unknown },
+  variableValues: Record<string, unknown>,
   returnType: GraphQLObjectType,
   fieldNodes: ReadonlyArray<FieldNode>,
 ): Map<string, ReadonlyArray<FieldNode>> {
@@ -88,7 +88,7 @@ export function collectSubfields(
 function collectFieldsImpl(
   schema: GraphQLSchema,
   fragments: ObjMap<FragmentDefinitionNode>,
-  variableValues: { [variable: string]: unknown },
+  variableValues: Record<string, unknown>,
   runtimeType: GraphQLObjectType,
   selectionSet: SelectionSetNode,
   fields: Map<string, Array<FieldNode>>,
@@ -163,7 +163,7 @@ function collectFieldsImpl(
  * directives, where `@skip` has higher precedence than `@include`.
  */
 function shouldIncludeNode(
-  variableValues: { [variable: string]: unknown },
+  variableValues: Record<string, unknown>,
   node: FragmentSpreadNode | FieldNode | InlineFragmentNode,
 ): boolean {
   const skip = getDirectiveValues(GraphQLSkipDirective, node, variableValues);

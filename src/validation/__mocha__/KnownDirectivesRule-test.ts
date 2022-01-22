@@ -9,7 +9,7 @@ import { KnownDirectivesRule } from '../rules/KnownDirectivesRule';
 import {
   expectSDLValidationErrors,
   expectValidationErrorsWithSchema,
-} from '../__mocha__/harness';
+} from './harness';
 
 function expectErrors(queryStr: string) {
   return expectValidationErrorsWithSchema(
@@ -32,7 +32,7 @@ function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {
 }
 
 const schemaWithDirectives = buildSchema(`
-  type Query {
+  resolver Query = {
     dummy: String
   }
 
@@ -44,20 +44,6 @@ const schemaWithDirectives = buildSchema(`
   directive @onFragmentSpread on FRAGMENT_SPREAD
   directive @onInlineFragment on INLINE_FRAGMENT
   directive @onVariableDefinition on VARIABLE_DEFINITION
-`);
-
-const schemaWithSDLDirectives = buildSchema(`
-  directive @onSchema on SCHEMA
-  directive @onScalar on SCALAR
-  directive @onObject on OBJECT
-  directive @onFieldDefinition on FIELD_DEFINITION
-  directive @onArgumentDefinition on ARGUMENT_DEFINITION
-  directive @onInterface on INTERFACE
-  directive @onUnion on UNION
-  directive @onEnum on ENUM
-  directive @onEnumValue on ENUM_VALUE
-  directive @onInputObject on INPUT_OBJECT
-  directive @onInputFieldDefinition on INPUT_FIELD_DEFINITION
 `);
 
 describe('Validate: Known directives', () => {
@@ -233,7 +219,7 @@ describe('Validate: Known directives', () => {
   describe('within SDL', () => {
     it('with directive defined inside SDL', () => {
       expectValidSDL(`
-        type Query {
+        resolver Query = {
           foo: String @test
         }
 
@@ -243,7 +229,7 @@ describe('Validate: Known directives', () => {
 
     it('with standard directive', () => {
       expectValidSDL(`
-        type Query {
+        resolver Query = {
           foo: String @deprecated
         }
       `);

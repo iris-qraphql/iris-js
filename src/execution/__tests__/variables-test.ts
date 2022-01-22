@@ -14,8 +14,8 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
-  IrisDataType,
 } from '../../type/definition';
+import { gqlEnum, gqlInput } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
@@ -34,9 +34,9 @@ const TestComplexScalar = new GraphQLScalarType({
   },
 });
 
-const expectedJSON = (result: unknown) => expect(toJSONDeep(result)).toEqual
+const expectedJSON = (result: unknown) => expect(toJSONDeep(result)).toEqual;
 
-const TestInputObject = new IrisDataType({
+const TestInputObject = gqlInput({
   name: 'TestInputObject',
   fields: {
     a: { type: GraphQLString },
@@ -46,7 +46,7 @@ const TestInputObject = new IrisDataType({
   },
 });
 
-const TestNestedInputObject = new IrisDataType({
+const TestNestedInputObject = gqlInput({
   name: 'TestNestedInputObject',
   fields: {
     na: { type: new GraphQLNonNull(TestInputObject) },
@@ -54,17 +54,14 @@ const TestNestedInputObject = new IrisDataType({
   },
 });
 
-const TestEnum = new IrisDataType({
-  name: 'TestEnum',
-  variants: [
-    { name: 'NULL' },
-    { name: 'UNDEFINED' },
-    { name: 'NAN' },
-    { name: 'FALSE' },
-    { name: 'CUSTOM' },
-    { name: 'DEFAULT_VALUE' },
-  ],
-});
+const TestEnum = gqlEnum('TestEnum', [
+  'NULL',
+  'UNDEFINED',
+  'NAN',
+  'FALSE',
+  'CUSTOM',
+  'DEFAULT_VALUE',
+]);
 
 function fieldWithInputArg(
   inputArg: GraphQLArgumentConfig,
@@ -121,10 +118,7 @@ const TestType = new GraphQLObjectType({
 
 const schema = new GraphQLSchema({ query: TestType });
 
-function executeQuery(
-  query: string,
-  variableValues?: Record<string,unknown>,
-) {
+function executeQuery(query: string, variableValues?: Record<string, unknown>) {
   const document = parse(query);
   return executeSync({ schema, document, variableValues });
 }

@@ -8,9 +8,9 @@ import {
   GraphQLList,
   GraphQLObjectType,
   GraphQLScalarType,
-  IrisDataType,
 } from '../definition';
 import { GraphQLDirective } from '../directives';
+import { emptyDataType, gqlInput } from '../make';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 
@@ -127,12 +127,9 @@ describe('Type System: Schema', () => {
 
   describe('Type Map', () => {
     it('includes nested data  objects in the map', () => {
-      const NestedInputObject = new IrisDataType({
-        name: 'NestedInputObject',
-        fields: {},
-      });
+      const NestedInputObject = emptyDataType('NestedInputObject');
 
-      const SomeInputObject = new IrisDataType({
+      const SomeInputObject = gqlInput({
         name: 'SomeInputObject',
         fields: { nested: { type: NestedInputObject } },
       });
@@ -159,20 +156,18 @@ describe('Type System: Schema', () => {
         locations: [DirectiveLocation.OBJECT],
         args: {
           arg: {
-            type: new IrisDataType({ name: 'Foo', fields: {} }),
+            type: emptyDataType('Foo'),
           },
           argList: {
-            type: new GraphQLList(
-              new IrisDataType({ name: 'Bar', fields: {} }),
-            ),
+            type: new GraphQLList(emptyDataType('Bar')),
           },
         },
       });
       const schema = new GraphQLSchema({ directives: [directive] });
 
       expect(Object.keys(schema.getTypeMap())).toEqual(
-        expect.arrayContaining(['Foo', 'Bar'])
-        );
+        expect.arrayContaining(['Foo', 'Bar']),
+      );
     });
   });
 

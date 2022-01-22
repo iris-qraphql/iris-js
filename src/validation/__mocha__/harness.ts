@@ -1,6 +1,7 @@
 import { expectJSON } from '../../__testUtils__/__mocha__/expectJSON';
 
 import type { Maybe } from '../../jsutils/Maybe';
+import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
 import { parse } from '../../language/parser';
 
@@ -10,7 +11,6 @@ import { buildSchema } from '../../utilities/buildASTSchema';
 
 import { validate, validateSDL } from '../validate';
 import type { SDLValidationRule, ValidationRule } from '../ValidationContext';
-import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
 export const testSchema: GraphQLSchema = buildSchema(`
   resolver Pet = {
@@ -122,7 +122,6 @@ export function expectSDLValidationErrors(
   const errors = validateSDL(doc, schema, [rule]);
   return expectJSON(errors);
 }
-
 
 export function getSDLValidationErrors(
   schema: Maybe<GraphQLSchema>,

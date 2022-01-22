@@ -47,7 +47,6 @@ describe('Validate: Possible fragment spreads', () => {
     `);
   });
 
-
   it('object into containing union', () => {
     expectValid(`
       fragment objectWithinUnion on CatOrDog { ...dogFragment }
@@ -95,5 +94,4 @@ describe('Validate: Possible fragment spreads', () => {
       },
     ]);
   });
-
 });
