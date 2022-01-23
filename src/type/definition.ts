@@ -6,7 +6,6 @@ import { identityFunc } from '../jsutils/identityFunc';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 import { isObjectLike } from '../jsutils/isObjectLike';
-import { keyValMap } from '../jsutils/keyValMap';
 import { mapValue } from '../jsutils/mapValue';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
@@ -65,16 +64,7 @@ export function isType(type: unknown): type is GraphQLType {
   );
 }
 
-export function assertType(type: unknown): GraphQLType {
-  if (!isType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL type.`);
-  }
-  return type;
-}
 
-/**
- * There are predicates for each kind of GraphQL type.
- */
 export function isScalarType(type: unknown): type is GraphQLScalarType {
   return instanceOf(type, GraphQLScalarType);
 }
@@ -98,11 +88,8 @@ export function isEnumType(type: unknown): type is IrisDataType {
   return isDataType(type) && !type.isVariantType();
 }
 
-export function isInputObjectType(type: unknown): type is IrisDataType {
-  return isDataType(type) && type.isVariantType();
-}
-
-
+export const isInputObjectType = (type: unknown): type is IrisDataType =>
+  isDataType(type) && type.isVariantType();
 
 export const assertBy =
   <T>(kind: string, f: (type: unknown) => type is T) =>
@@ -115,12 +102,12 @@ export const assertBy =
     return type;
   };
 
-export const assertCompositeType = assertBy('Resolver', isResolverType)
-export const assertResolverType = assertBy('Resolver', isResolverType)
+export const assertCompositeType = assertBy('Resolver', isResolverType);
+export const assertResolverType = assertBy('Resolver', isResolverType);
 export const assertObjectType = assertBy('Object', isObjectType);
-export const assertUnionType = assertBy('Union', isUnionType);
 export const assertDataType = assertBy('Data', isDataType);
 export const assertScalarType = assertBy('Scalar', isScalarType);
+export const assertType = assertBy('', isType);
 
 export function isListType(
   type: GraphQLInputType,
@@ -220,8 +207,6 @@ export type GraphQLCompositeType = IrisResolverType;
 export function isCompositeType(type: unknown): type is GraphQLCompositeType {
   return isResolverType(type);
 }
-
-
 
 export const isAbstractType = (type: unknown): type is IrisResolverType =>
   isUnionType(type);
@@ -526,25 +511,6 @@ export const defineArguments = (
 
 function isPlainObj(obj: unknown): boolean {
   return isObjectLike(obj) && !Array.isArray(obj);
-}
-
-/**
- * @internal
- */
-export function argsToArgsConfig(
-  args: ReadonlyArray<GraphQLArgument>,
-): GraphQLFieldConfigArgumentMap {
-  return keyValMap(
-    args,
-    (arg) => arg.name,
-    (arg) => ({
-      description: arg.description,
-      type: arg.type,
-      defaultValue: arg.defaultValue,
-      deprecationReason: arg.deprecationReason,
-      astNode: arg.astNode,
-    }),
-  );
 }
 
 export type GraphQLTypeResolver<TSource, TContext> = (

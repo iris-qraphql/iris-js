@@ -94,7 +94,7 @@ export {
   assertType,
   assertScalarType,
   assertObjectType,
-  assertUnionType,
+  assertResolverType,
   assertListType,
   assertNonNullType,
   assertLeafType,

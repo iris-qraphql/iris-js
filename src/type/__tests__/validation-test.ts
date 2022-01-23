@@ -17,8 +17,8 @@ import type {
 import {
   assertDataType,
   assertObjectType,
+  assertResolverType,
   assertScalarType,
-  assertUnionType,
   GraphQLList,
   GraphQLNonNull,
 } from '../definition';
@@ -44,7 +44,7 @@ const SomeSchema = buildSchema(`
 
 const SomeScalarType = assertScalarType(SomeSchema.getType('SomeScalar'));
 const SomeObjectType = assertObjectType(SomeSchema.getType('SomeObject'));
-const SomeUnionType = assertUnionType(SomeSchema.getType('SomeUnion'));
+const SomeUnionType = assertResolverType(SomeSchema.getType('SomeUnion'));
 const SomeEnumType = assertDataType(SomeSchema.getType('SomeEnum'));
 const SomeInputObjectType = assertDataType(
   SomeSchema.getType('SomeInputObject'),
