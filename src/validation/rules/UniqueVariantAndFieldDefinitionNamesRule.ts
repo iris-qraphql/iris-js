@@ -31,7 +31,7 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
   };
 
   function checkVariantUniqueness({ variants, name }: DataTypeDefinitionNode) {
-    const knownVariantNames: { [key: string]: NameNode } = {};
+    const knownVariantNames: Record<string, NameNode> = {};
     const typeName = name.value;
 
     for (const variant of variants) {

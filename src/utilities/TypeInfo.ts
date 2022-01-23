@@ -9,12 +9,12 @@ import { getEnterLeaveForKind } from '../language/visitor';
 import type {
   GraphQLArgument,
   GraphQLCompositeType,
-  IrisDataVariant,
   GraphQLField,
   GraphQLInputField,
   GraphQLInputType,
   GraphQLOutputType,
   GraphQLType,
+  IrisDataVariant,
 } from '../type/definition';
 import {
   getNamedType,
@@ -242,8 +242,8 @@ export class TypeInfo {
         let enumValue;
         if (isEnumType(enumType)) {
           enumValue = enumType.getValue(node.value);
-        }else if(isInputObjectType(enumType)){
-          enumValue = enumType.getVariants() as any as  IrisDataVariant
+        } else if (isInputObjectType(enumType)) {
+          enumValue = enumType.getVariants() as any as IrisDataVariant;
         }
         this._enumValue = enumValue;
         break;

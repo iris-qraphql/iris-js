@@ -5,7 +5,7 @@ import { instanceOf } from '../jsutils/instanceOf';
 type Location = {
   line: number;
   column: number;
-}
+};
 
 /**
  * A representation of source input to GraphQL. The `name` and `locationOffset` parameters are

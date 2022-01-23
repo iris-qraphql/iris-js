@@ -49,9 +49,7 @@ export function assertSchema(schema: unknown): GraphQLSchema {
  * the risk of conflicts. We recommend you add at most one extension field,
  * an object which can contain all the values you need.
  */
-export interface GraphQLSchemaExtensions {
-  [attributeName: string]: unknown;
-}
+export type GraphQLSchemaExtensions = Record<string, unknown>;
 
 /**
  * Schema Definition
@@ -152,7 +150,7 @@ export class GraphQLSchema {
     );
 
     this.description = config.description;
-    this.extensions = {...config.extensions};
+    this.extensions = { ...config.extensions };
     this.astNode = config.astNode;
 
     this._queryType = config.query;
@@ -256,14 +254,12 @@ export class GraphQLSchema {
   getPossibleTypes(
     abstractType: IrisResolverType,
   ): ReadonlyArray<GraphQLObjectType> {
-    return isUnionType(abstractType)
-      ? abstractType.getTypes()
-      : [];
+    return isUnionType(abstractType) ? abstractType.getTypes() : [];
   }
 
   isSubType(
     abstractType: IrisResolverType,
-    maybeSubType: GraphQLObjectType ,
+    maybeSubType: GraphQLObjectType,
   ): boolean {
     let map = this._subTypeMap[abstractType.name];
     if (map === undefined) {

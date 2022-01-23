@@ -40,9 +40,7 @@ export function assertDirective(directive: unknown): GraphQLDirective {
  * the risk of conflicts. We recommend you add at most one extension field,
  * an object which can contain all the values you need.
  */
-export interface GraphQLDirectiveExtensions {
-  [attributeName: string]: unknown;
-}
+export type GraphQLDirectiveExtensions = Record<string, unknown>;
 
 /**
  * Directives are used by the GraphQL runtime as a way of modifying execution

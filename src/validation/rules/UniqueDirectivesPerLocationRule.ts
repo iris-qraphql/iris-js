@@ -1,9 +1,7 @@
 import { GraphQLError } from '../../error/GraphQLError';
 
 import { Kind } from '../../language/kinds';
-import {
-  isTypeDefinitionNode,
-} from '../../language/predicates';
+import { isTypeDefinitionNode } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
@@ -54,9 +52,7 @@ export function UniqueDirectivesPerLocationRule(
       }
 
       let seenDirectives;
-      if (
-        node.kind === Kind.SCHEMA_DEFINITION 
-      ) {
+      if (node.kind === Kind.SCHEMA_DEFINITION) {
         seenDirectives = schemaDirectives;
       } else if (isTypeDefinitionNode(node)) {
         const typeName = node.name.value;

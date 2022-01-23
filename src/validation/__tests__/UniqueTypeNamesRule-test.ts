@@ -61,8 +61,7 @@ describe('Validate: Unique type names', () => {
           { line: 2, column: 16 },
           { line: 4, column: 12 },
         ],
-      }
+      },
     ]);
   });
-
 });

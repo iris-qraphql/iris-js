@@ -1,10 +1,11 @@
-import { toJSONDeep, toJSONError } from '../../jsutils/toJSONDeep';
 import { dedent } from '../../__testUtils__/dedent';
+
+import { toJSONDeep, toJSONError } from '../../jsutils/toJSONDeep';
 
 import { parse } from '../parser';
 
 function expectSyntaxError(text: string) {
-  return expect(toJSONError(() => parse(text)))
+  return expect(toJSONError(() => parse(text)));
 }
 
 const snapshot = (doc: string) =>

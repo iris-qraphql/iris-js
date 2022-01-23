@@ -419,5 +419,4 @@ describe('stripIgnoredCharacters', () => {
     expectStrippedString('"""\n a\n b"""').toEqual('"""a\nb"""');
     expectStrippedString('"""\na\n b\nc"""').toEqual('"""a\n b\nc"""');
   });
-
 });

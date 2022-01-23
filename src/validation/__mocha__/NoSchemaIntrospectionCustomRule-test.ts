@@ -19,11 +19,11 @@ function expectValid(queryStr: string) {
 }
 
 const schema = buildSchema(`
-  type Query {
+  resolver Query = {
     someQuery: SomeType
   }
 
-  type SomeType {
+  resolver SomeType = {
     someField: String
     introspectionField: __EnumValue
   }

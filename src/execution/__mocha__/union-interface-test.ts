@@ -57,9 +57,6 @@ class Person {
   }
 }
 
-
-
-
 const DogType: GraphQLObjectType = new GraphQLObjectType({
   name: 'Dog',
   fields: () => ({
@@ -129,7 +126,6 @@ const liz = new Person('Liz');
 const john = new Person('John', [garfield, odie], [liz, odie]);
 
 describe('Execute: Union and intersection types', () => {
- 
   it('executes using unions', () => {
     // NOTE: This is an *invalid* query, but it should be an *executable* query.
     const document = parse(`

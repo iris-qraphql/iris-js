@@ -2,7 +2,10 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import { dedent } from '../../__testUtils__/dedent';
-import { expectJSON, expectToThrowJSON } from '../../__testUtils__/__mocha__/expectJSON';
+import {
+  expectJSON,
+  expectToThrowJSON,
+} from '../../__testUtils__/__mocha__/expectJSON';
 
 import { inspect } from '../../jsutils/inspect';
 

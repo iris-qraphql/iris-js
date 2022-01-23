@@ -111,6 +111,6 @@ describe('typeComparators', () => {
       const union = new IrisResolverType({ name: 'Union', types: [member] });
       const schema = testSchema({ field: { type: union } });
       expect(isTypeSubTypeOf(schema, member, union)).to.equal(true);
-    });  
+    });
   });
 });

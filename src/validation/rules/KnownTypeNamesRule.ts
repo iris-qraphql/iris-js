@@ -67,8 +67,7 @@ export function KnownTypeNamesRule(
       }
     },
     VariantDefinition(node, _1, parent, _2, ancestors) {
-
-      if(node.fields){
+      if (node.fields) {
         return undefined;
       }
 
@@ -93,7 +92,6 @@ export function KnownTypeNamesRule(
       }
     },
   };
-  
 }
 
 const standardTypeNames = [...specifiedScalarTypes, ...introspectionTypes].map(

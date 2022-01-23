@@ -62,7 +62,9 @@ describe('dedentString', () => {
         \t\t      me: User
         \t\t    }
     `);
-    expect(output).to.equal(['resolver Query = {', '  me: User', '}'].join('\n'));
+    expect(output).to.equal(
+      ['resolver Query = {', '  me: User', '}'].join('\n'),
+    );
   });
 
   it('removes leading and trailing newlines', () => {
@@ -75,7 +77,9 @@ describe('dedentString', () => {
 
 
     `);
-    expect(output).to.equal(['resolver Query = {', '  me: User', '}'].join('\n'));
+    expect(output).to.equal(
+      ['resolver Query = {', '  me: User', '}'].join('\n'),
+    );
   });
 
   it('removes all trailing spaces and tabs', () => {
@@ -84,7 +88,9 @@ describe('dedentString', () => {
         me: User
       }
           \t\t  \t `);
-    expect(output).to.equal(['resolver Query = {', '  me: User', '}'].join('\n'));
+    expect(output).to.equal(
+      ['resolver Query = {', '  me: User', '}'].join('\n'),
+    );
   });
 
   it('works on text without leading newline', () => {
@@ -92,7 +98,9 @@ describe('dedentString', () => {
         me: User
       }
     `);
-    expect(output).to.equal(['resolver Query = {', '  me: User', '}'].join('\n'));
+    expect(output).to.equal(
+      ['resolver Query = {', '  me: User', '}'].join('\n'),
+    );
   });
 });
 
@@ -103,7 +111,9 @@ describe('dedent', () => {
         me: User
       }
     `;
-    expect(output).to.equal(['resolver Query = {', '  me: User', '}'].join('\n'));
+    expect(output).to.equal(
+      ['resolver Query = {', '  me: User', '}'].join('\n'),
+    );
   });
 
   it('supports expression interpolation', () => {

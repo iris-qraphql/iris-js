@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 
 import { buildSchema } from '../../utilities/buildASTSchema';
 
-import { expectValidationErrorsWithSchema } from '../__mocha__/harness';
+import { expectValidationErrorsWithSchema } from './harness';
 import { SingleFieldSubscriptionsRule } from '../rules/SingleFieldSubscriptionsRule';
 
 function expectErrors(queryStr: string) {
@@ -18,12 +18,12 @@ function expectValid(queryStr: string) {
 }
 
 const schema = buildSchema(`
-  type Message {
+  resolver Message = {
     body: String
     sender: String
   }
 
-  type Subscription {
+  resolver Subscription = {
     importantEmails: [String]
     notImportantEmails: [String]
     moreImportantEmails: [String]
@@ -32,7 +32,7 @@ const schema = buildSchema(`
     newMessage: Message
   }
 
-  type Query {
+  resolver Query = {
     dummy: String
   }
 `);
@@ -135,7 +135,6 @@ describe('Validate: Subscriptions with single field', () => {
     ]);
   });
 
-
   it('does not infinite loop on recursive fragments', () => {
     expectErrors(`
       subscription NoInfiniteLoop {
@@ -191,7 +190,7 @@ describe('Validate: Subscriptions with single field', () => {
 
   it('skips if not subscription type', () => {
     const emptySchema = buildSchema(`
-      type Query {
+      resolver Query = {
         dummy: String
       }
     `);

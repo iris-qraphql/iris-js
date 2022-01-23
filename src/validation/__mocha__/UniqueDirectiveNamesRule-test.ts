@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 
 import type { GraphQLSchema } from '../../type/schema';
 
-import { expectSDLValidationErrors } from '../__mocha__/harness';
+import { expectSDLValidationErrors } from './harness';
 import { UniqueDirectiveNamesRule } from '../rules/UniqueDirectiveNamesRule';
 
 function expectSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
@@ -16,7 +16,7 @@ function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {
 describe('Validate: Unique directive names', () => {
   it('no directive', () => {
     expectValidSDL(`
-      type Foo
+      resolver Foo
     `);
   });
 
@@ -38,7 +38,7 @@ describe('Validate: Unique directive names', () => {
     expectValidSDL(`
       query foo { __typename }
       fragment foo on foo { __typename }
-      type foo
+      resolver foo
 
       directive @foo on SCHEMA
     `);

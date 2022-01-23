@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 
 import { buildSchema } from '../../utilities/buildASTSchema';
 
-import { expectValidationErrorsWithSchema } from '../__mocha__/harness';
+import { expectValidationErrorsWithSchema } from './harness';
 import { NoDeprecatedCustomRule } from '../rules/custom/NoDeprecatedCustomRule';
 
 function buildAssertion(sdlStr: string) {
@@ -25,7 +25,7 @@ function buildAssertion(sdlStr: string) {
 describe('Validate: no deprecated', () => {
   describe('no deprecated fields', () => {
     const { expectValid, expectErrors } = buildAssertion(`
-      type Query {
+      resolver Query = {
         normalField: String
         deprecatedField: String @deprecated(reason: "Some field reason.")
       }
@@ -72,7 +72,7 @@ describe('Validate: no deprecated', () => {
 
   describe('no deprecated arguments on fields', () => {
     const { expectValid, expectErrors } = buildAssertion(`
-      type Query {
+      resolver Query = {
         someField(
           normalArg: String,
           deprecatedArg: String @deprecated(reason: "Some arg reason."),
@@ -114,7 +114,7 @@ describe('Validate: no deprecated', () => {
 
   describe('no deprecated arguments on directives', () => {
     const { expectValid, expectErrors } = buildAssertion(`
-      type Query {
+      resolver Query = {
         someField: String
       }
 
@@ -163,7 +163,7 @@ describe('Validate: no deprecated', () => {
         deprecatedField: String @deprecated(reason: "Some input field reason.")
       }
 
-      type Query {
+      resolver Query = {
         someField(someArg: InputType): String
       }
 
@@ -221,7 +221,7 @@ describe('Validate: no deprecated', () => {
         = NORMAL_VALUE
         | DEPRECATED_VALUE @deprecated(reason: "Some enum reason.")
       
-      type Query {
+      resolver Query = {
         someField(enumArg: EnumType): String
       }
     `);

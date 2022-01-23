@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+
 import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
 export function expectJSON(actual: unknown) {

@@ -63,7 +63,7 @@ export enum Kind {
   UNION_TYPE_EXTENSION = 'UnionTypeExtension',
   ENUM_TYPE_EXTENSION = 'EnumTypeExtension',
   INPUT_OBJECT_TYPE_EXTENSION = 'InputObjectTypeExtension',
-  VARIANT_DEFINITION = 'VariantDefinition'
+  VARIANT_DEFINITION = 'VariantDefinition',
 }
 
 /**

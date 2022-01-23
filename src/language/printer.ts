@@ -183,7 +183,12 @@ const printDocASTReducer: ASTReducer<string> = {
     leave: ({ description, name, directives, variants }) =>
       wrap('', description, '\n') +
       join(
-        ['resolver', name, join(directives, ' '), wrap('= ', join(variants, ' | '))],
+        [
+          'resolver',
+          name,
+          join(directives, ' '),
+          wrap('= ', join(variants, ' | ')),
+        ],
         ' ',
       ),
   },

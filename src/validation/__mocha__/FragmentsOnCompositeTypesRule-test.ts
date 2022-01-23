@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 
 import { FragmentsOnCompositeTypesRule } from '../rules/FragmentsOnCompositeTypesRule';
 
-import { expectValidationErrors } from '../__mocha__/harness';
+import { expectValidationErrors } from './harness';
 
 function expectErrors(queryStr: string) {
   return expectValidationErrors(FragmentsOnCompositeTypesRule, queryStr);
@@ -20,7 +20,6 @@ describe('Validate: Fragments on composite types', () => {
       }
     `);
   });
-
 
   it('object is valid inline fragment type', () => {
     expectValid(`

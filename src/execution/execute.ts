@@ -110,7 +110,7 @@ export interface ExecutionContext {
   rootValue: unknown;
   contextValue: unknown;
   operation: OperationDefinitionNode;
-  variableValues: { [variable: string]: unknown };
+  variableValues: Record<string, unknown>;
   fieldResolver: GraphQLFieldResolver<any, any>;
   typeResolver: GraphQLTypeResolver<any, any>;
   subscribeFieldResolver: GraphQLFieldResolver<any, any>;
@@ -147,7 +147,7 @@ export interface ExecutionArgs {
   document: DocumentNode;
   rootValue?: unknown;
   contextValue?: unknown;
-  variableValues?: Maybe<{ readonly [variable: string]: unknown }>;
+  variableValues?: Maybe<Readonly<Record<string, unknown>>>;
   operationName?: Maybe<string>;
   fieldResolver?: Maybe<GraphQLFieldResolver<any, any>>;
   typeResolver?: Maybe<GraphQLTypeResolver<any, any>>;
@@ -251,7 +251,7 @@ function buildResponse(
 export function assertValidExecutionArguments(
   schema: GraphQLSchema,
   document: DocumentNode,
-  rawVariableValues: Maybe<{ readonly [variable: string]: unknown }>,
+  rawVariableValues: Maybe<Readonly<Record<string, unknown>>>,
 ): void {
   devAssert(document, 'Must provide document.');
 

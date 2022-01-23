@@ -16,9 +16,7 @@ import type { Source } from '../language/source';
  * the risk of conflicts. We recommend you add at most one extension field,
  * an object which can contain all the values you need.
  */
-export type GraphQLErrorExtensions = {
-  [attributeName: string]: unknown;
-}
+export type GraphQLErrorExtensions = Record<string, unknown>;
 
 /**
  * A GraphQLError describes an Error found during the parse, validate, or
@@ -231,7 +229,7 @@ export interface GraphQLFormattedError {
    * Reserved for implementors to extend the protocol however they see fit,
    * and hence there are no additional restrictions on its contents.
    */
-  readonly extensions?: { [key: string]: unknown };
+  readonly extensions?: Record<string, unknown>;
 }
 
 /**

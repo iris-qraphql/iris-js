@@ -12,10 +12,7 @@ import type {
 import { Kind } from './kinds';
 
 export function isDefinitionNode(node: ASTNode): node is DefinitionNode {
-  return (
-    isExecutableDefinitionNode(node) ||
-    isTypeSystemDefinitionNode(node) 
-  );
+  return isExecutableDefinitionNode(node) || isTypeSystemDefinitionNode(node);
 }
 
 export function isExecutableDefinitionNode(

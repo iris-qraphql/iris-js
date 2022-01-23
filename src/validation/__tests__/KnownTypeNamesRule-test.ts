@@ -3,10 +3,9 @@ import type { GraphQLSchema } from '../../type/schema';
 import { buildSchema } from '../../utilities/buildASTSchema';
 
 import {
-  expectSDLValidationErrors,
   expectValidationErrors,
   expectValidationErrorsWithSchema,
-  getSDLValidationErrors
+  getSDLValidationErrors,
 } from '../__mocha__/harness';
 import { KnownTypeNamesRule } from '../rules/KnownTypeNamesRule';
 
@@ -21,7 +20,6 @@ function expectErrorsWithSchema(schema: GraphQLSchema, queryStr: string) {
 function expectValid(queryStr: string) {
   expectErrors(queryStr).toDeepEqual([]);
 }
-
 
 function getSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
   return getSDLValidationErrors(schema, KnownTypeNamesRule, sdlStr);
@@ -141,7 +139,8 @@ describe('Validate: Known type names', () => {
     });
 
     it('unknown type references', () => {
-      expect(getSDLErrors(`
+      expect(
+        getSDLErrors(`
         resolver A
         resolver B
 
@@ -156,11 +155,13 @@ describe('Validate: Known type names', () => {
         }
 
         directive @SomeDirective(k: K) on QUERY
-      `)).toMatchSnapshot()
-      })
+      `),
+      ).toMatchSnapshot();
+    });
 
     it('does not consider non-type definitions', () => {
-      expect(getSDLErrors(`
+      expect(
+        getSDLErrors(`
         query Foo { __typename }
         fragment Foo on Query { __typename }
         directive @Foo on QUERY
@@ -168,7 +169,8 @@ describe('Validate: Known type names', () => {
         resolver Query = {
           foo: Foo
         }
-      `)).toEqual([
+      `),
+      ).toEqual([
         {
           message: 'Unknown type "Foo".',
           locations: [{ line: 7, column: 16 }],

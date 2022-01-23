@@ -1,14 +1,13 @@
-import { graphqlSync } from '../../iris';
 import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
-import { GraphQLObjectType, IrisDataType } from '../definition';
+import { graphqlSync } from '../../iris';
+
+import { GraphQLObjectType } from '../definition';
+import { gqlEnum } from '../make';
 import { GraphQLInt } from '../scalars';
 import { GraphQLSchema } from '../schema';
 
-const ColorType = new IrisDataType({
-  name: 'Color',
-  variants: [{ name: 'RED' }, { name: 'GREEN' }, { name: 'BLUE' }],
-});
+const ColorType = gqlEnum('Color', ['RED', 'GREEN', 'BLUE']);
 
 const expectResult = (result: unknown, value: unknown) =>
   expect(toJSONDeep(result)).toEqual(value);
@@ -24,8 +23,8 @@ const QueryType = new GraphQLObjectType({
       resolve: (_source, { fromEnum }) => fromEnum,
     },
     count: {
-      type: GraphQLInt
-    }
+      type: GraphQLInt,
+    },
   },
 });
 

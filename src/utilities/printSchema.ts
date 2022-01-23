@@ -1,6 +1,7 @@
 import { inspect } from '../jsutils/inspect';
 import { invariant } from '../jsutils/invariant';
 import type { Maybe } from '../jsutils/Maybe';
+import type { ObjMap } from '../jsutils/ObjMap';
 
 import { isPrintableAsBlockString } from '../language/blockString';
 import { Kind } from '../language/kinds';
@@ -15,6 +16,8 @@ import type {
   GraphQLScalarType,
   GraphQLUnionType,
   IrisDataType,
+  IrisDataVariant,
+  IrisDataVariantField,
 } from '../type/definition';
 import {
   isEnumType,
@@ -94,7 +97,9 @@ function printObject(type: GraphQLObjectType): string {
   const fields = type.getFields();
   return (
     printDescription(type) +
-    `resolver ${type.name}${Object.keys(fields).length > 0 ? ' =' : ''}${printFields(fields)}`
+    `resolver ${type.name}${
+      Object.keys(fields).length > 0 ? ' =' : ''
+    }${printFields(fields)}`
   );
 }
 
@@ -105,34 +110,36 @@ function printUnion(type: GraphQLUnionType): string {
 }
 
 function printDATA(type: IrisDataType): string {
-  const start = printDescription(type) + `data ${type.name}`;
+  const variants = type.getVariants();
+  const firstVariant = variants[0];
+  const isEmptyType =
+    !firstVariant ||
+    ((firstVariant.fields?.length ?? 0) === 0 &&
+      firstVariant.name === type.name);
 
-  if (type.getValues().length === 0) {
-    return (
-      start +
-      printBlock(
-        Object.values(type.getFields()).map(
-          (f, i) => printDescription(f, '  ', !i) + '  ' + printInputValue(f),
-        ),
-      )
-    );
+  const start =
+    printDescription(type) + `data ${type.name}` + (!isEmptyType ? ' = ' : '');
+
+  if (type.isVariantType()) {
+    return start + printDataFields(variants[0]?.fields ?? {});
   }
 
-  const possibleTypes = type
-    .getValues()
-    .map(
-      (value) =>
-        printDescription(value) +
-        value.name +
-        printDeprecated(value.deprecationReason),
-    );
+  return start + variants.map(printDataVariant).join(' | ');
+}
 
-  if (possibleTypes.length === 1 && possibleTypes[0] === type.name) {
-    return start;
-  }
-
+function printDataFields(fields: ObjMap<IrisDataVariantField>): string {
+  return printBlock(
+    Object.values(fields).map(
+      (f, i) => printDescription(f, '  ', !i) + '  ' + printInputValue(f),
+    ),
+  );
+}
+function printDataVariant(variant: IrisDataVariant): string {
   return (
-    start + (possibleTypes.length ? ' = ' + possibleTypes.join(' | ') : '')
+    printDescription(variant) +
+    variant.name +
+    printDeprecated(variant.deprecationReason) +
+    (variant.fields ? printDataFields(variant.fields) : '')
   );
 }
 

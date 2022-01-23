@@ -10,7 +10,7 @@ import { buildSchema } from '../../utilities/buildASTSchema';
 import { FieldsOnCorrectTypeRule } from '../rules/FieldsOnCorrectTypeRule';
 import { validate } from '../validate';
 
-import { expectValidationErrorsWithSchema } from '../__mocha__/harness';
+import { expectValidationErrorsWithSchema } from './harness';
 
 function expectErrors(queryStr: string) {
   return expectValidationErrorsWithSchema(
@@ -25,13 +25,13 @@ function expectValid(queryStr: string) {
 }
 
 const testSchema = buildSchema(`
-  type Dog  {
+  resolver Dog = {
     name: String
     nickname: String
     barkVolume: Int
   }
 
-  type Cat {
+  resolver Cat = {
     name: String
     nickname: String
     meowVolume: Int
@@ -39,12 +39,12 @@ const testSchema = buildSchema(`
 
   resolver Pet = Cat | Dog
 
-  type Human {
+  resolver Human = {
     name: String
     pets: [Pet]
   }
 
-  type Query {
+  resolver Query = {
     human: Human
   }
 `);
@@ -206,7 +206,6 @@ describe('Validate: Fields on correct type', () => {
     ]);
   });
 
-
   it('Meta field selection on unions', () => {
     expectValid(`
       fragment directFieldSelectionOnUnion on Pat {
@@ -214,7 +213,6 @@ describe('Validate: Fields on correct type', () => {
       }
     `);
   });
-
 
   describe('Fields on correct type error message', () => {
     function expectErrorMessage(schema: GraphQLSchema, queryStr: string) {
@@ -227,10 +225,10 @@ describe('Validate: Fields on correct type', () => {
 
     it('Works with no suggestions', () => {
       const schema = buildSchema(`
-        type T {
+        resolver T = {
           fieldWithVeryLongNameThatWillNeverBeSuggested: String
         }
-        type Query { t: T }
+        resolver Query = { t: T }
       `);
 
       expectErrorMessage(schema, '{ t { f } }').to.equal(
@@ -241,10 +239,10 @@ describe('Validate: Fields on correct type', () => {
     it('Works with no small numbers of type suggestions', () => {
       const schema = buildSchema(`
         resolver T = A | B
-        type Query { t: T }
+        resolver Query = { t: T }
 
-        type A { f: String }
-        type B { f: String }
+        resolver A ={ f: String }
+        resolver B = { f: String }
       `);
 
       expectErrorMessage(schema, '{ t { f } }').to.equal(
@@ -254,11 +252,11 @@ describe('Validate: Fields on correct type', () => {
 
     it('Works with no small numbers of field suggestions', () => {
       const schema = buildSchema(`
-        type T {
+        resolver T = {
           y: String
           z: String
         }
-        type Query { t: T }
+        resolver Query = { t: T }
       `);
 
       expectErrorMessage(schema, '{ t { f } }').to.equal(
@@ -269,14 +267,14 @@ describe('Validate: Fields on correct type', () => {
     it('Limits lots of type suggestions', () => {
       const schema = buildSchema(`
         resolver T = A | B | C | D | E | F
-        type Query { t: T }
+        resolver Query = { t: T }
 
-        type A { f: String }
-        type B { f: String }
-        type C { f: String }
-        type D { f: String }
-        type E { f: String }
-        type F { f: String }
+        resolver A = { f: String }
+        resolver B = { f: String }
+        resolver C = { f: String }
+        resolver D = { f: String }
+        resolver E = { f: String }
+        resolver F = { f: String }
       `);
 
       expectErrorMessage(schema, '{ t { f } }').to.equal(
@@ -286,7 +284,7 @@ describe('Validate: Fields on correct type', () => {
 
     it('Limits lots of field suggestions', () => {
       const schema = buildSchema(`
-        type T {
+        resolver T = {
           u: String
           v: String
           w: String
@@ -294,7 +292,7 @@ describe('Validate: Fields on correct type', () => {
           y: String
           z: String
         }
-        type Query { t: T }
+        resolver Query = { t: T }
       `);
 
       expectErrorMessage(schema, '{ t { f } }').to.equal(

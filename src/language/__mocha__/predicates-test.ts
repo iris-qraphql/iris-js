@@ -32,7 +32,7 @@ describe('AST node predicates', () => {
       'ObjectTypeDefinition',
       'ResolverTypeDefinition',
       'DataTypeDefinition',
-      'DirectiveDefinition'
+      'DirectiveDefinition',
     ]);
   });
 
@@ -103,5 +103,4 @@ describe('AST node predicates', () => {
       'DataTypeDefinition',
     ]);
   });
-
 });

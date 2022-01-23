@@ -12,8 +12,6 @@ export type { GraphQLSchemaConfig, GraphQLSchemaExtensions } from './schema';
 
 export type { GraphQLUnionType } from './definition';
 export {
-  resolveObjMapThunk,
-  resolveReadonlyArrayThunk,
   isType,
   isScalarType,
   isObjectType,
@@ -64,7 +62,6 @@ export type {
   GraphQLNamedType,
   GraphQLNamedInputType,
   GraphQLNamedOutputType,
-  ThunkReadonlyArray,
   ThunkObjMap,
   GraphQLArgument,
   GraphQLArgumentConfig,

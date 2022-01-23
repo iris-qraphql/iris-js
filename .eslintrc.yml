@@ -4,7 +4,7 @@ parserOptions:
 env:
   es6: true
   node: true
-  jest/globals: true
+  jest: true
 reportUnusedDisableDirectives: true
 plugins:
   - internal-rules
@@ -500,8 +500,7 @@ overrides:
       '@typescript-eslint/ban-tslint-comment': error
       '@typescript-eslint/ban-types': off # TODO temporarily disabled
       '@typescript-eslint/class-literal-property-style': off # TODO enable after TS conversion
-      '@typescript-eslint/consistent-indexed-object-style':
-        [error, record]
+      '@typescript-eslint/consistent-indexed-object-style': [error, record]
       '@typescript-eslint/consistent-type-assertions': off # TODO temporarily disable
       '@typescript-eslint/consistent-type-exports': error
       '@typescript-eslint/consistent-type-imports': error

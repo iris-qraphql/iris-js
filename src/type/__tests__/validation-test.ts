@@ -1,6 +1,7 @@
 import { dedent } from '../../__testUtils__/dedent';
 
 import { inspect } from '../../jsutils/inspect';
+import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
 import { DirectiveLocation } from '../../language/directiveLocation';
 
@@ -21,14 +22,13 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
-  IrisDataType,
   IrisResolverType,
 } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
+import { gqlEnum } from '../make';
 import { GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
-import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
 const SomeSchema = buildSchema(`
   scalar SomeScalar
@@ -99,7 +99,7 @@ function schemaWithFieldType(type: GraphQLOutputType): GraphQLSchema {
 }
 
 const expectedJSON = (schema: GraphQLSchema, value: unknown) =>
-  expect(toJSONDeep((validateSchema(schema)))).toEqual(value);
+  expect(toJSONDeep(validateSchema(schema))).toEqual(value);
 
 describe('Type System: A Schema must have Object root types', () => {
   it('rejects a Schema whose query root resolver is not an Object', () => {
@@ -388,8 +388,7 @@ describe('Type System: Union types must be valid', () => {
         // @ts-expect-error
         types: [memberType],
       });
-      const schema = schemaWithFieldType(badUnion);
-      expectedJSON(schema,[
+      expectedJSON(schemaWithFieldType(badUnion), [
         {
           message:
             'Union type BadUnion can only include Object types, ' +
@@ -577,40 +576,11 @@ describe('Type System: Input Objects must have fields', () => {
       },
     ]);
   });
-
-  it('rejects an Input Object type with required argument that is deprecated', () => {
-    const schema = buildSchema(`
-      resolver Query = {
-        field(arg: SomeInputObject): String
-      }
-
-      data SomeInputObject = {
-        badField: String! @deprecated
-        optionalField: String @deprecated
-        anotherOptionalField: String! = "" @deprecated
-      }
-    `);
-    expectedJSON(schema, [
-      {
-        message:
-          'Required input field SomeInputObject.badField cannot be deprecated.',
-        locations: [
-          { line: 7, column: 27 },
-          { line: 7, column: 19 },
-        ],
-      },
-    ]);
-  });
 });
 
 describe('Type System: Enum types must be well defined', () => {
   it('rejects an Enum type with incorrectly named values', () => {
-    const schema = schemaWithFieldType(
-      new IrisDataType({
-        name: 'SomeEnum',
-        variants: [{ name: '__badName' }],
-      }),
-    );
+    const schema = schemaWithFieldType(gqlEnum('SomeEnum', ['__badName']));
 
     expectedJSON(schema, [
       {
