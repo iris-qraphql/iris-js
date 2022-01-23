@@ -2,8 +2,7 @@ import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
 import { graphqlSync } from '../../iris';
 
-import { GraphQLObjectType } from '../definition';
-import { gqlEnum } from '../make';
+import { gqlEnum, gqlObject } from '../make';
 import { GraphQLInt } from '../scalars';
 import { GraphQLSchema } from '../schema';
 
@@ -12,7 +11,7 @@ const ColorType = gqlEnum('Color', ['RED', 'GREEN', 'BLUE']);
 const expectResult = (result: unknown, value: unknown) =>
   expect(toJSONDeep(result)).toEqual(value);
 
-const QueryType = new GraphQLObjectType({
+const QueryType = gqlObject({
   name: 'Query',
   fields: {
     colorEnum: {
@@ -28,7 +27,7 @@ const QueryType = new GraphQLObjectType({
   },
 });
 
-const MutationType = new GraphQLObjectType({
+const MutationType = gqlObject({
   name: 'Mutation',
   fields: {
     favoriteEnum: {
@@ -39,7 +38,7 @@ const MutationType = new GraphQLObjectType({
   },
 });
 
-const SubscriptionType = new GraphQLObjectType({
+const SubscriptionType = gqlObject({
   name: 'Subscription',
   fields: {
     subscribeToEnum: {

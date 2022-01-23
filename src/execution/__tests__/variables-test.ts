@@ -12,10 +12,9 @@ import type {
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   GraphQLScalarType,
 } from '../../type/definition';
-import { gqlEnum, gqlInput } from '../../type/make';
+import { gqlEnum, gqlInput, gqlObject } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
@@ -77,7 +76,7 @@ function fieldWithInputArg(
   };
 }
 
-const TestType = new GraphQLObjectType({
+const TestType = gqlObject({
   name: 'TestType',
   fields: {
     fieldWithEnumInput: fieldWithInputArg({ type: TestEnum }),

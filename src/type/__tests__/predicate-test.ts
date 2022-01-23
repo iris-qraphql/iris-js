@@ -22,7 +22,6 @@ import {
   getNullableType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   GraphQLScalarType,
   IrisResolverType,
   isAbstractType,
@@ -53,7 +52,7 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlEnum, gqlInput } from '../make';
+import { gqlEnum, gqlInput, gqlObject } from '../make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -63,7 +62,7 @@ import {
   isSpecifiedScalarType,
 } from '../scalars';
 
-const ObjectType = new GraphQLObjectType({ name: 'Object', fields: {} });
+const ObjectType = gqlObject({ name: 'Object', fields: {} });
 const UnionType = new IrisResolverType({ name: 'Union', types: [ObjectType] });
 const EnumType = gqlEnum('Enum', ['foo']);
 const InputObjectType = gqlInput({
@@ -88,11 +87,6 @@ describe('Type predicates', () => {
     it('returns true for wrapped types', () => {
       expect(isType(new GraphQLNonNull(GraphQLString))).toEqual(true);
       expect(() => assertType(new GraphQLNonNull(GraphQLString))).not.toThrow();
-    });
-
-    it('returns false for type classes (rather than instances)', () => {
-      expect(isType(GraphQLObjectType)).toEqual(false);
-      expect(() => assertType(GraphQLObjectType)).toThrow();
     });
 
     it('returns false for random garbage', () => {

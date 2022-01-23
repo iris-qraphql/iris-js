@@ -17,7 +17,7 @@ import { execute, executeSync } from '../execute';
 
 describe('Execute: synchronously when possible', () => {
   const schema = new GraphQLSchema({
-    query: new GraphQLObjectType({
+    query: gqlObject({
       name: 'Query',
       fields: {
         syncField: {
@@ -34,7 +34,7 @@ describe('Execute: synchronously when possible', () => {
         },
       },
     }),
-    mutation: new GraphQLObjectType({
+    mutation: gqlObject({
       name: 'Mutation',
       fields: {
         syncMutationField: {

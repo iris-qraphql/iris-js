@@ -41,7 +41,7 @@ import {
 } from 'graphql';
 
 var schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
+  query: new IrisResolver({
     name: 'RootQueryType',
     fields: {
       hello: {

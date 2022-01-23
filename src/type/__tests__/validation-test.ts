@@ -21,11 +21,10 @@ import {
   assertUnionType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   IrisResolverType,
 } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
-import { gqlEnum } from '../make';
+import { gqlEnum, gqlObject } from '../make';
 import { GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
@@ -91,7 +90,7 @@ const notInputTypes: ReadonlyArray<GraphQLOutputType> = [
 
 function schemaWithFieldType(type: GraphQLOutputType): GraphQLSchema {
   return new GraphQLSchema({
-    query: new GraphQLObjectType({
+    query: gqlObject({
       name: 'Query',
       fields: { f: { type } },
     }),
@@ -219,7 +218,7 @@ describe('Type System: Objects must have fields', () => {
 
   it('rejects an Object type with incorrectly named fields', () => {
     const schema = schemaWithFieldType(
-      new GraphQLObjectType({
+      gqlObject({
         name: 'SomeObject',
         fields: {
           __badName: { type: GraphQLString },
@@ -238,7 +237,7 @@ describe('Type System: Objects must have fields', () => {
 describe('Type System: Fields args must be properly named', () => {
   it('accepts field args with valid names', () => {
     const schema = schemaWithFieldType(
-      new GraphQLObjectType({
+      gqlObject({
         name: 'SomeObject',
         fields: {
           goodField: {
@@ -255,7 +254,7 @@ describe('Type System: Fields args must be properly named', () => {
 
   it('rejects field arg with invalid names', () => {
     const schema = schemaWithFieldType(
-      new GraphQLObjectType({
+      gqlObject({
         name: 'SomeObject',
         fields: {
           badField: {
@@ -595,7 +594,7 @@ describe('Type System: Object fields must have output types', () => {
   function schemaWithObjectField(
     fieldConfig: GraphQLFieldConfig<unknown, unknown>,
   ): GraphQLSchema {
-    const BadObjectType = new GraphQLObjectType({
+    const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
         badField: fieldConfig,
@@ -603,7 +602,7 @@ describe('Type System: Object fields must have output types', () => {
     });
 
     return new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           f: { type: BadObjectType },
@@ -669,7 +668,7 @@ describe('Type System: Object fields must have output types', () => {
 
 describe('Type System: Arguments must have data  types', () => {
   function schemaWithArg(argConfig: GraphQLArgumentConfig): GraphQLSchema {
-    const BadObjectType = new GraphQLObjectType({
+    const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
         badField: {
@@ -682,7 +681,7 @@ describe('Type System: Arguments must have data  types', () => {
     });
 
     return new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           f: { type: BadObjectType },

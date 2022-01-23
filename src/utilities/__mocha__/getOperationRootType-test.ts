@@ -13,21 +13,21 @@ import { GraphQLSchema } from '../../type/schema';
 
 import { getOperationRootType } from '../getOperationRootType';
 
-const queryType = new GraphQLObjectType({
+const queryType = gqlObject({
   name: 'FooQuery',
   fields: () => ({
     field: { type: GraphQLString },
   }),
 });
 
-const mutationType = new GraphQLObjectType({
+const mutationType = gqlObject({
   name: 'FooMutation',
   fields: () => ({
     field: { type: GraphQLString },
   }),
 });
 
-const subscriptionType = new GraphQLObjectType({
+const subscriptionType = gqlObject({
   name: 'FooSubscription',
   fields: () => ({
     field: { type: GraphQLString },

@@ -47,7 +47,7 @@ class Root {
   }
 }
 
-const numberHolderType = new GraphQLObjectType({
+const numberHolderType = gqlObject({
   fields: {
     theNumber: { type: GraphQLInt },
   },
@@ -55,13 +55,13 @@ const numberHolderType = new GraphQLObjectType({
 });
 
 const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
+  query: gqlObject({
     fields: {
       numberHolder: { type: numberHolderType },
     },
     name: 'Query',
   }),
-  mutation: new GraphQLObjectType({
+  mutation: gqlObject({
     fields: {
       immediatelyChangeTheNumber: {
         type: numberHolderType,

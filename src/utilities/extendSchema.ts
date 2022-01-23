@@ -22,13 +22,11 @@ import type {
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
   GraphQLNamedType,
-  GraphQLType,
-  IrisDataVariantFieldFields,
-} from '../type/definition';
+  GraphQLObjectType,  GraphQLType,
+  IrisDataVariantFieldFields} from '../type/definition';
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   GraphQLScalarType,
   IrisDataType,
   IrisResolverType,
@@ -272,7 +270,7 @@ export function extendSchemaImpl(
       case Kind.OBJECT_TYPE_DEFINITION: {
         const allNodes = [astNode, ...extensionASTNodes];
 
-        return new GraphQLObjectType({
+        return new IrisResolverType({
           name,
           description: astNode.description?.value,
           fields: () => buildFieldMap(allNodes),
@@ -283,7 +281,7 @@ export function extendSchemaImpl(
         const allNodes = [astNode, ...extensionASTNodes];
 
         if (allNodes.length === 1 && allNodes[0]?.type) {
-          return new GraphQLObjectType({
+          return new IrisResolverType({
             name,
             description: astNode.description?.value,
             fields: () => buildFieldMap(allNodes),

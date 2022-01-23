@@ -54,7 +54,7 @@ describe('typeComparators', () => {
   describe('isTypeSubTypeOf', () => {
     function testSchema(fields: GraphQLFieldConfigMap<unknown, unknown>) {
       return new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields,
         }),
@@ -102,7 +102,7 @@ describe('typeComparators', () => {
     });
 
     it('member is subtype of union', () => {
-      const member = new GraphQLObjectType({
+      const member = gqlObject({
         name: 'Object',
         fields: {
           field: { type: GraphQLString },

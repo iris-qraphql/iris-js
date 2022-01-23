@@ -74,20 +74,20 @@ export type GraphQLSchemaExtensions = Record<string, unknown>;
  * Example:
  *
  * ```ts
- * const humanType = new GraphQLObjectType({
+ * const humanType = gqlObject({
  *   name: 'Human',
  *   interfaces: [],
  *   ...
  * });
  *
- * const droidType = new GraphQLObjectType({
+ * const droidType = gqlObject({
  *   name: 'Droid',
  *   interfaces: [characterInterface],
  *   ...
  * });
  *
  * const schema = new GraphQLSchema({
- *   query: new GraphQLObjectType({
+ *   query: gqlObject({
  *     name: 'Query',
  *     fields: {
  *       hero: { type: characterInterface, ... },

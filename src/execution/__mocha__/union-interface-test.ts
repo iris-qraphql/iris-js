@@ -57,7 +57,7 @@ class Person {
   }
 }
 
-const DogType: GraphQLObjectType = new GraphQLObjectType({
+const DogType: GraphQLObjectType = gqlObject({
   name: 'Dog',
   fields: () => ({
     name: { type: GraphQLString },
@@ -69,7 +69,7 @@ const DogType: GraphQLObjectType = new GraphQLObjectType({
   isTypeOf: (value) => value instanceof Dog,
 });
 
-const CatType: GraphQLObjectType = new GraphQLObjectType({
+const CatType: GraphQLObjectType = gqlObject({
   name: 'Cat',
   fields: () => ({
     name: { type: GraphQLString },
@@ -97,7 +97,7 @@ const PetType = new IrisResolverType({
   },
 });
 
-const PersonType: GraphQLObjectType = new GraphQLObjectType({
+const PersonType: GraphQLObjectType = gqlObject({
   name: 'Person',
   fields: () => ({
     name: { type: GraphQLString },

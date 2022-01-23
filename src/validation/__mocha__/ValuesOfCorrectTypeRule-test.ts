@@ -957,7 +957,7 @@ describe('Validate: Values of correct type', () => {
       });
 
       const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields: {
             invalidArg: {
@@ -994,7 +994,7 @@ describe('Validate: Values of correct type', () => {
       });
 
       const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields: {
             invalidArg: {
@@ -1016,7 +1016,7 @@ describe('Validate: Values of correct type', () => {
     it('allows custom scalar to accept complex literals', () => {
       const customScalar = new GraphQLScalarType({ name: 'Any' });
       const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields: {
             anyArg: {

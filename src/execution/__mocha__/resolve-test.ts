@@ -13,7 +13,7 @@ import { executeSync } from '../execute';
 describe('Execute: resolve function', () => {
   function testSchema(testField: GraphQLFieldConfig<any, any>) {
     return new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           test: testField,

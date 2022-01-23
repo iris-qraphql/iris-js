@@ -10,7 +10,7 @@ import { GraphQLSchema } from '../../type/schema';
 import { executeSync } from '../execute';
 
 const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
+  query: gqlObject({
     name: 'TestType',
     fields: {
       a: { type: GraphQLString },

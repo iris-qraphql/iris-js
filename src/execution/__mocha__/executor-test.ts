@@ -20,11 +20,12 @@ import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
 import { execute, executeSync } from '../execute';
+import { gqlObject } from '../../type/make';
 
 describe('Execute: Handles basic execution tasks', () => {
   it('throws if no document is provided', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -47,7 +48,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('throws on invalid variables', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           fieldA: {
@@ -94,7 +95,7 @@ describe('Execute: Handles basic execution tasks', () => {
       return Promise.resolve(data);
     }
 
-    const DataType: GraphQLObjectType = new GraphQLObjectType({
+    const DataType: GraphQLObjectType = gqlObject({
       name: 'DataType',
       fields: () => ({
         a: { type: GraphQLString },
@@ -113,7 +114,7 @@ describe('Execute: Handles basic execution tasks', () => {
       }),
     });
 
-    const DeepDataType = new GraphQLObjectType({
+    const DeepDataType = gqlObject({
       name: 'DeepDataType',
       fields: {
         a: { type: GraphQLString },
@@ -185,7 +186,7 @@ describe('Execute: Handles basic execution tasks', () => {
   });
 
   it('merges parallel fragments', () => {
-    const Type: GraphQLObjectType = new GraphQLObjectType({
+    const Type: GraphQLObjectType = gqlObject({
       name: 'Type',
       fields: () => ({
         a: { type: GraphQLString, resolve: () => 'Apple' },
@@ -230,7 +231,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('provides info about current execution state', () => {
     let resolvedInfo;
-    const testType = new GraphQLObjectType({
+    const testType = gqlObject({
       name: 'Test',
       fields: {
         test: {
@@ -284,7 +285,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('populates path correctly with complex types', () => {
     let path;
-    const someObject = new GraphQLObjectType({
+    const someObject = gqlObject({
       name: 'SomeObject',
       fields: {
         test: {
@@ -302,7 +303,7 @@ describe('Execute: Handles basic execution tasks', () => {
         return 'SomeObject';
       },
     });
-    const testType = new GraphQLObjectType({
+    const testType = gqlObject({
       name: 'SomeQuery',
       fields: {
         test: {
@@ -344,7 +345,7 @@ describe('Execute: Handles basic execution tasks', () => {
   it('threads root value context correctly', () => {
     let resolvedRootValue;
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: {
@@ -367,7 +368,7 @@ describe('Execute: Handles basic execution tasks', () => {
   it('correctly threads arguments', () => {
     let resolvedArgs;
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           b: {
@@ -396,7 +397,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('nulls out error subtrees', async () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           sync: { type: GraphQLString },
@@ -581,12 +582,12 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('nulls error subtree for promise rejection #1071', async () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           foods: {
             type: new GraphQLList(
-              new GraphQLObjectType({
+              gqlObject({
                 name: 'Food',
                 fields: {
                   name: { type: GraphQLString },
@@ -624,7 +625,7 @@ describe('Execute: Handles basic execution tasks', () => {
   });
 
   it('Full response path is included for non-nullable fields', () => {
-    const A: GraphQLObjectType = new GraphQLObjectType({
+    const A: GraphQLObjectType = gqlObject({
       name: 'A',
       fields: () => ({
         nullableA: {
@@ -644,7 +645,7 @@ describe('Execute: Handles basic execution tasks', () => {
       }),
     });
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'query',
         fields: () => ({
           nullableA: {
@@ -688,7 +689,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('uses the inline operation if no operation name is provided', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -704,7 +705,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('uses the only operation if no operation name is provided', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -720,7 +721,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('uses the named operation if operation name is provided', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -741,7 +742,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('provides error if no operation is provided', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -759,7 +760,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('errors if no op name is provided with multiple operations', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -784,7 +785,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('errors if unknown operation name is provided', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -805,7 +806,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('errors if empty string is provided as operation name', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -823,19 +824,19 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('uses the query schema for queries', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Q',
         fields: {
           a: { type: GraphQLString },
         },
       }),
-      mutation: new GraphQLObjectType({
+      mutation: gqlObject({
         name: 'M',
         fields: {
           c: { type: GraphQLString },
         },
       }),
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'S',
         fields: {
           a: { type: GraphQLString },
@@ -856,13 +857,13 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('uses the mutation schema for mutations', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Q',
         fields: {
           a: { type: GraphQLString },
         },
       }),
-      mutation: new GraphQLObjectType({
+      mutation: gqlObject({
         name: 'M',
         fields: {
           c: { type: GraphQLString },
@@ -882,13 +883,13 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('uses the subscription schema for subscriptions', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Q',
         fields: {
           a: { type: GraphQLString },
         },
       }),
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'S',
         fields: {
           a: { type: GraphQLString },
@@ -955,7 +956,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('correct field ordering despite execution order', async () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -983,7 +984,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('Avoids recursion', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           a: { type: GraphQLString },
@@ -1011,14 +1012,14 @@ describe('Execute: Handles basic execution tasks', () => {
   });
 
   it('ignores missing sub selections on fields', () => {
-    const someType = new GraphQLObjectType({
+    const someType = gqlObject({
       name: 'SomeType',
       fields: {
         b: { type: GraphQLString },
       },
     });
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           a: { type: someType },
@@ -1036,7 +1037,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('does not include illegal fields in output', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Q',
         fields: {
           a: { type: GraphQLString },
@@ -1053,7 +1054,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('does not include arguments that were not set', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Type',
         fields: {
           field: {
@@ -1097,7 +1098,7 @@ describe('Execute: Handles basic execution tasks', () => {
       }
     }
 
-    const SpecialType = new GraphQLObjectType({
+    const SpecialType = gqlObject({
       name: 'SpecialType',
       isTypeOf(obj, context) {
         const result = obj instanceof Special;
@@ -1107,7 +1108,7 @@ describe('Execute: Handles basic execution tasks', () => {
     });
 
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           specials: { type: new GraphQLList(SpecialType) },
@@ -1153,7 +1154,7 @@ describe('Execute: Handles basic execution tasks', () => {
       },
     });
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           customScalar: {
@@ -1180,7 +1181,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('executes ignoring invalid non-executable definitions', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           foo: { type: GraphQLString },
@@ -1200,7 +1201,7 @@ describe('Execute: Handles basic execution tasks', () => {
 
   it('uses a custom field resolver', () => {
     const schema = new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           foo: { type: GraphQLString },

@@ -700,14 +700,15 @@ export class IrisResolverType<TSource = any, TContext = any> {
 
   private _types?: ThunkReadonlyArray<GraphQLObjectType>;
   private _fields?: ThunkObjMap<GraphQLField<TSource, TContext>>;
+  private _isVariantType: boolean;
 
   constructor(config: Readonly<GraphQLUnionTypeConfig<any, any>>) {
-    // constructor(config: Readonly<GraphQLObjectTypeConfig<TSource, TContext>>) {
     this.name = assertName(config.name);
     this.description = config.description;
     this.astNode = config.astNode;
+    this._isVariantType = config.fields !== undefined
 
-    if (config.fields) {
+    if (this._isVariantType) {
       this.isTypeOf = config.isTypeOf;
 
       this._fields = () => defineFieldMap(config);
@@ -729,12 +730,10 @@ export class IrisResolverType<TSource = any, TContext = any> {
   }
 
   get [Symbol.toStringTag]() {
-    return 'GraphQLUnionType';
+    return 'IrisResolverType';
   }
 
-  // const [variant, ...xs] = this._variants;
-  // return variant?.name === this.name && xs.length === 0;
-  isVariantType = (): boolean => Object.values(this.getFields()).length > 0;
+  isVariantType = (): boolean => this._isVariantType;
 
   getFields(): GraphQLFieldMap<TSource, TContext> {
     if (typeof this._fields === 'function') {

@@ -499,6 +499,7 @@ function getResolverVariantNames(
   typeName: string,
 ): Maybe<ReadonlyArray<NameNode>> {
   const { astNode } = union;
+  // @ts-expect-error
   const nodes: ReadonlyArray<ResolverTypeDefinitionNode> =
     astNode != null ? [astNode] : [];
 
