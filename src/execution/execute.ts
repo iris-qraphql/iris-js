@@ -31,7 +31,6 @@ import type {
   GraphQLFieldResolver,
   GraphQLLeafType,
   GraphQLList,
-  GraphQLObjectType,
   GraphQLOutputType,
   GraphQLResolveInfo,
   GraphQLTypeResolver,
@@ -66,7 +65,7 @@ import { getArgumentValues, getVariableValues } from './values';
 const collectSubfields = memoize3(
   (
     exeContext: ExecutionContext,
-    returnType: GraphQLObjectType,
+    returnType: IrisResolverType,
     fieldNodes: ReadonlyArray<FieldNode>,
   ) =>
     _collectSubfields(
@@ -399,7 +398,7 @@ function executeOperation(
  */
 function executeFieldsSerially(
   exeContext: ExecutionContext,
-  parentType: GraphQLObjectType,
+  parentType: IrisResolverType,
   sourceValue: unknown,
   path: Path | undefined,
   fields: Map<string, ReadonlyArray<FieldNode>>,
@@ -437,7 +436,7 @@ function executeFieldsSerially(
  */
 function executeFields(
   exeContext: ExecutionContext,
-  parentType: GraphQLObjectType,
+  parentType: IrisResolverType,
   sourceValue: unknown,
   path: Path | undefined,
   fields: Map<string, ReadonlyArray<FieldNode>>,
@@ -482,7 +481,7 @@ function executeFields(
  */
 function executeField(
   exeContext: ExecutionContext,
-  parentType: GraphQLObjectType,
+  parentType: IrisResolverType,
   source: unknown,
   fieldNodes: ReadonlyArray<FieldNode>,
   path: Path,
@@ -559,7 +558,7 @@ export function buildResolveInfo(
   exeContext: ExecutionContext,
   fieldDef: GraphQLField<unknown, unknown>,
   fieldNodes: ReadonlyArray<FieldNode>,
-  parentType: GraphQLObjectType,
+  parentType: IrisResolverType,
   path: Path,
 ): GraphQLResolveInfo {
   // The resolve function's optional fourth argument is a collection of
@@ -854,7 +853,7 @@ function ensureValidRuntimeType(
   fieldNodes: ReadonlyArray<FieldNode>,
   info: GraphQLResolveInfo,
   result: unknown,
-): GraphQLObjectType {
+): IrisResolverType {
   if (runtimeTypeName == null) {
     throw new GraphQLError(
       `Abstract type "${returnType.name}" must resolve to an Object type at runtime for field "${info.parentType.name}.${info.fieldName}". Either the "${returnType.name}" type should provide a "resolveType" function or each possible type should provide an "isTypeOf" function.`,
@@ -862,11 +861,11 @@ function ensureValidRuntimeType(
     );
   }
 
-  // releases before 16.0.0 supported returning `GraphQLObjectType` from `resolveType`
+  // releases before 16.0.0 supported returning `IrisResolverType` from `resolveType`
   // TODO: remove in 17.0.0 release
   if (isObjectType(runtimeTypeName)) {
     throw new GraphQLError(
-      'Support for returning GraphQLObjectType from resolveType was removed in graphql-js@16.0.0 please return type name instead.',
+      'Support for returning IrisResolverType from resolveType was removed in graphql-js@16.0.0 please return type name instead.',
     );
   }
 
@@ -907,7 +906,7 @@ function ensureValidRuntimeType(
  */
 function completeObjectValue(
   exeContext: ExecutionContext,
-  returnType: GraphQLObjectType,
+  returnType: IrisResolverType,
   fieldNodes: ReadonlyArray<FieldNode>,
   info: GraphQLResolveInfo,
   path: Path,
@@ -946,7 +945,7 @@ function completeObjectValue(
 }
 
 function invalidReturnTypeError(
-  returnType: GraphQLObjectType,
+  returnType: IrisResolverType,
   result: unknown,
   fieldNodes: ReadonlyArray<FieldNode>,
 ): GraphQLError {
@@ -1033,7 +1032,7 @@ export const defaultFieldResolver: GraphQLFieldResolver<unknown, unknown> =
  */
 export function getFieldDef(
   schema: GraphQLSchema,
-  parentType: GraphQLObjectType,
+  parentType: IrisResolverType,
   fieldNode: FieldNode,
 ): Maybe<GraphQLField<unknown, unknown>> {
   const fieldName = fieldNode.name.value;

@@ -1,5 +1,6 @@
 import { keyMap } from '../jsutils/keyMap';
 import type { Maybe } from '../jsutils/Maybe';
+import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
   DirectiveDefinitionNode,
@@ -7,7 +8,6 @@ import type {
   FieldDefinitionNode,
   InputValueDefinitionNode,
   NamedTypeNode,
-  ObjectTypeDefinitionNode,
   ResolverVariantDefinitionNode,
   ScalarTypeDefinitionNode,
   SchemaDefinitionNode,
@@ -23,12 +23,12 @@ import type {
   GraphQLFieldConfigMap,
   GraphQLNamedType,
   GraphQLType,
-  IrisDataVariantFieldFields,
+  IrisDataVariantField,
+  IrisResolverVariantConfig,
 } from '../type/definition';
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   GraphQLScalarType,
   IrisDataType,
   IrisResolverType,
@@ -181,25 +181,21 @@ export function extendSchemaImpl(
   }
 
   function buildFieldMap(
-    nodes: ReadonlyArray<ObjectTypeDefinitionNode>,
+    node: ResolverVariantDefinitionNode,
   ): GraphQLFieldConfigMap<unknown, unknown> {
     const fieldConfigMap = Object.create(null);
-    for (const node of nodes) {
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
-      const nodeFields = /* c8 ignore next */ node.fields ?? [];
-
-      for (const field of nodeFields) {
-        fieldConfigMap[field.name.value] = {
-          // Note: While this could make assertions to get the correctly typed
-          // value, that would throw immediately while type system validation
-          // with validateSchema() will produce more actionable results.
-          type: getWrappedType(field.type),
-          description: field.description?.value,
-          args: buildArgumentMap(field.arguments),
-          deprecationReason: getDeprecationReason(field),
-          astNode: field,
-        };
-      }
+    const nodeFields = node.fields ?? [];
+    for (const field of nodeFields) {
+      fieldConfigMap[field.name.value] = {
+        // Note: While this could make assertions to get the correctly typed
+        // value, that would throw immediately while type system validation
+        // with validateSchema() will produce more actionable results.
+        type: getWrappedType(field.type),
+        description: field.description?.value,
+        args: buildArgumentMap(field.arguments),
+        deprecationReason: getDeprecationReason(field),
+        astNode: field,
+      };
     }
     return fieldConfigMap;
   }
@@ -207,7 +203,6 @@ export function extendSchemaImpl(
   function buildArgumentMap(
     args: Maybe<ReadonlyArray<InputValueDefinitionNode>>,
   ): GraphQLFieldConfigArgumentMap {
-    // FIXME: https://github.com/graphql/graphql-js/issues/2203
     const argsNodes = /* c8 ignore next */ args ?? [];
 
     const argConfigMap = Object.create(null);
@@ -230,7 +225,7 @@ export function extendSchemaImpl(
 
   function buildInputFieldMap(
     fields: ReadonlyArray<InputValueDefinitionNode>,
-  ): IrisDataVariantFieldFields {
+  ): ObjMap<IrisDataVariantField> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
       return [
@@ -248,57 +243,33 @@ export function extendSchemaImpl(
     return Object.fromEntries(entries);
   }
 
-  function getVariantType(
-    node: ResolverVariantDefinitionNode,
-  ): GraphQLObjectType {
-    // FIXME: real variant types
-    const name = node.name.value;
+  function buildResolverVariant(
+    variantNode: ResolverVariantDefinitionNode,
+  ): IrisResolverVariantConfig<any, any> {
+    const name = variantNode.name.value;
+    const description = variantNode.description?.value;
 
-    const type = stdTypeMap[name] ?? typeMap[name];
-
-    if (type === undefined) {
-      throw new Error(`Unknown variant type: "${name}".`);
+    if (variantNode.fields) {
+      return {
+        name,
+        description,
+        fields: () => buildFieldMap(variantNode),
+      };
     }
 
     // @ts-expect-error
-    return type;
+    return { name, description, type: () => getNamedType(variantNode) };
   }
 
   function buildType(astNode: TypeDefinitionNode): GraphQLNamedType {
     const name = astNode.name.value;
-    const extensionASTNodes = typeExtensionsMap[name] ?? [];
 
     switch (astNode.kind) {
-      case Kind.OBJECT_TYPE_DEFINITION: {
-        const allNodes = [astNode, ...extensionASTNodes];
-
-        return new GraphQLObjectType({
-          name,
-          description: astNode.description?.value,
-          fields: () => buildFieldMap(allNodes),
-          astNode,
-        });
-      }
       case Kind.RESOLVER_TYPE_DEFINITION: {
-        const allNodes = [astNode, ...extensionASTNodes];
-
-        if (allNodes.length === 1 && allNodes[0]?.type) {
-          return new GraphQLObjectType({
-            name,
-            description: astNode.description?.value,
-            fields: () => buildFieldMap(allNodes),
-            astNode: astNode as any,
-          });
-        }
-
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
-          types: () =>
-            allNodes.flatMap(
-              (node) =>
-                /* c8 ignore next */ node.variants?.map(getVariantType) ?? [],
-            ),
+          variants: (astNode.variants ?? []).map(buildResolverVariant),
           astNode,
         });
       }

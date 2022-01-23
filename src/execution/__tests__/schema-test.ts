@@ -1,10 +1,8 @@
 import { parse } from '../../language/parser';
 
-import {
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLObjectType,
-} from '../../type/definition';
+import type { IrisResolverType } from '../../type/definition';
+import { GraphQLList, GraphQLNonNull } from '../../type/definition';
+import { gqlObject } from '../../type/make';
 import {
   GraphQLBoolean,
   GraphQLID,
@@ -17,7 +15,7 @@ import { executeSync } from '../execute';
 
 describe('Execute: Handles execution with a complex schema', () => {
   it('executes using a schema', () => {
-    const BlogImage = new GraphQLObjectType({
+    const BlogImage = gqlObject({
       name: 'Image',
       fields: {
         url: { type: GraphQLString },
@@ -26,7 +24,7 @@ describe('Execute: Handles execution with a complex schema', () => {
       },
     });
 
-    const BlogAuthor: GraphQLObjectType = new GraphQLObjectType({
+    const BlogAuthor: IrisResolverType = gqlObject({
       name: 'Author',
       fields: () => ({
         id: { type: GraphQLString },
@@ -40,7 +38,7 @@ describe('Execute: Handles execution with a complex schema', () => {
       }),
     });
 
-    const BlogArticle = new GraphQLObjectType({
+    const BlogArticle = gqlObject({
       name: 'Article',
       fields: {
         id: { type: new GraphQLNonNull(GraphQLString) },
@@ -52,7 +50,7 @@ describe('Execute: Handles execution with a complex schema', () => {
       },
     });
 
-    const BlogQuery = new GraphQLObjectType({
+    const BlogQuery = gqlObject({
       name: 'Query',
       fields: {
         article: {

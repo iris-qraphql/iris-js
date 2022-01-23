@@ -3,14 +3,14 @@ import { describe, it } from 'mocha';
 
 import { parse } from '../../language/parser';
 
-import { GraphQLObjectType } from '../../type/definition';
+import { gqlObject } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
 import { executeSync } from '../execute';
 
 const schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
+  query: gqlObject({
     name: 'TestType',
     fields: {
       a: { type: GraphQLString },

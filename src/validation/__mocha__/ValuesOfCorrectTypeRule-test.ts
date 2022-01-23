@@ -7,7 +7,7 @@ import { inspect } from '../../jsutils/inspect';
 
 import { parse } from '../../language/parser';
 
-import { GraphQLObjectType, GraphQLScalarType } from '../../type/definition';
+import { GraphQLScalarType } from '../../type/definition';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
@@ -18,6 +18,7 @@ import {
   expectValidationErrors,
   expectValidationErrorsWithSchema,
 } from './harness';
+import { gqlObject } from '../../type/make';
 
 function expectErrors(queryStr: string) {
   return expectValidationErrors(ValuesOfCorrectTypeRule, queryStr);
@@ -957,7 +958,7 @@ describe('Validate: Values of correct type', () => {
       });
 
       const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields: {
             invalidArg: {
@@ -994,7 +995,7 @@ describe('Validate: Values of correct type', () => {
       });
 
       const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields: {
             invalidArg: {
@@ -1016,7 +1017,7 @@ describe('Validate: Values of correct type', () => {
     it('allows custom scalar to accept complex literals', () => {
       const customScalar = new GraphQLScalarType({ name: 'Any' });
       const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields: {
             anyArg: {

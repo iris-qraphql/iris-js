@@ -11,14 +11,13 @@ import type {
 } from '../language/ast';
 import { OperationTypeNode } from '../language/ast';
 
-// import { isEqualType, isTypeSubTypeOf } from '../utilities/typeComparators';
 import type {
   GraphQLInputField,
-  GraphQLObjectType,
-  GraphQLUnionType,
   IrisDataType,
+  IrisResolverType,
 } from './definition';
 import {
+  isDataType,
   isEnumType,
   isInputObjectType,
   isInputType,
@@ -28,7 +27,7 @@ import {
   isOutputType,
   isRequiredArgument,
   isRequiredInputField,
-  isUnionType,
+  isResolverType,
 } from './definition';
 import { GraphQLDeprecatedDirective, isDirective } from './directives';
 import { isIntrospectionType } from './introspection';
@@ -221,28 +220,30 @@ function validateTypes(context: SchemaValidationContext): void {
       validateName(context, type);
     }
 
-    if (isObjectType(type)) {
-      // Ensure fields are valid
-      validateFields(context, type);
-    } else if (isUnionType(type)) {
-      // Ensure Unions include valid member types.
-      validateUnionMembers(context, type);
-    } else if (isEnumType(type)) {
-      // Ensure Enums have valid values.
-      validateEnumValues(context, type);
-    } else if (isInputObjectType(type)) {
-      // Ensure Input Object fields are valid.
-      validateInputFields(context, type);
+    if (isResolverType(type)) {
+      validateResolverType(context, type);
+    }
 
-      // Ensure Input Objects do not contain non-nullable circular references
+    if (isDataType(type)) {
+      validateDataType(context, type);
       validateInputObjectCircularRefs(type);
     }
   }
 }
 
+const validateResolverType = (
+  context: SchemaValidationContext,
+  type: IrisResolverType,
+) => {
+  if (type.isVariantType()) {
+    return validateFields(context, type);
+  }
+  validateUnionMembers(context, type);
+};
+
 function validateFields(
   context: SchemaValidationContext,
-  type: GraphQLObjectType,
+  type: IrisResolverType,
 ): void {
   const fields = Object.values(type.getFields());
 
@@ -285,105 +286,20 @@ function validateFields(
   }
 }
 
-// function validateTypeImplementsInterface(
-//   context: SchemaValidationContext,
-//   type: GraphQLObjectType,
-//   iface: GraphQLObjectType,
-// ): void {
-//   const typeFieldMap = type.getFields();
-
-//   // Assert each interface field is implemented.
-//   for (const ifaceField of Object.values(iface.getFields())) {
-//     const fieldName = ifaceField.name;
-//     const typeField = typeFieldMap[fieldName];
-
-//     // Assert interface field exists on type.
-//     if (!typeField) {
-//       context.reportError(
-//         `Interface field ${iface.name}.${fieldName} expected but ${type.name} does not provide it.`,
-//         [ifaceField.astNode, type.astNode],
-//       );
-//       continue;
-//     }
-
-//     // Assert interface field type is satisfied by type field type, by being
-//     // a valid subtype. (covariant)
-//     if (!isTypeSubTypeOf(context.schema, typeField.type, ifaceField.type)) {
-//       context.reportError(
-//         `Interface field ${iface.name}.${fieldName} expects type ` +
-//           `${inspect(ifaceField.type)} but ${type.name}.${fieldName} ` +
-//           `is type ${inspect(typeField.type)}.`,
-//         [ifaceField.astNode?.type, typeField.astNode?.type],
-//       );
-//     }
-
-//     // Assert each interface field arg is implemented.
-//     for (const ifaceArg of ifaceField.args) {
-//       const argName = ifaceArg.name;
-//       const typeArg = typeField.args.find((arg) => arg.name === argName);
-
-//       // Assert interface field arg exists on object field.
-//       if (!typeArg) {
-//         context.reportError(
-//           `Interface field argument ${iface.name}.${fieldName}(${argName}:) expected but ${type.name}.${fieldName} does not provide it.`,
-//           [ifaceArg.astNode, typeField.astNode],
-//         );
-//         continue;
-//       }
-
-//       // Assert interface field arg type matches object field arg type.
-//       // (invariant)
-//       // TODO: change to contravariant?
-//       if (!isEqualType(ifaceArg.type, typeArg.type)) {
-//         context.reportError(
-//           `Interface field argument ${iface.name}.${fieldName}(${argName}:) ` +
-//             `expects type ${inspect(ifaceArg.type)} but ` +
-//             `${type.name}.${fieldName}(${argName}:) is type ` +
-//             `${inspect(typeArg.type)}.`,
-//           [ifaceArg.astNode?.type, typeArg.astNode?.type],
-//         );
-//       }
-
-//       // TODO: validate default values?
-//     }
-
-//     // Assert additional arguments must not be required.
-//     for (const typeArg of typeField.args) {
-//       const argName = typeArg.name;
-//       const ifaceArg = ifaceField.args.find((arg) => arg.name === argName);
-//       if (!ifaceArg && isRequiredArgument(typeArg)) {
-//         context.reportError(
-//           `Object field ${type.name}.${fieldName} includes required argument ${argName} that is missing from the Interface field ${iface.name}.${fieldName}.`,
-//           [typeArg.astNode, ifaceField.astNode],
-//         );
-//       }
-//     }
-//   }
-// }
-
 function validateUnionMembers(
   context: SchemaValidationContext,
-  adt: GraphQLUnionType,
+  adt: IrisResolverType,
 ): void {
-  const memberTypes = adt.getTypes();
+  const listedMembers: Record<string, boolean> = {};
 
-  if (memberTypes.length === 0) {
-    context.reportError(
-      `Union type ${adt.name} must define one or more member types.`,
-      [adt.astNode],
-    );
-  }
-
-  const includedTypeNames = Object.create(null);
-  for (const memberType of memberTypes) {
-    if (includedTypeNames[memberType.name]) {
-      context.reportError(
+  adt.getTypes().forEach((memberType) => {
+    if (listedMembers[memberType.name]) {
+      return context.reportError(
         `Union type ${adt.name} can only include type ${memberType.name} once.`,
         getResolverVariantNames(adt, memberType.name),
       );
-      continue;
     }
-    includedTypeNames[memberType.name] = true;
+    listedMembers[memberType.name] = true;
     if (!isObjectType(memberType)) {
       context.reportError(
         `Union type ${adt.name} can only include Object types, ` +
@@ -391,8 +307,19 @@ function validateUnionMembers(
         getResolverVariantNames(adt, String(memberType)),
       );
     }
-  }
+  });
 }
+
+const validateDataType = (
+  context: SchemaValidationContext,
+  type: IrisDataType,
+): void => {
+  if (isEnumType(type)) {
+    // Ensure Enums have valid values.
+    return validateEnumValues(context, type);
+  }
+  return validateInputFields(context, type);
+};
 
 function validateEnumValues(
   context: SchemaValidationContext,
@@ -495,7 +422,7 @@ function createInputObjectCircularRefsValidator(
 }
 
 function getResolverVariantNames(
-  union: GraphQLUnionType,
+  union: IrisResolverType,
   typeName: string,
 ): Maybe<ReadonlyArray<NameNode>> {
   const { astNode } = union;

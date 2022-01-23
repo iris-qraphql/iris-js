@@ -17,15 +17,13 @@ import type {
 import {
   assertDataType,
   assertObjectType,
+  assertResolverType,
   assertScalarType,
-  assertUnionType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
-  IrisResolverType,
 } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
-import { gqlEnum } from '../make';
+import { gqlEnum, gqlObject, gqlUnion } from '../make';
 import { GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
@@ -46,7 +44,7 @@ const SomeSchema = buildSchema(`
 
 const SomeScalarType = assertScalarType(SomeSchema.getType('SomeScalar'));
 const SomeObjectType = assertObjectType(SomeSchema.getType('SomeObject'));
-const SomeUnionType = assertUnionType(SomeSchema.getType('SomeUnion'));
+const SomeUnionType = assertResolverType(SomeSchema.getType('SomeUnion'));
 const SomeEnumType = assertDataType(SomeSchema.getType('SomeEnum'));
 const SomeInputObjectType = assertDataType(
   SomeSchema.getType('SomeInputObject'),
@@ -91,7 +89,7 @@ const notInputTypes: ReadonlyArray<GraphQLOutputType> = [
 
 function schemaWithFieldType(type: GraphQLOutputType): GraphQLSchema {
   return new GraphQLSchema({
-    query: new GraphQLObjectType({
+    query: gqlObject({
       name: 'Query',
       fields: { f: { type } },
     }),
@@ -219,7 +217,7 @@ describe('Type System: Objects must have fields', () => {
 
   it('rejects an Object type with incorrectly named fields', () => {
     const schema = schemaWithFieldType(
-      new GraphQLObjectType({
+      gqlObject({
         name: 'SomeObject',
         fields: {
           __badName: { type: GraphQLString },
@@ -238,7 +236,7 @@ describe('Type System: Objects must have fields', () => {
 describe('Type System: Fields args must be properly named', () => {
   it('accepts field args with valid names', () => {
     const schema = schemaWithFieldType(
-      new GraphQLObjectType({
+      gqlObject({
         name: 'SomeObject',
         fields: {
           goodField: {
@@ -255,7 +253,7 @@ describe('Type System: Fields args must be properly named', () => {
 
   it('rejects field arg with invalid names', () => {
     const schema = schemaWithFieldType(
-      new GraphQLObjectType({
+      gqlObject({
         name: 'SomeObject',
         fields: {
           badField: {
@@ -297,47 +295,6 @@ describe('Type System: Union types must be valid', () => {
         | TypeB
     `);
     expectedJSON(schema, []);
-  });
-
-  it('rejects a Union type with duplicated member type', () => {
-    const schema = buildSchema(`
-      resolver Query = {
-        test: BadUnion
-      }
-
-      resolver TypeA = {
-        field: String
-      }
-
-      resolver TypeB = {
-        field: String
-      }
-
-      resolver BadUnion 
-        = TypeA
-        | TypeB
-        | TypeA
-    `);
-
-    expectedJSON(schema, [
-      {
-        message: 'Union type BadUnion can only include type TypeA once.',
-        locations: [
-          { line: 15, column: 11 },
-          { line: 17, column: 11 },
-        ],
-      },
-    ]);
-
-    expectedJSON(schema, [
-      {
-        message: 'Union type BadUnion can only include type TypeA once.',
-        locations: [
-          { line: 15, column: 11 },
-          { line: 17, column: 11 },
-        ],
-      },
-    ]);
   });
 
   it('rejects a Union type with non-Object members types', () => {
@@ -383,7 +340,7 @@ describe('Type System: Union types must be valid', () => {
       SomeInputObjectType,
     ];
     for (const memberType of badUnionMemberTypes) {
-      const badUnion = new IrisResolverType({
+      const badUnion = gqlUnion({
         name: 'BadUnion',
         // @ts-expect-error
         types: [memberType],
@@ -595,7 +552,7 @@ describe('Type System: Object fields must have output types', () => {
   function schemaWithObjectField(
     fieldConfig: GraphQLFieldConfig<unknown, unknown>,
   ): GraphQLSchema {
-    const BadObjectType = new GraphQLObjectType({
+    const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
         badField: fieldConfig,
@@ -603,7 +560,7 @@ describe('Type System: Object fields must have output types', () => {
     });
 
     return new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           f: { type: BadObjectType },
@@ -669,7 +626,7 @@ describe('Type System: Object fields must have output types', () => {
 
 describe('Type System: Arguments must have data  types', () => {
   function schemaWithArg(argConfig: GraphQLArgumentConfig): GraphQLSchema {
-    const BadObjectType = new GraphQLObjectType({
+    const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
         badField: {
@@ -682,7 +639,7 @@ describe('Type System: Arguments must have data  types', () => {
     });
 
     return new GraphQLSchema({
-      query: new GraphQLObjectType({
+      query: gqlObject({
         name: 'Query',
         fields: {
           f: { type: BadObjectType },

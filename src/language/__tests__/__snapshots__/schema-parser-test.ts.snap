@@ -185,76 +185,7 @@ Object {
     Object {
       "description": undefined,
       "directives": Array [],
-      "fields": Array [
-        Object {
-          "arguments": Array [
-            Object {
-              "defaultValue": undefined,
-              "description": undefined,
-              "directives": Array [],
-              "kind": "InputValueDefinition",
-              "loc": Object {
-                "end": 40,
-                "start": 27,
-              },
-              "name": Object {
-                "kind": "Name",
-                "loc": Object {
-                  "end": 31,
-                  "start": 27,
-                },
-                "value": "flag",
-              },
-              "type": Object {
-                "kind": "NamedType",
-                "loc": Object {
-                  "end": 40,
-                  "start": 33,
-                },
-                "name": Object {
-                  "kind": "Name",
-                  "loc": Object {
-                    "end": 40,
-                    "start": 33,
-                  },
-                  "value": "Boolean",
-                },
-              },
-            },
-          ],
-          "description": undefined,
-          "directives": Array [],
-          "kind": "FieldDefinition",
-          "loc": Object {
-            "end": 49,
-            "start": 21,
-          },
-          "name": Object {
-            "kind": "Name",
-            "loc": Object {
-              "end": 26,
-              "start": 21,
-            },
-            "value": "world",
-          },
-          "type": Object {
-            "kind": "NamedType",
-            "loc": Object {
-              "end": 49,
-              "start": 43,
-            },
-            "name": Object {
-              "kind": "Name",
-              "loc": Object {
-                "end": 49,
-                "start": 43,
-              },
-              "value": "String",
-            },
-          },
-        },
-      ],
-      "kind": "ObjectTypeDefinition",
+      "kind": "ResolverTypeDefinition",
       "loc": Object {
         "end": 51,
         "start": 0,
@@ -267,6 +198,88 @@ Object {
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "fields": Array [
+            Object {
+              "arguments": Array [
+                Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "directives": Array [],
+                  "kind": "InputValueDefinition",
+                  "loc": Object {
+                    "end": 40,
+                    "start": 27,
+                  },
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": Object {
+                      "end": 31,
+                      "start": 27,
+                    },
+                    "value": "flag",
+                  },
+                  "type": Object {
+                    "kind": "NamedType",
+                    "loc": Object {
+                      "end": 40,
+                      "start": 33,
+                    },
+                    "name": Object {
+                      "kind": "Name",
+                      "loc": Object {
+                        "end": 40,
+                        "start": 33,
+                      },
+                      "value": "Boolean",
+                    },
+                  },
+                },
+              ],
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 49,
+                "start": 21,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 26,
+                  "start": 21,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 49,
+                  "start": 43,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 49,
+                    "start": 43,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 14,
+              "start": 9,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",
@@ -283,83 +296,7 @@ Object {
     Object {
       "description": undefined,
       "directives": Array [],
-      "fields": Array [
-        Object {
-          "arguments": Array [
-            Object {
-              "defaultValue": Object {
-                "kind": "BooleanValue",
-                "loc": Object {
-                  "end": 47,
-                  "start": 43,
-                },
-                "value": true,
-              },
-              "description": undefined,
-              "directives": Array [],
-              "kind": "InputValueDefinition",
-              "loc": Object {
-                "end": 47,
-                "start": 27,
-              },
-              "name": Object {
-                "kind": "Name",
-                "loc": Object {
-                  "end": 31,
-                  "start": 27,
-                },
-                "value": "flag",
-              },
-              "type": Object {
-                "kind": "NamedType",
-                "loc": Object {
-                  "end": 40,
-                  "start": 33,
-                },
-                "name": Object {
-                  "kind": "Name",
-                  "loc": Object {
-                    "end": 40,
-                    "start": 33,
-                  },
-                  "value": "Boolean",
-                },
-              },
-            },
-          ],
-          "description": undefined,
-          "directives": Array [],
-          "kind": "FieldDefinition",
-          "loc": Object {
-            "end": 56,
-            "start": 21,
-          },
-          "name": Object {
-            "kind": "Name",
-            "loc": Object {
-              "end": 26,
-              "start": 21,
-            },
-            "value": "world",
-          },
-          "type": Object {
-            "kind": "NamedType",
-            "loc": Object {
-              "end": 56,
-              "start": 50,
-            },
-            "name": Object {
-              "kind": "Name",
-              "loc": Object {
-                "end": 56,
-                "start": 50,
-              },
-              "value": "String",
-            },
-          },
-        },
-      ],
-      "kind": "ObjectTypeDefinition",
+      "kind": "ResolverTypeDefinition",
       "loc": Object {
         "end": 58,
         "start": 0,
@@ -372,6 +309,95 @@ Object {
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "fields": Array [
+            Object {
+              "arguments": Array [
+                Object {
+                  "defaultValue": Object {
+                    "kind": "BooleanValue",
+                    "loc": Object {
+                      "end": 47,
+                      "start": 43,
+                    },
+                    "value": true,
+                  },
+                  "description": undefined,
+                  "directives": Array [],
+                  "kind": "InputValueDefinition",
+                  "loc": Object {
+                    "end": 47,
+                    "start": 27,
+                  },
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": Object {
+                      "end": 31,
+                      "start": 27,
+                    },
+                    "value": "flag",
+                  },
+                  "type": Object {
+                    "kind": "NamedType",
+                    "loc": Object {
+                      "end": 40,
+                      "start": 33,
+                    },
+                    "name": Object {
+                      "kind": "Name",
+                      "loc": Object {
+                        "end": 40,
+                        "start": 33,
+                      },
+                      "value": "Boolean",
+                    },
+                  },
+                },
+              ],
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 56,
+                "start": 21,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 26,
+                  "start": 21,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 56,
+                  "start": 50,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 56,
+                    "start": 50,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 14,
+              "start": 9,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",
@@ -388,83 +414,7 @@ Object {
     Object {
       "description": undefined,
       "directives": Array [],
-      "fields": Array [
-        Object {
-          "arguments": Array [
-            Object {
-              "defaultValue": undefined,
-              "description": undefined,
-              "directives": Array [],
-              "kind": "InputValueDefinition",
-              "loc": Object {
-                "end": 43,
-                "start": 27,
-              },
-              "name": Object {
-                "kind": "Name",
-                "loc": Object {
-                  "end": 33,
-                  "start": 27,
-                },
-                "value": "things",
-              },
-              "type": Object {
-                "kind": "ListType",
-                "loc": Object {
-                  "end": 43,
-                  "start": 35,
-                },
-                "type": Object {
-                  "kind": "NamedType",
-                  "loc": Object {
-                    "end": 42,
-                    "start": 36,
-                  },
-                  "name": Object {
-                    "kind": "Name",
-                    "loc": Object {
-                      "end": 42,
-                      "start": 36,
-                    },
-                    "value": "String",
-                  },
-                },
-              },
-            },
-          ],
-          "description": undefined,
-          "directives": Array [],
-          "kind": "FieldDefinition",
-          "loc": Object {
-            "end": 52,
-            "start": 21,
-          },
-          "name": Object {
-            "kind": "Name",
-            "loc": Object {
-              "end": 26,
-              "start": 21,
-            },
-            "value": "world",
-          },
-          "type": Object {
-            "kind": "NamedType",
-            "loc": Object {
-              "end": 52,
-              "start": 46,
-            },
-            "name": Object {
-              "kind": "Name",
-              "loc": Object {
-                "end": 52,
-                "start": 46,
-              },
-              "value": "String",
-            },
-          },
-        },
-      ],
-      "kind": "ObjectTypeDefinition",
+      "kind": "ResolverTypeDefinition",
       "loc": Object {
         "end": 54,
         "start": 0,
@@ -477,6 +427,95 @@ Object {
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "fields": Array [
+            Object {
+              "arguments": Array [
+                Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "directives": Array [],
+                  "kind": "InputValueDefinition",
+                  "loc": Object {
+                    "end": 43,
+                    "start": 27,
+                  },
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": Object {
+                      "end": 33,
+                      "start": 27,
+                    },
+                    "value": "things",
+                  },
+                  "type": Object {
+                    "kind": "ListType",
+                    "loc": Object {
+                      "end": 43,
+                      "start": 35,
+                    },
+                    "type": Object {
+                      "kind": "NamedType",
+                      "loc": Object {
+                        "end": 42,
+                        "start": 36,
+                      },
+                      "name": Object {
+                        "kind": "Name",
+                        "loc": Object {
+                          "end": 42,
+                          "start": 36,
+                        },
+                        "value": "String",
+                      },
+                    },
+                  },
+                },
+              ],
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 52,
+                "start": 21,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 26,
+                  "start": 21,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 52,
+                  "start": 46,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 52,
+                    "start": 46,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 14,
+              "start": 9,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",
@@ -493,109 +532,7 @@ Object {
     Object {
       "description": undefined,
       "directives": Array [],
-      "fields": Array [
-        Object {
-          "arguments": Array [
-            Object {
-              "defaultValue": undefined,
-              "description": undefined,
-              "directives": Array [],
-              "kind": "InputValueDefinition",
-              "loc": Object {
-                "end": 42,
-                "start": 27,
-              },
-              "name": Object {
-                "kind": "Name",
-                "loc": Object {
-                  "end": 33,
-                  "start": 27,
-                },
-                "value": "argOne",
-              },
-              "type": Object {
-                "kind": "NamedType",
-                "loc": Object {
-                  "end": 42,
-                  "start": 35,
-                },
-                "name": Object {
-                  "kind": "Name",
-                  "loc": Object {
-                    "end": 42,
-                    "start": 35,
-                  },
-                  "value": "Boolean",
-                },
-              },
-            },
-            Object {
-              "defaultValue": undefined,
-              "description": undefined,
-              "directives": Array [],
-              "kind": "InputValueDefinition",
-              "loc": Object {
-                "end": 55,
-                "start": 44,
-              },
-              "name": Object {
-                "kind": "Name",
-                "loc": Object {
-                  "end": 50,
-                  "start": 44,
-                },
-                "value": "argTwo",
-              },
-              "type": Object {
-                "kind": "NamedType",
-                "loc": Object {
-                  "end": 55,
-                  "start": 52,
-                },
-                "name": Object {
-                  "kind": "Name",
-                  "loc": Object {
-                    "end": 55,
-                    "start": 52,
-                  },
-                  "value": "Int",
-                },
-              },
-            },
-          ],
-          "description": undefined,
-          "directives": Array [],
-          "kind": "FieldDefinition",
-          "loc": Object {
-            "end": 64,
-            "start": 21,
-          },
-          "name": Object {
-            "kind": "Name",
-            "loc": Object {
-              "end": 26,
-              "start": 21,
-            },
-            "value": "world",
-          },
-          "type": Object {
-            "kind": "NamedType",
-            "loc": Object {
-              "end": 64,
-              "start": 58,
-            },
-            "name": Object {
-              "kind": "Name",
-              "loc": Object {
-                "end": 64,
-                "start": 58,
-              },
-              "value": "String",
-            },
-          },
-        },
-      ],
-      "kind": "ObjectTypeDefinition",
+      "kind": "ResolverTypeDefinition",
       "loc": Object {
         "end": 66,
         "start": 0,
@@ -608,6 +545,121 @@ Object {
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "fields": Array [
+            Object {
+              "arguments": Array [
+                Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "directives": Array [],
+                  "kind": "InputValueDefinition",
+                  "loc": Object {
+                    "end": 42,
+                    "start": 27,
+                  },
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": Object {
+                      "end": 33,
+                      "start": 27,
+                    },
+                    "value": "argOne",
+                  },
+                  "type": Object {
+                    "kind": "NamedType",
+                    "loc": Object {
+                      "end": 42,
+                      "start": 35,
+                    },
+                    "name": Object {
+                      "kind": "Name",
+                      "loc": Object {
+                        "end": 42,
+                        "start": 35,
+                      },
+                      "value": "Boolean",
+                    },
+                  },
+                },
+                Object {
+                  "defaultValue": undefined,
+                  "description": undefined,
+                  "directives": Array [],
+                  "kind": "InputValueDefinition",
+                  "loc": Object {
+                    "end": 55,
+                    "start": 44,
+                  },
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": Object {
+                      "end": 50,
+                      "start": 44,
+                    },
+                    "value": "argTwo",
+                  },
+                  "type": Object {
+                    "kind": "NamedType",
+                    "loc": Object {
+                      "end": 55,
+                      "start": 52,
+                    },
+                    "name": Object {
+                      "kind": "Name",
+                      "loc": Object {
+                        "end": 55,
+                        "start": 52,
+                      },
+                      "value": "Int",
+                    },
+                  },
+                },
+              ],
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 64,
+                "start": 21,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 26,
+                  "start": 21,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 64,
+                  "start": 58,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 64,
+                    "start": 58,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 14,
+              "start": 9,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",
@@ -624,49 +676,7 @@ Object {
     Object {
       "description": undefined,
       "directives": Array [],
-      "fields": Array [
-        Object {
-          "arguments": Array [],
-          "description": undefined,
-          "directives": Array [],
-          "kind": "FieldDefinition",
-          "loc": Object {
-            "end": 35,
-            "start": 21,
-          },
-          "name": Object {
-            "kind": "Name",
-            "loc": Object {
-              "end": 26,
-              "start": 21,
-            },
-            "value": "world",
-          },
-          "type": Object {
-            "kind": "NonNullType",
-            "loc": Object {
-              "end": 35,
-              "start": 28,
-            },
-            "type": Object {
-              "kind": "NamedType",
-              "loc": Object {
-                "end": 34,
-                "start": 28,
-              },
-              "name": Object {
-                "kind": "Name",
-                "loc": Object {
-                  "end": 34,
-                  "start": 28,
-                },
-                "value": "String",
-              },
-            },
-          },
-        },
-      ],
-      "kind": "ObjectTypeDefinition",
+      "kind": "ResolverTypeDefinition",
       "loc": Object {
         "end": 37,
         "start": 0,
@@ -679,6 +689,61 @@ Object {
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "fields": Array [
+            Object {
+              "arguments": Array [],
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 35,
+                "start": 21,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 26,
+                  "start": 21,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NonNullType",
+                "loc": Object {
+                  "end": 35,
+                  "start": 28,
+                },
+                "type": Object {
+                  "kind": "NamedType",
+                  "loc": Object {
+                    "end": 34,
+                    "start": 28,
+                  },
+                  "name": Object {
+                    "kind": "Name",
+                    "loc": Object {
+                      "end": 34,
+                      "start": 28,
+                    },
+                    "value": "String",
+                  },
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 14,
+              "start": 9,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",
@@ -695,42 +760,7 @@ Object {
     Object {
       "description": undefined,
       "directives": Array [],
-      "fields": Array [
-        Object {
-          "arguments": Array [],
-          "description": undefined,
-          "directives": Array [],
-          "kind": "FieldDefinition",
-          "loc": Object {
-            "end": 34,
-            "start": 21,
-          },
-          "name": Object {
-            "kind": "Name",
-            "loc": Object {
-              "end": 26,
-              "start": 21,
-            },
-            "value": "world",
-          },
-          "type": Object {
-            "kind": "NamedType",
-            "loc": Object {
-              "end": 34,
-              "start": 28,
-            },
-            "name": Object {
-              "kind": "Name",
-              "loc": Object {
-                "end": 34,
-                "start": 28,
-              },
-              "value": "String",
-            },
-          },
-        },
-      ],
-      "kind": "ObjectTypeDefinition",
+      "kind": "ResolverTypeDefinition",
       "loc": Object {
         "end": 36,
         "start": 0,
@@ -743,6 +773,54 @@ Object {
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "fields": Array [
+            Object {
+              "arguments": Array [],
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 34,
+                "start": 21,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 26,
+                  "start": 21,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 34,
+                  "start": 28,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 34,
+                    "start": 28,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 14,
+              "start": 9,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",
@@ -932,42 +1010,7 @@ Object {
         "value": "Description",
       },
       "directives": Array [],
-      "fields": Array [
-        Object {
-          "arguments": Array [],
-          "description": undefined,
-          "directives": Array [],
-          "kind": "FieldDefinition",
-          "loc": Object {
-            "end": 88,
-            "start": 75,
-          },
-          "name": Object {
-            "kind": "Name",
-            "loc": Object {
-              "end": 80,
-              "start": 75,
-            },
-            "value": "world",
-          },
-          "type": Object {
-            "kind": "NamedType",
-            "loc": Object {
-              "end": 88,
-              "start": 82,
-            },
-            "name": Object {
-              "kind": "Name",
-              "loc": Object {
-                "end": 88,
-                "start": 82,
-              },
-              "value": "String",
-            },
-          },
-        },
-      ],
-      "kind": "ObjectTypeDefinition",
+      "kind": "ResolverTypeDefinition",
       "loc": Object {
         "end": 90,
         "start": 0,
@@ -980,6 +1023,54 @@ Object {
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "fields": Array [
+            Object {
+              "arguments": Array [],
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 88,
+                "start": 75,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 80,
+                  "start": 75,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 88,
+                  "start": 82,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 88,
+                    "start": 82,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 68,
+              "start": 63,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",
@@ -1004,42 +1095,7 @@ Object {
         "value": "Description",
       },
       "directives": Array [],
-      "fields": Array [
-        Object {
-          "arguments": Array [],
-          "description": undefined,
-          "directives": Array [],
-          "kind": "FieldDefinition",
-          "loc": Object {
-            "end": 48,
-            "start": 35,
-          },
-          "name": Object {
-            "kind": "Name",
-            "loc": Object {
-              "end": 40,
-              "start": 35,
-            },
-            "value": "world",
-          },
-          "type": Object {
-            "kind": "NamedType",
-            "loc": Object {
-              "end": 48,
-              "start": 42,
-            },
-            "name": Object {
-              "kind": "Name",
-              "loc": Object {
-                "end": 48,
-                "start": 42,
-              },
-              "value": "String",
-            },
-          },
-        },
-      ],
-      "kind": "ObjectTypeDefinition",
+      "kind": "ResolverTypeDefinition",
       "loc": Object {
         "end": 50,
         "start": 0,
@@ -1052,6 +1108,54 @@ Object {
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "fields": Array [
+            Object {
+              "arguments": Array [],
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 48,
+                "start": 35,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 40,
+                  "start": 35,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 48,
+                  "start": 42,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 48,
+                    "start": 42,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 28,
+              "start": 23,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",

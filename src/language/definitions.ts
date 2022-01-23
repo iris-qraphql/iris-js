@@ -3,7 +3,6 @@ import type {
   DefinitionNode,
   FieldDefinitionNode,
   NameNode,
-  ObjectTypeDefinitionNode,
   ResolverTypeDefinitionNode,
   ResolverVariantDefinitionNode,
   Role,
@@ -33,7 +32,7 @@ export const parseDefinitions = (
 
 const parseResolverTypeDefinition = (
   parser: Parser,
-): ResolverTypeDefinitionNode | ObjectTypeDefinitionNode => {
+): ResolverTypeDefinitionNode => {
   const start = parser.lookAhead();
   const description = parser.parseDescription();
   parser.expectKeyword('resolver');
@@ -43,12 +42,12 @@ const parseResolverTypeDefinition = (
   const afterEquals = parser.lookAhead().kind;
 
   if (!isEquals) {
-    return parser.node<ObjectTypeDefinitionNode>(start, {
-      kind: Kind.OBJECT_TYPE_DEFINITION,
+    return parser.node<ResolverTypeDefinitionNode>(start, {
+      kind: Kind.RESOLVER_TYPE_DEFINITION,
       description,
       name,
       directives,
-      fields: [],
+      variants: [{ kind: Kind.VARIANT_DEFINITION, name, fields: [] }],
     });
   }
 
@@ -73,12 +72,13 @@ const parseResolverTypeDefinition = (
   }
 
   const fields = parseFieldsDefinition(parser);
-  return parser.node<ObjectTypeDefinitionNode>(start, {
-    kind: Kind.OBJECT_TYPE_DEFINITION,
+
+  return parser.node<ResolverTypeDefinitionNode>(start, {
+    kind: Kind.RESOLVER_TYPE_DEFINITION,
     description,
     name,
     directives,
-    fields,
+    variants: [{ kind: Kind.VARIANT_DEFINITION, name, fields }],
   });
 };
 

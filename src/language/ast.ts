@@ -164,7 +164,6 @@ export type ASTNode =
   | SchemaDefinitionNode
   | OperationTypeDefinitionNode
   | ScalarTypeDefinitionNode
-  | ObjectTypeDefinitionNode
   | FieldDefinitionNode
   | InputValueDefinitionNode
   | ResolverTypeDefinitionNode
@@ -231,13 +230,6 @@ export const QueryDocumentKeys: {
   OperationTypeDefinition: ['type'],
 
   ScalarTypeDefinition: ['description', 'name', 'directives'],
-  ObjectTypeDefinition: [
-    'description',
-    'name',
-    'interfaces',
-    'directives',
-    'fields',
-  ],
   FieldDefinition: ['description', 'name', 'arguments', 'type', 'directives'],
   InputValueDefinition: [
     'description',
@@ -536,7 +528,6 @@ export interface OperationTypeDefinitionNode {
 
 export type TypeDefinitionNode =
   | ScalarTypeDefinitionNode
-  | ObjectTypeDefinitionNode
   | ResolverTypeDefinitionNode
   | DataTypeDefinitionNode;
 
@@ -546,16 +537,6 @@ export interface ScalarTypeDefinitionNode {
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-}
-
-export interface ObjectTypeDefinitionNode {
-  readonly kind: Kind.OBJECT_TYPE_DEFINITION;
-  readonly loc?: Location;
-  readonly description?: StringValueNode;
-  readonly name: NameNode;
-  readonly interfaces?: ReadonlyArray<NamedTypeNode>;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly fields?: ReadonlyArray<FieldDefinitionNode>;
 }
 
 export interface FieldDefinitionNode {
@@ -584,15 +565,15 @@ export interface ResolverTypeDefinitionNode {
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly variants?: ReadonlyArray<ResolverVariantDefinitionNode>;
+  readonly variants: ReadonlyArray<ResolverVariantDefinitionNode>;
 }
 
 export type ResolverVariantDefinitionNode = {
   readonly kind: Kind.VARIANT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly name: NameNode;
+  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly fields?: ReadonlyArray<FieldDefinitionNode>;
 };
 

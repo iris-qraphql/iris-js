@@ -3,11 +3,8 @@ import { describe, it } from 'mocha';
 
 import { parse } from '../../language/parser';
 
-import {
-  GraphQLList,
-  GraphQLObjectType,
-  IrisResolverType,
-} from '../../type/definition';
+import { GraphQLList, IrisResolverType } from '../../type/definition';
+import { gqlObject, gqlUnion } from '../../type/make';
 import { GraphQLBoolean, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
@@ -57,7 +54,7 @@ class Person {
   }
 }
 
-const DogType: GraphQLObjectType = new GraphQLObjectType({
+const DogType: IrisResolverType = gqlObject({
   name: 'Dog',
   fields: () => ({
     name: { type: GraphQLString },
@@ -69,7 +66,7 @@ const DogType: GraphQLObjectType = new GraphQLObjectType({
   isTypeOf: (value) => value instanceof Dog,
 });
 
-const CatType: GraphQLObjectType = new GraphQLObjectType({
+const CatType: IrisResolverType = gqlObject({
   name: 'Cat',
   fields: () => ({
     name: { type: GraphQLString },
@@ -81,7 +78,7 @@ const CatType: GraphQLObjectType = new GraphQLObjectType({
   isTypeOf: (value) => value instanceof Cat,
 });
 
-const PetType = new IrisResolverType({
+const PetType = gqlUnion({
   name: 'Pet',
   types: [DogType, CatType],
   resolveType(value) {
@@ -97,7 +94,7 @@ const PetType = new IrisResolverType({
   },
 });
 
-const PersonType: GraphQLObjectType = new GraphQLObjectType({
+const PersonType: IrisResolverType = gqlObject({
   name: 'Person',
   fields: () => ({
     name: { type: GraphQLString },

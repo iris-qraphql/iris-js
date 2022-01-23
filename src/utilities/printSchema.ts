@@ -12,20 +12,13 @@ import type {
   GraphQLFieldMap,
   GraphQLInputField,
   GraphQLNamedType,
-  GraphQLObjectType,
   GraphQLScalarType,
-  GraphQLUnionType,
   IrisDataType,
   IrisDataVariant,
   IrisDataVariantField,
+  IrisResolverType,
 } from '../type/definition';
-import {
-  isEnumType,
-  isInputObjectType,
-  isObjectType,
-  isScalarType,
-  isUnionType,
-} from '../type/definition';
+import { isDataType, isResolverType, isScalarType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import {
   DEFAULT_DEPRECATION_REASON,
@@ -73,13 +66,10 @@ export function printType(type: GraphQLNamedType): string {
   if (isScalarType(type)) {
     return printScalar(type);
   }
-  if (isObjectType(type)) {
-    return printObject(type);
+  if (isResolverType(type)) {
+    return type.isVariantType() ? printObject(type) : printUnion(type);
   }
-  if (isUnionType(type)) {
-    return printUnion(type);
-  }
-  if (isEnumType(type) || isInputObjectType(type)) {
+  if (isDataType(type)) {
     return printDATA(type);
   }
   /* c8 ignore next 3 */
@@ -93,7 +83,7 @@ function printScalar(type: GraphQLScalarType): string {
   );
 }
 
-function printObject(type: GraphQLObjectType): string {
+function printObject(type: IrisResolverType): string {
   const fields = type.getFields();
   return (
     printDescription(type) +
@@ -103,7 +93,7 @@ function printObject(type: GraphQLObjectType): string {
   );
 }
 
-function printUnion(type: GraphQLUnionType): string {
+function printUnion(type: IrisResolverType): string {
   const types = type.getTypes();
   const possibleTypes = types.length ? ' = ' + types.join(' | ') : '';
   return printDescription(type) + 'resolver ' + type.name + possibleTypes;

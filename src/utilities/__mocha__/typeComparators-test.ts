@@ -2,12 +2,8 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import type { GraphQLFieldConfigMap } from '../../type/definition';
-import {
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLObjectType,
-  IrisResolverType,
-} from '../../type/definition';
+import { GraphQLList, GraphQLNonNull } from '../../type/definition';
+import { gqlObject, gqlUnion } from '../../type/make';
 import { GraphQLFloat, GraphQLInt, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
@@ -54,7 +50,7 @@ describe('typeComparators', () => {
   describe('isTypeSubTypeOf', () => {
     function testSchema(fields: GraphQLFieldConfigMap<unknown, unknown>) {
       return new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields,
         }),
@@ -102,13 +98,13 @@ describe('typeComparators', () => {
     });
 
     it('member is subtype of union', () => {
-      const member = new GraphQLObjectType({
+      const member = gqlObject({
         name: 'Object',
         fields: {
           field: { type: GraphQLString },
         },
       });
-      const union = new IrisResolverType({ name: 'Union', types: [member] });
+      const union = gqlUnion({ name: 'Union', types: [member] });
       const schema = testSchema({ field: { type: union } });
       expect(isTypeSubTypeOf(schema, member, union)).to.equal(true);
     });

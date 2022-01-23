@@ -5,6 +5,7 @@ import type {
   FieldDefinitionNode,
   InputValueDefinitionNode,
   NameNode,
+  ResolverTypeDefinitionNode,
 } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
@@ -27,10 +28,13 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
 
   return {
     DataTypeDefinition: checkVariantUniqueness,
-    ObjectTypeDefinition: checkFieldUniqueness,
+    ResolverTypeDefinition: checkVariantUniqueness,
   };
 
-  function checkVariantUniqueness({ variants, name }: DataTypeDefinitionNode) {
+  function checkVariantUniqueness({
+    variants,
+    name,
+  }: DataTypeDefinitionNode | ResolverTypeDefinitionNode) {
     const knownVariantNames: Record<string, NameNode> = {};
     const typeName = name.value;
 

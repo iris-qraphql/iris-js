@@ -1,7 +1,14 @@
 import type { ObjMap } from '../jsutils/ObjMap';
 
-import type { GraphQLInputField } from './definition';
-import { IrisDataType } from './definition';
+import type {
+  GraphQLFieldConfig,
+  GraphQLInputField,
+  GraphQLIsTypeOfFn,
+  GraphQLTypeResolver,
+  IrisResolverVariantConfig,
+  ThunkObjMap,
+} from './definition';
+import { IrisDataType, IrisResolverType } from './definition';
 
 type InputC = {
   name: string;
@@ -27,4 +34,37 @@ const gqlEnum = (name: string, values: Array<string>) =>
     variants: values.map((v) => ({ name: v })),
   });
 
-export { gqlInput, gqlEnum };
+type GQLObject = {
+  name: string;
+  description?: string;
+  fields: ThunkObjMap<GraphQLFieldConfig<any, any>>;
+  isTypeOf?: GraphQLIsTypeOfFn<any, any>;
+};
+
+const gqlObject = ({ name, fields, isTypeOf, description }: GQLObject) =>
+  new IrisResolverType({
+    name,
+    variants: [{ name, description, fields }],
+    isTypeOf,
+    description,
+  });
+
+type GQLUnion = {
+  name: string;
+  types: ReadonlyArray<IrisResolverType>;
+  resolveType?: GraphQLTypeResolver<any, any>;
+};
+
+const gqlUnion = ({ name, types, resolveType }: GQLUnion) =>
+  new IrisResolverType({
+    name,
+    variants: types.map(
+      (type): IrisResolverVariantConfig<any, any> => ({
+        name: type.name,
+        type: () => type,
+      }),
+    ),
+    resolveType,
+  });
+
+export { gqlInput, gqlEnum, gqlObject, gqlUnion };

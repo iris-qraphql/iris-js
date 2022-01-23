@@ -9,7 +9,7 @@ import type {
 } from '../language/ast';
 import { Kind } from '../language/kinds';
 
-import type { GraphQLObjectType } from '../type/definition';
+import type { IrisResolverType } from '../type/definition';
 import { isAbstractType } from '../type/definition';
 import {
   GraphQLIncludeDirective,
@@ -34,7 +34,7 @@ export function collectFields(
   schema: GraphQLSchema,
   fragments: ObjMap<FragmentDefinitionNode>,
   variableValues: Record<string, unknown>,
-  runtimeType: GraphQLObjectType,
+  runtimeType: IrisResolverType,
   selectionSet: SelectionSetNode,
 ): Map<string, ReadonlyArray<FieldNode>> {
   const fields = new Map();
@@ -64,7 +64,7 @@ export function collectSubfields(
   schema: GraphQLSchema,
   fragments: ObjMap<FragmentDefinitionNode>,
   variableValues: Record<string, unknown>,
-  returnType: GraphQLObjectType,
+  returnType: IrisResolverType,
   fieldNodes: ReadonlyArray<FieldNode>,
 ): Map<string, ReadonlyArray<FieldNode>> {
   const subFieldNodes = new Map();
@@ -89,7 +89,7 @@ function collectFieldsImpl(
   schema: GraphQLSchema,
   fragments: ObjMap<FragmentDefinitionNode>,
   variableValues: Record<string, unknown>,
-  runtimeType: GraphQLObjectType,
+  runtimeType: IrisResolverType,
   selectionSet: SelectionSetNode,
   fields: Map<string, Array<FieldNode>>,
   visitedFragmentNames: Set<string>,
@@ -188,7 +188,7 @@ function shouldIncludeNode(
 function doesFragmentConditionMatch(
   schema: GraphQLSchema,
   fragment: FragmentDefinitionNode | InlineFragmentNode,
-  type: GraphQLObjectType,
+  type: IrisResolverType,
 ): boolean {
   const typeConditionNode = fragment.typeCondition;
   if (!typeConditionNode) {

@@ -5,7 +5,7 @@ import { expectJSON } from '../../__testUtils__/__mocha__/expectJSON';
 
 import { parse } from '../../language/parser';
 
-import { GraphQLObjectType } from '../../type/definition';
+import { gqlObject } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
@@ -17,7 +17,7 @@ import { execute, executeSync } from '../execute';
 
 describe('Execute: synchronously when possible', () => {
   const schema = new GraphQLSchema({
-    query: new GraphQLObjectType({
+    query: gqlObject({
       name: 'Query',
       fields: {
         syncField: {
@@ -34,7 +34,7 @@ describe('Execute: synchronously when possible', () => {
         },
       },
     }),
-    mutation: new GraphQLObjectType({
+    mutation: gqlObject({
       name: 'Mutation',
       fields: {
         syncMutationField: {

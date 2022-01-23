@@ -3,7 +3,7 @@ import { GraphQLError } from '../../error/GraphQLError';
 import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { isCompositeType } from '../../type/definition';
+import { isResolverType } from '../../type/definition';
 
 import { typeFromAST } from '../../utilities/typeFromAST';
 
@@ -26,7 +26,7 @@ export function FragmentsOnCompositeTypesRule(
       const typeCondition = node.typeCondition;
       if (typeCondition) {
         const type = typeFromAST(context.getSchema(), typeCondition);
-        if (type && !isCompositeType(type)) {
+        if (type && !isResolverType(type)) {
           const typeStr = print(typeCondition);
           context.reportError(
             new GraphQLError(
@@ -39,7 +39,7 @@ export function FragmentsOnCompositeTypesRule(
     },
     FragmentDefinition(node) {
       const type = typeFromAST(context.getSchema(), node.typeCondition);
-      if (type && !isCompositeType(type)) {
+      if (type && !isResolverType(type)) {
         const typeStr = print(node.typeCondition);
         context.reportError(
           new GraphQLError(

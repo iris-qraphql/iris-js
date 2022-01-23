@@ -7,27 +7,27 @@ import type { DocumentNode, OperationDefinitionNode } from '../../language/ast';
 import { Kind } from '../../language/kinds';
 import { parse } from '../../language/parser';
 
-import { GraphQLObjectType } from '../../type/definition';
+import { gqlObject } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
 import { getOperationRootType } from '../getOperationRootType';
 
-const queryType = new GraphQLObjectType({
+const queryType = gqlObject({
   name: 'FooQuery',
   fields: () => ({
     field: { type: GraphQLString },
   }),
 });
 
-const mutationType = new GraphQLObjectType({
+const mutationType = gqlObject({
   name: 'FooMutation',
   fields: () => ({
     field: { type: GraphQLString },
   }),
 });
 
-const subscriptionType = new GraphQLObjectType({
+const subscriptionType = gqlObject({
   name: 'FooSubscription',
   fields: () => ({
     field: { type: GraphQLString },

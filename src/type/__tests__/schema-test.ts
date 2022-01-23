@@ -4,19 +4,16 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { printSchema } from '../../utilities/printSchema';
 
-import {
-  GraphQLList,
-  GraphQLObjectType,
-  GraphQLScalarType,
-} from '../definition';
+import type { IrisResolverType } from '../definition';
+import { GraphQLList, GraphQLScalarType } from '../definition';
 import { GraphQLDirective } from '../directives';
-import { emptyDataType, gqlInput } from '../make';
+import { emptyDataType, gqlInput, gqlObject } from '../make';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 
 describe('Type System: Schema', () => {
   it('Define sample schema', () => {
-    const BlogImage = new GraphQLObjectType({
+    const BlogImage = gqlObject({
       name: 'Image',
       fields: {
         url: { type: GraphQLString },
@@ -25,7 +22,7 @@ describe('Type System: Schema', () => {
       },
     });
 
-    const BlogAuthor: GraphQLObjectType = new GraphQLObjectType({
+    const BlogAuthor: IrisResolverType = gqlObject({
       name: 'Author',
       fields: () => ({
         id: { type: GraphQLString },
@@ -38,7 +35,7 @@ describe('Type System: Schema', () => {
       }),
     });
 
-    const BlogArticle: GraphQLObjectType = new GraphQLObjectType({
+    const BlogArticle: IrisResolverType = gqlObject({
       name: 'Article',
       fields: {
         id: { type: GraphQLString },
@@ -49,7 +46,7 @@ describe('Type System: Schema', () => {
       },
     });
 
-    const BlogQuery = new GraphQLObjectType({
+    const BlogQuery = gqlObject({
       name: 'Query',
       fields: {
         article: {
@@ -62,7 +59,7 @@ describe('Type System: Schema', () => {
       },
     });
 
-    const BlogMutation = new GraphQLObjectType({
+    const BlogMutation = gqlObject({
       name: 'Mutation',
       fields: {
         writeArticle: {
@@ -71,7 +68,7 @@ describe('Type System: Schema', () => {
       },
     });
 
-    const BlogSubscription = new GraphQLObjectType({
+    const BlogSubscription = gqlObject({
       name: 'Subscription',
       fields: {
         articleSubscribe: {
@@ -135,7 +132,7 @@ describe('Type System: Schema', () => {
       });
 
       const schema = new GraphQLSchema({
-        query: new GraphQLObjectType({
+        query: gqlObject({
           name: 'Query',
           fields: {
             something: {
@@ -203,7 +200,7 @@ describe('Type System: Schema', () => {
       it('rejects a Schema which redefines a built-in type', () => {
         const FakeString = new GraphQLScalarType({ name: 'String' });
 
-        const QueryType = new GraphQLObjectType({
+        const QueryType = gqlObject({
           name: 'Query',
           fields: {
             normal: { type: GraphQLString },
@@ -217,7 +214,7 @@ describe('Type System: Schema', () => {
       });
 
       it('rejects a Schema when a provided type has no name', () => {
-        const query = new GraphQLObjectType({
+        const query = gqlObject({
           name: 'Query',
           fields: { foo: { type: GraphQLString } },
         });
@@ -231,8 +228,8 @@ describe('Type System: Schema', () => {
 
       it('rejects a Schema which defines an object type twice', () => {
         const types = [
-          new GraphQLObjectType({ name: 'SameName', fields: {} }),
-          new GraphQLObjectType({ name: 'SameName', fields: {} }),
+          gqlObject({ name: 'SameName', fields: {} }),
+          gqlObject({ name: 'SameName', fields: {} }),
         ];
 
         expect(() => new GraphQLSchema({ types })).toThrow(
@@ -242,11 +239,11 @@ describe('Type System: Schema', () => {
 
       it('rejects a Schema which defines fields with conflicting types', () => {
         const fields = {};
-        const QueryType = new GraphQLObjectType({
+        const QueryType = gqlObject({
           name: 'Query',
           fields: {
-            a: { type: new GraphQLObjectType({ name: 'SameName', fields }) },
-            b: { type: new GraphQLObjectType({ name: 'SameName', fields }) },
+            a: { type: gqlObject({ name: 'SameName', fields }) },
+            b: { type: gqlObject({ name: 'SameName', fields }) },
           },
         });
 

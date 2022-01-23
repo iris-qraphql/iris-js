@@ -152,12 +152,6 @@ const printDocASTReducer: ASTReducer<string> = {
       join(['scalar', name, join(directives, ' ')], ' '),
   },
 
-  ObjectTypeDefinition: {
-    leave: ({ description, name, directives, fields }) =>
-      wrap('', description, '\n') +
-      join(['type', name, join(directives, ' '), block(fields)], ' '),
-  },
-
   FieldDefinition: {
     leave: ({ description, name, arguments: args, type, directives }) =>
       wrap('', description, '\n') +
@@ -192,6 +186,12 @@ const printDocASTReducer: ASTReducer<string> = {
         ' ',
       ),
   },
+
+  // ObjectTypeDefinition: {
+  //   leave: ({ description, name, directives, fields }) =>
+  //     wrap('', description, '\n') +
+  //     join(['type', name, join(directives, ' '), block(fields)], ' '),
+  // },
 
   // TODO: consider variants with fields
   VariantDefinition: { leave: ({ name }) => name },

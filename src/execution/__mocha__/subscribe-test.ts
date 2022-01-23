@@ -9,13 +9,14 @@ import { isAsyncIterable } from '../../jsutils/isAsyncIterable';
 
 import { parse } from '../../language/parser';
 
-import { GraphQLList, GraphQLObjectType } from '../../type/definition';
+import { GraphQLList } from '../../type/definition';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
 import { createSourceEventStream, subscribe } from '../subscribe';
 
 import { SimplePubSub } from './simplePubSub';
+import { gqlObject } from '../../type/make';
 
 interface Email {
   from: string;
@@ -24,7 +25,7 @@ interface Email {
   unread: boolean;
 }
 
-const EmailType = new GraphQLObjectType({
+const EmailType = gqlObject({
   name: 'Email',
   fields: {
     from: { type: GraphQLString },
@@ -34,7 +35,7 @@ const EmailType = new GraphQLObjectType({
   },
 });
 
-const InboxType = new GraphQLObjectType({
+const InboxType = gqlObject({
   name: 'Inbox',
   fields: {
     total: {
@@ -50,14 +51,14 @@ const InboxType = new GraphQLObjectType({
   },
 });
 
-const QueryType = new GraphQLObjectType({
+const QueryType = gqlObject({
   name: 'Query',
   fields: {
     inbox: { type: InboxType },
   },
 });
 
-const EmailEventType = new GraphQLObjectType({
+const EmailEventType = gqlObject({
   name: 'EmailEvent',
   fields: {
     email: { type: EmailType },
@@ -67,7 +68,7 @@ const EmailEventType = new GraphQLObjectType({
 
 const emailSchema = new GraphQLSchema({
   query: QueryType,
-  subscription: new GraphQLObjectType({
+  subscription: gqlObject({
     name: 'Subscription',
     fields: {
       importantEmail: {
@@ -145,7 +146,7 @@ async function expectPromise(promise: Promise<unknown>) {
   };
 }
 
-const DummyQueryType = new GraphQLObjectType({
+const DummyQueryType = gqlObject({
   name: 'Query',
   fields: {
     dummy: { type: GraphQLString },
@@ -158,7 +159,7 @@ describe('Subscription Initialization Phase', () => {
   it('accepts multiple subscription fields defined in schema', async () => {
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: { type: GraphQLString },
@@ -196,7 +197,7 @@ describe('Subscription Initialization Phase', () => {
 
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: {
@@ -231,7 +232,7 @@ describe('Subscription Initialization Phase', () => {
 
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: {
@@ -265,7 +266,7 @@ describe('Subscription Initialization Phase', () => {
   it('uses a custom default subscribeFieldResolver', async () => {
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: { type: GraphQLString },
@@ -306,7 +307,7 @@ describe('Subscription Initialization Phase', () => {
 
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: {
@@ -348,7 +349,7 @@ describe('Subscription Initialization Phase', () => {
     const document = parse('subscription { foo }');
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: { type: GraphQLString },
@@ -396,7 +397,7 @@ describe('Subscription Initialization Phase', () => {
   it('resolves to an error for unknown subscription field', async () => {
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: { type: GraphQLString },
@@ -419,7 +420,7 @@ describe('Subscription Initialization Phase', () => {
   it('should pass through unexpected errors thrown in subscribe', async () => {
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: { type: GraphQLString },
@@ -434,7 +435,7 @@ describe('Subscription Initialization Phase', () => {
   it('throws an error if subscribe does not return an iterator', async () => {
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: {
@@ -456,7 +457,7 @@ describe('Subscription Initialization Phase', () => {
     async function subscribeWithFn(subscribeFn: () => unknown) {
       const schema = new GraphQLSchema({
         query: DummyQueryType,
-        subscription: new GraphQLObjectType({
+        subscription: gqlObject({
           name: 'Subscription',
           fields: {
             foo: { type: GraphQLString, subscribe: subscribeFn },
@@ -508,7 +509,7 @@ describe('Subscription Initialization Phase', () => {
   it('resolves to an error if variables were wrong type', async () => {
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           foo: {
@@ -923,7 +924,7 @@ describe('Subscription Publish Phase', () => {
 
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           newMessage: {
@@ -989,7 +990,7 @@ describe('Subscription Publish Phase', () => {
 
     const schema = new GraphQLSchema({
       query: DummyQueryType,
-      subscription: new GraphQLObjectType({
+      subscription: gqlObject({
         name: 'Subscription',
         fields: {
           newMessage: {

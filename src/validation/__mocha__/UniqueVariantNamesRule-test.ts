@@ -56,3 +56,34 @@ describe('Validate: Unique variant value names', () => {
     ]);
   });
 });
+
+describe('Validate: Unique Resolver variants', () => {
+  it('rejects a Union type with duplicated member type', () => {
+    expectSDLErrors(`
+      resolver Query = {
+        test: BadUnion
+      }
+  
+      resolver TypeA = {
+        field: String
+      }
+  
+      resolver TypeB = {
+        field: String
+      }
+  
+      resolver BadUnion 
+        = TypeA
+        | TypeB
+        | TypeA
+    `).toDeepEqual([
+      {
+        message: 'Variant "BadUnion.TypeA" can only be defined once.',
+        locations: [
+          { line: 15, column: 11 },
+          { line: 17, column: 11 },
+        ],
+      },
+    ]);
+  });
+});

@@ -7,26 +7,17 @@ import type {
 } from '../definition';
 import {
   assertAbstractType,
-  assertCompositeType,
   assertLeafType,
   assertListType,
-  assertNamedType,
   assertNonNullType,
-  assertNullableType,
   assertObjectType,
   assertScalarType,
-  assertType,
-  assertUnionType,
-  assertWrappingType,
   getNamedType,
   getNullableType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   GraphQLScalarType,
-  IrisResolverType,
   isAbstractType,
-  isCompositeType,
   isEnumType,
   isInputObjectType,
   isInputType,
@@ -39,6 +30,7 @@ import {
   isOutputType,
   isRequiredArgument,
   isRequiredInputField,
+  isResolverType,
   isScalarType,
   isType,
   isUnionType,
@@ -53,7 +45,7 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlEnum, gqlInput } from '../make';
+import { gqlEnum, gqlInput, gqlObject, gqlUnion } from '../make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -63,8 +55,8 @@ import {
   isSpecifiedScalarType,
 } from '../scalars';
 
-const ObjectType = new GraphQLObjectType({ name: 'Object', fields: {} });
-const UnionType = new IrisResolverType({ name: 'Union', types: [ObjectType] });
+const ObjectType = gqlObject({ name: 'Object', fields: {} });
+const UnionType = gqlUnion({ name: 'Union', types: [ObjectType] });
 const EnumType = gqlEnum('Enum', ['foo']);
 const InputObjectType = gqlInput({
   name: 'InputObject',
@@ -80,24 +72,15 @@ describe('Type predicates', () => {
   describe('isType', () => {
     it('returns true for unwrapped types', () => {
       expect(isType(GraphQLString)).toEqual(true);
-      expect(() => assertType(GraphQLString)).not.toThrow();
       expect(isType(ObjectType)).toEqual(true);
-      expect(() => assertType(ObjectType)).not.toThrow();
     });
 
     it('returns true for wrapped types', () => {
       expect(isType(new GraphQLNonNull(GraphQLString))).toEqual(true);
-      expect(() => assertType(new GraphQLNonNull(GraphQLString))).not.toThrow();
-    });
-
-    it('returns false for type classes (rather than instances)', () => {
-      expect(isType(GraphQLObjectType)).toEqual(false);
-      expect(() => assertType(GraphQLObjectType)).toThrow();
     });
 
     it('returns false for random garbage', () => {
       expect(isType({ what: 'is this' })).toEqual(false);
-      expect(() => assertType({ what: 'is this' })).toThrow();
     });
   });
 
@@ -164,17 +147,11 @@ describe('Type predicates', () => {
   describe('isUnionType', () => {
     it('returns true for union type', () => {
       expect(isUnionType(UnionType)).toEqual(true);
-      expect(() => assertUnionType(UnionType)).not.toThrow();
-    });
-
-    it('returns false for wrapped union type', () => {
-      expect(isUnionType(new GraphQLList(UnionType))).toEqual(false);
-      expect(() => assertUnionType(new GraphQLList(UnionType))).toThrow();
     });
 
     it('returns false for non-union type', () => {
+      expect(isUnionType(new GraphQLList(UnionType))).toEqual(false);
       expect(isUnionType(ObjectType)).toEqual(false);
-      expect(() => assertUnionType(ObjectType)).toThrow();
     });
   });
 
@@ -355,27 +332,20 @@ describe('Type predicates', () => {
 
   describe('isCompositeType', () => {
     it('returns true for object, interface, and union types', () => {
-      expect(isCompositeType(ObjectType)).toEqual(true);
-      expect(() => assertCompositeType(ObjectType)).not.toThrow();
-      expect(isCompositeType(UnionType)).toEqual(true);
-      expect(() => assertCompositeType(UnionType)).not.toThrow();
+      expect(isResolverType(ObjectType)).toEqual(true);
+      expect(isResolverType(UnionType)).toEqual(true);
     });
 
     it('returns false for wrapped composite type', () => {
-      expect(isCompositeType(new GraphQLList(ObjectType))).toEqual(false);
-      expect(() => assertCompositeType(new GraphQLList(ObjectType))).toThrow();
+      expect(isResolverType(new GraphQLList(ObjectType))).toEqual(false);
     });
 
     it('returns false for non-composite type', () => {
-      expect(isCompositeType(InputObjectType)).toEqual(false);
-      expect(() => assertCompositeType(InputObjectType)).toThrow();
+      expect(isResolverType(InputObjectType)).toEqual(false);
     });
 
     it('returns false for wrapped non-composite type', () => {
-      expect(isCompositeType(new GraphQLList(InputObjectType))).toEqual(false);
-      expect(() =>
-        assertCompositeType(new GraphQLList(InputObjectType)),
-      ).toThrow();
+      expect(isResolverType(new GraphQLList(InputObjectType))).toEqual(false);
     });
   });
 
@@ -399,41 +369,27 @@ describe('Type predicates', () => {
   describe('isWrappingType', () => {
     it('returns true for list and non-null types', () => {
       expect(isWrappingType(new GraphQLList(ObjectType))).toEqual(true);
-      expect(() =>
-        assertWrappingType(new GraphQLList(ObjectType)),
-      ).not.toThrow();
       expect(isWrappingType(new GraphQLNonNull(ObjectType))).toEqual(true);
-      expect(() =>
-        assertWrappingType(new GraphQLNonNull(ObjectType)),
-      ).not.toThrow();
     });
 
     it('returns false for unwrapped types', () => {
       expect(isWrappingType(ObjectType)).toEqual(false);
-      expect(() => assertWrappingType(ObjectType)).toThrow();
     });
   });
 
   describe('isNullableType', () => {
     it('returns true for unwrapped types', () => {
       expect(isNullableType(ObjectType)).toEqual(true);
-      expect(() => assertNullableType(ObjectType)).not.toThrow();
     });
 
     it('returns true for list of non-null types', () => {
       expect(
         isNullableType(new GraphQLList(new GraphQLNonNull(ObjectType))),
       ).toEqual(true);
-      expect(() =>
-        assertNullableType(new GraphQLList(new GraphQLNonNull(ObjectType))),
-      ).not.toThrow();
     });
 
     it('returns false for non-null types', () => {
       expect(isNullableType(new GraphQLNonNull(ObjectType))).toEqual(false);
-      expect(() =>
-        assertNullableType(new GraphQLNonNull(ObjectType)),
-      ).toThrow();
     });
   });
 
@@ -459,14 +415,11 @@ describe('Type predicates', () => {
   describe('isNamedType', () => {
     it('returns true for unwrapped types', () => {
       expect(isNamedType(ObjectType)).toEqual(true);
-      expect(() => assertNamedType(ObjectType)).not.toThrow();
     });
 
     it('returns false for list and non-null types', () => {
       expect(isNamedType(new GraphQLList(ObjectType))).toEqual(false);
-      expect(() => assertNamedType(new GraphQLList(ObjectType))).toThrow();
       expect(isNamedType(new GraphQLNonNull(ObjectType))).toEqual(false);
-      expect(() => assertNamedType(new GraphQLNonNull(ObjectType))).toThrow();
     });
   });
 

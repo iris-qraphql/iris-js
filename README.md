@@ -33,15 +33,10 @@ serving queries against that type schema.
 First, build a GraphQL type schema which maps to your codebase.
 
 ```js
-import {
-  graphql,
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLString,
-} from 'graphql';
+import { graphql, IrisSchema, IrisResolverType, GraphQLString } from 'graphql';
 
-var schema = new GraphQLSchema({
-  query: new GraphQLObjectType({
+var schema = new IrisSchema({
+  query: new IrisResolver({
     name: 'RootQueryType',
     fields: {
       hello: {

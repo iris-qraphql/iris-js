@@ -12,7 +12,6 @@ import { OperationTypeNode } from '../language/ast';
 
 import type {
   GraphQLNamedType,
-  GraphQLObjectType,
   GraphQLType,
   IrisResolverType,
 } from './definition';
@@ -74,20 +73,20 @@ export type GraphQLSchemaExtensions = Record<string, unknown>;
  * Example:
  *
  * ```ts
- * const humanType = new GraphQLObjectType({
+ * const humanType = gqlObject({
  *   name: 'Human',
  *   interfaces: [],
  *   ...
  * });
  *
- * const droidType = new GraphQLObjectType({
+ * const droidType = gqlObject({
  *   name: 'Droid',
  *   interfaces: [characterInterface],
  *   ...
  * });
  *
  * const schema = new GraphQLSchema({
- *   query: new GraphQLObjectType({
+ *   query: gqlObject({
  *     name: 'Query',
  *     fields: {
  *       hero: { type: characterInterface, ... },
@@ -122,14 +121,14 @@ export class GraphQLSchema {
   // Used as a cache for validateSchema().
   __validationErrors: Maybe<ReadonlyArray<GraphQLError>>;
 
-  private _queryType: Maybe<GraphQLObjectType>;
-  private _mutationType: Maybe<GraphQLObjectType>;
-  private _subscriptionType: Maybe<GraphQLObjectType>;
+  private _queryType: Maybe<IrisResolverType>;
+  private _mutationType: Maybe<IrisResolverType>;
+  private _subscriptionType: Maybe<IrisResolverType>;
   private _directives: ReadonlyArray<GraphQLDirective>;
   private _typeMap: TypeMap;
   private _subTypeMap: ObjMap<ObjMap<boolean>>;
   private _implementationsMap: ObjMap<{
-    objects: Array<GraphQLObjectType>;
+    objects: Array<IrisResolverType>;
   }>;
 
   constructor(config: Readonly<GraphQLSchemaConfig>) {
@@ -220,19 +219,19 @@ export class GraphQLSchema {
     return 'GraphQLSchema';
   }
 
-  getQueryType(): Maybe<GraphQLObjectType> {
+  getQueryType(): Maybe<IrisResolverType> {
     return this._queryType;
   }
 
-  getMutationType(): Maybe<GraphQLObjectType> {
+  getMutationType(): Maybe<IrisResolverType> {
     return this._mutationType;
   }
 
-  getSubscriptionType(): Maybe<GraphQLObjectType> {
+  getSubscriptionType(): Maybe<IrisResolverType> {
     return this._subscriptionType;
   }
 
-  getRootType(operation: OperationTypeNode): Maybe<GraphQLObjectType> {
+  getRootType(operation: OperationTypeNode): Maybe<IrisResolverType> {
     switch (operation) {
       case OperationTypeNode.QUERY:
         return this.getQueryType();
@@ -253,13 +252,13 @@ export class GraphQLSchema {
 
   getPossibleTypes(
     abstractType: IrisResolverType,
-  ): ReadonlyArray<GraphQLObjectType> {
+  ): ReadonlyArray<IrisResolverType> {
     return isUnionType(abstractType) ? abstractType.getTypes() : [];
   }
 
   isSubType(
     abstractType: IrisResolverType,
-    maybeSubType: GraphQLObjectType,
+    maybeSubType: IrisResolverType,
   ): boolean {
     let map = this._subTypeMap[abstractType.name];
     if (map === undefined) {
@@ -308,9 +307,9 @@ export interface GraphQLSchemaValidationOptions {
 
 export interface GraphQLSchemaConfig extends GraphQLSchemaValidationOptions {
   description?: Maybe<string>;
-  query?: Maybe<GraphQLObjectType>;
-  mutation?: Maybe<GraphQLObjectType>;
-  subscription?: Maybe<GraphQLObjectType>;
+  query?: Maybe<IrisResolverType>;
+  mutation?: Maybe<IrisResolverType>;
+  subscription?: Maybe<IrisResolverType>;
   types?: Maybe<ReadonlyArray<GraphQLNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
   extensions?: Maybe<Readonly<GraphQLSchemaExtensions>>;

@@ -12,26 +12,28 @@ import type {
   GraphQLInputField,
   GraphQLNamedType,
   GraphQLType,
+  IrisResolverType,
 } from './definition';
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   IrisDataType,
   isAbstractType,
+  isDataType,
   isEnumType,
   isInputObjectType,
   isListType,
   isNonNullType,
   isObjectType,
+  isResolverType,
   isScalarType,
-  isUnionType,
 } from './definition';
 import type { GraphQLDirective } from './directives';
+import { gqlObject } from './make';
 import { GraphQLBoolean, GraphQLString } from './scalars';
 import type { GraphQLSchema } from './schema';
 
-export const __Schema: GraphQLObjectType = new GraphQLObjectType({
+export const __Schema: IrisResolverType = gqlObject({
   name: '__Schema',
   description:
     'A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations.',
@@ -75,7 +77,7 @@ export const __Schema: GraphQLObjectType = new GraphQLObjectType({
     } as GraphQLFieldConfigMap<GraphQLSchema, unknown>),
 });
 
-export const __Directive: GraphQLObjectType = new GraphQLObjectType({
+export const __Directive: IrisResolverType = gqlObject({
   name: '__Directive',
   description:
     "A Directive provides a way to describe alternate runtime execution and type validation behavior in a GraphQL document.\n\nIn some cases, you need to provide options to alter GraphQL's execution behavior in ways field arguments will not suffice, such as conditionally including or skipping a field. Directives provide this by describing additional information to the executor.",
@@ -202,7 +204,7 @@ export const __DirectiveLocation: IrisDataType = new IrisDataType({
   ],
 });
 
-export const __Type: GraphQLObjectType = new GraphQLObjectType({
+export const __Type: IrisResolverType = gqlObject({
   name: '__Type',
   description:
     'The fundamental unit of any GraphQL Schema is the type. There are many kinds of types in GraphQL as represented by the `__TypeKind` enum.\n\nDepending on the kind of a type, certain fields describe information about that type. Scalar types provide no information beyond a name, description and optional `specifiedByURL`, while Enum types provide their values. Object and Interface types provide the fields they describe. Abstract types, Union and Interface, provide the Object types possible at runtime. List and NonNull types compose other types.',
@@ -214,17 +216,11 @@ export const __Type: GraphQLObjectType = new GraphQLObjectType({
           if (isScalarType(type)) {
             return TypeKind.SCALAR;
           }
-          if (isObjectType(type)) {
-            return TypeKind.OBJECT;
+          if (isResolverType(type)) {
+            return type.isVariantType() ? TypeKind.OBJECT : TypeKind.UNION;
           }
-          if (isUnionType(type)) {
-            return TypeKind.UNION;
-          }
-          if (isEnumType(type)) {
-            return TypeKind.ENUM;
-          }
-          if (isInputObjectType(type)) {
-            return TypeKind.INPUT_OBJECT;
+          if (isDataType(type)) {
+            return type.isVariantType() ? TypeKind.ENUM : TypeKind.INPUT_OBJECT;
           }
           if (isListType(type)) {
             return TypeKind.LIST;
@@ -313,7 +309,7 @@ export const __Type: GraphQLObjectType = new GraphQLObjectType({
     } as GraphQLFieldConfigMap<GraphQLType, unknown>),
 });
 
-export const __Field: GraphQLObjectType = new GraphQLObjectType({
+export const __Field: IrisResolverType = gqlObject({
   name: '__Field',
   description:
     'Object and Interface types are described by a list of Fields, each of which has a name, potentially a list of arguments, and a return type.',
@@ -358,7 +354,7 @@ export const __Field: GraphQLObjectType = new GraphQLObjectType({
     } as GraphQLFieldConfigMap<GraphQLField<unknown, unknown>, unknown>),
 });
 
-export const __InputValue: GraphQLObjectType = new GraphQLObjectType({
+export const __InputValue: IrisResolverType = gqlObject({
   name: '__InputValue',
   description:
     'Arguments provided to Fields or Directives and the input fields of an InputObject are represented as Input Values which describe their type and optionally a default value.',
@@ -397,7 +393,7 @@ export const __InputValue: GraphQLObjectType = new GraphQLObjectType({
     } as GraphQLFieldConfigMap<GraphQLInputField, unknown>),
 });
 
-export const __EnumValue: GraphQLObjectType = new GraphQLObjectType({
+export const __EnumValue: IrisResolverType = gqlObject({
   name: '__EnumValue',
   description:
     'One possible value for a given Enum. Enum values are unique values, not a placeholder for a string or numeric value. However an Enum value is returned in a JSON response as a string.',

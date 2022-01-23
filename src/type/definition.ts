@@ -6,7 +6,6 @@ import { identityFunc } from '../jsutils/identityFunc';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 import { isObjectLike } from '../jsutils/isObjectLike';
-import { keyValMap } from '../jsutils/keyValMap';
 import { mapValue } from '../jsutils/mapValue';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
@@ -22,7 +21,6 @@ import type {
   FieldNode,
   FragmentDefinitionNode,
   InputValueDefinitionNode,
-  ObjectTypeDefinitionNode,
   OperationDefinitionNode,
   ResolverTypeDefinitionNode,
   ScalarTypeDefinitionNode,
@@ -46,90 +44,78 @@ import type { GraphQLSchema } from './schema';
  */
 export type GraphQLType =
   | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLUnionType
+  | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLType>
   | GraphQLNonNull<
       | GraphQLScalarType
-      | GraphQLObjectType
-      | GraphQLUnionType
+      | IrisResolverType
       | IrisDataType
       | GraphQLList<GraphQLType>
     >;
 
 export function isType(type: unknown): type is GraphQLType {
-  return (
-    isScalarType(type) ||
-    isObjectType(type) ||
-    isUnionType(type) ||
-    isDataType(type) ||
-    isListType(type) ||
-    isNonNullType(type)
-  );
+  return isNamedType(type) || isListType(type) || isNonNullType(type);
 }
 
-export function assertType(type: unknown): GraphQLType {
-  if (!isType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL type.`);
-  }
-  return type;
+export function isNamedType(type: unknown): type is GraphQLNamedType {
+  return isScalarType(type) || isResolverType(type) || isDataType(type);
 }
 
-/**
- * There are predicates for each kind of GraphQL type.
- */
 export function isScalarType(type: unknown): type is GraphQLScalarType {
   return instanceOf(type, GraphQLScalarType);
 }
 
-export function assertScalarType(type: unknown): GraphQLScalarType {
-  if (!isScalarType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Scalar type.`);
-  }
-  return type;
-}
-
-export function isObjectType(type: unknown): type is GraphQLObjectType {
-  return instanceOf(type, GraphQLObjectType);
-}
-
-export function assertObjectType(type: unknown): GraphQLObjectType {
-  if (!isObjectType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Object type.`);
-  }
-  return type;
-}
-
-export function isUnionType(type: unknown): type is GraphQLUnionType {
+export function isResolverType(type: unknown): type is IrisResolverType {
   return instanceOf(type, IrisResolverType);
 }
+export function isObjectType(type: unknown): type is IrisResolverType {
+  return isResolverType(type) && type.isVariantType();
+}
 
-export function assertUnionType(type: unknown): GraphQLUnionType {
-  if (!isUnionType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Union type.`);
-  }
-  return type;
+export function isUnionType(type: unknown): type is IrisResolverType {
+  return isResolverType(type) && !type.isVariantType();
 }
 
 export function isDataType(type: unknown): type is IrisDataType {
   return instanceOf(type, IrisDataType);
 }
 
-export function assertDataType(type: unknown): IrisDataType {
-  if (!isDataType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Enum type.`);
-  }
-  return type;
-}
-
 export function isEnumType(type: unknown): type is IrisDataType {
   return isDataType(type) && !type.isVariantType();
 }
 
-export function isInputObjectType(type: unknown): type is IrisDataType {
-  return isDataType(type) && type.isVariantType();
-}
+export const isLeafType = (type: unknown): type is GraphQLLeafType =>
+  isScalarType(type) || isEnumType(type);
+
+export const isInputObjectType = (type: unknown): type is IrisDataType =>
+  isDataType(type) && type.isVariantType();
+
+export const isAbstractType = isUnionType;
+
+export const assertBy =
+  <T>(kind: string, f: (type: unknown) => type is T) =>
+  (type: unknown): T => {
+    if (!f(type)) {
+      throw new Error(
+        `Expected ${inspect(type)} to be a GraphQL ${kind} type.`,
+      );
+    }
+    return type;
+  };
+
+export const isNullableType = (type: unknown): type is GraphQLNullableType =>
+  isType(type) && !isNonNullType(type);
+
+export const assertCompositeType = assertBy('Resolver', isResolverType);
+export const assertResolverType = assertBy('Resolver', isResolverType);
+export const assertObjectType = assertBy('Object', isObjectType);
+export const assertDataType = assertBy('Data', isDataType);
+export const assertScalarType = assertBy('Scalar', isScalarType);
+export const assertLeafType = assertBy('leaf', isLeafType);
+export const assertNonNullType = assertBy('Non-Null', isNonNullType);
+export const assertListType = assertBy('List', isListType);
+export const assertAbstractType = assertBy('abstract', isAbstractType);
 
 export function isListType(
   type: GraphQLInputType,
@@ -140,13 +126,6 @@ export function isListType(
 export function isListType(type: unknown): type is GraphQLList<GraphQLType>;
 export function isListType(type: unknown): type is GraphQLList<GraphQLType> {
   return instanceOf(type, GraphQLList);
-}
-
-export function assertListType(type: unknown): GraphQLList<GraphQLType> {
-  if (!isListType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL List type.`);
-  }
-  return type;
 }
 
 export function isNonNullType(
@@ -162,13 +141,6 @@ export function isNonNullType(
   type: unknown,
 ): type is GraphQLNonNull<GraphQLType> {
   return instanceOf(type, GraphQLNonNull);
-}
-
-export function assertNonNullType(type: unknown): GraphQLNonNull<GraphQLType> {
-  if (!isNonNullType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Non-Null type.`);
-  }
-  return type;
 }
 
 export type GraphQLInputType =
@@ -189,14 +161,12 @@ export function isInputType(type: unknown): type is GraphQLInputType {
 
 export type GraphQLOutputType =
   | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLUnionType
+  | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLOutputType>
   | GraphQLNonNull<
       | GraphQLScalarType
-      | GraphQLObjectType
-      | GraphQLUnionType
+      | IrisResolverType
       | IrisDataType
       | GraphQLList<GraphQLOutputType>
     >;
@@ -204,53 +174,13 @@ export type GraphQLOutputType =
 export function isOutputType(type: unknown): type is GraphQLOutputType {
   return (
     isScalarType(type) ||
-    isObjectType(type) ||
-    isUnionType(type) ||
+    isResolverType(type) ||
     isEnumType(type) ||
     (isWrappingType(type) && isOutputType(type.ofType))
   );
 }
 
 export type GraphQLLeafType = GraphQLScalarType | IrisDataType;
-
-export function isLeafType(type: unknown): type is GraphQLLeafType {
-  return isScalarType(type) || isEnumType(type);
-}
-
-export function assertLeafType(type: unknown): GraphQLLeafType {
-  if (!isLeafType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL leaf type.`);
-  }
-  return type;
-}
-
-/**
- * These types may describe the parent context of a selection set.
- */
-export type GraphQLCompositeType = GraphQLObjectType | GraphQLUnionType;
-
-export function isCompositeType(type: unknown): type is GraphQLCompositeType {
-  return isObjectType(type) || isUnionType(type);
-}
-
-export function assertCompositeType(type: unknown): GraphQLCompositeType {
-  if (!isCompositeType(type)) {
-    throw new Error(
-      `Expected ${inspect(type)} to be a GraphQL composite type.`,
-    );
-  }
-  return type;
-}
-
-export const isAbstractType = (type: unknown): type is IrisResolverType =>
-  isUnionType(type);
-
-export function assertAbstractType(type: unknown): IrisResolverType {
-  if (!isAbstractType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL abstract type.`);
-  }
-  return type;
-}
 
 export class GraphQLList<T extends GraphQLType> {
   readonly ofType: T;
@@ -314,33 +244,14 @@ export function isWrappingType(type: unknown): type is GraphQLWrappingType {
   return isListType(type) || isNonNullType(type);
 }
 
-export function assertWrappingType(type: unknown): GraphQLWrappingType {
-  if (!isWrappingType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL wrapping type.`);
-  }
-  return type;
-}
-
 /**
  * These types can all accept null as a value.
  */
 export type GraphQLNullableType =
   | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLUnionType
+  | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLType>;
-
-export function isNullableType(type: unknown): type is GraphQLNullableType {
-  return isType(type) && !isNonNullType(type);
-}
-
-export function assertNullableType(type: unknown): GraphQLNullableType {
-  if (!isNullableType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL nullable type.`);
-  }
-  return type;
-}
 
 export function getNullableType(type: undefined | null): void;
 export function getNullableType<T extends GraphQLNullableType>(
@@ -366,26 +277,8 @@ export type GraphQLNamedInputType = GraphQLScalarType | IrisDataType;
 
 export type GraphQLNamedOutputType =
   | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLUnionType
+  | IrisResolverType
   | IrisDataType;
-
-export function isNamedType(type: unknown): type is GraphQLNamedType {
-  return (
-    isScalarType(type) ||
-    isObjectType(type) ||
-    isUnionType(type) ||
-    isEnumType(type) ||
-    isInputObjectType(type)
-  );
-}
-
-export function assertNamedType(type: unknown): GraphQLNamedType {
-  if (!isNamedType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL named type.`);
-  }
-  return type;
-}
 
 export function getNamedType(type: undefined | null): void;
 export function getNamedType(type: GraphQLInputType): GraphQLNamedInputType;
@@ -505,70 +398,18 @@ export interface GraphQLScalarTypeConfig<TInternal, TExternal> {
   astNode?: Maybe<ScalarTypeDefinitionNode>;
 }
 
-export type GraphQLObjectTypeExtensions<
-  _TSource = any,
-  _TContext = any,
-> = Record<string, unknown>;
-
-export class GraphQLObjectType<TSource = any, TContext = any> {
-  name: string;
-  description: Maybe<string>;
-  isTypeOf: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
-  astNode: Maybe<ObjectTypeDefinitionNode>;
-
-  private _fields: ThunkObjMap<GraphQLField<TSource, TContext>>;
-
-  constructor(config: Readonly<GraphQLObjectTypeConfig<TSource, TContext>>) {
-    this.name = assertName(config.name);
-    this.description = config.description;
-    this.isTypeOf = config.isTypeOf;
-    this.astNode = config.astNode;
-
-    this._fields = () => defineFieldMap(config);
-    devAssert(
-      config.isTypeOf == null || typeof config.isTypeOf === 'function',
-      `${this.name} must provide "isTypeOf" as a function, ` +
-        `but got: ${inspect(config.isTypeOf)}.`,
-    );
-  }
-
-  get [Symbol.toStringTag]() {
-    return 'GraphQLObjectType';
-  }
-
-  getFields(): GraphQLFieldMap<TSource, TContext> {
-    if (typeof this._fields === 'function') {
-      this._fields = this._fields();
-    }
-    return this._fields;
-  }
-
-  toString(): string {
-    return this.name;
-  }
-
-  toJSON(): string {
-    return this.toString();
-  }
-}
-
-function defineFieldMap<TSource, TContext>(
-  config: Readonly<GraphQLObjectTypeConfig<TSource, TContext>>,
-): GraphQLFieldMap<TSource, TContext> {
-  const fieldMap = resolveThunk(config.fields);
-  devAssert(
-    isPlainObj(fieldMap),
-    `${config.name} fields must be an object with field names as keys or a function which returns such an object.`,
-  );
-
-  return mapValue(fieldMap, (fieldConfig, fieldName) => {
+const defineFieldMap = <TSource, TContext>(
+  typename: string,
+  fields: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>,
+): GraphQLFieldMap<TSource, TContext> =>
+  mapValue(resolveThunk(fields), (fieldConfig, fieldName) => {
     devAssert(
       isPlainObj(fieldConfig),
-      `${config.name}.${fieldName} field config must be an object.`,
+      `${typename}.${fieldName} field config must be an object.`,
     );
     devAssert(
       fieldConfig.resolve == null || typeof fieldConfig.resolve === 'function',
-      `${config.name}.${fieldName} field resolver must be a function if ` +
+      `${typename}.${fieldName} field resolver must be a function if ` +
         `provided, but got: ${inspect(fieldConfig.resolve)}.`,
     );
 
@@ -583,7 +424,6 @@ function defineFieldMap<TSource, TContext>(
       astNode: fieldConfig.astNode,
     };
   });
-}
 
 export const defineArguments = (
   config: GraphQLFieldConfigArgumentMap,
@@ -597,36 +437,8 @@ export const defineArguments = (
     astNode: argConfig.astNode,
   }));
 
-function isPlainObj(obj: unknown): boolean {
-  return isObjectLike(obj) && !Array.isArray(obj);
-}
-
-/**
- * @internal
- */
-export function argsToArgsConfig(
-  args: ReadonlyArray<GraphQLArgument>,
-): GraphQLFieldConfigArgumentMap {
-  return keyValMap(
-    args,
-    (arg) => arg.name,
-    (arg) => ({
-      description: arg.description,
-      type: arg.type,
-      defaultValue: arg.defaultValue,
-      deprecationReason: arg.deprecationReason,
-      astNode: arg.astNode,
-    }),
-  );
-}
-
-export interface GraphQLObjectTypeConfig<TSource, TContext> {
-  name: string;
-  description?: Maybe<string>;
-  fields: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>;
-  isTypeOf?: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
-  astNode?: Maybe<ObjectTypeDefinitionNode>;
-}
+const isPlainObj = (obj: unknown): boolean =>
+  isObjectLike(obj) && !Array.isArray(obj);
 
 export type GraphQLTypeResolver<TSource, TContext> = (
   value: TSource,
@@ -657,7 +469,7 @@ export interface GraphQLResolveInfo {
   readonly fieldName: string;
   readonly fieldNodes: ReadonlyArray<FieldNode>;
   readonly returnType: GraphQLOutputType;
-  readonly parentType: GraphQLObjectType;
+  readonly parentType: IrisResolverType;
   readonly path: Path;
   readonly schema: GraphQLSchema;
   readonly fragments: ObjMap<FragmentDefinitionNode>;
@@ -701,14 +513,14 @@ export interface GraphQLField<TSource, TContext, TArgs = any> {
   astNode: Maybe<FieldDefinitionNode>;
 }
 
-export interface GraphQLArgument {
+export type GraphQLArgument = {
   name: string;
   description: Maybe<string>;
   type: GraphQLInputType;
   defaultValue: unknown;
   deprecationReason: Maybe<string>;
   astNode: Maybe<InputValueDefinitionNode>;
-}
+};
 
 export function isRequiredArgument(arg: GraphQLArgument): boolean {
   return isNonNullType(arg.type) && arg.defaultValue === undefined;
@@ -718,22 +530,64 @@ export type GraphQLFieldMap<TSource, TContext> = ObjMap<
   GraphQLField<TSource, TContext>
 >;
 
-export type GraphQLUnionType = IrisResolverType;
+export type IrisResolverVariantConfig<TSource, TContext> = {
+  name?: string;
+  description?: Maybe<string>;
+  // inline variant
+  fields?: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>;
+  // variant ref
+  type?: () => IrisResolverType;
+};
 
-export class IrisResolverType {
+export type IrisResolverTypeConfig<TSource, TContext> = {
+  name: string;
+  description?: Maybe<string>;
+  resolveType?: Maybe<GraphQLTypeResolver<TSource, TContext>>;
+  variants: ReadonlyArray<IrisResolverVariantConfig<TSource, TContext>>;
+  astNode?: Maybe<ResolverTypeDefinitionNode>;
+  // move to variant type
+  isTypeOf?: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
+};
+
+export class IrisResolverType<TSource = any, TContext = any> {
   name: string;
   description: Maybe<string>;
   resolveType: Maybe<GraphQLTypeResolver<any, any>>;
   astNode: Maybe<ResolverTypeDefinitionNode>;
+  isTypeOf: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
 
-  private _types: ThunkReadonlyArray<GraphQLObjectType>;
+  private _types: () => ReadonlyArray<IrisResolverType>;
+  private _fields: ThunkObjMap<GraphQLField<TSource, TContext>>;
+  private _isVariantType: boolean;
 
-  constructor(config: Readonly<GraphQLUnionTypeConfig<any, any>>) {
+  constructor(config: Readonly<IrisResolverTypeConfig<any, any>>) {
     this.name = assertName(config.name);
     this.description = config.description;
-    this.resolveType = config.resolveType;
     this.astNode = config.astNode;
-    this._types = () => resolveThunk(config.types);
+    this._isVariantType =
+      config.variants.length < 2 &&
+      config.variants[0]?.name === config.name &&
+      config.variants[0]?.fields !== undefined;
+
+    this.isTypeOf = config.isTypeOf;
+    this._fields = () =>
+      this._isVariantType
+        ? defineFieldMap(config.name, config.variants[0].fields ?? {})
+        : {};
+
+    // UNION
+    this._types = () =>
+      resolveThunk(config.variants ?? []).flatMap((x) =>
+        x.type ? [x.type()] : [],
+      );
+    this.resolveType = config.resolveType;
+
+    devAssert(
+      config.isTypeOf == null || typeof config.isTypeOf === 'function',
+      `${this.name} must provide "isTypeOf" as a function, ` +
+        `but got: ${inspect(config.isTypeOf)}.`,
+    );
+
     devAssert(
       config.resolveType == null || typeof config.resolveType === 'function',
       `${this.name} must provide "resolveType" as a function, ` +
@@ -742,14 +596,20 @@ export class IrisResolverType {
   }
 
   get [Symbol.toStringTag]() {
-    return 'GraphQLUnionType';
+    return 'IrisResolverType';
   }
 
-  getTypes(): ReadonlyArray<GraphQLObjectType> {
-    if (typeof this._types === 'function') {
-      this._types = this._types();
+  isVariantType = (): boolean => this._isVariantType;
+
+  getFields(): GraphQLFieldMap<TSource, TContext> {
+    if (typeof this._fields === 'function') {
+      this._fields = this._fields();
     }
-    return this._types;
+    return this._fields;
+  }
+
+  getTypes(): ReadonlyArray<IrisResolverType> {
+    return this._types();
   }
 
   toString(): string {
@@ -761,23 +621,8 @@ export class IrisResolverType {
   }
 }
 
-export interface GraphQLUnionTypeConfig<TSource, TContext> {
-  name: string;
-  description?: Maybe<string>;
-  types: ThunkReadonlyArray<GraphQLObjectType>;
-  resolveType?: Maybe<GraphQLTypeResolver<TSource, TContext>>;
-  astNode?: Maybe<ResolverTypeDefinitionNode>;
-}
-
-export type IrisDataVariantFieldFields = ObjMap<IrisDataVariantField>;
-
-export type GraphQLInputField = {
-  name: string;
-  description?: Maybe<string>;
-  type: GraphQLInputType;
+export type GraphQLInputField = IrisDataVariantField & {
   defaultValue?: unknown;
-  deprecationReason?: Maybe<string>;
-  astNode?: Maybe<InputValueDefinitionNode>;
 };
 
 export type IrisDataVariantField = {

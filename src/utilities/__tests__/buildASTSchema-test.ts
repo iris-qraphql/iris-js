@@ -322,7 +322,7 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
-  it('Can build recursive Union', () => {
+  it("can't build recursive Union", () => {
     const schema = buildSchema(`
       resolver Hello = Hello
 
