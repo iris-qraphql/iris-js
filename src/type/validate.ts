@@ -292,7 +292,7 @@ function validateUnionMembers(
 ): void {
   const listedMembers: Record<string, boolean> = {};
 
-  adt.getTypes().forEach( memberType => {
+  adt.getTypes().forEach((memberType) => {
     if (listedMembers[memberType.name]) {
       return context.reportError(
         `Union type ${adt.name} can only include type ${memberType.name} once.`,
@@ -307,7 +307,7 @@ function validateUnionMembers(
         getResolverVariantNames(adt, String(memberType)),
       );
     }
-  })
+  });
 }
 
 const validateDataType = (

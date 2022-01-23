@@ -12,10 +12,8 @@ import {
   assertListType,
   assertNamedType,
   assertNonNullType,
-  assertNullableType,
   assertObjectType,
   assertScalarType,
-  assertType,
   assertWrappingType,
   getNamedType,
   getNullableType,
@@ -77,19 +75,15 @@ describe('Type predicates', () => {
   describe('isType', () => {
     it('returns true for unwrapped types', () => {
       expect(isType(GraphQLString)).toEqual(true);
-      expect(() => assertType(GraphQLString)).not.toThrow();
       expect(isType(ObjectType)).toEqual(true);
-      expect(() => assertType(ObjectType)).not.toThrow();
     });
 
     it('returns true for wrapped types', () => {
       expect(isType(new GraphQLNonNull(GraphQLString))).toEqual(true);
-      expect(() => assertType(new GraphQLNonNull(GraphQLString))).not.toThrow();
     });
 
     it('returns false for random garbage', () => {
       expect(isType({ what: 'is this' })).toEqual(false);
-      expect(() => assertType({ what: 'is this' })).toThrow();
     });
   });
 
@@ -403,23 +397,16 @@ describe('Type predicates', () => {
   describe('isNullableType', () => {
     it('returns true for unwrapped types', () => {
       expect(isNullableType(ObjectType)).toEqual(true);
-      expect(() => assertNullableType(ObjectType)).not.toThrow();
     });
 
     it('returns true for list of non-null types', () => {
       expect(
         isNullableType(new GraphQLList(new GraphQLNonNull(ObjectType))),
       ).toEqual(true);
-      expect(() =>
-        assertNullableType(new GraphQLList(new GraphQLNonNull(ObjectType))),
-      ).not.toThrow();
     });
 
     it('returns false for non-null types', () => {
       expect(isNullableType(new GraphQLNonNull(ObjectType))).toEqual(false);
-      expect(() =>
-        assertNullableType(new GraphQLNonNull(ObjectType)),
-      ).toThrow();
     });
   });
 

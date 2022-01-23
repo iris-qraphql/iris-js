@@ -64,7 +64,6 @@ export function isType(type: unknown): type is GraphQLType {
   );
 }
 
-
 export function isScalarType(type: unknown): type is GraphQLScalarType {
   return instanceOf(type, GraphQLScalarType);
 }
@@ -88,6 +87,10 @@ export function isEnumType(type: unknown): type is IrisDataType {
   return isDataType(type) && !type.isVariantType();
 }
 
+export function isLeafType(type: unknown): type is GraphQLLeafType {
+  return isScalarType(type) || isEnumType(type);
+}
+
 export const isInputObjectType = (type: unknown): type is IrisDataType =>
   isDataType(type) && type.isVariantType();
 
@@ -102,12 +105,17 @@ export const assertBy =
     return type;
   };
 
+export const isNullableType = (type: unknown): type is GraphQLNullableType =>
+  isType(type) && !isNonNullType(type);
+
 export const assertCompositeType = assertBy('Resolver', isResolverType);
 export const assertResolverType = assertBy('Resolver', isResolverType);
 export const assertObjectType = assertBy('Object', isObjectType);
 export const assertDataType = assertBy('Data', isDataType);
 export const assertScalarType = assertBy('Scalar', isScalarType);
-export const assertType = assertBy('', isType);
+export const assertLeafType = assertBy('leaf', isLeafType);
+export const assertNonNullType = assertBy('Non-Null', isNonNullType);
+export const assertListType = assertBy('List', isListType);
 
 export function isListType(
   type: GraphQLInputType,
@@ -118,13 +126,6 @@ export function isListType(
 export function isListType(type: unknown): type is GraphQLList<GraphQLType>;
 export function isListType(type: unknown): type is GraphQLList<GraphQLType> {
   return instanceOf(type, GraphQLList);
-}
-
-export function assertListType(type: unknown): GraphQLList<GraphQLType> {
-  if (!isListType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL List type.`);
-  }
-  return type;
 }
 
 export function isNonNullType(
@@ -140,13 +141,6 @@ export function isNonNullType(
   type: unknown,
 ): type is GraphQLNonNull<GraphQLType> {
   return instanceOf(type, GraphQLNonNull);
-}
-
-export function assertNonNullType(type: unknown): GraphQLNonNull<GraphQLType> {
-  if (!isNonNullType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Non-Null type.`);
-  }
-  return type;
 }
 
 export type GraphQLInputType =
@@ -188,23 +182,12 @@ export function isOutputType(type: unknown): type is GraphQLOutputType {
 
 export type GraphQLLeafType = GraphQLScalarType | IrisDataType;
 
-export function isLeafType(type: unknown): type is GraphQLLeafType {
-  return isScalarType(type) || isEnumType(type);
-}
-
-export function assertLeafType(type: unknown): GraphQLLeafType {
-  if (!isLeafType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL leaf type.`);
-  }
-  return type;
-}
-
 /**
  * These types may describe the parent context of a selection set.
  */
 export type GraphQLCompositeType = IrisResolverType;
 
-export function isCompositeType(type: unknown): type is GraphQLCompositeType {
+export function isCompositeType(type: unknown): type is IrisResolverType {
   return isResolverType(type);
 }
 
@@ -295,17 +278,6 @@ export type GraphQLNullableType =
   | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLType>;
-
-export function isNullableType(type: unknown): type is GraphQLNullableType {
-  return isType(type) && !isNonNullType(type);
-}
-
-export function assertNullableType(type: unknown): GraphQLNullableType {
-  if (!isNullableType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL nullable type.`);
-  }
-  return type;
-}
 
 export function getNullableType(type: undefined | null): void;
 export function getNullableType<T extends GraphQLNullableType>(
