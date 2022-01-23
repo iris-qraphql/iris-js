@@ -247,20 +247,19 @@ export function extendSchemaImpl(
     variantNode: ResolverVariantDefinitionNode,
   ): IrisResolverVariantConfig<any, any> {
     const name = variantNode.name.value;
-    const description = variantNode.description?.value
+    const description = variantNode.description?.value;
 
-    if(variantNode.fields){
+    if (variantNode.fields) {
       return {
         name,
         description,
-        fields: () => buildFieldMap(variantNode)
-      }
+        fields: () => buildFieldMap(variantNode),
+      };
     }
-    
-    // @ts-expect-error
-    return {  name, description, type: () => getNamedType(variantNode)};
-  }
 
+    // @ts-expect-error
+    return { name, description, type: () => getNamedType(variantNode) };
+  }
 
   function buildType(astNode: TypeDefinitionNode): GraphQLNamedType {
     const name = astNode.name.value;

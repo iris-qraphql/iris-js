@@ -621,13 +621,8 @@ export class IrisResolverType<TSource = any, TContext = any> {
   }
 }
 
-export type GraphQLInputField = {
-  name: string;
-  description?: Maybe<string>;
-  type: GraphQLInputType;
+export type GraphQLInputField = IrisDataVariantField & {
   defaultValue?: unknown;
-  deprecationReason?: Maybe<string>;
-  astNode?: Maybe<InputValueDefinitionNode>;
 };
 
 export type IrisDataVariantField = {
