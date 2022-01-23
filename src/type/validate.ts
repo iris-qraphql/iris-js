@@ -17,6 +17,7 @@ import type {
   GraphQLObjectType,
   GraphQLUnionType,
   IrisDataType,
+  IrisResolverType,
 } from './definition';
 import {
   isDataType,
@@ -29,7 +30,7 @@ import {
   isOutputType,
   isRequiredArgument,
   isRequiredInputField,
-  isUnionType,
+  isResolverType,
 } from './definition';
 import { GraphQLDeprecatedDirective, isDirective } from './directives';
 import { isIntrospectionType } from './introspection';
@@ -222,19 +223,26 @@ function validateTypes(context: SchemaValidationContext): void {
       validateName(context, type);
     }
 
-    if (isObjectType(type)) {
-      // Ensure fields are valid
-      validateFields(context, type);
-    } else if (isUnionType(type)) {
-      // Ensure Unions include valid member types.
-      validateUnionMembers(context, type);
+    if (isResolverType(type)) {
+      validateResolverType(context, type);
     }
+
     if (isDataType(type)) {
       validateDataType(context, type);
       validateInputObjectCircularRefs(type);
     }
   }
 }
+
+const validateResolverType = (
+  context: SchemaValidationContext,
+  type: IrisResolverType,
+) => {
+  if (type.isVariantType()) {
+    return validateFields(context, type);
+  }
+  validateUnionMembers(context, type);
+};
 
 function validateFields(
   context: SchemaValidationContext,

@@ -16,7 +16,6 @@ import {
   assertObjectType,
   assertScalarType,
   assertType,
-  assertUnionType,
   assertWrappingType,
   getNamedType,
   getNullableType,
@@ -157,17 +156,11 @@ describe('Type predicates', () => {
   describe('isUnionType', () => {
     it('returns true for union type', () => {
       expect(isUnionType(UnionType)).toEqual(true);
-      expect(() => assertUnionType(UnionType)).not.toThrow();
-    });
-
-    it('returns false for wrapped union type', () => {
-      expect(isUnionType(new GraphQLList(UnionType))).toEqual(false);
-      expect(() => assertUnionType(new GraphQLList(UnionType))).toThrow();
     });
 
     it('returns false for non-union type', () => {
+      expect(isUnionType(new GraphQLList(UnionType))).toEqual(false);
       expect(isUnionType(ObjectType)).toEqual(false);
-      expect(() => assertUnionType(ObjectType)).toThrow();
     });
   });
 

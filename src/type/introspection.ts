@@ -12,20 +12,20 @@ import type {
   GraphQLInputField,
   GraphQLNamedType,
   GraphQLObjectType,
-  GraphQLType,
-} from './definition';
+  GraphQLType} from './definition';
 import {
   GraphQLList,
   GraphQLNonNull,
   IrisDataType,
   isAbstractType,
+  isDataType,
   isEnumType,
   isInputObjectType,
   isListType,
   isNonNullType,
   isObjectType,
+  isResolverType,
   isScalarType,
-  isUnionType,
 } from './definition';
 import type { GraphQLDirective } from './directives';
 import { gqlObject } from './make';
@@ -215,17 +215,11 @@ export const __Type: GraphQLObjectType = gqlObject({
           if (isScalarType(type)) {
             return TypeKind.SCALAR;
           }
-          if (isObjectType(type)) {
-            return TypeKind.OBJECT;
+          if (isResolverType(type)) {
+            return type.isVariantType() ? TypeKind.OBJECT : TypeKind.UNION;
           }
-          if (isUnionType(type)) {
-            return TypeKind.UNION;
-          }
-          if (isEnumType(type)) {
-            return TypeKind.ENUM;
-          }
-          if (isInputObjectType(type)) {
-            return TypeKind.INPUT_OBJECT;
+          if (isDataType(type)) {
+            return type.isVariantType() ? TypeKind.ENUM : TypeKind.INPUT_OBJECT;
           }
           if (isListType(type)) {
             return TypeKind.LIST;

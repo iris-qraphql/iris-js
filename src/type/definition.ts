@@ -60,8 +60,7 @@ export type GraphQLType =
 export function isType(type: unknown): type is GraphQLType {
   return (
     isScalarType(type) ||
-    isObjectType(type) ||
-    isUnionType(type) ||
+    isResolverType(type) ||
     isDataType(type) ||
     isListType(type) ||
     isNonNullType(type)
@@ -206,8 +205,7 @@ export type GraphQLOutputType =
 export function isOutputType(type: unknown): type is GraphQLOutputType {
   return (
     isScalarType(type) ||
-    isObjectType(type) ||
-    isUnionType(type) ||
+    isResolverType(type) ||
     isEnumType(type) ||
     (isWrappingType(type) && isOutputType(type.ofType))
   );

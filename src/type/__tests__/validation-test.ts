@@ -317,15 +317,6 @@ describe('Type System: Union types must be valid', () => {
         | TypeA
     `);
 
-    expectedJSON(schema, [
-      {
-        message: 'Union type BadUnion can only include type TypeA once.',
-        locations: [
-          { line: 15, column: 11 },
-          { line: 17, column: 11 },
-        ],
-      },
-    ]);
 
     expectedJSON(schema, [
       {

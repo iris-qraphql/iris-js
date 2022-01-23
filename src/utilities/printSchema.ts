@@ -17,14 +17,11 @@ import type {
   GraphQLUnionType,
   IrisDataType,
   IrisDataVariant,
-  IrisDataVariantField,
-} from '../type/definition';
+  IrisDataVariantField} from '../type/definition';
 import {
-  isEnumType,
-  isInputObjectType,
-  isObjectType,
+  isDataType,
+  isResolverType,
   isScalarType,
-  isUnionType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import {
@@ -73,13 +70,10 @@ export function printType(type: GraphQLNamedType): string {
   if (isScalarType(type)) {
     return printScalar(type);
   }
-  if (isObjectType(type)) {
-    return printObject(type);
+  if (isResolverType(type)) {
+    return type.isVariantType() ? printObject(type) : printUnion(type);
   }
-  if (isUnionType(type)) {
-    return printUnion(type);
-  }
-  if (isEnumType(type) || isInputObjectType(type)) {
+  if (isDataType(type)) {
     return printDATA(type);
   }
   /* c8 ignore next 3 */
