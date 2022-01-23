@@ -78,9 +78,7 @@ export function printType(type: GraphQLNamedType): string {
 }
 
 function printScalar(type: GraphQLScalarType): string {
-  return (
-    printDescription(type) + `scalar ${type.name}` + printSpecifiedByURL(type)
-  );
+  return printDescription(type) + `scalar ${type.name}`;
 }
 
 function printObject(type: IrisResolverType): string {
@@ -211,17 +209,6 @@ function printDeprecated(reason: Maybe<string>): string {
     return ` @deprecated(reason: ${astValue})`;
   }
   return ' @deprecated';
-}
-
-function printSpecifiedByURL(scalar: GraphQLScalarType): string {
-  if (scalar.specifiedByURL == null) {
-    return '';
-  }
-  const astValue = print({
-    kind: Kind.STRING,
-    value: scalar.specifiedByURL,
-  });
-  return ` @specifiedBy(url: ${astValue})`;
 }
 
 function printDescription(

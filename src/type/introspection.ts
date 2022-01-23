@@ -240,14 +240,7 @@ export const __Type: IrisResolverType = gqlObject({
       description: {
         type: GraphQLString,
         resolve: (type) =>
-          // FIXME: add test case
-          /* c8 ignore next */
           'description' in type ? type.description : undefined,
-      },
-      specifiedByURL: {
-        type: GraphQLString,
-        resolve: (obj) =>
-          'specifiedByURL' in obj ? obj.specifiedByURL : undefined,
       },
       fields: {
         type: new GraphQLList(new GraphQLNonNull(__Field)),

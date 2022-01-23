@@ -7,7 +7,6 @@ import { inspect } from '../../jsutils/inspect';
 
 import { parse } from '../../language/parser';
 
-import { GraphQLScalarType } from '../../type/definition';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
@@ -18,7 +17,7 @@ import {
   expectValidationErrors,
   expectValidationErrorsWithSchema,
 } from './harness';
-import { gqlObject } from '../../type/make';
+import { gqlObject, gqlScalar } from '../../type/make';
 
 function expectErrors(queryStr: string) {
   return expectValidationErrors(ValuesOfCorrectTypeRule, queryStr);
@@ -948,7 +947,7 @@ describe('Validate: Values of correct type', () => {
     });
 
     it('reports original error for custom scalar which throws', () => {
-      const customScalar = new GraphQLScalarType({
+      const customScalar = gqlScalar({
         name: 'Invalid',
         parseValue(value) {
           throw new Error(
@@ -987,7 +986,7 @@ describe('Validate: Values of correct type', () => {
     });
 
     it('reports error for custom scalar that returns undefined', () => {
-      const customScalar = new GraphQLScalarType({
+      const customScalar = gqlScalar({
         name: 'CustomScalar',
         parseValue() {
           return undefined;
@@ -1015,7 +1014,7 @@ describe('Validate: Values of correct type', () => {
     });
 
     it('allows custom scalar to accept complex literals', () => {
-      const customScalar = new GraphQLScalarType({ name: 'Any' });
+      const customScalar = gqlScalar({ name: 'Any' });
       const schema = new GraphQLSchema({
         query: gqlObject({
           name: 'Query',

@@ -9,19 +9,15 @@ import type {
   GraphQLArgumentConfig,
   GraphQLFieldConfig,
 } from '../../type/definition';
-import {
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLScalarType,
-} from '../../type/definition';
-import { gqlEnum, gqlInput, gqlObject } from '../../type/make';
+import { GraphQLList, GraphQLNonNull } from '../../type/definition';
+import { gqlEnum, gqlInput, gqlObject, gqlScalar } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
 import { executeSync } from '../execute';
 import { getVariableValues } from '../values';
 
-const TestComplexScalar = new GraphQLScalarType({
+const TestComplexScalar = gqlScalar({
   name: 'ComplexScalar',
   parseValue(value) {
     expect(value).toEqual('SerializedValue');

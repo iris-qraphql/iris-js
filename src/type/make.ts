@@ -4,6 +4,9 @@ import type {
   GraphQLFieldConfig,
   GraphQLInputField,
   GraphQLIsTypeOfFn,
+  GraphQLScalarLiteralParser,
+  GraphQLScalarSerializer,
+  GraphQLScalarValueParser,
   GraphQLTypeResolver,
   IrisResolverVariantConfig,
   ThunkObjMap,
@@ -67,4 +70,15 @@ const gqlUnion = ({ name, types, resolveType }: GQLUnion) =>
     resolveType,
   });
 
-export { gqlInput, gqlEnum, gqlObject, gqlUnion };
+type GQLScalar<I = unknown, O = I> = {
+  name: string;
+  description?: string;
+  serialize?: GraphQLScalarSerializer<O>;
+  parseValue?: GraphQLScalarValueParser<I>;
+  parseLiteral?: GraphQLScalarLiteralParser<I>;
+};
+
+const gqlScalar = <T>(x: GQLScalar<T>) =>
+  new IrisDataType<T>({ ...x, isPrimitive: true });
+
+export { gqlInput, gqlEnum, gqlObject, gqlUnion, gqlScalar };

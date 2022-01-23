@@ -1,8 +1,7 @@
-import { isNil, pluck } from 'ramda';
+import { identity, isNil, pluck } from 'ramda';
 
 import { devAssert } from '../jsutils/devAssert';
 import { didYouMean } from '../jsutils/didYouMean';
-import { identityFunc } from '../jsutils/identityFunc';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 import { isObjectLike } from '../jsutils/isObjectLike';
@@ -23,7 +22,6 @@ import type {
   InputValueDefinitionNode,
   OperationDefinitionNode,
   ResolverTypeDefinitionNode,
-  ScalarTypeDefinitionNode,
   ValueNode,
   VariantDefinitionNode,
 } from '../language/ast';
@@ -43,16 +41,10 @@ import type { GraphQLSchema } from './schema';
  * These are all of the possible kinds of types.
  */
 export type GraphQLType =
-  | GraphQLScalarType
   | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLType>
-  | GraphQLNonNull<
-      | GraphQLScalarType
-      | IrisResolverType
-      | IrisDataType
-      | GraphQLList<GraphQLType>
-    >;
+  | GraphQLNonNull<IrisResolverType | IrisDataType | GraphQLList<GraphQLType>>;
 
 export function isType(type: unknown): type is GraphQLType {
   return isNamedType(type) || isListType(type) || isNonNullType(type);
@@ -60,10 +52,6 @@ export function isType(type: unknown): type is GraphQLType {
 
 export function isNamedType(type: unknown): type is GraphQLNamedType {
   return isScalarType(type) || isResolverType(type) || isDataType(type);
-}
-
-export function isScalarType(type: unknown): type is GraphQLScalarType {
-  return instanceOf(type, GraphQLScalarType);
 }
 
 export function isResolverType(type: unknown): type is IrisResolverType {
@@ -77,16 +65,17 @@ export function isUnionType(type: unknown): type is IrisResolverType {
   return isResolverType(type) && !type.isVariantType();
 }
 
-export function isDataType(type: unknown): type is IrisDataType {
-  return instanceOf(type, IrisDataType);
-}
+export const isScalarType = (type: unknown): type is IrisDataType =>
+  isDataType(type);
+
+export const isDataType = (type: unknown): type is IrisDataType =>
+  instanceOf(type, IrisDataType);
 
 export function isEnumType(type: unknown): type is IrisDataType {
   return isDataType(type) && !type.isVariantType();
 }
 
-export const isLeafType = (type: unknown): type is GraphQLLeafType =>
-  isScalarType(type) || isEnumType(type);
+export const isLeafType = isDataType;
 
 export const isInputObjectType = (type: unknown): type is IrisDataType =>
   isDataType(type) && type.isVariantType();
@@ -144,12 +133,9 @@ export function isNonNullType(
 }
 
 export type GraphQLInputType =
-  | GraphQLScalarType
   | IrisDataType
   | GraphQLList<GraphQLInputType>
-  | GraphQLNonNull<
-      GraphQLScalarType | IrisDataType | GraphQLList<GraphQLInputType>
-    >;
+  | GraphQLNonNull<IrisDataType | GraphQLList<GraphQLInputType>>;
 
 export function isInputType(type: unknown): type is GraphQLInputType {
   return (
@@ -160,15 +146,11 @@ export function isInputType(type: unknown): type is GraphQLInputType {
 }
 
 export type GraphQLOutputType =
-  | GraphQLScalarType
   | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLOutputType>
   | GraphQLNonNull<
-      | GraphQLScalarType
-      | IrisResolverType
-      | IrisDataType
-      | GraphQLList<GraphQLOutputType>
+      IrisResolverType | IrisDataType | GraphQLList<GraphQLOutputType>
     >;
 
 export function isOutputType(type: unknown): type is GraphQLOutputType {
@@ -180,7 +162,7 @@ export function isOutputType(type: unknown): type is GraphQLOutputType {
   );
 }
 
-export type GraphQLLeafType = GraphQLScalarType | IrisDataType;
+export type GraphQLLeafType = IrisDataType;
 
 export class GraphQLList<T extends GraphQLType> {
   readonly ofType: T;
@@ -232,10 +214,6 @@ export class GraphQLNonNull<T extends GraphQLNullableType> {
   }
 }
 
-/**
- * These types wrap and modify other types
- */
-
 export type GraphQLWrappingType =
   | GraphQLList<GraphQLType>
   | GraphQLNonNull<GraphQLType>;
@@ -248,7 +226,6 @@ export function isWrappingType(type: unknown): type is GraphQLWrappingType {
  * These types can all accept null as a value.
  */
 export type GraphQLNullableType =
-  | GraphQLScalarType
   | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLType>;
@@ -273,12 +250,9 @@ export function getNullableType(
  */
 export type GraphQLNamedType = GraphQLNamedInputType | GraphQLNamedOutputType;
 
-export type GraphQLNamedInputType = GraphQLScalarType | IrisDataType;
+export type GraphQLNamedInputType = IrisDataType;
 
-export type GraphQLNamedOutputType =
-  | GraphQLScalarType
-  | IrisResolverType
-  | IrisDataType;
+export type GraphQLNamedOutputType = IrisResolverType | IrisDataType;
 
 export function getNamedType(type: undefined | null): void;
 export function getNamedType(type: GraphQLInputType): GraphQLNamedInputType;
@@ -313,90 +287,13 @@ const isThunk = <T>(thunk: Thunk<T>): thunk is () => T =>
 const resolveThunk = <T>(thunk: Thunk<T>): T =>
   isThunk(thunk) ? thunk() : thunk;
 
-export class GraphQLScalarType<TInternal = unknown, TExternal = TInternal> {
-  name: string;
-  description: Maybe<string>;
-  specifiedByURL: Maybe<string>;
-  serialize: GraphQLScalarSerializer<TExternal>;
-  parseValue: GraphQLScalarValueParser<TInternal>;
-  parseLiteral: GraphQLScalarLiteralParser<TInternal>;
-  astNode: Maybe<ScalarTypeDefinitionNode>;
-
-  constructor(config: Readonly<GraphQLScalarTypeConfig<TInternal, TExternal>>) {
-    const parseValue =
-      config.parseValue ??
-      (identityFunc as GraphQLScalarValueParser<TInternal>);
-
-    this.name = assertName(config.name);
-    this.description = config.description;
-    this.specifiedByURL = config.specifiedByURL;
-    this.serialize =
-      config.serialize ?? (identityFunc as GraphQLScalarSerializer<TExternal>);
-    this.parseValue = parseValue;
-    this.parseLiteral =
-      config.parseLiteral ??
-      ((node, variables) => parseValue(valueFromASTUntyped(node, variables)));
-    this.astNode = config.astNode;
-
-    devAssert(
-      config.specifiedByURL == null ||
-        typeof config.specifiedByURL === 'string',
-      `${this.name} must provide "specifiedByURL" as a string, ` +
-        `but got: ${inspect(config.specifiedByURL)}.`,
-    );
-
-    devAssert(
-      config.serialize == null || typeof config.serialize === 'function',
-      `${this.name} must provide "serialize" function. If this custom Scalar is also used as an input type, ensure "parseValue" and "parseLiteral" functions are also provided.`,
-    );
-
-    if (config.parseLiteral) {
-      devAssert(
-        typeof config.parseValue === 'function' &&
-          typeof config.parseLiteral === 'function',
-        `${this.name} must provide both "parseValue" and "parseLiteral" functions.`,
-      );
-    }
-  }
-
-  get [Symbol.toStringTag]() {
-    return 'GraphQLScalarType';
-  }
-
-  toString(): string {
-    return this.name;
-  }
-
-  toJSON(): string {
-    return this.toString();
-  }
-}
-
-export type GraphQLScalarSerializer<TExternal> = (
-  outputValue: unknown,
-) => TExternal;
-
-export type GraphQLScalarValueParser<TInternal> = (
-  inputValue: unknown,
-) => TInternal;
+export type GraphQLScalarSerializer<O> = (outputValue: unknown) => O;
+export type GraphQLScalarValueParser<I> = (inputValue: unknown) => I;
 
 export type GraphQLScalarLiteralParser<TInternal> = (
   valueNode: ValueNode,
   variables?: Maybe<ObjMap<unknown>>,
 ) => TInternal;
-
-export interface GraphQLScalarTypeConfig<TInternal, TExternal> {
-  name: string;
-  description?: Maybe<string>;
-  specifiedByURL?: Maybe<string>;
-  /** Serializes an internal value to include in a response. */
-  serialize?: GraphQLScalarSerializer<TExternal>;
-  /** Parses an externally provided value to use as an input. */
-  parseValue?: GraphQLScalarValueParser<TInternal>;
-  /** Parses an externally provided literal value to use as an input. */
-  parseLiteral?: GraphQLScalarLiteralParser<TInternal>;
-  astNode?: Maybe<ScalarTypeDefinitionNode>;
-}
 
 const defineFieldMap = <TSource, TContext>(
   typename: string,
@@ -642,12 +539,19 @@ export type IrisDataVariant = {
   toJSON?: () => string;
 };
 
-type IrisDataTypeConfig = {
+type IrisDataTypeConfig<I, O> = Readonly<{
   name: string;
   description?: Maybe<string>;
-  variants?: ReadonlyArray<IrisDataVariantConfig>;
   astNode?: Maybe<DataTypeDefinitionNode>;
-};
+  variants?: ReadonlyArray<IrisDataVariantConfig>;
+  isPrimitive?: boolean;
+  /** Serializes an internal value to include in a response. */
+  serialize?: GraphQLScalarSerializer<O>;
+  /** Parses an externally provided value to use as an input. */
+  parseValue?: GraphQLScalarValueParser<I>;
+  /** Parses an externally provided literal value to use as an input. */
+  parseLiteral?: GraphQLScalarLiteralParser<I>;
+}>;
 
 type IrisDataVariantConfig = Override<
   IrisDataVariant,
@@ -670,20 +574,52 @@ const dataVariant = (config: IrisDataVariantConfig): IrisDataVariantConfig => ({
 
 const resolveVariant = (v: IrisDataVariantConfig): IrisDataVariant => ({
   ...v,
-  fields: mapValue(resolveThunk(v.fields ?? {}), (x, name) => ({ ...x, name })),
+  fields: mapValue(resolveThunk(v?.fields ?? {}), (x, name) => ({
+    ...x,
+    name,
+  })),
 });
 
-export class IrisDataType {
+export type GraphQLScalarType<I = unknown, O = I> = IrisDataType<I, O>;
+
+export class IrisDataType<I = unknown, O = I> {
   name: string;
   description: Maybe<string>;
   astNode: Maybe<DataTypeDefinitionNode>;
+  isPrimitive: boolean;
+  private _serialize: GraphQLScalarSerializer<O>;
+  private _parseValue: GraphQLScalarValueParser<I>;
+  private _parseLiteral: GraphQLScalarLiteralParser<I>;
   private _variants: ReadonlyArray<IrisDataVariantConfig>;
 
-  constructor(config: Readonly<IrisDataTypeConfig>) {
+  constructor(config: IrisDataTypeConfig<I, O>) {
     this.astNode = config.astNode;
     this.name = assertName(config.name);
     this.description = config.description;
     this._variants = (config.variants ?? []).map(dataVariant);
+    this.isPrimitive = Boolean(config.isPrimitive);
+
+    const parseValue =
+      config.parseValue ?? (identity as GraphQLScalarValueParser<I>);
+    this._serialize =
+      config.serialize ?? (identity as GraphQLScalarValueParser<O>);
+    this._parseValue = parseValue;
+    this._parseLiteral =
+      config.parseLiteral ??
+      ((node, variables) => parseValue(valueFromASTUntyped(node, variables)));
+
+    devAssert(
+      config.serialize == null || typeof config.serialize === 'function',
+      `${this.name} must provide "serialize" function. If this custom Scalar is also used as an input type, ensure "parseValue" and "parseLiteral" functions are also provided.`,
+    );
+
+    if (config.parseLiteral) {
+      devAssert(
+        typeof config.parseValue === 'function' &&
+          typeof config.parseLiteral === 'function',
+        `${this.name} must provide both "parseValue" and "parseLiteral" functions.`,
+      );
+    }
   }
 
   get [Symbol.toStringTag]() {
@@ -710,6 +646,10 @@ export class IrisDataType {
   }
 
   serialize(value: unknown): Maybe<any> {
+    if (this.isPrimitive) {
+      return this._serialize(value);
+    }
+
     const enumValue = this.getValue((value as any)?.name ?? value);
     if (isNil(enumValue)) {
       throw new GraphQLError(
@@ -721,6 +661,10 @@ export class IrisDataType {
   }
 
   parseValue(inputValue: unknown): Maybe<any> /* T */ {
+    if (this.isPrimitive) {
+      return this._parseValue(inputValue);
+    }
+
     if (typeof inputValue !== 'string') {
       const valueStr = inspect(inputValue);
       throw new GraphQLError(
@@ -739,10 +683,10 @@ export class IrisDataType {
     return enumValue.name;
   }
 
-  parseLiteral(
-    valueNode: ValueNode,
-    _variables: Maybe<ObjMap<unknown>>,
-  ): Maybe<any> /* T */ {
+  parseLiteral(valueNode: ValueNode): Maybe<any> /* T */ {
+    if (this.isPrimitive) {
+      return this._parseLiteral(valueNode);
+    }
     // Note: variables will be resolved to a value before calling this function.
     if (valueNode.kind !== Kind.ENUM) {
       const valueStr = print(valueNode);
@@ -752,7 +696,6 @@ export class IrisDataType {
         valueNode,
       );
     }
-
     const enumValue = this._variants.find((x) => x.name === valueNode.value);
     if (enumValue == null) {
       const valueStr = print(valueNode);
@@ -762,7 +705,6 @@ export class IrisDataType {
         valueNode,
       );
     }
-
     return enumValue;
   }
 

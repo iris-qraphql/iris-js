@@ -11,12 +11,7 @@ import { suggestionList } from '../jsutils/suggestionList';
 import { GraphQLError } from '../error/GraphQLError';
 
 import type { GraphQLInputType } from '../type/definition';
-import {
-  isInputObjectType,
-  isLeafType,
-  isListType,
-  isNonNullType,
-} from '../type/definition';
+import { isLeafType, isListType, isNonNullType } from '../type/definition';
 
 type OnErrorCB = (
   path: ReadonlyArray<string | number>,
@@ -85,67 +80,67 @@ function coerceInputValueImpl(
     return [coerceInputValueImpl(inputValue, itemType, onError, path)];
   }
 
-  if (isInputObjectType(type)) {
-    if (!isObjectLike(inputValue)) {
-      onError(
-        pathToArray(path),
-        inputValue,
-        new GraphQLError(`Expected type "${type.name}" to be an object.`),
-      );
-      return;
-    }
+  if (isLeafType(type)) {
+    if (type.isVariantType()) {
+      if (!isObjectLike(inputValue)) {
+        onError(
+          pathToArray(path),
+          inputValue,
+          new GraphQLError(`Expected type "${type.name}" to be an object.`),
+        );
+        return;
+      }
 
-    const coercedValue: any = {};
-    const fieldDefs = type.getFields();
+      const coercedValue: any = {};
+      const fieldDefs = type.getFields();
 
-    for (const field of Object.values(fieldDefs)) {
-      const fieldValue = inputValue[field.name];
+      for (const field of Object.values(fieldDefs)) {
+        const fieldValue = inputValue[field.name];
 
-      if (fieldValue === undefined) {
-        if (field.defaultValue !== undefined) {
-          coercedValue[field.name] = field.defaultValue;
-        } else if (isNonNullType(field.type)) {
-          const typeStr = inspect(field.type);
+        if (fieldValue === undefined) {
+          if (field.defaultValue !== undefined) {
+            coercedValue[field.name] = field.defaultValue;
+          } else if (isNonNullType(field.type)) {
+            const typeStr = inspect(field.type);
+            onError(
+              pathToArray(path),
+              inputValue,
+              new GraphQLError(
+                `Field "${field.name}" of required type "${typeStr}" was not provided.`,
+              ),
+            );
+          }
+          continue;
+        }
+
+        coercedValue[field.name] = coerceInputValueImpl(
+          fieldValue,
+          field.type,
+          onError,
+          addPath(path, field.name, type.name),
+        );
+      }
+
+      // Ensure every provided field is defined.
+      for (const fieldName of Object.keys(inputValue)) {
+        if (!fieldDefs[fieldName]) {
+          const suggestions = suggestionList(
+            fieldName,
+            Object.keys(type.getFields()),
+          );
           onError(
             pathToArray(path),
             inputValue,
             new GraphQLError(
-              `Field "${field.name}" of required type "${typeStr}" was not provided.`,
+              `Field "${fieldName}" is not defined by type "${type.name}".` +
+                didYouMean(suggestions),
             ),
           );
         }
-        continue;
       }
-
-      coercedValue[field.name] = coerceInputValueImpl(
-        fieldValue,
-        field.type,
-        onError,
-        addPath(path, field.name, type.name),
-      );
+      return coercedValue;
     }
 
-    // Ensure every provided field is defined.
-    for (const fieldName of Object.keys(inputValue)) {
-      if (!fieldDefs[fieldName]) {
-        const suggestions = suggestionList(
-          fieldName,
-          Object.keys(type.getFields()),
-        );
-        onError(
-          pathToArray(path),
-          inputValue,
-          new GraphQLError(
-            `Field "${fieldName}" is not defined by type "${type.name}".` +
-              didYouMean(suggestions),
-          ),
-        );
-      }
-    }
-    return coercedValue;
-  }
-
-  if (isLeafType(type)) {
     let parseResult;
 
     // Scalars and Enums determine if a input value is valid via parseValue(),

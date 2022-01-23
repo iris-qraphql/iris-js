@@ -34,7 +34,6 @@ import type {
   ObjectValueNode,
   OperationDefinitionNode,
   OperationTypeDefinitionNode,
-  ScalarTypeDefinitionNode,
   SelectionNode,
   SelectionSetNode,
   StringValueNode,
@@ -51,6 +50,8 @@ import { Kind } from './kinds';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { isSource, Source } from './source';
 import { TokenKind } from './tokenKind';
+
+import type { DataTypeDefinitionNode } from '.';
 
 /**
  * Configuration options to control parser behavior
@@ -751,17 +752,23 @@ export class Parser {
   /**
    * ScalarTypeDefinition : Description? scalar Name Directives[Const]?
    */
-  parseScalarTypeDefinition(): ScalarTypeDefinitionNode {
+  parseScalarTypeDefinition(): DataTypeDefinitionNode {
     const start = this._lexer.token;
     const description = this.parseDescription();
     this.expectKeyword('scalar');
     const name = this.parseName();
     const directives = this.parseConstDirectives();
-    return this.node<ScalarTypeDefinitionNode>(start, {
-      kind: Kind.SCALAR_TYPE_DEFINITION,
+    return this.node<DataTypeDefinitionNode>(start, {
+      kind: Kind.DATA_TYPE_DEFINITION,
       description,
       name,
       directives,
+      variants: [
+        {
+          kind: Kind.VARIANT_DEFINITION,
+          name: { value: 'Scalar', kind: Kind.NAME },
+        },
+      ],
     });
   }
 

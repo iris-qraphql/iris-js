@@ -163,7 +163,6 @@ export type ASTNode =
   | NonNullTypeNode
   | SchemaDefinitionNode
   | OperationTypeDefinitionNode
-  | ScalarTypeDefinitionNode
   | FieldDefinitionNode
   | InputValueDefinitionNode
   | ResolverTypeDefinitionNode
@@ -228,8 +227,6 @@ export const QueryDocumentKeys: {
 
   SchemaDefinition: ['description', 'directives', 'operationTypes'],
   OperationTypeDefinition: ['type'],
-
-  ScalarTypeDefinition: ['description', 'name', 'directives'],
   FieldDefinition: ['description', 'name', 'arguments', 'type', 'directives'],
   InputValueDefinition: [
     'description',
@@ -527,17 +524,8 @@ export interface OperationTypeDefinitionNode {
 /** Type Definition */
 
 export type TypeDefinitionNode =
-  | ScalarTypeDefinitionNode
   | ResolverTypeDefinitionNode
   | DataTypeDefinitionNode;
-
-export interface ScalarTypeDefinitionNode {
-  readonly kind: Kind.SCALAR_TYPE_DEFINITION;
-  readonly loc?: Location;
-  readonly description?: StringValueNode;
-  readonly name: NameNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-}
 
 export interface FieldDefinitionNode {
   readonly kind: Kind.FIELD_DEFINITION;
@@ -594,7 +582,7 @@ export interface VariantDefinitionNode {
   readonly description?: StringValueNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly name: NameNode;
-  readonly fields: ReadonlyArray<InputValueDefinitionNode>;
+  readonly fields?: ReadonlyArray<InputValueDefinitionNode>;
 }
 
 /** Directive Definitions */

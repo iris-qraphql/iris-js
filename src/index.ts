@@ -33,10 +33,10 @@ export { version, versionInfo } from './version';
 export type { GraphQLArgs } from './iris';
 export { graphql, graphqlSync } from './iris';
 
+export type { GraphQLScalarType } from './type/index';
 export {
   GraphQLSchema,
   GraphQLDirective,
-  GraphQLScalarType,
   GraphQLList,
   GraphQLNonNull,
   specifiedScalarTypes,
@@ -135,7 +135,6 @@ export type {
   GraphQLIsTypeOfFn,
   GraphQLResolveInfo,
   ResponsePath,
-  GraphQLScalarTypeConfig,
   GraphQLTypeResolver,
   GraphQLScalarSerializer,
   GraphQLScalarValueParser,
@@ -234,7 +233,6 @@ export type {
   SchemaDefinitionNode,
   OperationTypeDefinitionNode,
   TypeDefinitionNode,
-  ScalarTypeDefinitionNode,
   FieldDefinitionNode,
   InputValueDefinitionNode,
   ResolverTypeDefinitionNode,

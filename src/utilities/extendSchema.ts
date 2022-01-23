@@ -9,7 +9,6 @@ import type {
   InputValueDefinitionNode,
   NamedTypeNode,
   ResolverVariantDefinitionNode,
-  ScalarTypeDefinitionNode,
   SchemaDefinitionNode,
   TypeDefinitionNode,
   TypeNode,
@@ -29,14 +28,12 @@ import type {
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLScalarType,
   IrisDataType,
   IrisResolverType,
 } from '../type/definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,
-  GraphQLSpecifiedByDirective,
 } from '../type/directives';
 import { introspectionTypes } from '../type/introspection';
 import { specifiedScalarTypes } from '../type/scalars';
@@ -273,18 +270,17 @@ export function extendSchemaImpl(
           astNode,
         });
       }
-      case Kind.SCALAR_TYPE_DEFINITION: {
-        return new GraphQLScalarType({
-          name,
-          description: astNode.description?.value,
-          specifiedByURL: getSpecifiedByURL(astNode),
-          astNode,
-        });
-      }
       case Kind.DATA_TYPE_DEFINITION: {
         const [variant, ...ext] = astNode.variants;
 
-        if (ext.length === 0 && variant.fields.length > 0) {
+        // return new IrisDataType({
+        //   name,
+        //   description: astNode.description?.value,
+        //   astNode: { ...astNode, Kind.DATA_TYPE_DEFINITION, variants: [{name}] },
+        //   isPrimitive: true,
+        // });
+
+        if (ext.length === 0 && (variant.fields?.length ?? 0) > 0) {
           return new IrisDataType({
             name,
             description: astNode.description?.value,
@@ -292,7 +288,8 @@ export function extendSchemaImpl(
             variants: [
               {
                 name,
-                fields: () => buildInputFieldMap(astNode.variants[0].fields),
+                fields: () =>
+                  buildInputFieldMap(astNode.variants[0].fields ?? []),
               },
             ],
           });
@@ -329,13 +326,4 @@ function getDeprecationReason(
   const deprecated = getDirectiveValues(GraphQLDeprecatedDirective, node);
   // @ts-expect-error validated by `getDirectiveValues`
   return deprecated?.reason;
-}
-
-/**
- * Given a scalar node, returns the string value for the specifiedByURL.
- */
-function getSpecifiedByURL(node: ScalarTypeDefinitionNode): Maybe<string> {
-  const specifiedBy = getDirectiveValues(GraphQLSpecifiedByDirective, node);
-  // @ts-expect-error validated by `getDirectiveValues`
-  return specifiedBy?.url;
 }

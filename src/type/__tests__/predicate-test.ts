@@ -16,7 +16,6 @@ import {
   getNullableType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLScalarType,
   isAbstractType,
   isEnumType,
   isInputObjectType,
@@ -45,7 +44,7 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlEnum, gqlInput, gqlObject, gqlUnion } from '../make';
+import { gqlEnum, gqlInput, gqlObject, gqlScalar, gqlUnion } from '../make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -62,7 +61,7 @@ const InputObjectType = gqlInput({
   name: 'InputObject',
   fields: {},
 });
-const ScalarType = new GraphQLScalarType({ name: 'Scalar' });
+const ScalarType = gqlScalar({ name: 'Scalar' });
 const Directive = new GraphQLDirective({
   name: 'Directive',
   locations: [DirectiveLocation.QUERY],
@@ -93,11 +92,6 @@ describe('Type predicates', () => {
     it('returns true for custom scalar', () => {
       expect(isScalarType(ScalarType)).toEqual(true);
       expect(() => assertScalarType(ScalarType)).not.toThrow();
-    });
-
-    it('returns false for scalar class (rather than instance)', () => {
-      expect(isScalarType(GraphQLScalarType)).toEqual(false);
-      expect(() => assertScalarType(GraphQLScalarType)).toThrow();
     });
 
     it('returns false for wrapped scalar', () => {

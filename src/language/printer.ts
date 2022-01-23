@@ -146,12 +146,6 @@ const printDocASTReducer: ASTReducer<string> = {
     leave: ({ operation, type }) => operation + ': ' + type,
   },
 
-  ScalarTypeDefinition: {
-    leave: ({ description, name, directives }) =>
-      wrap('', description, '\n') +
-      join(['scalar', name, join(directives, ' ')], ' '),
-  },
-
   FieldDefinition: {
     leave: ({ description, name, arguments: args, type, directives }) =>
       wrap('', description, '\n') +

@@ -1,9 +1,5 @@
-import {
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLScalarType,
-} from '../../type/definition';
-import { gqlEnum, gqlInput } from '../../type/make';
+import { GraphQLList, GraphQLNonNull } from '../../type/definition';
+import { gqlEnum, gqlInput, gqlScalar } from '../../type/make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -189,7 +185,7 @@ describe('astFromValue', () => {
   });
 
   it('converts using serialize from a custom scalar type', () => {
-    const passthroughScalar = new GraphQLScalarType({
+    const passthroughScalar = gqlScalar({
       name: 'PassthroughScalar',
       serialize(value) {
         return value;
@@ -208,7 +204,7 @@ describe('astFromValue', () => {
       'Cannot convert value to AST: Infinity.',
     );
 
-    const returnNullScalar = new GraphQLScalarType({
+    const returnNullScalar = gqlScalar({
       name: 'ReturnNullScalar',
       serialize() {
         return null;
@@ -219,7 +215,7 @@ describe('astFromValue', () => {
 
     class SomeClass {}
 
-    const returnCustomClassScalar = new GraphQLScalarType({
+    const returnCustomClassScalar = gqlScalar({
       name: 'ReturnCustomClassScalar',
       serialize() {
         return new SomeClass();

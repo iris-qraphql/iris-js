@@ -43,7 +43,6 @@ export enum Kind {
   OPERATION_TYPE_DEFINITION = 'OperationTypeDefinition',
 
   /** Type Definitions */
-  SCALAR_TYPE_DEFINITION = 'ScalarTypeDefinition',
   FIELD_DEFINITION = 'FieldDefinition',
   INPUT_VALUE_DEFINITION = 'InputValueDefinition',
   RESOLVER_TYPE_DEFINITION = 'ResolverTypeDefinition',

@@ -79,7 +79,6 @@ export function isTypeDefinitionNode(
   node: ASTNode,
 ): node is TypeDefinitionNode {
   return (
-    node.kind === Kind.SCALAR_TYPE_DEFINITION ||
     node.kind === Kind.RESOLVER_TYPE_DEFINITION ||
     node.kind === Kind.DATA_TYPE_DEFINITION
   );

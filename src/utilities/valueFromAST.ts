@@ -9,7 +9,6 @@ import { Kind } from '../language/kinds';
 
 import type { GraphQLInputType } from '../type/definition';
 import {
-  isInputObjectType,
   isLeafType,
   isListType,
   isNonNullType,
@@ -103,38 +102,37 @@ export function valueFromAST(
     return [coercedValue];
   }
 
-  if (isInputObjectType(type)) {
-    if (valueNode.kind !== Kind.OBJECT) {
-      return; // Invalid: intentionally return no value.
-    }
-    const coercedObj = Object.create(null);
-    const fieldNodes = keyMap(valueNode.fields, (field) => field.name.value);
-    for (const field of Object.values(type.getFields())) {
-      const fieldNode = fieldNodes[field.name];
-      if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
-        if (field.defaultValue !== undefined) {
-          coercedObj[field.name] = field.defaultValue;
-        } else if (isNonNullType(field.type)) {
-          return; // Invalid: intentionally return no value.
-        }
-        continue;
-      }
-      const fieldValue = valueFromAST(fieldNode.value, field.type, variables);
-      if (fieldValue === undefined) {
+  if (isLeafType(type)) {
+    if (type.isVariantType()) {
+      if (valueNode.kind !== Kind.OBJECT) {
         return; // Invalid: intentionally return no value.
       }
-      coercedObj[field.name] = fieldValue;
+      const coercedObj = Object.create(null);
+      const fieldNodes = keyMap(valueNode.fields, (field) => field.name.value);
+      for (const field of Object.values(type.getFields())) {
+        const fieldNode = fieldNodes[field.name];
+        if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
+          if (field.defaultValue !== undefined) {
+            coercedObj[field.name] = field.defaultValue;
+          } else if (isNonNullType(field.type)) {
+            return; // Invalid: intentionally return no value.
+          }
+          continue;
+        }
+        const fieldValue = valueFromAST(fieldNode.value, field.type, variables);
+        if (fieldValue === undefined) {
+          return; // Invalid: intentionally return no value.
+        }
+        coercedObj[field.name] = fieldValue;
+      }
+      return coercedObj;
     }
-    return coercedObj;
-  }
-
-  if (isLeafType(type)) {
     // Scalars and Enums fulfill parsing a literal value via parseLiteral().
     // Invalid values represent a failure to parse correctly, in which case
     // no value is returned.
     let result;
     try {
-      result = type.parseLiteral(valueNode, variables);
+      result = type.parseLiteral(valueNode, /* variables */ );
     } catch (_error) {
       return; // Invalid: intentionally return no value.
     }
