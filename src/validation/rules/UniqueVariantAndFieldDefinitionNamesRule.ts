@@ -31,7 +31,10 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
     ResolverTypeDefinition: checkVariantUniqueness,
   };
 
-  function checkVariantUniqueness({ variants, name }: DataTypeDefinitionNode | ResolverTypeDefinitionNode) {
+  function checkVariantUniqueness({
+    variants,
+    name,
+  }: DataTypeDefinitionNode | ResolverTypeDefinitionNode) {
     const knownVariantNames: Record<string, NameNode> = {};
     const typeName = name.value;
 

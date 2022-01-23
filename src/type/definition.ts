@@ -682,7 +682,7 @@ export type GraphQLUnionTypeConfig<TSource, TContext> = {
   // union
   types?: ThunkReadonlyArray<GraphQLObjectType>;
   resolveType?: Maybe<GraphQLTypeResolver<TSource, TContext>>;
-  astNode?: Maybe<ResolverTypeDefinitionNode >;
+  astNode?: Maybe<ResolverTypeDefinitionNode>;
   // object
   fields?: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>;
   isTypeOf?: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;

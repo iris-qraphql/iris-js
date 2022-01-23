@@ -280,7 +280,7 @@ export function extendSchemaImpl(
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
-          types: () => (astNode.variants ?? []).map(getVariantType) ,
+          types: () => (astNode.variants ?? []).map(getVariantType),
           astNode,
         });
       }

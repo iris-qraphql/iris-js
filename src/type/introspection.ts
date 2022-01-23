@@ -12,7 +12,8 @@ import type {
   GraphQLInputField,
   GraphQLNamedType,
   GraphQLObjectType,
-  GraphQLType} from './definition';
+  GraphQLType,
+} from './definition';
 import {
   GraphQLList,
   GraphQLNonNull,

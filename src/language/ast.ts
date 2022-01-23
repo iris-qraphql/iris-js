@@ -539,8 +539,6 @@ export interface ScalarTypeDefinitionNode {
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
 }
 
-
-
 export interface FieldDefinitionNode {
   readonly kind: Kind.FIELD_DEFINITION;
   readonly loc?: Location;

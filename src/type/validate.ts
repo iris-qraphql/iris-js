@@ -369,25 +369,16 @@ function validateUnionMembers(
   context: SchemaValidationContext,
   adt: GraphQLUnionType,
 ): void {
-  const memberTypes = adt.getTypes();
+  const listedMembers: Record<string, boolean> = {};
 
-  if (memberTypes.length === 0) {
-    context.reportError(
-      `Union type ${adt.name} must define one or more member types.`,
-      [adt.astNode],
-    );
-  }
-
-  const includedTypeNames = Object.create(null);
-  for (const memberType of memberTypes) {
-    if (includedTypeNames[memberType.name]) {
-      context.reportError(
+  adt.getTypes().forEach( memberType => {
+    if (listedMembers[memberType.name]) {
+      return context.reportError(
         `Union type ${adt.name} can only include type ${memberType.name} once.`,
         getResolverVariantNames(adt, memberType.name),
       );
-      continue;
     }
-    includedTypeNames[memberType.name] = true;
+    listedMembers[memberType.name] = true;
     if (!isObjectType(memberType)) {
       context.reportError(
         `Union type ${adt.name} can only include Object types, ` +
@@ -395,7 +386,7 @@ function validateUnionMembers(
         getResolverVariantNames(adt, String(memberType)),
       );
     }
-  }
+  })
 }
 
 const validateDataType = (

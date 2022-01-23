@@ -17,12 +17,9 @@ import type {
   GraphQLUnionType,
   IrisDataType,
   IrisDataVariant,
-  IrisDataVariantField} from '../type/definition';
-import {
-  isDataType,
-  isResolverType,
-  isScalarType,
+  IrisDataVariantField,
 } from '../type/definition';
+import { isDataType, isResolverType, isScalarType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import {
   DEFAULT_DEPRECATION_REASON,
