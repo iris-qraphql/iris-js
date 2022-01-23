@@ -5,7 +5,7 @@ import { expectJSON } from '../../__testUtils__/__mocha__/expectJSON';
 
 import { parse } from '../../language/parser';
 
-import { gqlObject } from '../../type/make';;
+import { gqlObject } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 

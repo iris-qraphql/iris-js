@@ -21,10 +21,9 @@ import {
   assertUnionType,
   GraphQLList,
   GraphQLNonNull,
-  IrisResolverType,
 } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
-import { gqlEnum, gqlObject } from '../make';
+import { gqlEnum, gqlObject, gqlUnion } from '../make';
 import { GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
@@ -382,7 +381,7 @@ describe('Type System: Union types must be valid', () => {
       SomeInputObjectType,
     ];
     for (const memberType of badUnionMemberTypes) {
-      const badUnion = new IrisResolverType({
+      const badUnion = gqlUnion({
         name: 'BadUnion',
         // @ts-expect-error
         types: [memberType],

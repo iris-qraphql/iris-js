@@ -23,7 +23,6 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLScalarType,
-  IrisResolverType,
   isAbstractType,
   isCompositeType,
   isEnumType,
@@ -52,7 +51,7 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlEnum, gqlInput, gqlObject } from '../make';
+import { gqlEnum, gqlInput, gqlObject, gqlUnion } from '../make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -63,7 +62,7 @@ import {
 } from '../scalars';
 
 const ObjectType = gqlObject({ name: 'Object', fields: {} });
-const UnionType = new IrisResolverType({ name: 'Union', types: [ObjectType] });
+const UnionType = gqlUnion({ name: 'Union', types: [ObjectType] });
 const EnumType = gqlEnum('Enum', ['foo']);
 const InputObjectType = gqlInput({
   name: 'InputObject',

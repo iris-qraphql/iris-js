@@ -4,12 +4,8 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { printSchema } from '../../utilities/printSchema';
 
-import type {
-  GraphQLObjectType} from '../definition';
-import {
-  GraphQLList,
-  GraphQLScalarType,
-} from '../definition';
+import type { GraphQLObjectType } from '../definition';
+import { GraphQLList, GraphQLScalarType } from '../definition';
 import { GraphQLDirective } from '../directives';
 import { emptyDataType, gqlInput, gqlObject } from '../make';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../scalars';

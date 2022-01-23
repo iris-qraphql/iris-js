@@ -4,7 +4,9 @@ import type {
   GraphQLFieldConfig,
   GraphQLInputField,
   GraphQLIsTypeOfFn,
+  GraphQLTypeResolver,
   ThunkObjMap,
+  ThunkReadonlyArray,
 } from './definition';
 import { IrisDataType, IrisResolverType } from './definition';
 
@@ -42,4 +44,12 @@ type GQLObject = {
 const gqlObject = ({ name, fields, isTypeOf, description }: GQLObject) =>
   new IrisResolverType({ name, fields, isTypeOf, description });
 
-export { gqlInput, gqlEnum, gqlObject };
+type GQLUnion = {
+  name: string;
+  types: ThunkReadonlyArray<IrisResolverType>;
+  resolveType?: GraphQLTypeResolver<any, any>;
+};
+const gqlUnion = ({ name, types, resolveType }: GQLUnion) =>
+  new IrisResolverType({ name, types, resolveType });
+
+export { gqlInput, gqlEnum, gqlObject, gqlUnion };

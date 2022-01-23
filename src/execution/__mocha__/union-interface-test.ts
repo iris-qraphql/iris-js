@@ -3,12 +3,8 @@ import { describe, it } from 'mocha';
 
 import { parse } from '../../language/parser';
 
-import {
-  GraphQLList,
-  GraphQLObjectType,
-  IrisResolverType,
-} from '../../type/definition';
-import { gqlObject } from '../../type/make';
+import { GraphQLList, GraphQLObjectType } from '../../type/definition';
+import { gqlObject, gqlUnion } from '../../type/make';
 import { GraphQLBoolean, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
@@ -82,7 +78,7 @@ const CatType: GraphQLObjectType = gqlObject({
   isTypeOf: (value) => value instanceof Cat,
 });
 
-const PetType = new IrisResolverType({
+const PetType = gqlUnion({
   name: 'Pet',
   types: [DogType, CatType],
   resolveType(value) {

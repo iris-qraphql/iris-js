@@ -7,7 +7,7 @@ import type { DocumentNode, OperationDefinitionNode } from '../../language/ast';
 import { Kind } from '../../language/kinds';
 import { parse } from '../../language/parser';
 
-import { gqlObject } from '../../type/make';;
+import { gqlObject } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 

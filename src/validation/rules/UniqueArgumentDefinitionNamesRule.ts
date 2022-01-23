@@ -28,12 +28,12 @@ export function UniqueArgumentDefinitionNamesRule(
 
       return checkArgUniqueness(`@${directiveNode.name.value}`, argumentNodes);
     },
-    ObjectTypeDefinition: checkArgUniquenessPerField,
+    VariantDefinition: checkArgUniquenessPerField,
   };
 
   function checkArgUniquenessPerField(typeNode: {
     readonly name: NameNode;
-    readonly fields?: ReadonlyArray<FieldDefinitionNode>;
+    readonly fields?: ReadonlyArray<FieldDefinitionNode| InputValueDefinitionNode>;
   }) {
     const typeName = typeNode.name.value;
 
@@ -44,8 +44,7 @@ export function UniqueArgumentDefinitionNamesRule(
     for (const fieldDef of fieldNodes) {
       const fieldName = fieldDef.name.value;
 
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
-      /* c8 ignore next */
+      // @ts-expect-error
       const argumentNodes = fieldDef.arguments ?? [];
 
       checkArgUniqueness(`${typeName}.${fieldName}`, argumentNodes);

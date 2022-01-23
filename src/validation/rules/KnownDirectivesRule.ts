@@ -92,8 +92,6 @@ function getDirectiveLocationForASTPath(
       return DirectiveLocation.SCHEMA;
     case Kind.SCALAR_TYPE_DEFINITION:
       return DirectiveLocation.SCALAR;
-    case Kind.OBJECT_TYPE_DEFINITION:
-      return DirectiveLocation.OBJECT;
     case Kind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
     case Kind.RESOLVER_TYPE_DEFINITION:

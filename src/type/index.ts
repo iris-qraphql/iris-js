@@ -12,7 +12,43 @@ export type { GraphQLSchemaConfig, GraphQLSchemaExtensions } from './schema';
 
 export type { GraphQLUnionType } from './definition';
 export type { GraphQLObjectType } from './definition';
-export { isType, isScalarType, isObjectType, isUnionType, isEnumType, isInputObjectType, isListType, isNonNullType, isInputType, isOutputType, isLeafType, isCompositeType, isAbstractType, isWrappingType, isNullableType, isNamedType, isRequiredArgument, isRequiredInputField, assertType, assertScalarType, assertObjectType, assertUnionType, assertListType, assertNonNullType, assertLeafType, assertCompositeType, assertAbstractType, assertWrappingType, assertNullableType, assertNamedType, getNullableType, getNamedType, GraphQLScalarType, GraphQLList, GraphQLNonNull } from './definition';
+export {
+  isType,
+  isScalarType,
+  isObjectType,
+  isUnionType,
+  isEnumType,
+  isInputObjectType,
+  isListType,
+  isNonNullType,
+  isInputType,
+  isOutputType,
+  isLeafType,
+  isCompositeType,
+  isAbstractType,
+  isWrappingType,
+  isNullableType,
+  isNamedType,
+  isRequiredArgument,
+  isRequiredInputField,
+  assertType,
+  assertScalarType,
+  assertObjectType,
+  assertUnionType,
+  assertListType,
+  assertNonNullType,
+  assertLeafType,
+  assertCompositeType,
+  assertAbstractType,
+  assertWrappingType,
+  assertNullableType,
+  assertNamedType,
+  getNullableType,
+  getNamedType,
+  GraphQLScalarType,
+  GraphQLList,
+  GraphQLNonNull,
+} from './definition';
 
 export type {
   GraphQLType,

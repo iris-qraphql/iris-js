@@ -19,6 +19,7 @@ import type {
   IrisDataType,
 } from './definition';
 import {
+  isDataType,
   isEnumType,
   isInputObjectType,
   isInputType,
@@ -227,14 +228,9 @@ function validateTypes(context: SchemaValidationContext): void {
     } else if (isUnionType(type)) {
       // Ensure Unions include valid member types.
       validateUnionMembers(context, type);
-    } else if (isEnumType(type)) {
-      // Ensure Enums have valid values.
-      validateEnumValues(context, type);
-    } else if (isInputObjectType(type)) {
-      // Ensure Input Object fields are valid.
-      validateInputFields(context, type);
-
-      // Ensure Input Objects do not contain non-nullable circular references
+    }
+    if (isDataType(type)) {
+      validateDataType(context, type);
       validateInputObjectCircularRefs(type);
     }
   }
@@ -394,6 +390,17 @@ function validateUnionMembers(
   }
 }
 
+const validateDataType = (
+  context: SchemaValidationContext,
+  type: IrisDataType,
+): void => {
+  if (isEnumType(type)) {
+    // Ensure Enums have valid values.
+    return validateEnumValues(context, type);
+  }
+  return validateInputFields(context, type);
+};
+
 function validateEnumValues(
   context: SchemaValidationContext,
   enumType: IrisDataType,
@@ -499,7 +506,6 @@ function getResolverVariantNames(
   typeName: string,
 ): Maybe<ReadonlyArray<NameNode>> {
   const { astNode } = union;
-  // @ts-expect-error
   const nodes: ReadonlyArray<ResolverTypeDefinitionNode> =
     astNode != null ? [astNode] : [];
 

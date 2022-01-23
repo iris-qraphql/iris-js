@@ -1,11 +1,7 @@
 import { parse } from '../../language/parser';
 
-import type {
-  GraphQLObjectType} from '../../type/definition';
-import {
-  GraphQLList,
-  GraphQLNonNull
-} from '../../type/definition';
+import type { GraphQLObjectType } from '../../type/definition';
+import { GraphQLList, GraphQLNonNull } from '../../type/definition';
 import { gqlObject } from '../../type/make';
 import {
   GraphQLBoolean,

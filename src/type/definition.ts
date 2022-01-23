@@ -22,7 +22,6 @@ import type {
   FieldNode,
   FragmentDefinitionNode,
   InputValueDefinitionNode,
-  ObjectTypeDefinitionNode,
   OperationDefinitionNode,
   ResolverTypeDefinitionNode,
   ScalarTypeDefinitionNode,
@@ -685,7 +684,7 @@ export type GraphQLUnionTypeConfig<TSource, TContext> = {
   // union
   types?: ThunkReadonlyArray<GraphQLObjectType>;
   resolveType?: Maybe<GraphQLTypeResolver<TSource, TContext>>;
-  astNode?: Maybe<ResolverTypeDefinitionNode | ObjectTypeDefinitionNode>;
+  astNode?: Maybe<ResolverTypeDefinitionNode >;
   // object
   fields?: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>;
   isTypeOf?: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
@@ -695,33 +694,32 @@ export class IrisResolverType<TSource = any, TContext = any> {
   name: string;
   description: Maybe<string>;
   resolveType: Maybe<GraphQLTypeResolver<any, any>>;
-  astNode: Maybe<ResolverTypeDefinitionNode | ObjectTypeDefinitionNode>;
+  astNode: Maybe<ResolverTypeDefinitionNode>;
   isTypeOf: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
 
-  private _types?: ThunkReadonlyArray<GraphQLObjectType>;
-  private _fields?: ThunkObjMap<GraphQLField<TSource, TContext>>;
+  private _types: ThunkReadonlyArray<GraphQLObjectType>;
+  private _fields: ThunkObjMap<GraphQLField<TSource, TContext>>;
   private _isVariantType: boolean;
 
   constructor(config: Readonly<GraphQLUnionTypeConfig<any, any>>) {
     this.name = assertName(config.name);
     this.description = config.description;
     this.astNode = config.astNode;
-    this._isVariantType = config.fields !== undefined
+    this._isVariantType = config.fields !== undefined;
+    // OBJECT
+    this.isTypeOf = config.isTypeOf;
+    this._fields = () => defineFieldMap(config ?? {});
 
-    if (this._isVariantType) {
-      this.isTypeOf = config.isTypeOf;
-
-      this._fields = () => defineFieldMap(config);
-      devAssert(
-        config.isTypeOf == null || typeof config.isTypeOf === 'function',
-        `${this.name} must provide "isTypeOf" as a function, ` +
-          `but got: ${inspect(config.isTypeOf)}.`,
-      );
-      return;
-    }
-    
-    this.resolveType = config.resolveType;
+    // UNION
     this._types = () => resolveThunk(config.types ?? []);
+    this.resolveType = config.resolveType;
+
+    devAssert(
+      config.isTypeOf == null || typeof config.isTypeOf === 'function',
+      `${this.name} must provide "isTypeOf" as a function, ` +
+        `but got: ${inspect(config.isTypeOf)}.`,
+    );
+
     devAssert(
       config.resolveType == null || typeof config.resolveType === 'function',
       `${this.name} must provide "resolveType" as a function, ` +
@@ -739,14 +737,14 @@ export class IrisResolverType<TSource = any, TContext = any> {
     if (typeof this._fields === 'function') {
       this._fields = this._fields();
     }
-    return this._fields ?? {};
+    return this._fields;
   }
 
   getTypes(): ReadonlyArray<GraphQLObjectType> {
     if (typeof this._types === 'function') {
       this._types = this._types();
     }
-    return this._types ?? [];
+    return this._types;
   }
 
   toString(): string {

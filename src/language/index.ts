@@ -72,7 +72,6 @@ export type {
   OperationTypeDefinitionNode,
   TypeDefinitionNode,
   ScalarTypeDefinitionNode,
-  ObjectTypeDefinitionNode,
   FieldDefinitionNode,
   InputValueDefinitionNode,
   ResolverTypeDefinitionNode,

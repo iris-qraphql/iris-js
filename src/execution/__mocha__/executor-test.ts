@@ -14,13 +14,12 @@ import {
   GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
-  IrisResolverType,
 } from '../../type/definition';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
 import { execute, executeSync } from '../execute';
-import { gqlObject } from '../../type/make';
+import { gqlObject, gqlUnion } from '../../type/make';
 
 describe('Execute: Handles basic execution tasks', () => {
   it('throws if no document is provided', () => {
@@ -296,7 +295,7 @@ describe('Execute: Handles basic execution tasks', () => {
         },
       },
     });
-    const someUnion = new IrisResolverType({
+    const someUnion = gqlUnion({
       name: 'SomeUnion',
       types: [someObject],
       resolveType() {
