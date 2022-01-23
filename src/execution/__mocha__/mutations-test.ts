@@ -6,7 +6,7 @@ import { resolveOnNextTick } from '../../__testUtils__/resolveOnNextTick';
 
 import { parse } from '../../language/parser';
 
-import { GraphQLObjectType } from '../../type/definition';
+import { gqlObject } from '../../type/make';;
 import { GraphQLInt } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 

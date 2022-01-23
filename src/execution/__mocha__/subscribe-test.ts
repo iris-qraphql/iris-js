@@ -9,13 +9,14 @@ import { isAsyncIterable } from '../../jsutils/isAsyncIterable';
 
 import { parse } from '../../language/parser';
 
-import { GraphQLList, GraphQLObjectType } from '../../type/definition';
+import { GraphQLList } from '../../type/definition';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
 import { createSourceEventStream, subscribe } from '../subscribe';
 
 import { SimplePubSub } from './simplePubSub';
+import { gqlObject } from '../../type/make';
 
 interface Email {
   from: string;

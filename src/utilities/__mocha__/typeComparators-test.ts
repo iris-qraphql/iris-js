@@ -5,9 +5,9 @@ import type { GraphQLFieldConfigMap } from '../../type/definition';
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
   IrisResolverType,
 } from '../../type/definition';
+import { gqlObject } from '../../type/make';
 import { GraphQLFloat, GraphQLInt, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 

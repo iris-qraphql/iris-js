@@ -8,6 +8,7 @@ import {
   GraphQLObjectType,
   IrisResolverType,
 } from '../../type/definition';
+import { gqlObject } from '../../type/make';
 import { GraphQLBoolean, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
