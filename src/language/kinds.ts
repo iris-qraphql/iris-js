@@ -44,7 +44,6 @@ export enum Kind {
 
   /** Type Definitions */
   SCALAR_TYPE_DEFINITION = 'ScalarTypeDefinition',
-  OBJECT_TYPE_DEFINITION = 'ObjectTypeDefinition',
   FIELD_DEFINITION = 'FieldDefinition',
   INPUT_VALUE_DEFINITION = 'InputValueDefinition',
   RESOLVER_TYPE_DEFINITION = 'ResolverTypeDefinition',

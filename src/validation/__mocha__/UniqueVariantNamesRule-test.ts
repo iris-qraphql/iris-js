@@ -59,7 +59,7 @@ describe('Validate: Unique variant value names', () => {
 
 describe('Validate: Unique Resolver variants', () => {
   it('rejects a Union type with duplicated member type', () => {
-    const schema = buildSchema(`
+    expectSDLErrors(`
       resolver Query = {
         test: BadUnion
       }
@@ -76,11 +76,9 @@ describe('Validate: Unique Resolver variants', () => {
         = TypeA
         | TypeB
         | TypeA
-    `);
-
-    expectSDLErrors(schema).toDeepEqual([
+    `).toDeepEqual([
       {
-        message: 'Union type BadUnion can only include type TypeA once.',
+        message: 'Variant "BadUnion.TypeA" can only be defined once.',
         locations: [
           { line: 15, column: 11 },
           { line: 17, column: 11 },

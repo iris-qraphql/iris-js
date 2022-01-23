@@ -281,8 +281,8 @@ describe('toString', () => {
       ),
     );
     const opA = docA.definitions[0];
-    invariant(opA.kind === Kind.OBJECT_TYPE_DEFINITION && opA.fields);
-    const fieldA = opA.fields[0];
+    invariant(opA.kind === Kind.RESOLVER_TYPE_DEFINITION && opA.variants?.[0]?.fields);
+    const fieldA = opA.variants?.[0]?.fields[0]
 
     const docB = parse(
       new Source(
@@ -295,8 +295,8 @@ describe('toString', () => {
       ),
     );
     const opB = docB.definitions[0];
-    invariant(opB.kind === Kind.OBJECT_TYPE_DEFINITION && opB.fields);
-    const fieldB = opB.fields[0];
+    invariant(opB.kind === Kind.RESOLVER_TYPE_DEFINITION && opB.variants?.[0]?.fields);
+    const fieldB = opB.variants?.[0]?.fields[0]
 
     const error = new GraphQLError('Example error with two nodes', [
       fieldA.type,
