@@ -297,38 +297,6 @@ describe('Type System: Union types must be valid', () => {
     expectedJSON(schema, []);
   });
 
-  it('rejects a Union type with duplicated member type', () => {
-    const schema = buildSchema(`
-      resolver Query = {
-        test: BadUnion
-      }
-
-      resolver TypeA = {
-        field: String
-      }
-
-      resolver TypeB = {
-        field: String
-      }
-
-      resolver BadUnion 
-        = TypeA
-        | TypeB
-        | TypeA
-    `);
-
-
-    expectedJSON(schema, [
-      {
-        message: 'Union type BadUnion can only include type TypeA once.',
-        locations: [
-          { line: 15, column: 11 },
-          { line: 17, column: 11 },
-        ],
-      },
-    ]);
-  });
-
   it('rejects a Union type with non-Object members types', () => {
     const schema = buildSchema(`
       resolver Query = {

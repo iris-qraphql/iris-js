@@ -266,7 +266,8 @@ export function extendSchemaImpl(
       case Kind.RESOLVER_TYPE_DEFINITION: {
         if (
           astNode.variants.length === 1 &&
-          astNode.variants[0].name.value === name
+          astNode.variants[0].name.value === name &&
+          astNode.variants[0].fields !== undefined
         ) {
           return new IrisResolverType({
             name,

@@ -56,3 +56,36 @@ describe('Validate: Unique variant value names', () => {
     ]);
   });
 });
+
+describe('Validate: Unique Resolver variants', () => {
+  it('rejects a Union type with duplicated member type', () => {
+    const schema = buildSchema(`
+      resolver Query = {
+        test: BadUnion
+      }
+  
+      resolver TypeA = {
+        field: String
+      }
+  
+      resolver TypeB = {
+        field: String
+      }
+  
+      resolver BadUnion 
+        = TypeA
+        | TypeB
+        | TypeA
+    `);
+
+    expectSDLErrors(schema).toDeepEqual([
+      {
+        message: 'Union type BadUnion can only include type TypeA once.',
+        locations: [
+          { line: 15, column: 11 },
+          { line: 17, column: 11 },
+        ],
+      },
+    ]);
+  });
+});
