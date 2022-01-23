@@ -45,14 +45,12 @@ import type { GraphQLSchema } from './schema';
  */
 export type GraphQLType =
   | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLUnionType
+  | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLType>
   | GraphQLNonNull<
       | GraphQLScalarType
-      | GraphQLObjectType
-      | GraphQLUnionType
+      | IrisResolverType
       | IrisDataType
       | GraphQLList<GraphQLType>
     >;
@@ -81,13 +79,6 @@ export function isScalarType(type: unknown): type is GraphQLScalarType {
   return instanceOf(type, GraphQLScalarType);
 }
 
-export function assertScalarType(type: unknown): GraphQLScalarType {
-  if (!isScalarType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Scalar type.`);
-  }
-  return type;
-}
-
 export function isResolverType(type: unknown): type is IrisResolverType {
   return instanceOf(type, IrisResolverType);
 }
@@ -99,29 +90,8 @@ export function isUnionType(type: unknown): type is IrisResolverType {
   return isResolverType(type) && !type.isVariantType();
 }
 
-export function assertObjectType(type: unknown): GraphQLObjectType {
-  if (!isObjectType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Object type.`);
-  }
-  return type;
-}
-
-export function assertUnionType(type: unknown): GraphQLUnionType {
-  if (!isUnionType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Union type.`);
-  }
-  return type;
-}
-
 export function isDataType(type: unknown): type is IrisDataType {
   return instanceOf(type, IrisDataType);
-}
-
-export function assertDataType(type: unknown): IrisDataType {
-  if (!isDataType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL Enum type.`);
-  }
-  return type;
 }
 
 export function isEnumType(type: unknown): type is IrisDataType {
@@ -131,6 +101,26 @@ export function isEnumType(type: unknown): type is IrisDataType {
 export function isInputObjectType(type: unknown): type is IrisDataType {
   return isDataType(type) && type.isVariantType();
 }
+
+
+
+export const assertBy =
+  <T>(kind: string, f: (type: unknown) => type is T) =>
+  (type: unknown): T => {
+    if (!f(type)) {
+      throw new Error(
+        `Expected ${inspect(type)} to be a GraphQL ${kind} type.`,
+      );
+    }
+    return type;
+  };
+
+export const assertCompositeType = assertBy('Resolver', isResolverType)
+export const assertResolverType = assertBy('Resolver', isResolverType)
+export const assertObjectType = assertBy('Object', isObjectType);
+export const assertUnionType = assertBy('Union', isUnionType);
+export const assertDataType = assertBy('Data', isDataType);
+export const assertScalarType = assertBy('Scalar', isScalarType);
 
 export function isListType(
   type: GraphQLInputType,
@@ -190,14 +180,12 @@ export function isInputType(type: unknown): type is GraphQLInputType {
 
 export type GraphQLOutputType =
   | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLUnionType
+  | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLOutputType>
   | GraphQLNonNull<
       | GraphQLScalarType
-      | GraphQLObjectType
-      | GraphQLUnionType
+      | IrisResolverType
       | IrisDataType
       | GraphQLList<GraphQLOutputType>
     >;
@@ -227,20 +215,13 @@ export function assertLeafType(type: unknown): GraphQLLeafType {
 /**
  * These types may describe the parent context of a selection set.
  */
-export type GraphQLCompositeType = GraphQLObjectType | GraphQLUnionType;
+export type GraphQLCompositeType = IrisResolverType;
 
 export function isCompositeType(type: unknown): type is GraphQLCompositeType {
-  return isObjectType(type) || isUnionType(type);
+  return isResolverType(type);
 }
 
-export function assertCompositeType(type: unknown): GraphQLCompositeType {
-  if (!isCompositeType(type)) {
-    throw new Error(
-      `Expected ${inspect(type)} to be a GraphQL composite type.`,
-    );
-  }
-  return type;
-}
+
 
 export const isAbstractType = (type: unknown): type is IrisResolverType =>
   isUnionType(type);
@@ -326,8 +307,7 @@ export function assertWrappingType(type: unknown): GraphQLWrappingType {
  */
 export type GraphQLNullableType =
   | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLUnionType
+  | IrisResolverType
   | IrisDataType
   | GraphQLList<GraphQLType>;
 
@@ -366,18 +346,11 @@ export type GraphQLNamedInputType = GraphQLScalarType | IrisDataType;
 
 export type GraphQLNamedOutputType =
   | GraphQLScalarType
-  | GraphQLObjectType
-  | GraphQLUnionType
+  | IrisResolverType
   | IrisDataType;
 
 export function isNamedType(type: unknown): type is GraphQLNamedType {
-  return (
-    isScalarType(type) ||
-    isObjectType(type) ||
-    isUnionType(type) ||
-    isEnumType(type) ||
-    isInputObjectType(type)
-  );
+  return isScalarType(type) || isResolverType(type) || isDataType(type);
 }
 
 export function assertNamedType(type: unknown): GraphQLNamedType {
@@ -505,13 +478,8 @@ export interface GraphQLScalarTypeConfig<TInternal, TExternal> {
   astNode?: Maybe<ScalarTypeDefinitionNode>;
 }
 
-export type GraphQLObjectTypeExtensions<
-  _TSource = any,
-  _TContext = any,
-> = Record<string, unknown>;
-
 function defineFieldMap<TSource, TContext>(
-  config: Readonly<GraphQLObjectTypeConfig<TSource, TContext>>,
+  config: Readonly<IrisResolverTypeConfig<TSource, TContext>>,
 ): GraphQLFieldMap<TSource, TContext> {
   const fieldMap = resolveThunk(config.fields);
   devAssert(
@@ -608,7 +576,7 @@ export interface GraphQLResolveInfo {
   readonly fieldName: string;
   readonly fieldNodes: ReadonlyArray<FieldNode>;
   readonly returnType: GraphQLOutputType;
-  readonly parentType: GraphQLObjectType;
+  readonly parentType: IrisResolverType;
   readonly path: Path;
   readonly schema: GraphQLSchema;
   readonly fragments: ObjMap<FragmentDefinitionNode>;
@@ -669,18 +637,11 @@ export type GraphQLFieldMap<TSource, TContext> = ObjMap<
   GraphQLField<TSource, TContext>
 >;
 
-export type GraphQLUnionType = IrisResolverType;
-export type GraphQLObjectType = IrisResolverType;
-export type GraphQLObjectTypeConfig<Src, Ctx> = GraphQLUnionTypeConfig<
-  Src,
-  Ctx
->;
-
-export type GraphQLUnionTypeConfig<TSource, TContext> = {
+export type IrisResolverTypeConfig<TSource, TContext> = {
   name: string;
   description?: Maybe<string>;
   // union
-  types?: ThunkReadonlyArray<GraphQLObjectType>;
+  types?: ThunkReadonlyArray<IrisResolverType>;
   resolveType?: Maybe<GraphQLTypeResolver<TSource, TContext>>;
   astNode?: Maybe<ResolverTypeDefinitionNode>;
   // object
@@ -695,11 +656,11 @@ export class IrisResolverType<TSource = any, TContext = any> {
   astNode: Maybe<ResolverTypeDefinitionNode>;
   isTypeOf: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
 
-  private _types: ThunkReadonlyArray<GraphQLObjectType>;
+  private _types: ThunkReadonlyArray<IrisResolverType>;
   private _fields: ThunkObjMap<GraphQLField<TSource, TContext>>;
   private _isVariantType: boolean;
 
-  constructor(config: Readonly<GraphQLUnionTypeConfig<any, any>>) {
+  constructor(config: Readonly<IrisResolverTypeConfig<any, any>>) {
     this.name = assertName(config.name);
     this.description = config.description;
     this.astNode = config.astNode;
@@ -738,7 +699,7 @@ export class IrisResolverType<TSource = any, TContext = any> {
     return this._fields;
   }
 
-  getTypes(): ReadonlyArray<GraphQLObjectType> {
+  getTypes(): ReadonlyArray<IrisResolverType> {
     if (typeof this._types === 'function') {
       this._types = this._types();
     }
@@ -753,8 +714,6 @@ export class IrisResolverType<TSource = any, TContext = any> {
     return this.toString();
   }
 }
-
-export type IrisDataVariantFieldFields = ObjMap<IrisDataVariantField>;
 
 export type GraphQLInputField = {
   name: string;

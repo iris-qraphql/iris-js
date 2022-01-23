@@ -5,7 +5,7 @@ import type {
   OperationTypeDefinitionNode,
 } from '../language/ast';
 
-import type { GraphQLObjectType } from '../type/definition';
+import type { IrisResolverType } from '../type/definition';
 import type { GraphQLSchema } from '../type/schema';
 
 /**
@@ -16,7 +16,7 @@ import type { GraphQLSchema } from '../type/schema';
 export function getOperationRootType(
   schema: GraphQLSchema,
   operation: OperationDefinitionNode | OperationTypeDefinitionNode,
-): GraphQLObjectType {
+): IrisResolverType {
   if (operation.operation === 'query') {
     const queryType = schema.getQueryType();
     if (!queryType) {

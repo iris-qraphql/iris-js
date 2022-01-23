@@ -12,7 +12,7 @@ import { parse } from '../../language/parser';
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLObjectType,
+  IrisResolverType,
   GraphQLScalarType,
 } from '../../type/definition';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../../type/scalars';
@@ -94,7 +94,7 @@ describe('Execute: Handles basic execution tasks', () => {
       return Promise.resolve(data);
     }
 
-    const DataType: GraphQLObjectType = gqlObject({
+    const DataType: IrisResolverType = gqlObject({
       name: 'DataType',
       fields: () => ({
         a: { type: GraphQLString },
@@ -185,7 +185,7 @@ describe('Execute: Handles basic execution tasks', () => {
   });
 
   it('merges parallel fragments', () => {
-    const Type: GraphQLObjectType = gqlObject({
+    const Type: IrisResolverType = gqlObject({
       name: 'Type',
       fields: () => ({
         a: { type: GraphQLString, resolve: () => 'Apple' },
@@ -624,7 +624,7 @@ describe('Execute: Handles basic execution tasks', () => {
   });
 
   it('Full response path is included for non-nullable fields', () => {
-    const A: GraphQLObjectType = gqlObject({
+    const A: IrisResolverType = gqlObject({
       name: 'A',
       fields: () => ({
         nullableA: {

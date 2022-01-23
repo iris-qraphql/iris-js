@@ -8,8 +8,8 @@ import type { FieldNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
 import type {
-  GraphQLObjectType,
   GraphQLOutputType,
+  IrisResolverType,
 } from '../../type/definition';
 import { isAbstractType, isObjectType } from '../../type/definition';
 import type { GraphQLSchema } from '../../type/schema';
@@ -77,7 +77,7 @@ function getSuggestedTypeNames(
     return [];
   }
 
-  const suggestedTypes: Set<GraphQLObjectType> = new Set();
+  const suggestedTypes: Set<IrisResolverType> = new Set();
   const usageCount = Object.create(null);
   for (const possibleType of schema.getPossibleTypes(type)) {
     if (!possibleType.getFields()[fieldName]) {

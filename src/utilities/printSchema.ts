@@ -12,12 +12,11 @@ import type {
   GraphQLFieldMap,
   GraphQLInputField,
   GraphQLNamedType,
-  GraphQLObjectType,
   GraphQLScalarType,
-  GraphQLUnionType,
   IrisDataType,
   IrisDataVariant,
   IrisDataVariantField,
+  IrisResolverType,
 } from '../type/definition';
 import { isDataType, isResolverType, isScalarType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
@@ -84,7 +83,7 @@ function printScalar(type: GraphQLScalarType): string {
   );
 }
 
-function printObject(type: GraphQLObjectType): string {
+function printObject(type: IrisResolverType): string {
   const fields = type.getFields();
   return (
     printDescription(type) +
@@ -94,7 +93,7 @@ function printObject(type: GraphQLObjectType): string {
   );
 }
 
-function printUnion(type: GraphQLUnionType): string {
+function printUnion(type: IrisResolverType): string {
   const types = type.getTypes();
   const possibleTypes = types.length ? ' = ' + types.join(' | ') : '';
   return printDescription(type) + 'resolver ' + type.name + possibleTypes;

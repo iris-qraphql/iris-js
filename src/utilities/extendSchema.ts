@@ -1,5 +1,6 @@
 import { keyMap } from '../jsutils/keyMap';
 import type { Maybe } from '../jsutils/Maybe';
+import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
   DirectiveDefinitionNode,
@@ -21,9 +22,8 @@ import type {
   GraphQLFieldConfigArgumentMap,
   GraphQLFieldConfigMap,
   GraphQLNamedType,
-  GraphQLObjectType,
   GraphQLType,
-  IrisDataVariantFieldFields,
+  IrisDataVariantField,
 } from '../type/definition';
 import {
   GraphQLList,
@@ -225,7 +225,7 @@ export function extendSchemaImpl(
 
   function buildInputFieldMap(
     fields: ReadonlyArray<InputValueDefinitionNode>,
-  ): IrisDataVariantFieldFields {
+  ): ObjMap<IrisDataVariantField> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
       return [
@@ -245,7 +245,7 @@ export function extendSchemaImpl(
 
   function getVariantType(
     node: ResolverVariantDefinitionNode,
-  ): GraphQLObjectType {
+  ): IrisResolverType {
     // FIXME: real variant types
     const name = node.name.value;
 

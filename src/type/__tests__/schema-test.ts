@@ -4,7 +4,7 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { printSchema } from '../../utilities/printSchema';
 
-import type { GraphQLObjectType } from '../definition';
+import type { IrisResolverType } from '../definition';
 import { GraphQLList, GraphQLScalarType } from '../definition';
 import { GraphQLDirective } from '../directives';
 import { emptyDataType, gqlInput, gqlObject } from '../make';
@@ -22,7 +22,7 @@ describe('Type System: Schema', () => {
       },
     });
 
-    const BlogAuthor: GraphQLObjectType = gqlObject({
+    const BlogAuthor: IrisResolverType = gqlObject({
       name: 'Author',
       fields: () => ({
         id: { type: GraphQLString },
@@ -35,7 +35,7 @@ describe('Type System: Schema', () => {
       }),
     });
 
-    const BlogArticle: GraphQLObjectType = gqlObject({
+    const BlogArticle: IrisResolverType = gqlObject({
       name: 'Article',
       fields: {
         id: { type: GraphQLString },

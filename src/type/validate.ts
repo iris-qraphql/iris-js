@@ -11,11 +11,8 @@ import type {
 } from '../language/ast';
 import { OperationTypeNode } from '../language/ast';
 
-// import { isEqualType, isTypeSubTypeOf } from '../utilities/typeComparators';
 import type {
   GraphQLInputField,
-  GraphQLObjectType,
-  GraphQLUnionType,
   IrisDataType,
   IrisResolverType,
 } from './definition';
@@ -246,7 +243,7 @@ const validateResolverType = (
 
 function validateFields(
   context: SchemaValidationContext,
-  type: GraphQLObjectType,
+  type: IrisResolverType,
 ): void {
   const fields = Object.values(type.getFields());
 
@@ -289,85 +286,9 @@ function validateFields(
   }
 }
 
-// function validateTypeImplementsInterface(
-//   context: SchemaValidationContext,
-//   type: GraphQLObjectType,
-//   iface: GraphQLObjectType,
-// ): void {
-//   const typeFieldMap = type.getFields();
-
-//   // Assert each interface field is implemented.
-//   for (const ifaceField of Object.values(iface.getFields())) {
-//     const fieldName = ifaceField.name;
-//     const typeField = typeFieldMap[fieldName];
-
-//     // Assert interface field exists on type.
-//     if (!typeField) {
-//       context.reportError(
-//         `Interface field ${iface.name}.${fieldName} expected but ${type.name} does not provide it.`,
-//         [ifaceField.astNode, type.astNode],
-//       );
-//       continue;
-//     }
-
-//     // Assert interface field type is satisfied by type field type, by being
-//     // a valid subtype. (covariant)
-//     if (!isTypeSubTypeOf(context.schema, typeField.type, ifaceField.type)) {
-//       context.reportError(
-//         `Interface field ${iface.name}.${fieldName} expects type ` +
-//           `${inspect(ifaceField.type)} but ${type.name}.${fieldName} ` +
-//           `is type ${inspect(typeField.type)}.`,
-//         [ifaceField.astNode?.type, typeField.astNode?.type],
-//       );
-//     }
-
-//     // Assert each interface field arg is implemented.
-//     for (const ifaceArg of ifaceField.args) {
-//       const argName = ifaceArg.name;
-//       const typeArg = typeField.args.find((arg) => arg.name === argName);
-
-//       // Assert interface field arg exists on object field.
-//       if (!typeArg) {
-//         context.reportError(
-//           `Interface field argument ${iface.name}.${fieldName}(${argName}:) expected but ${type.name}.${fieldName} does not provide it.`,
-//           [ifaceArg.astNode, typeField.astNode],
-//         );
-//         continue;
-//       }
-
-//       // Assert interface field arg type matches object field arg type.
-//       // (invariant)
-//       // TODO: change to contravariant?
-//       if (!isEqualType(ifaceArg.type, typeArg.type)) {
-//         context.reportError(
-//           `Interface field argument ${iface.name}.${fieldName}(${argName}:) ` +
-//             `expects type ${inspect(ifaceArg.type)} but ` +
-//             `${type.name}.${fieldName}(${argName}:) is type ` +
-//             `${inspect(typeArg.type)}.`,
-//           [ifaceArg.astNode?.type, typeArg.astNode?.type],
-//         );
-//       }
-
-//       // TODO: validate default values?
-//     }
-
-//     // Assert additional arguments must not be required.
-//     for (const typeArg of typeField.args) {
-//       const argName = typeArg.name;
-//       const ifaceArg = ifaceField.args.find((arg) => arg.name === argName);
-//       if (!ifaceArg && isRequiredArgument(typeArg)) {
-//         context.reportError(
-//           `Object field ${type.name}.${fieldName} includes required argument ${argName} that is missing from the Interface field ${iface.name}.${fieldName}.`,
-//           [typeArg.astNode, ifaceField.astNode],
-//         );
-//       }
-//     }
-//   }
-// }
-
 function validateUnionMembers(
   context: SchemaValidationContext,
-  adt: GraphQLUnionType,
+  adt: IrisResolverType,
 ): void {
   const listedMembers: Record<string, boolean> = {};
 
@@ -501,7 +422,7 @@ function createInputObjectCircularRefsValidator(
 }
 
 function getResolverVariantNames(
-  union: GraphQLUnionType,
+  union: IrisResolverType,
   typeName: string,
 ): Maybe<ReadonlyArray<NameNode>> {
   const { astNode } = union;

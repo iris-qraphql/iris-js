@@ -10,8 +10,6 @@ export {
 } from './schema';
 export type { GraphQLSchemaConfig, GraphQLSchemaExtensions } from './schema';
 
-export type { GraphQLUnionType } from './definition';
-export type { GraphQLObjectType } from './definition';
 export {
   isType,
   isScalarType,
@@ -73,14 +71,10 @@ export type {
   GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLInputField,
-  IrisDataVariantFieldFields,
   GraphQLIsTypeOfFn,
-  GraphQLObjectTypeConfig,
-  GraphQLObjectTypeExtensions,
   GraphQLResolveInfo,
   GraphQLScalarTypeConfig,
   GraphQLTypeResolver,
-  GraphQLUnionTypeConfig,
   GraphQLScalarSerializer,
   GraphQLScalarValueParser,
   GraphQLScalarLiteralParser,

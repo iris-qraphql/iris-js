@@ -33,8 +33,6 @@ export { version, versionInfo } from './version';
 export type { GraphQLArgs } from './iris';
 export { graphql, graphqlSync } from './iris';
 
-export type { GraphQLUnionType } from './type/index';
-export type { GraphQLObjectType } from './type/index';
 export {
   GraphQLSchema,
   GraphQLDirective,
@@ -139,15 +137,11 @@ export type {
   GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLInputField,
-  IrisDataVariantFieldFields,
   GraphQLIsTypeOfFn,
-  GraphQLObjectTypeConfig,
-  GraphQLObjectTypeExtensions,
   GraphQLResolveInfo,
   ResponsePath,
   GraphQLScalarTypeConfig,
   GraphQLTypeResolver,
-  GraphQLUnionTypeConfig,
   GraphQLScalarSerializer,
   GraphQLScalarValueParser,
   GraphQLScalarLiteralParser,

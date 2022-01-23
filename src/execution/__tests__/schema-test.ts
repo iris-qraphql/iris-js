@@ -1,6 +1,6 @@
 import { parse } from '../../language/parser';
 
-import type { GraphQLObjectType } from '../../type/definition';
+import type { IrisResolverType } from '../../type/definition';
 import { GraphQLList, GraphQLNonNull } from '../../type/definition';
 import { gqlObject } from '../../type/make';
 import {
@@ -24,7 +24,7 @@ describe('Execute: Handles execution with a complex schema', () => {
       },
     });
 
-    const BlogAuthor: GraphQLObjectType = gqlObject({
+    const BlogAuthor: IrisResolverType = gqlObject({
       name: 'Author',
       fields: () => ({
         id: { type: GraphQLString },

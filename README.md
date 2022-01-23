@@ -35,12 +35,12 @@ First, build a GraphQL type schema which maps to your codebase.
 ```js
 import {
   graphql,
-  GraphQLSchema,
-  GraphQLObjectType,
+  IrisSchema,
+  IrisResolverType,
   GraphQLString,
 } from 'graphql';
 
-var schema = new GraphQLSchema({
+var schema = new IrisSchema({
   query: new IrisResolver({
     name: 'RootQueryType',
     fields: {
