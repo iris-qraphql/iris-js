@@ -1,4 +1,4 @@
-import type { GraphQLCompositeType, GraphQLType } from '../type/definition';
+import type { GraphQLType, IrisResolverType } from '../type/definition';
 import {
   isAbstractType,
   isListType,
@@ -88,8 +88,8 @@ export function isTypeSubTypeOf(
  */
 export function doTypesOverlap(
   schema: GraphQLSchema,
-  typeA: GraphQLCompositeType,
-  typeB: GraphQLCompositeType,
+  typeA: IrisResolverType,
+  typeB: IrisResolverType,
 ): boolean {
   // Equivalent types overlap
   if (typeA === typeB) {

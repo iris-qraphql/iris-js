@@ -5,8 +5,8 @@ import { GraphQLError } from '../../error/GraphQLError';
 
 import type { ASTVisitor } from '../../language/visitor';
 
-import type { GraphQLCompositeType } from '../../type/definition';
-import { isCompositeType } from '../../type/definition';
+import type { IrisResolverType } from '../../type/definition';
+import { isResolverType } from '../../type/definition';
 
 import { doTypesOverlap } from '../../utilities/typeComparators';
 import { typeFromAST } from '../../utilities/typeFromAST';
@@ -28,8 +28,8 @@ export function PossibleFragmentSpreadsRule(
       const fragType = context.getType();
       const parentType = context.getParentType();
       if (
-        isCompositeType(fragType) &&
-        isCompositeType(parentType) &&
+        isResolverType(fragType) &&
+        isResolverType(parentType) &&
         !doTypesOverlap(context.getSchema(), fragType, parentType)
       ) {
         const parentTypeStr = inspect(parentType);
@@ -67,11 +67,11 @@ export function PossibleFragmentSpreadsRule(
 function getFragmentType(
   context: ValidationContext,
   name: string,
-): Maybe<GraphQLCompositeType> {
+): Maybe<IrisResolverType> {
   const frag = context.getFragment(name);
   if (frag) {
     const type = typeFromAST(context.getSchema(), frag.typeCondition);
-    if (isCompositeType(type)) {
+    if (isResolverType(type)) {
       return type;
     }
   }

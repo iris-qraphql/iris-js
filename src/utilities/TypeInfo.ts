@@ -8,24 +8,24 @@ import { getEnterLeaveForKind } from '../language/visitor';
 
 import type {
   GraphQLArgument,
-  GraphQLCompositeType,
   GraphQLField,
   GraphQLInputField,
   GraphQLInputType,
   GraphQLOutputType,
   GraphQLType,
   IrisDataVariant,
+  IrisResolverType,
 } from '../type/definition';
 import {
   getNamedType,
   getNullableType,
-  isCompositeType,
   isEnumType,
   isInputObjectType,
   isInputType,
   isListType,
   isObjectType,
   isOutputType,
+  isResolverType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import {
@@ -45,7 +45,7 @@ import { typeFromAST } from './typeFromAST';
 export class TypeInfo {
   private _schema: GraphQLSchema;
   private _typeStack: Array<Maybe<GraphQLOutputType>>;
-  private _parentTypeStack: Array<Maybe<GraphQLCompositeType>>;
+  private _parentTypeStack: Array<Maybe<IrisResolverType>>;
   private _inputTypeStack: Array<Maybe<GraphQLInputType>>;
   private _fieldDefStack: Array<Maybe<GraphQLField<unknown, unknown>>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
@@ -79,7 +79,7 @@ export class TypeInfo {
       if (isInputType(initialType)) {
         this._inputTypeStack.push(initialType);
       }
-      if (isCompositeType(initialType)) {
+      if (isResolverType(initialType)) {
         this._parentTypeStack.push(initialType);
       }
       if (isOutputType(initialType)) {
@@ -98,7 +98,7 @@ export class TypeInfo {
     }
   }
 
-  getParentType(): Maybe<GraphQLCompositeType> {
+  getParentType(): Maybe<IrisResolverType> {
     if (this._parentTypeStack.length > 0) {
       return this._parentTypeStack[this._parentTypeStack.length - 1];
     }
@@ -150,7 +150,7 @@ export class TypeInfo {
       case Kind.SELECTION_SET: {
         const namedType: unknown = getNamedType(this.getType());
         this._parentTypeStack.push(
-          isCompositeType(namedType) ? namedType : undefined,
+          isResolverType(namedType) ? namedType : undefined,
         );
         break;
       }
@@ -318,7 +318,7 @@ function getFieldDef(
   if (name === TypeMetaFieldDef.name && schema.getQueryType() === parentType) {
     return TypeMetaFieldDef;
   }
-  if (name === TypeNameMetaFieldDef.name && isCompositeType(parentType)) {
+  if (name === TypeNameMetaFieldDef.name && isResolverType(parentType)) {
     return TypeNameMetaFieldDef;
   }
   if (isObjectType(parentType)) {

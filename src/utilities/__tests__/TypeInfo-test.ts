@@ -4,7 +4,7 @@ import { parse, parseValue } from '../../language/parser';
 import { print } from '../../language/printer';
 import { visit } from '../../language/visitor';
 
-import { getNamedType, isCompositeType } from '../../type/definition';
+import { getNamedType, isResolverType } from '../../type/definition';
 import { GraphQLSchema } from '../../type/schema';
 
 import { buildSchema } from '../buildASTSchema';
@@ -245,7 +245,7 @@ describe('visitWithTypeInfo', () => {
           if (
             node.kind === 'Field' &&
             !node.selectionSet &&
-            isCompositeType(getNamedType(type))
+            isResolverType(getNamedType(type))
           ) {
             return {
               ...node,

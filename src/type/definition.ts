@@ -55,13 +55,11 @@ export type GraphQLType =
     >;
 
 export function isType(type: unknown): type is GraphQLType {
-  return (
-    isScalarType(type) ||
-    isResolverType(type) ||
-    isDataType(type) ||
-    isListType(type) ||
-    isNonNullType(type)
-  );
+  return isNamedType(type) || isListType(type) || isNonNullType(type);
+}
+
+export function isNamedType(type: unknown): type is GraphQLNamedType {
+  return isScalarType(type) || isResolverType(type) || isDataType(type);
 }
 
 export function isScalarType(type: unknown): type is GraphQLScalarType {
@@ -87,12 +85,13 @@ export function isEnumType(type: unknown): type is IrisDataType {
   return isDataType(type) && !type.isVariantType();
 }
 
-export function isLeafType(type: unknown): type is GraphQLLeafType {
-  return isScalarType(type) || isEnumType(type);
-}
+export const isLeafType = (type: unknown): type is GraphQLLeafType =>
+  isScalarType(type) || isEnumType(type);
 
 export const isInputObjectType = (type: unknown): type is IrisDataType =>
   isDataType(type) && type.isVariantType();
+
+export const isAbstractType = isUnionType;
 
 export const assertBy =
   <T>(kind: string, f: (type: unknown) => type is T) =>
@@ -116,6 +115,7 @@ export const assertScalarType = assertBy('Scalar', isScalarType);
 export const assertLeafType = assertBy('leaf', isLeafType);
 export const assertNonNullType = assertBy('Non-Null', isNonNullType);
 export const assertListType = assertBy('List', isListType);
+export const assertAbstractType = assertBy('abstract', isAbstractType);
 
 export function isListType(
   type: GraphQLInputType,
@@ -182,25 +182,6 @@ export function isOutputType(type: unknown): type is GraphQLOutputType {
 
 export type GraphQLLeafType = GraphQLScalarType | IrisDataType;
 
-/**
- * These types may describe the parent context of a selection set.
- */
-export type GraphQLCompositeType = IrisResolverType;
-
-export function isCompositeType(type: unknown): type is IrisResolverType {
-  return isResolverType(type);
-}
-
-export const isAbstractType = (type: unknown): type is IrisResolverType =>
-  isUnionType(type);
-
-export function assertAbstractType(type: unknown): IrisResolverType {
-  if (!isAbstractType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL abstract type.`);
-  }
-  return type;
-}
-
 export class GraphQLList<T extends GraphQLType> {
   readonly ofType: T;
 
@@ -263,13 +244,6 @@ export function isWrappingType(type: unknown): type is GraphQLWrappingType {
   return isListType(type) || isNonNullType(type);
 }
 
-export function assertWrappingType(type: unknown): GraphQLWrappingType {
-  if (!isWrappingType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL wrapping type.`);
-  }
-  return type;
-}
-
 /**
  * These types can all accept null as a value.
  */
@@ -305,17 +279,6 @@ export type GraphQLNamedOutputType =
   | GraphQLScalarType
   | IrisResolverType
   | IrisDataType;
-
-export function isNamedType(type: unknown): type is GraphQLNamedType {
-  return isScalarType(type) || isResolverType(type) || isDataType(type);
-}
-
-export function assertNamedType(type: unknown): GraphQLNamedType {
-  if (!isNamedType(type)) {
-    throw new Error(`Expected ${inspect(type)} to be a GraphQL named type.`);
-  }
-  return type;
-}
 
 export function getNamedType(type: undefined | null): void;
 export function getNamedType(type: GraphQLInputType): GraphQLNamedInputType;
@@ -435,24 +398,18 @@ export interface GraphQLScalarTypeConfig<TInternal, TExternal> {
   astNode?: Maybe<ScalarTypeDefinitionNode>;
 }
 
-function defineFieldMap<TSource, TContext>(
-  config: Readonly<IrisResolverTypeConfig<TSource, TContext>>,
-): GraphQLFieldMap<TSource, TContext> {
-  const fieldMap = resolveThunk(config.fields);
-  devAssert(
-    isPlainObj(fieldMap),
-    `${config.name} fields must be an object with field names as keys or a function which returns such an object.`,
-  );
-
-  // @ts-expect-error
-  return mapValue(fieldMap, (fieldConfig, fieldName) => {
+const defineFieldMap = <TSource, TContext>(
+  typename: string,
+  fields: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>,
+): GraphQLFieldMap<TSource, TContext> =>
+  mapValue(resolveThunk(fields), (fieldConfig, fieldName) => {
     devAssert(
       isPlainObj(fieldConfig),
-      `${config.name}.${fieldName} field config must be an object.`,
+      `${typename}.${fieldName} field config must be an object.`,
     );
     devAssert(
       fieldConfig.resolve == null || typeof fieldConfig.resolve === 'function',
-      `${config.name}.${fieldName} field resolver must be a function if ` +
+      `${typename}.${fieldName} field resolver must be a function if ` +
         `provided, but got: ${inspect(fieldConfig.resolve)}.`,
     );
 
@@ -467,7 +424,6 @@ function defineFieldMap<TSource, TContext>(
       astNode: fieldConfig.astNode,
     };
   });
-}
 
 export const defineArguments = (
   config: GraphQLFieldConfigArgumentMap,
@@ -481,9 +437,8 @@ export const defineArguments = (
     astNode: argConfig.astNode,
   }));
 
-function isPlainObj(obj: unknown): boolean {
-  return isObjectLike(obj) && !Array.isArray(obj);
-}
+const isPlainObj = (obj: unknown): boolean =>
+  isObjectLike(obj) && !Array.isArray(obj);
 
 export type GraphQLTypeResolver<TSource, TContext> = (
   value: TSource,
@@ -558,14 +513,14 @@ export interface GraphQLField<TSource, TContext, TArgs = any> {
   astNode: Maybe<FieldDefinitionNode>;
 }
 
-export interface GraphQLArgument {
+export type GraphQLArgument = {
   name: string;
   description: Maybe<string>;
   type: GraphQLInputType;
   defaultValue: unknown;
   deprecationReason: Maybe<string>;
   astNode: Maybe<InputValueDefinitionNode>;
-}
+};
 
 export function isRequiredArgument(arg: GraphQLArgument): boolean {
   return isNonNullType(arg.type) && arg.defaultValue === undefined;
@@ -575,15 +530,22 @@ export type GraphQLFieldMap<TSource, TContext> = ObjMap<
   GraphQLField<TSource, TContext>
 >;
 
+export type IrisResolverVariantConfig<TSource, TContext> = {
+  name?: string;
+  description?: Maybe<string>;
+  // inline variant
+  fields?: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>;
+  // variant ref
+  type?: () => IrisResolverType;
+};
+
 export type IrisResolverTypeConfig<TSource, TContext> = {
   name: string;
   description?: Maybe<string>;
-  // union
-  types?: ThunkReadonlyArray<IrisResolverType>;
   resolveType?: Maybe<GraphQLTypeResolver<TSource, TContext>>;
+  variants: ReadonlyArray<IrisResolverVariantConfig<TSource, TContext>>;
   astNode?: Maybe<ResolverTypeDefinitionNode>;
-  // object
-  fields?: ThunkObjMap<GraphQLFieldConfig<TSource, TContext>>;
+  // move to variant type
   isTypeOf?: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
 };
 
@@ -594,7 +556,7 @@ export class IrisResolverType<TSource = any, TContext = any> {
   astNode: Maybe<ResolverTypeDefinitionNode>;
   isTypeOf: Maybe<GraphQLIsTypeOfFn<TSource, TContext>>;
 
-  private _types: ThunkReadonlyArray<IrisResolverType>;
+  private _types: () => ReadonlyArray<IrisResolverType>;
   private _fields: ThunkObjMap<GraphQLField<TSource, TContext>>;
   private _isVariantType: boolean;
 
@@ -602,13 +564,22 @@ export class IrisResolverType<TSource = any, TContext = any> {
     this.name = assertName(config.name);
     this.description = config.description;
     this.astNode = config.astNode;
-    this._isVariantType = config.fields !== undefined;
-    // OBJECT
+    this._isVariantType =
+      config.variants.length < 2 &&
+      config.variants[0]?.name === config.name &&
+      config.variants[0]?.fields !== undefined;
+
     this.isTypeOf = config.isTypeOf;
-    this._fields = () => defineFieldMap(config ?? {});
+    this._fields = () =>
+      this._isVariantType
+        ? defineFieldMap(config.name, config.variants[0].fields ?? {})
+        : {};
 
     // UNION
-    this._types = () => resolveThunk(config.types ?? []);
+    this._types = () =>
+      resolveThunk(config.variants ?? []).flatMap((x) =>
+        x.type ? [x.type()] : [],
+      );
     this.resolveType = config.resolveType;
 
     devAssert(
@@ -638,10 +609,7 @@ export class IrisResolverType<TSource = any, TContext = any> {
   }
 
   getTypes(): ReadonlyArray<IrisResolverType> {
-    if (typeof this._types === 'function') {
-      this._types = this._types();
-    }
-    return this._types;
+    return this._types();
   }
 
   toString(): string {

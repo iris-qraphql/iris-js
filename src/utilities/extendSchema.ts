@@ -24,6 +24,7 @@ import type {
   GraphQLNamedType,
   GraphQLType,
   IrisDataVariantField,
+  IrisResolverVariantConfig,
 } from '../type/definition';
 import {
   GraphQLList,
@@ -202,7 +203,6 @@ export function extendSchemaImpl(
   function buildArgumentMap(
     args: Maybe<ReadonlyArray<InputValueDefinitionNode>>,
   ): GraphQLFieldConfigArgumentMap {
-    // FIXME: https://github.com/graphql/graphql-js/issues/2203
     const argsNodes = /* c8 ignore next */ args ?? [];
 
     const argConfigMap = Object.create(null);
@@ -243,44 +243,34 @@ export function extendSchemaImpl(
     return Object.fromEntries(entries);
   }
 
-  function getVariantType(
-    node: ResolverVariantDefinitionNode,
-  ): IrisResolverType {
-    // FIXME: real variant types
-    const name = node.name.value;
+  function buildResolverVariant(
+    variantNode: ResolverVariantDefinitionNode,
+  ): IrisResolverVariantConfig<any, any> {
+    const name = variantNode.name.value;
+    const description = variantNode.description?.value
 
-    const type = stdTypeMap[name] ?? typeMap[name];
-
-    if (type === undefined) {
-      throw new Error(`Unknown variant type: "${name}".`);
+    if(variantNode.fields){
+      return {
+        name,
+        description,
+        fields: () => buildFieldMap(variantNode)
+      }
     }
-
+    
     // @ts-expect-error
-    return type;
+    return {  name, description, type: () => getNamedType(variantNode)};
   }
+
 
   function buildType(astNode: TypeDefinitionNode): GraphQLNamedType {
     const name = astNode.name.value;
 
     switch (astNode.kind) {
       case Kind.RESOLVER_TYPE_DEFINITION: {
-        if (
-          astNode.variants.length === 1 &&
-          astNode.variants[0].name.value === name &&
-          astNode.variants[0].fields !== undefined
-        ) {
-          return new IrisResolverType({
-            name,
-            description: astNode.description?.value,
-            fields: () => buildFieldMap(astNode.variants[0]),
-            astNode: astNode as any,
-          });
-        }
-
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
-          types: () => (astNode.variants ?? []).map(getVariantType),
+          variants: (astNode.variants ?? []).map(buildResolverVariant),
           astNode,
         });
       }

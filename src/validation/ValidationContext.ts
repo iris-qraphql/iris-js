@@ -17,11 +17,11 @@ import { visit } from '../language/visitor';
 
 import type {
   GraphQLArgument,
-  GraphQLCompositeType,
   GraphQLField,
   GraphQLInputType,
   GraphQLOutputType,
   IrisDataVariant,
+  IrisResolverType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import type { GraphQLSchema } from '../type/schema';
@@ -237,7 +237,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getType();
   }
 
-  getParentType(): Maybe<GraphQLCompositeType> {
+  getParentType(): Maybe<IrisResolverType> {
     return this._typeInfo.getParentType();
   }
 
