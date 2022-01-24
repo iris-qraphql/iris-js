@@ -279,24 +279,10 @@ describe('Type predicates', () => {
       expectOutputType(new GraphQLList(ObjectType));
       expectOutputType(new GraphQLList(UnionType));
       expectOutputType(new GraphQLList(EnumType));
-
       expectOutputType(new GraphQLNonNull(GraphQLString));
       expectOutputType(new GraphQLNonNull(ObjectType));
       expectOutputType(new GraphQLNonNull(UnionType));
       expectOutputType(new GraphQLNonNull(EnumType));
-    });
-
-    function expectNonOutputType(type: unknown) {
-      expect(isOutputType(type)).toEqual(false);
-    }
-
-    it('returns false for an data  type', () => {
-      expectNonOutputType(InputObjectType);
-    });
-
-    it('returns false for a wrapped data  type', () => {
-      expectNonOutputType(new GraphQLList(InputObjectType));
-      expectNonOutputType(new GraphQLNonNull(InputObjectType));
     });
   });
 

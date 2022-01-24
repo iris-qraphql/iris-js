@@ -138,11 +138,7 @@ export type GraphQLInputType =
   | GraphQLNonNull<IrisDataType | GraphQLList<GraphQLInputType>>;
 
 export function isInputType(type: unknown): type is GraphQLInputType {
-  return (
-    isScalarType(type) ||
-    isDataType(type) ||
-    (isWrappingType(type) && isInputType(type.ofType))
-  );
+  return isDataType(type) || (isWrappingType(type) && isInputType(type.ofType));
 }
 
 export type GraphQLOutputType =
@@ -155,9 +151,8 @@ export type GraphQLOutputType =
 
 export function isOutputType(type: unknown): type is GraphQLOutputType {
   return (
-    isScalarType(type) ||
     isResolverType(type) ||
-    isEnumType(type) ||
+    isDataType(type) ||
     (isWrappingType(type) && isOutputType(type.ofType))
   );
 }

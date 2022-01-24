@@ -547,43 +547,39 @@ export interface InputValueDefinitionNode {
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
 }
 
-export interface ResolverTypeDefinitionNode {
-  readonly kind: Kind.RESOLVER_TYPE_DEFINITION;
-  readonly loc?: Location;
-  readonly description?: StringValueNode;
-  readonly name: NameNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly variants: ReadonlyArray<ResolverVariantDefinitionNode>;
-}
-
-export type ResolverVariantDefinitionNode = {
-  readonly kind: Kind.VARIANT_DEFINITION;
-  readonly loc?: Location;
-  readonly description?: StringValueNode;
-  readonly name: NameNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly fields?: ReadonlyArray<FieldDefinitionNode>;
-};
-
 export type Role = 'resolver' | 'data';
 
-export interface DataTypeDefinitionNode {
-  readonly kind: Kind.DATA_TYPE_DEFINITION;
+export type DataTypeDefinitionNode = TypeDefinition<
+  Kind.DATA_TYPE_DEFINITION,
+  VariantDefinitionNode
+>;
+
+export type ResolverTypeDefinitionNode = TypeDefinition<
+  Kind.RESOLVER_TYPE_DEFINITION,
+  ResolverVariantDefinitionNode
+>;
+
+type TypeDefinition<K, Variants> = {
+  readonly kind: K;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly variants: ReadonlyArray<VariantDefinitionNode>;
-}
+  readonly variants: ReadonlyArray<Variants>;
+};
 
-export interface VariantDefinitionNode {
+export type VariantDefinition<Fields> = {
   readonly kind: Kind.VARIANT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly name: NameNode;
-  readonly fields?: ReadonlyArray<InputValueDefinitionNode>;
-}
+  readonly fields?: ReadonlyArray<Fields>;
+};
+
+export type VariantDefinitionNode = VariantDefinition<InputValueDefinitionNode>;
+export type ResolverVariantDefinitionNode =
+  VariantDefinition<FieldDefinitionNode>;
 
 /** Directive Definitions */
 

@@ -71,10 +71,6 @@ const outputTypes: ReadonlyArray<GraphQLOutputType> = [
   ...withModifiers(SomeUnionType),
 ];
 
-const notOutputTypes: ReadonlyArray<GraphQLInputType> = [
-  ...withModifiers(SomeInputObjectType),
-];
-
 const inputTypes: ReadonlyArray<GraphQLInputType> = [
   ...withModifiers(GraphQLString),
   ...withModifiers(SomeScalarType),
@@ -578,18 +574,6 @@ describe('Type System: Object fields must have output types', () => {
     });
   }
 
-  for (const type of notOutputTypes) {
-    const typeStr = inspect(type);
-    it(`rejects a non-output type as an Object field type: ${typeStr}`, () => {
-      const schema = schemaWithObjectField({ type });
-      expectedJSON(schema, [
-        {
-          message: `The type of BadObject.badField must be Output Type but got: ${typeStr}.`,
-        },
-      ]);
-    });
-  }
-
   it('rejects a non-type value as an Object field type', () => {
     // @ts-expect-error
     const schema = schemaWithObjectField({ type: Number });
@@ -604,7 +588,7 @@ describe('Type System: Object fields must have output types', () => {
     ]);
   });
 
-  it('rejects with relevant locations for a non-output type as an Object field type', () => {
+  it('accept data as resolver field type', () => {
     const schema = buildSchema(`
       resolver Query = {
         field: [SomeInputObject]
@@ -614,13 +598,7 @@ describe('Type System: Object fields must have output types', () => {
         field: String
       }
     `);
-    expectedJSON(schema, [
-      {
-        message:
-          'The type of Query.field must be Output Type but got: [SomeInputObject].',
-        locations: [{ line: 3, column: 16 }],
-      },
-    ]);
+    expectedJSON(schema, []);
   });
 });
 

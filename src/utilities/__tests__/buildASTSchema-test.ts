@@ -139,7 +139,7 @@ describe('Schema Builder', () => {
       ) on FIELD
 
       """Who knows what inside this scalar?"""
-      scalar MysteryScalar
+      data MysteryScalar = Int
 
       """This is a data  object type"""
       data FooInput {
@@ -336,7 +336,7 @@ describe('Schema Builder', () => {
 
   it('Custom Scalar', () => {
     const sdl = dedent`
-      scalar CustomScalar
+      data CustomScalar = Int
 
       resolver Query = {
         customScalar: CustomScalar
@@ -376,7 +376,7 @@ describe('Schema Builder', () => {
 
   it('Custom scalar argument field with default', () => {
     const sdl = dedent`
-      scalar CustomScalar
+      data CustomScalar = Int
 
       resolver Query = {
         str(int: CustomScalar = 2): String
