@@ -766,7 +766,7 @@ export class Parser {
       variants: [
         {
           kind: Kind.VARIANT_DEFINITION,
-          name: { value: 'Scalar', kind: Kind.NAME },
+          name: { value: 'String', kind: Kind.NAME },
         },
       ],
     });

@@ -29,7 +29,7 @@ import { GraphQLSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
 
 const SomeSchema = buildSchema(`
-  scalar SomeScalar
+  data SomeScalar = Int
 
   resolver SomeObject = { f: SomeObject }
 

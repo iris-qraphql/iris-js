@@ -18,7 +18,6 @@ import type {
 } from './definition';
 import {
   isDataType,
-  isEnumType,
   isInputObjectType,
   isInputType,
   isNamedType,
@@ -314,31 +313,11 @@ const validateDataType = (
   context: SchemaValidationContext,
   type: IrisDataType,
 ): void => {
-  if (isEnumType(type)) {
-    // Ensure Enums have valid values.
-    return validateEnumValues(context, type);
+  if (!type.isVariantType()) {
+    type.getVariants().forEach((enumValue) => validateName(context, enumValue));
   }
   return validateInputFields(context, type);
 };
-
-function validateEnumValues(
-  context: SchemaValidationContext,
-  enumType: IrisDataType,
-): void {
-  const enumValues = enumType.getVariants();
-
-  if (enumValues.length === 0) {
-    context.reportError(
-      `Enum type ${enumType.name} must define one or more values.`,
-      [enumType.astNode],
-    );
-  }
-
-  for (const enumValue of enumValues) {
-    // Ensure valid name.
-    validateName(context, enumValue);
-  }
-}
 
 function validateInputFields(
   context: SchemaValidationContext,

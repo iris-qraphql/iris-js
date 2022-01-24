@@ -12,13 +12,12 @@ import type {
   GraphQLFieldMap,
   GraphQLInputField,
   GraphQLNamedType,
-  GraphQLScalarType,
   IrisDataType,
   IrisDataVariant,
   IrisDataVariantField,
   IrisResolverType,
 } from '../type/definition';
-import { isDataType, isResolverType, isScalarType } from '../type/definition';
+import { isDataType, isResolverType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import {
   DEFAULT_DEPRECATION_REASON,
@@ -63,9 +62,6 @@ function printFilteredSchema(
 }
 
 export function printType(type: GraphQLNamedType): string {
-  if (isScalarType(type)) {
-    return printScalar(type);
-  }
   if (isResolverType(type)) {
     return type.isVariantType() ? printObject(type) : printUnion(type);
   }
@@ -75,10 +71,6 @@ export function printType(type: GraphQLNamedType): string {
   /* c8 ignore next 3 */
   // Not reachable, all possible types have been considered.
   invariant(false, 'Unexpected type: ' + inspect(type));
-}
-
-function printScalar(type: GraphQLScalarType): string {
-  return printDescription(type) + `scalar ${type.name}`;
 }
 
 function printObject(type: IrisResolverType): string {
