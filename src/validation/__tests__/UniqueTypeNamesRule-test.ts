@@ -45,14 +45,14 @@ describe('Validate: Unique type names', () => {
   it('types named the same', () => {
     expectSDLErrors(`
       resolver Foo
-      scalar Foo
+      data Foo
       data Foo
     `).toDeepEqual([
       {
         message: 'There can be only one type named "Foo".',
         locations: [
           { line: 2, column: 16 },
-          { line: 3, column: 14 },
+          { line: 3, column: 12 },
         ],
       },
       {

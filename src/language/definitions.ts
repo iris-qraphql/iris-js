@@ -18,8 +18,6 @@ export const parseDefinitions = (
   keywordToken: string,
 ): DefinitionNode | undefined => {
   switch (keywordToken) {
-    case 'scalar':
-      return parser.parseScalarTypeDefinition();
     case 'resolver':
       return parseResolverTypeDefinition(parser);
     case 'data':

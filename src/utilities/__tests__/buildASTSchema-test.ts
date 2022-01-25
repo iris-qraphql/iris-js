@@ -374,7 +374,7 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
-  it('Custom scalar argument field with default', () => {
+  it('Custom int argument field with default', () => {
     const sdl = dedent`
       data CustomScalar = Int
 
@@ -507,9 +507,9 @@ describe('Schema Builder', () => {
     // attempts so just documenting it here.
 
     const schema = buildSchema(`
-      scalar ID
+      data ID = String
 
-      scalar __Schema
+      data __Schema
     `);
 
     expect(schema.getType('ID')).toEqual(GraphQLID);
