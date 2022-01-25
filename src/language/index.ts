@@ -72,7 +72,7 @@ export type {
   OperationTypeDefinitionNode,
   TypeDefinitionNode,
   FieldDefinitionNode,
-  InputValueDefinitionNode,
+  ArgumentDefinitionNode,
   ResolverTypeDefinitionNode,
   DataTypeDefinitionNode,
   DirectiveDefinitionNode,

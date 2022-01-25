@@ -1,4 +1,5 @@
 import type {
+  DataFieldDefinitionNode,
   DataTypeDefinitionNode,
   DefinitionNode,
   FieldDefinitionNode,
@@ -181,13 +182,31 @@ const parseVariantDefinition = (
   });
 };
 
-const parseVariantFields = (parser: Parser) => {
+const parseVariantFields = (
+  parser: Parser,
+): ReadonlyArray<DataFieldDefinitionNode> => {
   const nodes = [];
   if (parser.expectOptionalToken(TokenKind.BRACE_L)) {
     while (!parser.expectOptionalToken(TokenKind.BRACE_R)) {
-      nodes.push(parser.parseInputValueDef());
+      nodes.push(parseDataFieldDefinition(parser));
     }
     return nodes;
   }
   return [];
+};
+
+const parseDataFieldDefinition = (parser: Parser): DataFieldDefinitionNode => {
+  const start = parser.lookAhead();
+  const description = parser.parseDescription();
+  const name = parser.parseName();
+  parser.expectToken(TokenKind.COLON);
+  const type = parser.parseTypeReference();
+  const directives = parser.parseConstDirectives();
+  return parser.node<DataFieldDefinitionNode>(start, {
+    kind: Kind.FIELD_DEFINITION,
+    description,
+    name,
+    type,
+    directives,
+  });
 };

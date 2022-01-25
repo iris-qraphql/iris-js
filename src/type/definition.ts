@@ -15,11 +15,12 @@ import { suggestionList } from '../jsutils/suggestionList';
 import { GraphQLError } from '../error/GraphQLError';
 
 import type {
+  ArgumentDefinitionNode,
+  DataFieldDefinitionNode,
   DataTypeDefinitionNode,
   FieldDefinitionNode,
   FieldNode,
   FragmentDefinitionNode,
-  InputValueDefinitionNode,
   OperationDefinitionNode,
   ResolverTypeDefinitionNode,
   ValueNode,
@@ -383,7 +384,7 @@ export interface GraphQLArgumentConfig {
   type: GraphQLInputType;
   defaultValue?: unknown;
   deprecationReason?: Maybe<string>;
-  astNode?: Maybe<InputValueDefinitionNode>;
+  astNode?: Maybe<ArgumentDefinitionNode>;
 }
 
 export type GraphQLFieldConfigMap<TSource, TContext> = ObjMap<
@@ -407,7 +408,7 @@ export type GraphQLArgument = {
   type: GraphQLInputType;
   defaultValue: unknown;
   deprecationReason: Maybe<string>;
-  astNode: Maybe<InputValueDefinitionNode>;
+  astNode: Maybe<ArgumentDefinitionNode>;
 };
 
 export function isRequiredArgument(arg: GraphQLArgument): boolean {
@@ -518,7 +519,7 @@ export type IrisDataVariantField = {
   description?: Maybe<string>;
   type: GraphQLInputType;
   deprecationReason?: Maybe<string>;
-  astNode?: Maybe<InputValueDefinitionNode>;
+  astNode?: Maybe<DataFieldDefinitionNode>;
 };
 
 export type IrisDataVariant = {

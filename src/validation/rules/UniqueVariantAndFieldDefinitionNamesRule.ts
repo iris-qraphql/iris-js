@@ -1,9 +1,9 @@
 import { GraphQLError } from '../../error/GraphQLError';
 
 import type {
+  ArgumentDefinitionNode,
   DataTypeDefinitionNode,
   FieldDefinitionNode,
-  InputValueDefinitionNode,
   NameNode,
   ResolverTypeDefinitionNode,
 } from '../../language/ast';
@@ -60,7 +60,7 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
   function checkFieldUniqueness(node: {
     readonly name: NameNode;
     readonly fields?: ReadonlyArray<
-      InputValueDefinitionNode | FieldDefinitionNode
+      ArgumentDefinitionNode | FieldDefinitionNode
     >;
   }) {
     const typeName = node.name.value;

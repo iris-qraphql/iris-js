@@ -42,8 +42,8 @@ export enum Kind {
   SCHEMA_DEFINITION = 'SchemaDefinition',
   OPERATION_TYPE_DEFINITION = 'OperationTypeDefinition',
 
+  ARGUMENT_DEFINITION = 'InputValueDefinition',
   /** Type Definitions */
-  INPUT_VALUE_DEFINITION = 'InputValueDefinition',
   FIELD_DEFINITION = 'FieldDefinition',
   RESOLVER_TYPE_DEFINITION = 'ResolverTypeDefinition',
   DATA_TYPE_DEFINITION = 'DataTypeDefinition',

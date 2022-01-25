@@ -232,7 +232,7 @@ export type {
   OperationTypeDefinitionNode,
   TypeDefinitionNode,
   FieldDefinitionNode,
-  InputValueDefinitionNode,
+  ArgumentDefinitionNode,
   ResolverTypeDefinitionNode,
   DirectiveDefinitionNode,
 } from './language/index';

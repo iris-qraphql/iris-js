@@ -164,7 +164,7 @@ export type ASTNode =
   | SchemaDefinitionNode
   | OperationTypeDefinitionNode
   | FieldDefinitionNode
-  | InputValueDefinitionNode
+  | ArgumentDefinitionNode
   | ResolverTypeDefinitionNode
   | DataTypeDefinitionNode
   | DirectiveDefinitionNode
@@ -527,18 +527,8 @@ export type TypeDefinitionNode =
   | ResolverTypeDefinitionNode
   | DataTypeDefinitionNode;
 
-export interface FieldDefinitionNode {
-  readonly kind: Kind.FIELD_DEFINITION;
-  readonly loc?: Location;
-  readonly description?: StringValueNode;
-  readonly name: NameNode;
-  readonly arguments?: ReadonlyArray<InputValueDefinitionNode>;
-  readonly type: TypeNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-}
-
-export interface InputValueDefinitionNode {
-  readonly kind: Kind.INPUT_VALUE_DEFINITION;
+export interface ArgumentDefinitionNode {
+  readonly kind: Kind.ARGUMENT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
@@ -568,16 +558,29 @@ type TypeDefinition<K, Variants> = {
   readonly variants: ReadonlyArray<Variants>;
 };
 
-export type VariantDefinition<Fields> = {
+export type VariantDefinition<F> = {
   readonly kind: Kind.VARIANT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly name: NameNode;
-  readonly fields?: ReadonlyArray<Fields>;
+  readonly fields?: ReadonlyArray<F>;
 };
 
-export type VariantDefinitionNode = VariantDefinition<InputValueDefinitionNode>;
+export type DataFieldDefinitionNode = {
+  readonly kind: Kind.FIELD_DEFINITION;
+  readonly loc?: Location;
+  readonly description?: StringValueNode;
+  readonly name: NameNode;
+  readonly type: TypeNode;
+  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+};
+
+export type FieldDefinitionNode = DataFieldDefinitionNode & {
+  readonly arguments?: ReadonlyArray<ArgumentDefinitionNode>;
+};
+
+export type VariantDefinitionNode = VariantDefinition<FieldDefinitionNode>;
 export type ResolverVariantDefinitionNode =
   VariantDefinition<FieldDefinitionNode>;
 
@@ -588,7 +591,7 @@ export interface DirectiveDefinitionNode {
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
-  readonly arguments?: ReadonlyArray<InputValueDefinitionNode>;
+  readonly arguments?: ReadonlyArray<ArgumentDefinitionNode>;
   readonly repeatable: boolean;
   readonly locations: ReadonlyArray<NameNode>;
 }

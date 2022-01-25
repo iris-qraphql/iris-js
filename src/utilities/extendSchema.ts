@@ -3,10 +3,11 @@ import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
+  ArgumentDefinitionNode,
+  DataFieldDefinitionNode,
   DirectiveDefinitionNode,
   DocumentNode,
   FieldDefinitionNode,
-  InputValueDefinitionNode,
   NamedTypeNode,
   ResolverVariantDefinitionNode,
   SchemaDefinitionNode,
@@ -198,7 +199,7 @@ export function extendSchemaImpl(
   }
 
   function buildArgumentMap(
-    args: Maybe<ReadonlyArray<InputValueDefinitionNode>>,
+    args: Maybe<ReadonlyArray<ArgumentDefinitionNode>>,
   ): GraphQLFieldConfigArgumentMap {
     const argsNodes = /* c8 ignore next */ args ?? [];
 
@@ -221,7 +222,7 @@ export function extendSchemaImpl(
   }
 
   function buildInputFieldMap(
-    fields: ReadonlyArray<InputValueDefinitionNode>,
+    fields: ReadonlyArray<DataFieldDefinitionNode>,
   ): ObjMap<IrisDataVariantField> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
@@ -230,7 +231,6 @@ export function extendSchemaImpl(
         {
           type,
           description: field.description?.value,
-          defaultValue: valueFromAST(field.defaultValue, type),
           deprecationReason: getDeprecationReason(field),
           astNode: field,
         },
@@ -321,7 +321,7 @@ const stdTypeMap = keyMap(
  * deprecation reason.
  */
 function getDeprecationReason(
-  node: FieldDefinitionNode | InputValueDefinitionNode | VariantDefinitionNode,
+  node: FieldDefinitionNode | ArgumentDefinitionNode | VariantDefinitionNode,
 ): Maybe<string> {
   const deprecated = getDirectiveValues(GraphQLDeprecatedDirective, node);
   // @ts-expect-error validated by `getDirectiveValues`

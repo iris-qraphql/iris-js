@@ -36,7 +36,7 @@ const SomeSchema = buildSchema(`
 
   data SomeEnum = ONLY
 
-  data SomeInputObject = { val: String = "hello" }
+  data SomeInputObject = { val: String }
 
   directive @SomeDirective on QUERY
 `);

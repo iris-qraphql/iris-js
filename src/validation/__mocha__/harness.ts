@@ -60,7 +60,7 @@ export const testSchema: GraphQLSchema = buildSchema(`
 
   data  ComplexInput {
     requiredField: Boolean!
-    nonNullField: Boolean! = false
+    nonNullField: Boolean!
     intField: Int
     stringField: String
     booleanField: Boolean
