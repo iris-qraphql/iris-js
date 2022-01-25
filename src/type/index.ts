@@ -63,7 +63,6 @@ export type {
   GraphQLFieldConfigMap,
   GraphQLFieldMap,
   GraphQLFieldResolver,
-  GraphQLInputField,
   GraphQLIsTypeOfFn,
   GraphQLResolveInfo,
   GraphQLTypeResolver,

@@ -10,7 +10,6 @@ import { print } from '../language/printer';
 import type {
   GraphQLArgument,
   GraphQLFieldMap,
-  GraphQLInputField,
   GraphQLNamedType,
   IrisDataType,
   IrisDataVariant,
@@ -110,10 +109,17 @@ function printDATA(type: IrisDataType): string {
 function printDataFields(fields: ObjMap<IrisDataVariantField>): string {
   return printBlock(
     Object.values(fields).map(
-      (f, i) => printDescription(f, '  ', !i) + '  ' + printInputValue(f),
+      (f, i) =>
+        printDescription(f, '  ', !i) +
+        '  ' +
+        f.name +
+        ': ' +
+        String(f.type) +
+        printDeprecated(f.deprecationReason),
     ),
   );
 }
+
 function printDataVariant(variant: IrisDataVariant): string {
   return (
     printDescription(variant) +
@@ -151,7 +157,7 @@ function printArgs(
 
   // If every arg does not have a description, print them on one line.
   if (args.every((arg) => !arg.description)) {
-    return '(' + args.map(printInputValue).join(', ') + ')';
+    return '(' + args.map(printArgument).join(', ') + ')';
   }
 
   return (
@@ -162,7 +168,7 @@ function printArgs(
           printDescription(arg, '  ' + indentation, !i) +
           '  ' +
           indentation +
-          printInputValue(arg),
+          printArgument(arg),
       )
       .join('\n') +
     '\n' +
@@ -171,14 +177,19 @@ function printArgs(
   );
 }
 
-function printInputValue(arg: GraphQLInputField): string {
-  const defaultAST = astFromValue(arg.defaultValue, arg.type);
-  let argDecl = arg.name + ': ' + String(arg.type);
-  if (defaultAST) {
-    argDecl += ` = ${print(defaultAST)}`;
-  }
-  return argDecl + printDeprecated(arg.deprecationReason);
-}
+const printArgument = ({
+  name,
+  type,
+  defaultValue,
+  deprecationReason,
+}: GraphQLArgument): string => {
+  const value = astFromValue(defaultValue, type);
+  const printedDefaultValue = value ? ` = ${print(value)}` : '';
+
+  return `${name}: ${type.toString()}${printedDefaultValue}${printDeprecated(
+    deprecationReason,
+  )}`;
+};
 
 function printDirective(directive: GraphQLDirective): string {
   return (

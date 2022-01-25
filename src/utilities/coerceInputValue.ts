@@ -98,9 +98,7 @@ function coerceInputValueImpl(
         const fieldValue = inputValue[field.name];
 
         if (fieldValue === undefined) {
-          if (field.defaultValue !== undefined) {
-            coercedValue[field.name] = field.defaultValue;
-          } else if (isNonNullType(field.type)) {
+          if (isNonNullType(field.type)) {
             const typeStr = inspect(field.type);
             onError(
               pathToArray(path),

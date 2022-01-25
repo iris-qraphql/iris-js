@@ -404,10 +404,10 @@ export interface GraphQLField<TSource, TContext, TArgs = any> {
 
 export type GraphQLArgument = {
   name: string;
-  description: Maybe<string>;
+  description?: Maybe<string>;
   type: GraphQLInputType;
-  defaultValue: unknown;
-  deprecationReason: Maybe<string>;
+  defaultValue?: unknown;
+  deprecationReason?: Maybe<string>;
   astNode: Maybe<ArgumentDefinitionNode>;
 };
 
@@ -547,7 +547,7 @@ type IrisDataTypeConfig<I, O> = Readonly<{
 
 type IrisDataVariantConfig = Override<
   IrisDataVariant,
-  { fields?: ThunkObjMap<Omit<GraphQLInputField, 'name'>> }
+  { fields?: ThunkObjMap<Omit<IrisDataVariantField, 'name'>> }
 >;
 
 const dataVariant = (config: IrisDataVariantConfig): IrisDataVariantConfig => ({
@@ -557,7 +557,6 @@ const dataVariant = (config: IrisDataVariantConfig): IrisDataVariantConfig => ({
       name: assertName(fieldName),
       description: fieldConfig.description,
       type: fieldConfig.type,
-      defaultValue: fieldConfig.defaultValue,
       deprecationReason: fieldConfig.deprecationReason,
       astNode: fieldConfig.astNode,
     })),
@@ -631,7 +630,7 @@ export class IrisDataType<I = unknown, O = I> {
     return this._variants.map(resolveVariant);
   }
 
-  getFields(): ObjMap<GraphQLInputField> {
+  getFields(): ObjMap<IrisDataVariantField> {
     const fields = resolveVariant(this._variants[0])?.fields;
     return fields ?? {};
   }

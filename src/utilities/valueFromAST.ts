@@ -8,11 +8,7 @@ import type { ValueNode } from '../language/ast';
 import { Kind } from '../language/kinds';
 
 import type { GraphQLInputType } from '../type/definition';
-import {
-  isLeafType,
-  isListType,
-  isNonNullType,
-} from '../type/definition';
+import { isLeafType, isListType, isNonNullType } from '../type/definition';
 
 /**
  * Produces a JavaScript value given a GraphQL Value AST.
@@ -112,9 +108,7 @@ export function valueFromAST(
       for (const field of Object.values(type.getFields())) {
         const fieldNode = fieldNodes[field.name];
         if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
-          if (field.defaultValue !== undefined) {
-            coercedObj[field.name] = field.defaultValue;
-          } else if (isNonNullType(field.type)) {
+          if (isNonNullType(field.type)) {
             return; // Invalid: intentionally return no value.
           }
           continue;
@@ -132,7 +126,7 @@ export function valueFromAST(
     // no value is returned.
     let result;
     try {
-      result = type.parseLiteral(valueNode, /* variables */ );
+      result = type.parseLiteral(valueNode /* variables */);
     } catch (_error) {
       return; // Invalid: intentionally return no value.
     }

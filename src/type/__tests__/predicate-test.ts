@@ -2,8 +2,8 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import type {
   GraphQLArgument,
-  GraphQLInputField,
   GraphQLInputType,
+  IrisDataVariantField,
 } from '../definition';
 import {
   assertAbstractType,
@@ -446,7 +446,7 @@ describe('Type predicates', () => {
   describe('isRequiredInputField', () => {
     function buildInputField(config: {
       type: GraphQLInputType;
-    }): GraphQLInputField {
+    }): IrisDataVariantField {
       return {
         name: 'someInputField',
         type: config.type,

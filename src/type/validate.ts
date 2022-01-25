@@ -12,8 +12,8 @@ import type {
 import { OperationTypeNode } from '../language/ast';
 
 import type {
-  GraphQLInputField,
   IrisDataType,
+  IrisDataVariantField,
   IrisResolverType,
 } from './definition';
 import {
@@ -357,7 +357,7 @@ function createInputObjectCircularRefsValidator(
   const visitedTypes = Object.create(null);
 
   // Array of types nodes used to produce meaningful errors
-  const fieldPath: Array<GraphQLInputField> = [];
+  const fieldPath: Array<IrisDataVariantField> = [];
 
   // Position in the type path
   const fieldPathIndexByTypeName = Object.create(null);
