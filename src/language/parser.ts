@@ -51,8 +51,6 @@ import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { isSource, Source } from './source';
 import { TokenKind } from './tokenKind';
 
-import type { DataTypeDefinitionNode } from '.';
-
 /**
  * Configuration options to control parser behavior
  */
@@ -749,32 +747,6 @@ export class Parser {
     });
   }
 
-  /**
-   * ScalarTypeDefinition : Description? scalar Name Directives[Const]?
-   */
-  parseScalarTypeDefinition(): DataTypeDefinitionNode {
-    const start = this._lexer.token;
-    const description = this.parseDescription();
-    this.expectKeyword('scalar');
-    const name = this.parseName();
-    const directives = this.parseConstDirectives();
-    return this.node<DataTypeDefinitionNode>(start, {
-      kind: Kind.DATA_TYPE_DEFINITION,
-      description,
-      name,
-      directives,
-      variants: [
-        {
-          kind: Kind.VARIANT_DEFINITION,
-          name: { value: 'String', kind: Kind.NAME },
-        },
-      ],
-    });
-  }
-
-  /**
-   * ArgumentsDefinition : ( InputValueDefinition+ )
-   */
   parseArgumentDefs(): Array<ArgumentDefinitionNode> {
     return this.optionalMany(
       TokenKind.PAREN_L,

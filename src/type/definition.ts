@@ -1,4 +1,4 @@
-import { identity, isNil, pluck } from 'ramda';
+import { contains, identity, isNil, pluck } from 'ramda';
 
 import { devAssert } from '../jsutils/devAssert';
 import { didYouMean } from '../jsutils/didYouMean';
@@ -574,6 +574,8 @@ const resolveVariant = (v: IrisDataVariantConfig): IrisDataVariant => ({
 
 export type GraphQLScalarType<I = unknown, O = I> = IrisDataType<I, O>;
 
+const PRIMITIVES = ['Int', 'Boolean', 'String', 'Float'];
+
 export class IrisDataType<I = unknown, O = I> {
   name: string;
   description: Maybe<string>;
@@ -589,7 +591,9 @@ export class IrisDataType<I = unknown, O = I> {
     this.name = assertName(config.name);
     this.description = config.description;
     this._variants = (config.variants ?? []).map(dataVariant);
-    this.isPrimitive = Boolean(config.isPrimitive);
+    this.isPrimitive =
+      Boolean(config.isPrimitive) ||
+      contains(this._variants[0]?.name, PRIMITIVES);
 
     const parseValue =
       config.parseValue ?? (identity as GraphQLScalarValueParser<I>);

@@ -141,10 +141,9 @@ Object {
           "directives": Array [],
           "fields": Array [
             Object {
-              "defaultValue": undefined,
               "description": undefined,
               "directives": Array [],
-              "kind": "InputValueDefinition",
+              "kind": "FieldDefinition",
               "loc": Object {
                 "end": 37,
                 "start": 24,
