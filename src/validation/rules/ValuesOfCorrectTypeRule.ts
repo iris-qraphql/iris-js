@@ -12,8 +12,8 @@ import type { ASTVisitor } from '../../language/visitor';
 import {
   getNamedType,
   getNullableType,
+  isDataType,
   isInputObjectType,
-  isLeafType,
   isListType,
   isNonNullType,
   isRequiredInputField,
@@ -112,7 +112,7 @@ function isValidValueNode(context: ValidationContext, node: ValueNode): void {
 
   const type = getNamedType(locationType);
 
-  if (!isLeafType(type)) {
+  if (!isDataType(type)) {
     const typeStr = inspect(locationType);
     context.reportError(
       new GraphQLError(

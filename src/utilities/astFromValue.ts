@@ -8,12 +8,7 @@ import type { ObjectFieldNode, ValueNode } from '../language/ast';
 import { Kind } from '../language/kinds';
 
 import type { GraphQLInputType } from '../type/definition';
-import {
-  isEnumType,
-  isLeafType,
-  isListType,
-  isNonNullType,
-} from '../type/definition';
+import { isDataType, isListType, isNonNullType } from '../type/definition';
 import { GraphQLID } from '../type/scalars';
 
 /**
@@ -76,7 +71,7 @@ export function astFromValue(
     return astFromValue(value, itemType);
   }
 
-  if (isLeafType(type)) {
+  if (isDataType(type)) {
     // Populate the fields of the input object by creating ASTs from each value
     // in the JavaScript object according to the fields in the input type.
     if (type.isVariantType()) {
@@ -119,7 +114,7 @@ export function astFromValue(
 
     if (typeof serialized === 'string') {
       // Enum types use Enum literals.
-      if (isEnumType(type)) {
+      if (!type.isPrimitive) {
         return { kind: Kind.ENUM, value: serialized };
       }
 

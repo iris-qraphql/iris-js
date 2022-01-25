@@ -33,7 +33,6 @@ export { version, versionInfo } from './version';
 export type { GraphQLArgs } from './iris';
 export { graphql, graphqlSync } from './iris';
 
-export type { GraphQLScalarType } from './type/index';
 export {
   GraphQLSchema,
   GraphQLDirective,
@@ -71,15 +70,13 @@ export {
   isType,
   isObjectType,
   isUnionType,
-  isEnumType,
   isInputObjectType,
   isListType,
   isNonNullType,
   isInputType,
   isOutputType,
-  isLeafType,
+  isDataType,
   isResolverType,
-  isAbstractType,
   isWrappingType,
   isNullableType,
   isNamedType,
@@ -89,13 +86,9 @@ export {
   isSpecifiedDirective,
   assertSchema,
   assertDirective,
-  assertObjectType,
   assertResolverType,
   assertListType,
   assertNonNullType,
-  assertLeafType,
-  assertCompositeType,
-  assertAbstractType,
   getNullableType,
   getNamedType,
   validateSchema,
@@ -118,20 +111,11 @@ export type {
   GraphQLDirectiveConfig,
   GraphQLDirectiveExtensions,
   GraphQLArgument,
-  GraphQLArgumentConfig,
   GraphQLField,
-  GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
-  GraphQLFieldConfigMap,
-  GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLIsTypeOfFn,
-  GraphQLResolveInfo,
   ResponsePath,
   GraphQLTypeResolver,
-  GraphQLScalarSerializer,
-  GraphQLScalarValueParser,
-  GraphQLScalarLiteralParser,
 } from './type/index';
 
 // Parse and operate on GraphQL language source files.

@@ -37,11 +37,11 @@ import type {
   IrisResolverType,
 } from '../type/definition';
 import {
-  isAbstractType,
-  isLeafType,
+  isDataType,
   isListType,
   isNonNullType,
   isObjectType,
+  isUnionType,
 } from '../type/definition';
 import {
   SchemaMetaFieldDef,
@@ -556,7 +556,7 @@ function executeField(
  */
 export function buildResolveInfo(
   exeContext: ExecutionContext,
-  fieldDef: GraphQLField<unknown, unknown>,
+  fieldDef: GraphQLField,
   fieldNodes: ReadonlyArray<FieldNode>,
   parentType: IrisResolverType,
   path: Path,
@@ -666,13 +666,13 @@ function completeValue(
 
   // If field type is a leaf type, Scalar or Enum, serialize to a valid value,
   // returning null if serialization is not possible.
-  if (isLeafType(returnType)) {
+  if (isDataType(returnType)) {
     return completeLeafValue(returnType, result);
   }
 
   // If field type is an abstract type, Interface or Union, determine the
   // runtime Object type and complete for that type.
-  if (isAbstractType(returnType)) {
+  if (isUnionType(returnType)) {
     return completeAbstractValue(
       exeContext,
       returnType,
@@ -1034,7 +1034,7 @@ export function getFieldDef(
   schema: GraphQLSchema,
   parentType: IrisResolverType,
   fieldNode: FieldNode,
-): Maybe<GraphQLField<unknown, unknown>> {
+): Maybe<GraphQLField> {
   const fieldName = fieldNode.name.value;
 
   if (

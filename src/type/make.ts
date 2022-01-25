@@ -1,11 +1,11 @@
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
+  DataLiteralParser,
+  DataParser,
+  DataSerializer,
   GraphQLFieldConfig,
   GraphQLIsTypeOfFn,
-  GraphQLScalarLiteralParser,
-  GraphQLScalarSerializer,
-  GraphQLScalarValueParser,
   GraphQLTypeResolver,
   IrisDataVariantField,
   IrisResolverVariantConfig,
@@ -37,14 +37,14 @@ const gqlEnum = (name: string, values: Array<string>) =>
     variants: values.map((v) => ({ name: v })),
   });
 
-type GQLObject = {
+type GQLObject<S = any> = {
   name: string;
   description?: string;
-  fields: ThunkObjMap<GraphQLFieldConfig<any, any>>;
+  fields: ThunkObjMap<GraphQLFieldConfig<S, any>>;
   isTypeOf?: GraphQLIsTypeOfFn<any, any>;
 };
 
-const gqlObject = ({ name, fields, isTypeOf, description }: GQLObject) =>
+const gqlObject = <S>({ name, fields, isTypeOf, description }: GQLObject<S>) =>
   new IrisResolverType({
     name,
     variants: [{ name, description, fields }],
@@ -73,9 +73,9 @@ const gqlUnion = ({ name, types, resolveType }: GQLUnion) =>
 type GQLScalar<I = unknown, O = I> = {
   name: string;
   description?: string;
-  serialize?: GraphQLScalarSerializer<O>;
-  parseValue?: GraphQLScalarValueParser<I>;
-  parseLiteral?: GraphQLScalarLiteralParser<I>;
+  serialize?: DataSerializer<O>;
+  parseValue?: DataParser<I>;
+  parseLiteral?: DataLiteralParser<I>;
 };
 
 const gqlScalar = <T>(x: GQLScalar<T>) =>

@@ -22,7 +22,7 @@ import type {
 } from '../../type/definition';
 import {
   getNamedType,
-  isLeafType,
+  isDataType,
   isListType,
   isNonNullType,
   isObjectType,
@@ -95,11 +95,7 @@ type ConflictReason = [string, ConflictReasonMessage];
 // Reason is a string, or a nested list of conflicts.
 type ConflictReasonMessage = string | Array<ConflictReason>;
 // Tuple defining a field node in a context.
-type NodeAndDef = [
-  Maybe<GraphQLNamedType>,
-  FieldNode,
-  Maybe<GraphQLField<unknown, unknown>>,
-];
+type NodeAndDef = [Maybe<GraphQLNamedType>, FieldNode, Maybe<GraphQLField>];
 // Map of array of those.
 type NodeAndDefCollection = ObjMap<Array<NodeAndDef>>;
 type FragmentNames = Array<string>;
@@ -682,7 +678,7 @@ function doTypesConflict(
   if (isNonNullType(type2)) {
     return true;
   }
-  if (isLeafType(type1) || isLeafType(type2)) {
+  if (isDataType(type1) || isDataType(type2)) {
     return type1 !== type2;
   }
   return false;

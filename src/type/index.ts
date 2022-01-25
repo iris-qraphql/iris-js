@@ -10,31 +10,24 @@ export {
 } from './schema';
 export type { GraphQLSchemaConfig, GraphQLSchemaExtensions } from './schema';
 
-export type { GraphQLScalarType } from './definition';
 export {
   isType,
   isObjectType,
   isUnionType,
-  isEnumType,
   isInputObjectType,
   isListType,
   isNonNullType,
   isInputType,
   isOutputType,
-  isLeafType,
+  isDataType,
   isResolverType,
-  isAbstractType,
   isWrappingType,
   isNullableType,
   isNamedType,
   isRequiredArgument,
-  assertObjectType,
   assertResolverType,
   assertListType,
   assertNonNullType,
-  assertLeafType,
-  assertCompositeType,
-  assertAbstractType,
   getNullableType,
   getNamedType,
   GraphQLList,
@@ -51,20 +44,11 @@ export type {
   GraphQLNullableType,
   GraphQLNamedType,
   GraphQLArgument,
-  GraphQLArgumentConfig,
   IrisDataVariant,
   GraphQLField,
-  GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
-  GraphQLFieldConfigMap,
-  GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLIsTypeOfFn,
-  GraphQLResolveInfo,
   GraphQLTypeResolver,
-  GraphQLScalarSerializer,
-  GraphQLScalarValueParser,
-  GraphQLScalarLiteralParser,
 } from './definition';
 
 export {

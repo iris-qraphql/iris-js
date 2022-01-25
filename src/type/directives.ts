@@ -7,11 +7,10 @@ import type { Maybe } from '../jsutils/Maybe';
 import type { DirectiveDefinitionNode } from '../language/ast';
 import { DirectiveLocation } from '../language/directiveLocation';
 
+import type { ConfigMap } from '../utils/type-level';
+
 import { assertName } from './assertName';
-import type {
-  GraphQLArgument,
-  GraphQLFieldConfigArgumentMap,
-} from './definition';
+import type { GraphQLArgument } from './definition';
 import { defineArguments, GraphQLNonNull } from './definition';
 import { GraphQLBoolean, GraphQLString } from './scalars';
 
@@ -92,7 +91,7 @@ export interface GraphQLDirectiveConfig {
   name: string;
   description?: Maybe<string>;
   locations: ReadonlyArray<DirectiveLocation>;
-  args?: Maybe<GraphQLFieldConfigArgumentMap>;
+  args?: ConfigMap<GraphQLArgument>;
   isRepeatable?: Maybe<boolean>;
   astNode?: Maybe<DirectiveDefinitionNode>;
 }

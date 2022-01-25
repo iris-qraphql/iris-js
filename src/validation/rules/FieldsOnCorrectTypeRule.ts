@@ -11,7 +11,7 @@ import type {
   GraphQLOutputType,
   IrisResolverType,
 } from '../../type/definition';
-import { isAbstractType, isObjectType } from '../../type/definition';
+import { isObjectType, isUnionType } from '../../type/definition';
 import type { GraphQLSchema } from '../../type/schema';
 
 import type { ValidationContext } from '../ValidationContext';
@@ -72,7 +72,7 @@ function getSuggestedTypeNames(
   type: GraphQLOutputType,
   fieldName: string,
 ): Array<string> {
-  if (!isAbstractType(type)) {
+  if (!isUnionType(type)) {
     // Must be an Object type, which does not have possible fields.
     return [];
   }

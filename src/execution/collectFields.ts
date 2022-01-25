@@ -10,7 +10,7 @@ import type {
 import { Kind } from '../language/kinds';
 
 import type { IrisResolverType } from '../type/definition';
-import { isAbstractType } from '../type/definition';
+import { isUnionType } from '../type/definition';
 import {
   GraphQLIncludeDirective,
   GraphQLSkipDirective,
@@ -198,7 +198,7 @@ function doesFragmentConditionMatch(
   if (conditionalType === type) {
     return true;
   }
-  if (isAbstractType(conditionalType)) {
+  if (isUnionType(conditionalType)) {
     return schema.isSubType(conditionalType, type);
   }
   return false;

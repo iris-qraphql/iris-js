@@ -47,7 +47,7 @@ export class TypeInfo {
   private _typeStack: Array<Maybe<GraphQLOutputType>>;
   private _parentTypeStack: Array<Maybe<IrisResolverType>>;
   private _inputTypeStack: Array<Maybe<GraphQLInputType>>;
-  private _fieldDefStack: Array<Maybe<GraphQLField<unknown, unknown>>>;
+  private _fieldDefStack: Array<Maybe<GraphQLField>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
   private _directive: Maybe<GraphQLDirective>;
   private _argument: Maybe<GraphQLArgument>;
@@ -116,7 +116,7 @@ export class TypeInfo {
     }
   }
 
-  getFieldDef(): Maybe<GraphQLField<unknown, unknown>> {
+  getFieldDef(): Maybe<GraphQLField> {
     if (this._fieldDefStack.length > 0) {
       return this._fieldDefStack[this._fieldDefStack.length - 1];
     }
@@ -294,7 +294,7 @@ type GetFieldDefFn = (
   schema: GraphQLSchema,
   parentType: GraphQLType,
   fieldNode: FieldNode,
-) => Maybe<GraphQLField<unknown, unknown>>;
+) => Maybe<GraphQLField>;
 
 /**
  * Not exactly the same as the executor's definition of getFieldDef, in this
@@ -305,7 +305,7 @@ function getFieldDef(
   schema: GraphQLSchema,
   parentType: GraphQLType,
   fieldNode: FieldNode,
-): Maybe<GraphQLField<unknown, unknown>> {
+): Maybe<GraphQLField> {
   const name = fieldNode.name.value;
   if (
     name === SchemaMetaFieldDef.name &&

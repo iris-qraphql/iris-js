@@ -5,7 +5,7 @@ import { GraphQLError } from '../../error/GraphQLError';
 import type { FieldNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { getNamedType, isLeafType } from '../../type/definition';
+import { getNamedType, isDataType } from '../../type/definition';
 
 import type { ValidationContext } from '../ValidationContext';
 
@@ -20,7 +20,7 @@ export function ScalarLeafsRule(context: ValidationContext): ASTVisitor {
       const type = context.getType();
       const selectionSet = node.selectionSet;
       if (type) {
-        if (isLeafType(getNamedType(type))) {
+        if (isDataType(getNamedType(type))) {
           if (selectionSet) {
             const fieldName = node.name.value;
             const typeStr = inspect(type);

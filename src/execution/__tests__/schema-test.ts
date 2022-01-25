@@ -24,7 +24,7 @@ describe('Execute: Handles execution with a complex schema', () => {
       },
     });
 
-    const BlogAuthor: IrisResolverType = gqlObject({
+    const BlogAuthor: IrisResolverType = gqlObject<any>({
       name: 'Author',
       fields: () => ({
         id: { type: GraphQLString },

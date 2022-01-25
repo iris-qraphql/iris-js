@@ -7,8 +7,10 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { buildSchema } from '../../utilities/buildASTSchema';
 
+import type { ConfigMapValue } from '../../utils/type-level';
+
 import type {
-  GraphQLArgumentConfig,
+  GraphQLArgument,
   GraphQLFieldConfig,
   GraphQLInputType,
   GraphQLNamedType,
@@ -16,7 +18,6 @@ import type {
 } from '../definition';
 import {
   assertDataType,
-  assertObjectType,
   assertResolverType,
   GraphQLList,
   GraphQLNonNull,
@@ -42,7 +43,7 @@ const SomeSchema = buildSchema(`
 `);
 
 const SomeScalarType = assertDataType(SomeSchema.getType('SomeScalar'));
-const SomeObjectType = assertObjectType(SomeSchema.getType('SomeObject'));
+const SomeObjectType = assertResolverType(SomeSchema.getType('SomeObject'));
 const SomeUnionType = assertResolverType(SomeSchema.getType('SomeUnion'));
 const SomeEnumType = assertDataType(SomeSchema.getType('SomeEnum'));
 const SomeInputObjectType = assertDataType(
@@ -602,7 +603,9 @@ describe('Type System: Object fields must have output types', () => {
 });
 
 describe('Type System: Arguments must have data  types', () => {
-  function schemaWithArg(argConfig: GraphQLArgumentConfig): GraphQLSchema {
+  function schemaWithArg(
+    argConfig: ConfigMapValue<GraphQLArgument>,
+  ): GraphQLSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {

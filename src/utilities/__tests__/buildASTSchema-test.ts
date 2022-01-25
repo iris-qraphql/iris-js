@@ -3,7 +3,7 @@ import { dedent } from '../../__testUtils__/dedent';
 import { Kind } from '../../language/kinds';
 import { parse } from '../../language/parser';
 
-import { assertDataType, assertObjectType } from '../../type/definition';
+import { assertDataType, assertResolverType } from '../../type/definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLIncludeDirective,
@@ -459,7 +459,7 @@ describe('Schema Builder', () => {
       }),
     );
 
-    const rootFields = assertObjectType(schema.getType('Query')).getFields();
+    const rootFields = assertResolverType(schema.getType('Query')).getFields();
     expect(rootFields.field1).toEqual(
       expect.objectContaining({
         deprecationReason: 'No longer supported',
@@ -523,7 +523,7 @@ describe('Schema Builder', () => {
       }
     `);
 
-    const queryType = assertObjectType(schema.getType('Query'));
+    const queryType = assertResolverType(schema.getType('Query'));
     expect(queryType.getFields()).toMatchSnapshot();
   });
 

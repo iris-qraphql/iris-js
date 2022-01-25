@@ -8,7 +8,7 @@ import type { ValueNode } from '../language/ast';
 import { Kind } from '../language/kinds';
 
 import type { GraphQLInputType } from '../type/definition';
-import { isLeafType, isListType, isNonNullType } from '../type/definition';
+import { isDataType, isListType, isNonNullType } from '../type/definition';
 
 /**
  * Produces a JavaScript value given a GraphQL Value AST.
@@ -98,7 +98,7 @@ export function valueFromAST(
     return [coercedValue];
   }
 
-  if (isLeafType(type)) {
+  if (isDataType(type)) {
     if (type.isVariantType()) {
       if (valueNode.kind !== Kind.OBJECT) {
         return; // Invalid: intentionally return no value.

@@ -6,13 +6,15 @@ import { Kind } from '../../language/kinds';
 import { parse } from '../../language/parser';
 
 import type {
-  GraphQLArgumentConfig,
+  GraphQLArgument,
   GraphQLFieldConfig,
 } from '../../type/definition';
 import { GraphQLList, GraphQLNonNull } from '../../type/definition';
 import { gqlEnum, gqlInput, gqlObject, gqlScalar } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
+
+import type { ConfigMapValue } from '../../utils/type-level';
 
 import { executeSync } from '../execute';
 import { getVariableValues } from '../values';
@@ -59,7 +61,7 @@ const TestEnum = gqlEnum('TestEnum', [
 ]);
 
 function fieldWithInputArg(
-  inputArg: GraphQLArgumentConfig,
+  inputArg: ConfigMapValue<GraphQLArgument>,
 ): GraphQLFieldConfig<any, any> {
   return {
     type: GraphQLString,
