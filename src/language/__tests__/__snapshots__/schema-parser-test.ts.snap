@@ -73,24 +73,44 @@ Object {
     Object {
       "description": undefined,
       "directives": Array [],
-      "kind": "ScalarTypeDefinition",
+      "kind": "DataTypeDefinition",
       "loc": Object {
-        "end": 12,
+        "end": 19,
         "start": 0,
       },
       "name": Object {
         "kind": "Name",
         "loc": Object {
-          "end": 12,
-          "start": 7,
+          "end": 10,
+          "start": 5,
         },
         "value": "Hello",
       },
+      "variants": Array [
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": Array [],
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 19,
+            "start": 13,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 19,
+              "start": 13,
+            },
+            "value": "String",
+          },
+        },
+      ],
     },
   ],
   "kind": "Document",
   "loc": Object {
-    "end": 12,
+    "end": 19,
     "start": 0,
   },
 }
