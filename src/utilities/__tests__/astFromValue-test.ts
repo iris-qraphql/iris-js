@@ -242,12 +242,12 @@ describe('astFromValue', () => {
 
     // Note: case sensitive
     expect(() => astFromValue('hello', myEnum)).toThrow(
-      'Enum "MyEnum" cannot represent value: "hello"',
+      'Data "MyEnum" cannot represent value: "hello"',
     );
 
     // Note: Not a valid enum value
     expect(() => astFromValue('UNKNOWN_VALUE', myEnum)).toThrow(
-      'Enum "MyEnum" cannot represent value: "UNKNOWN_VALUE"',
+      'Data "MyEnum" cannot represent value: "UNKNOWN_VALUE"',
     );
   });
 

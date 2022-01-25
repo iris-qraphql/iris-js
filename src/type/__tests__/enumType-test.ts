@@ -78,7 +78,7 @@ describe('Type System: Enum Values', () => {
       errors: [
         {
           message:
-            'Enum "Color" cannot represent non-enum value: "GREEN". Did you mean the enum value "GREEN"?',
+            'Data "Color" cannot represent value: "GREEN". Did you mean the enum value "GREEN"?',
           locations: [{ line: 1, column: 23 }],
         },
       ],
@@ -119,7 +119,7 @@ describe('Type System: Enum Values', () => {
     expectResult(result, {
       errors: [
         {
-          message: 'Enum "Color" cannot represent non-enum value: 1.',
+          message: 'Data "Color" cannot represent value: 1.',
           locations: [{ line: 1, column: 23 }],
         },
       ],

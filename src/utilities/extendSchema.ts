@@ -272,14 +272,6 @@ export function extendSchemaImpl(
       }
       case Kind.DATA_TYPE_DEFINITION: {
         const [variant, ...ext] = astNode.variants;
-
-        // return new IrisDataType({
-        //   name,
-        //   description: astNode.description?.value,
-        //   astNode: { ...astNode, Kind.DATA_TYPE_DEFINITION, variants: [{name}] },
-        //   isPrimitive: true,
-        // });
-
         if (ext.length === 0 && (variant.fields?.length ?? 0) > 0) {
           return new IrisDataType({
             name,

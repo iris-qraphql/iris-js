@@ -649,7 +649,7 @@ export class IrisDataType<I = unknown, O = I> {
     const enumValue = this.getValue((value as any)?.name ?? value);
     if (isNil(enumValue)) {
       throw new GraphQLError(
-        `Enum "${this.name}" cannot represent value: ${inspect(value)}`,
+        `Data "${this.name}" cannot represent value: ${inspect(value)}`,
       );
     }
 
@@ -687,7 +687,7 @@ export class IrisDataType<I = unknown, O = I> {
     if (valueNode.kind !== Kind.ENUM) {
       const valueStr = print(valueNode);
       throw new GraphQLError(
-        `Enum "${this.name}" cannot represent non-enum value: ${valueStr}.` +
+        `Data "${this.name}" cannot represent value: ${valueStr}.` +
           didYouMeanEnumValue(this, valueStr),
         valueNode,
       );
