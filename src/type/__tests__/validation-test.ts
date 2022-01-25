@@ -18,7 +18,6 @@ import {
   assertDataType,
   assertObjectType,
   assertResolverType,
-  assertScalarType,
   GraphQLList,
   GraphQLNonNull,
 } from '../definition';
@@ -42,7 +41,7 @@ const SomeSchema = buildSchema(`
   directive @SomeDirective on QUERY
 `);
 
-const SomeScalarType = assertScalarType(SomeSchema.getType('SomeScalar'));
+const SomeScalarType = assertDataType(SomeSchema.getType('SomeScalar'));
 const SomeObjectType = assertObjectType(SomeSchema.getType('SomeObject'));
 const SomeUnionType = assertResolverType(SomeSchema.getType('SomeUnion'));
 const SomeEnumType = assertDataType(SomeSchema.getType('SomeEnum'));

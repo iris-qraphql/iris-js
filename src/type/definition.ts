@@ -51,7 +51,7 @@ export function isType(type: unknown): type is GraphQLType {
 }
 
 export function isNamedType(type: unknown): type is GraphQLNamedType {
-  return isScalarType(type) || isResolverType(type) || isDataType(type);
+  return isResolverType(type) || isDataType(type);
 }
 
 export function isResolverType(type: unknown): type is IrisResolverType {
@@ -65,14 +65,11 @@ export function isUnionType(type: unknown): type is IrisResolverType {
   return isResolverType(type) && !type.isVariantType();
 }
 
-export const isScalarType = (type: unknown): type is IrisDataType =>
-  isDataType(type);
-
 export const isDataType = (type: unknown): type is IrisDataType =>
   instanceOf(type, IrisDataType);
 
 export function isEnumType(type: unknown): type is IrisDataType {
-  return isDataType(type) && !type.isVariantType();
+  return isDataType(type) && !type.isVariantType() && !type.isPrimitive;
 }
 
 export const isLeafType = isDataType;
@@ -100,7 +97,6 @@ export const assertCompositeType = assertBy('Resolver', isResolverType);
 export const assertResolverType = assertBy('Resolver', isResolverType);
 export const assertObjectType = assertBy('Object', isObjectType);
 export const assertDataType = assertBy('Data', isDataType);
-export const assertScalarType = assertBy('Scalar', isScalarType);
 export const assertLeafType = assertBy('leaf', isLeafType);
 export const assertNonNullType = assertBy('Non-Null', isNonNullType);
 export const assertListType = assertBy('List', isListType);

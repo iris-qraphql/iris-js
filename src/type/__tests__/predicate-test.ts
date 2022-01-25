@@ -11,7 +11,6 @@ import {
   assertListType,
   assertNonNullType,
   assertObjectType,
-  assertScalarType,
   getNamedType,
   getNullableType,
   GraphQLList,
@@ -30,7 +29,6 @@ import {
   isRequiredArgument,
   isRequiredInputField,
   isResolverType,
-  isScalarType,
   isType,
   isUnionType,
   isWrappingType,
@@ -80,35 +78,6 @@ describe('Type predicates', () => {
 
     it('returns false for random garbage', () => {
       expect(isType({ what: 'is this' })).toEqual(false);
-    });
-  });
-
-  describe('isScalarType', () => {
-    it('returns true for spec defined scalar', () => {
-      expect(isScalarType(GraphQLString)).toEqual(true);
-      expect(() => assertScalarType(GraphQLString)).not.toThrow();
-    });
-
-    it('returns true for custom scalar', () => {
-      expect(isScalarType(ScalarType)).toEqual(true);
-      expect(() => assertScalarType(ScalarType)).not.toThrow();
-    });
-
-    it('returns false for wrapped scalar', () => {
-      expect(isScalarType(new GraphQLList(ScalarType))).toEqual(false);
-      expect(() => assertScalarType(new GraphQLList(ScalarType))).toThrow();
-    });
-
-    it('returns false for non-scalar', () => {
-      expect(isScalarType(EnumType)).toEqual(false);
-      expect(() => assertScalarType(EnumType)).toThrow();
-      expect(isScalarType(Directive)).toEqual(false);
-      expect(() => assertScalarType(Directive)).toThrow();
-    });
-
-    it('returns false for random garbage', () => {
-      expect(isScalarType({ what: 'is this' })).toEqual(false);
-      expect(() => assertScalarType({ what: 'is this' })).toThrow();
     });
   });
 

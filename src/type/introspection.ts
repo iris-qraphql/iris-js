@@ -26,7 +26,6 @@ import {
   isNonNullType,
   isObjectType,
   isResolverType,
-  isScalarType,
 } from './definition';
 import type { GraphQLDirective } from './directives';
 import { gqlObject } from './make';
@@ -213,9 +212,6 @@ export const __Type: IrisResolverType = gqlObject({
       kind: {
         type: new GraphQLNonNull(__TypeKind),
         resolve(type) {
-          if (isScalarType(type)) {
-            return TypeKind.SCALAR;
-          }
           if (isResolverType(type)) {
             return type.isVariantType() ? TypeKind.OBJECT : TypeKind.UNION;
           }
