@@ -139,7 +139,7 @@ describe('Schema Builder', () => {
       ) on FIELD
 
       """Who knows what inside this scalar?"""
-      scalar MysteryScalar
+      data MysteryScalar = Int
 
       """This is a data  object type"""
       data FooInput {
@@ -336,7 +336,7 @@ describe('Schema Builder', () => {
 
   it('Custom Scalar', () => {
     const sdl = dedent`
-      scalar CustomScalar
+      data CustomScalar = Int
 
       resolver Query = {
         customScalar: CustomScalar
@@ -374,9 +374,9 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
-  it('Custom scalar argument field with default', () => {
+  it('Custom int argument field with default', () => {
     const sdl = dedent`
-      scalar CustomScalar
+      data CustomScalar = Int
 
       resolver Query = {
         str(int: CustomScalar = 2): String
@@ -507,9 +507,9 @@ describe('Schema Builder', () => {
     // attempts so just documenting it here.
 
     const schema = buildSchema(`
-      scalar ID
+      data ID = String
 
-      scalar __Schema
+      data __Schema
     `);
 
     expect(schema.getType('ID')).toEqual(GraphQLID);

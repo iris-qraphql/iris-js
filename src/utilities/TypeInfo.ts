@@ -9,11 +9,11 @@ import { getEnterLeaveForKind } from '../language/visitor';
 import type {
   GraphQLArgument,
   GraphQLField,
-  GraphQLInputField,
   GraphQLInputType,
   GraphQLOutputType,
   GraphQLType,
   IrisDataVariant,
+  IrisDataVariantField,
   IrisResolverType,
 } from '../type/definition';
 import {
@@ -222,16 +222,14 @@ export class TypeInfo {
       case Kind.OBJECT_FIELD: {
         const objectType: unknown = getNamedType(this.getInputType());
         let inputFieldType: GraphQLInputType | undefined;
-        let inputField: GraphQLInputField | undefined;
+        let inputField: IrisDataVariantField | undefined;
+
         if (isInputObjectType(objectType)) {
           inputField = objectType.getFields()[node.name.value];
           if (inputField) {
             inputFieldType = inputField.type;
           }
         }
-        this._defaultValueStack.push(
-          inputField ? inputField.defaultValue : undefined,
-        );
         this._inputTypeStack.push(
           isInputType(inputFieldType) ? inputFieldType : undefined,
         );

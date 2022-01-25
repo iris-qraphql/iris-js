@@ -18,7 +18,7 @@ import type {
 import {
   getNamedType,
   isInputObjectType,
-  isObjectType,
+  isResolverType,
   isUnionType,
 } from './definition';
 import type { GraphQLDirective } from './directives';
@@ -335,15 +335,17 @@ function collectReferencedTypes(
 
   if (!typeSet.has(namedType)) {
     typeSet.add(namedType);
-    if (isUnionType(namedType)) {
-      for (const memberType of namedType.getTypes()) {
-        collectReferencedTypes(memberType, typeSet);
-      }
-    } else if (isObjectType(namedType)) {
-      for (const field of Object.values(namedType.getFields())) {
-        collectReferencedTypes(field.type, typeSet);
-        for (const arg of field.args) {
-          collectReferencedTypes(arg.type, typeSet);
+    if (isResolverType(namedType)) {
+      if (namedType.isVariantType()) {
+        for (const field of Object.values(namedType.getFields())) {
+          collectReferencedTypes(field.type, typeSet);
+          for (const arg of field.args) {
+            collectReferencedTypes(arg.type, typeSet);
+          }
+        }
+      } else {
+        for (const memberType of namedType.getTypes()) {
+          collectReferencedTypes(memberType, typeSet);
         }
       }
     } else if (isInputObjectType(namedType)) {

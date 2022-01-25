@@ -1,10 +1,6 @@
 import type { GraphQLInputType } from '../../type/definition';
-import {
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLScalarType,
-} from '../../type/definition';
-import { gqlEnum, gqlInput } from '../../type/make';
+import { GraphQLList, GraphQLNonNull } from '../../type/definition';
+import { gqlEnum, gqlInput, gqlScalar } from '../../type/make';
 import { GraphQLInt } from '../../type/scalars';
 
 import { coerceInputValue } from '../coerceInputValue';
@@ -78,7 +74,7 @@ describe('coerceInputValue', () => {
   });
 
   describe('for GraphQLScalar', () => {
-    const TestScalar = new GraphQLScalarType({
+    const TestScalar = gqlScalar({
       name: 'TestScalar',
       parseValue(input: any) {
         if (input.error != null) {

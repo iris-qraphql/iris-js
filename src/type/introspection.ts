@@ -9,7 +9,6 @@ import { astFromValue } from '../utilities/astFromValue';
 import type {
   GraphQLField,
   GraphQLFieldConfigMap,
-  GraphQLInputField,
   GraphQLNamedType,
   GraphQLType,
   IrisResolverType,
@@ -26,12 +25,13 @@ import {
   isNonNullType,
   isObjectType,
   isResolverType,
-  isScalarType,
 } from './definition';
 import type { GraphQLDirective } from './directives';
 import { gqlObject } from './make';
 import { GraphQLBoolean, GraphQLString } from './scalars';
 import type { GraphQLSchema } from './schema';
+
+import type { GraphQLArgument } from '.';
 
 export const __Schema: IrisResolverType = gqlObject({
   name: '__Schema',
@@ -213,9 +213,6 @@ export const __Type: IrisResolverType = gqlObject({
       kind: {
         type: new GraphQLNonNull(__TypeKind),
         resolve(type) {
-          if (isScalarType(type)) {
-            return TypeKind.SCALAR;
-          }
           if (isResolverType(type)) {
             return type.isVariantType() ? TypeKind.OBJECT : TypeKind.UNION;
           }
@@ -240,14 +237,7 @@ export const __Type: IrisResolverType = gqlObject({
       description: {
         type: GraphQLString,
         resolve: (type) =>
-          // FIXME: add test case
-          /* c8 ignore next */
           'description' in type ? type.description : undefined,
-      },
-      specifiedByURL: {
-        type: GraphQLString,
-        resolve: (obj) =>
-          'specifiedByURL' in obj ? obj.specifiedByURL : undefined,
       },
       fields: {
         type: new GraphQLList(new GraphQLNonNull(__Field)),
@@ -390,7 +380,7 @@ export const __InputValue: IrisResolverType = gqlObject({
         type: GraphQLString,
         resolve: (obj) => obj.deprecationReason,
       },
-    } as GraphQLFieldConfigMap<GraphQLInputField, unknown>),
+    } as GraphQLFieldConfigMap<GraphQLArgument, unknown>),
 });
 
 export const __EnumValue: IrisResolverType = gqlObject({

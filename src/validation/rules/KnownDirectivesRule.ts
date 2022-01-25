@@ -90,15 +90,13 @@ function getDirectiveLocationForASTPath(
       return DirectiveLocation.VARIABLE_DEFINITION;
     case Kind.SCHEMA_DEFINITION:
       return DirectiveLocation.SCHEMA;
-    case Kind.SCALAR_TYPE_DEFINITION:
-      return DirectiveLocation.SCALAR;
     case Kind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
     case Kind.RESOLVER_TYPE_DEFINITION:
       return DirectiveLocation.UNION;
     case Kind.DATA_TYPE_DEFINITION:
       return DirectiveLocation.INPUT_OBJECT;
-    case Kind.INPUT_VALUE_DEFINITION: {
+    case Kind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
       return [Kind.DATA_TYPE_DEFINITION, Kind.VARIANT_DEFINITION].includes(

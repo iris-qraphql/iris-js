@@ -10,7 +10,6 @@ import { Kind } from '../language/kinds';
 import type { GraphQLInputType } from '../type/definition';
 import {
   isEnumType,
-  isInputObjectType,
   isLeafType,
   isListType,
   isNonNullType,
@@ -77,27 +76,27 @@ export function astFromValue(
     return astFromValue(value, itemType);
   }
 
-  // Populate the fields of the input object by creating ASTs from each value
-  // in the JavaScript object according to the fields in the input type.
-  if (isInputObjectType(type)) {
-    if (!isObjectLike(value)) {
-      return null;
-    }
-    const fieldNodes: Array<ObjectFieldNode> = [];
-    for (const field of Object.values(type.getFields())) {
-      const fieldValue = astFromValue(value[field.name], field.type);
-      if (fieldValue) {
-        fieldNodes.push({
-          kind: Kind.OBJECT_FIELD,
-          name: { kind: Kind.NAME, value: field.name },
-          value: fieldValue,
-        });
-      }
-    }
-    return { kind: Kind.OBJECT, fields: fieldNodes };
-  }
-
   if (isLeafType(type)) {
+    // Populate the fields of the input object by creating ASTs from each value
+    // in the JavaScript object according to the fields in the input type.
+    if (type.isVariantType()) {
+      if (!isObjectLike(value)) {
+        return null;
+      }
+      const fieldNodes: Array<ObjectFieldNode> = [];
+      for (const field of Object.values(type.getFields())) {
+        const fieldValue = astFromValue(value[field.name], field.type);
+        if (fieldValue) {
+          fieldNodes.push({
+            kind: Kind.OBJECT_FIELD,
+            name: { kind: Kind.NAME, value: field.name },
+            value: fieldValue,
+          });
+        }
+      }
+      return { kind: Kind.OBJECT, fields: fieldNodes };
+    }
+
     // Since value is an internally represented value, it must be serialized
     // to an externally represented value before converting into an AST.
     const serialized = type.serialize(value);

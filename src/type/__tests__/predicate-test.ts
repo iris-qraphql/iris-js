@@ -2,8 +2,8 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import type {
   GraphQLArgument,
-  GraphQLInputField,
   GraphQLInputType,
+  IrisDataVariantField,
 } from '../definition';
 import {
   assertAbstractType,
@@ -11,12 +11,10 @@ import {
   assertListType,
   assertNonNullType,
   assertObjectType,
-  assertScalarType,
   getNamedType,
   getNullableType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLScalarType,
   isAbstractType,
   isEnumType,
   isInputObjectType,
@@ -31,7 +29,6 @@ import {
   isRequiredArgument,
   isRequiredInputField,
   isResolverType,
-  isScalarType,
   isType,
   isUnionType,
   isWrappingType,
@@ -45,7 +42,7 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlEnum, gqlInput, gqlObject, gqlUnion } from '../make';
+import { gqlEnum, gqlInput, gqlObject, gqlScalar, gqlUnion } from '../make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -62,7 +59,7 @@ const InputObjectType = gqlInput({
   name: 'InputObject',
   fields: {},
 });
-const ScalarType = new GraphQLScalarType({ name: 'Scalar' });
+const ScalarType = gqlScalar({ name: 'Scalar' });
 const Directive = new GraphQLDirective({
   name: 'Directive',
   locations: [DirectiveLocation.QUERY],
@@ -81,40 +78,6 @@ describe('Type predicates', () => {
 
     it('returns false for random garbage', () => {
       expect(isType({ what: 'is this' })).toEqual(false);
-    });
-  });
-
-  describe('isScalarType', () => {
-    it('returns true for spec defined scalar', () => {
-      expect(isScalarType(GraphQLString)).toEqual(true);
-      expect(() => assertScalarType(GraphQLString)).not.toThrow();
-    });
-
-    it('returns true for custom scalar', () => {
-      expect(isScalarType(ScalarType)).toEqual(true);
-      expect(() => assertScalarType(ScalarType)).not.toThrow();
-    });
-
-    it('returns false for scalar class (rather than instance)', () => {
-      expect(isScalarType(GraphQLScalarType)).toEqual(false);
-      expect(() => assertScalarType(GraphQLScalarType)).toThrow();
-    });
-
-    it('returns false for wrapped scalar', () => {
-      expect(isScalarType(new GraphQLList(ScalarType))).toEqual(false);
-      expect(() => assertScalarType(new GraphQLList(ScalarType))).toThrow();
-    });
-
-    it('returns false for non-scalar', () => {
-      expect(isScalarType(EnumType)).toEqual(false);
-      expect(() => assertScalarType(EnumType)).toThrow();
-      expect(isScalarType(Directive)).toEqual(false);
-      expect(() => assertScalarType(Directive)).toThrow();
-    });
-
-    it('returns false for random garbage', () => {
-      expect(isScalarType({ what: 'is this' })).toEqual(false);
-      expect(() => assertScalarType({ what: 'is this' })).toThrow();
     });
   });
 
@@ -285,24 +248,10 @@ describe('Type predicates', () => {
       expectOutputType(new GraphQLList(ObjectType));
       expectOutputType(new GraphQLList(UnionType));
       expectOutputType(new GraphQLList(EnumType));
-
       expectOutputType(new GraphQLNonNull(GraphQLString));
       expectOutputType(new GraphQLNonNull(ObjectType));
       expectOutputType(new GraphQLNonNull(UnionType));
       expectOutputType(new GraphQLNonNull(EnumType));
-    });
-
-    function expectNonOutputType(type: unknown) {
-      expect(isOutputType(type)).toEqual(false);
-    }
-
-    it('returns false for an data  type', () => {
-      expectNonOutputType(InputObjectType);
-    });
-
-    it('returns false for a wrapped data  type', () => {
-      expectNonOutputType(new GraphQLList(InputObjectType));
-      expectNonOutputType(new GraphQLNonNull(InputObjectType));
     });
   });
 
@@ -497,7 +446,7 @@ describe('Type predicates', () => {
   describe('isRequiredInputField', () => {
     function buildInputField(config: {
       type: GraphQLInputType;
-    }): GraphQLInputField {
+    }): IrisDataVariantField {
       return {
         name: 'someInputField',
         type: config.type,

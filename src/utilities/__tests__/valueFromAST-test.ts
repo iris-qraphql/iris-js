@@ -5,12 +5,8 @@ import type { ObjMap } from '../../jsutils/ObjMap';
 import { parseValue } from '../../language/parser';
 
 import type { GraphQLInputType } from '../../type/definition';
-import {
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLScalarType,
-} from '../../type/definition';
-import { gqlInput } from '../../type/make';
+import { GraphQLList, GraphQLNonNull } from '../../type/definition';
+import { gqlInput, gqlScalar } from '../../type/make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -59,7 +55,7 @@ describe('valueFromAST', () => {
   });
 
   it('convert using parseLiteral from a custom scalar type', () => {
-    const passthroughScalar = new GraphQLScalarType({
+    const passthroughScalar = gqlScalar({
       name: 'PassthroughScalar',
       parseLiteral(node) {
         invariant(node.kind === 'StringValue');
@@ -70,7 +66,7 @@ describe('valueFromAST', () => {
 
     expectValueFrom('"value"', passthroughScalar).toEqual('value');
 
-    const throwScalar = new GraphQLScalarType({
+    const throwScalar = gqlScalar({
       name: 'ThrowScalar',
       parseLiteral() {
         throw new Error('Test');
@@ -80,7 +76,7 @@ describe('valueFromAST', () => {
 
     expectValueFrom('value', throwScalar).toEqual(undefined);
 
-    const returnUndefinedScalar = new GraphQLScalarType({
+    const returnUndefinedScalar = gqlScalar({
       name: 'ReturnUndefinedScalar',
       parseLiteral() {
         return undefined;

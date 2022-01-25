@@ -5,9 +5,9 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 import { printSchema } from '../../utilities/printSchema';
 
 import type { IrisResolverType } from '../definition';
-import { GraphQLList, GraphQLScalarType } from '../definition';
+import { GraphQLList } from '../definition';
 import { GraphQLDirective } from '../directives';
-import { emptyDataType, gqlInput, gqlObject } from '../make';
+import { emptyDataType, gqlInput, gqlObject, gqlScalar } from '../make';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 
@@ -198,7 +198,7 @@ describe('Type System: Schema', () => {
 
     describe('A Schema must contain uniquely named types', () => {
       it('rejects a Schema which redefines a built-in type', () => {
-        const FakeString = new GraphQLScalarType({ name: 'String' });
+        const FakeString = gqlScalar({ name: 'String' });
 
         const QueryType = gqlObject({
           name: 'Query',

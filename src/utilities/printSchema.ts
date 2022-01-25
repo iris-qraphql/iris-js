@@ -10,15 +10,13 @@ import { print } from '../language/printer';
 import type {
   GraphQLArgument,
   GraphQLFieldMap,
-  GraphQLInputField,
   GraphQLNamedType,
-  GraphQLScalarType,
   IrisDataType,
   IrisDataVariant,
   IrisDataVariantField,
   IrisResolverType,
 } from '../type/definition';
-import { isDataType, isResolverType, isScalarType } from '../type/definition';
+import { isDataType, isResolverType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import {
   DEFAULT_DEPRECATION_REASON,
@@ -63,9 +61,6 @@ function printFilteredSchema(
 }
 
 export function printType(type: GraphQLNamedType): string {
-  if (isScalarType(type)) {
-    return printScalar(type);
-  }
   if (isResolverType(type)) {
     return type.isVariantType() ? printObject(type) : printUnion(type);
   }
@@ -75,12 +70,6 @@ export function printType(type: GraphQLNamedType): string {
   /* c8 ignore next 3 */
   // Not reachable, all possible types have been considered.
   invariant(false, 'Unexpected type: ' + inspect(type));
-}
-
-function printScalar(type: GraphQLScalarType): string {
-  return (
-    printDescription(type) + `scalar ${type.name}` + printSpecifiedByURL(type)
-  );
 }
 
 function printObject(type: IrisResolverType): string {
@@ -120,10 +109,17 @@ function printDATA(type: IrisDataType): string {
 function printDataFields(fields: ObjMap<IrisDataVariantField>): string {
   return printBlock(
     Object.values(fields).map(
-      (f, i) => printDescription(f, '  ', !i) + '  ' + printInputValue(f),
+      (f, i) =>
+        printDescription(f, '  ', !i) +
+        '  ' +
+        f.name +
+        ': ' +
+        String(f.type) +
+        printDeprecated(f.deprecationReason),
     ),
   );
 }
+
 function printDataVariant(variant: IrisDataVariant): string {
   return (
     printDescription(variant) +
@@ -161,7 +157,7 @@ function printArgs(
 
   // If every arg does not have a description, print them on one line.
   if (args.every((arg) => !arg.description)) {
-    return '(' + args.map(printInputValue).join(', ') + ')';
+    return '(' + args.map(printArgument).join(', ') + ')';
   }
 
   return (
@@ -172,7 +168,7 @@ function printArgs(
           printDescription(arg, '  ' + indentation, !i) +
           '  ' +
           indentation +
-          printInputValue(arg),
+          printArgument(arg),
       )
       .join('\n') +
     '\n' +
@@ -181,14 +177,19 @@ function printArgs(
   );
 }
 
-function printInputValue(arg: GraphQLInputField): string {
-  const defaultAST = astFromValue(arg.defaultValue, arg.type);
-  let argDecl = arg.name + ': ' + String(arg.type);
-  if (defaultAST) {
-    argDecl += ` = ${print(defaultAST)}`;
-  }
-  return argDecl + printDeprecated(arg.deprecationReason);
-}
+const printArgument = ({
+  name,
+  type,
+  defaultValue,
+  deprecationReason,
+}: GraphQLArgument): string => {
+  const value = astFromValue(defaultValue, type);
+  const printedDefaultValue = value ? ` = ${print(value)}` : '';
+
+  return `${name}: ${type.toString()}${printedDefaultValue}${printDeprecated(
+    deprecationReason,
+  )}`;
+};
 
 function printDirective(directive: GraphQLDirective): string {
   return (
@@ -211,17 +212,6 @@ function printDeprecated(reason: Maybe<string>): string {
     return ` @deprecated(reason: ${astValue})`;
   }
   return ' @deprecated';
-}
-
-function printSpecifiedByURL(scalar: GraphQLScalarType): string {
-  if (scalar.specifiedByURL == null) {
-    return '';
-  }
-  const astValue = print({
-    kind: Kind.STRING,
-    value: scalar.specifiedByURL,
-  });
-  return ` @specifiedBy(url: ${astValue})`;
 }
 
 function printDescription(

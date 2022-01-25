@@ -58,9 +58,8 @@ export const testSchema: GraphQLSchema = buildSchema(`
     | NO_FUR {}
     | UNKNOWN {}
 
-  data  ComplexInput {
+  data ComplexInput = {
     requiredField: Boolean!
-    nonNullField: Boolean! = false
     intField: Int
     stringField: String
     booleanField: Boolean

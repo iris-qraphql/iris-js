@@ -3,13 +3,13 @@ import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
+  ArgumentDefinitionNode,
+  DataFieldDefinitionNode,
   DirectiveDefinitionNode,
   DocumentNode,
   FieldDefinitionNode,
-  InputValueDefinitionNode,
   NamedTypeNode,
   ResolverVariantDefinitionNode,
-  ScalarTypeDefinitionNode,
   SchemaDefinitionNode,
   TypeDefinitionNode,
   TypeNode,
@@ -29,14 +29,12 @@ import type {
 import {
   GraphQLList,
   GraphQLNonNull,
-  GraphQLScalarType,
   IrisDataType,
   IrisResolverType,
 } from '../type/definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,
-  GraphQLSpecifiedByDirective,
 } from '../type/directives';
 import { introspectionTypes } from '../type/introspection';
 import { specifiedScalarTypes } from '../type/scalars';
@@ -201,7 +199,7 @@ export function extendSchemaImpl(
   }
 
   function buildArgumentMap(
-    args: Maybe<ReadonlyArray<InputValueDefinitionNode>>,
+    args: Maybe<ReadonlyArray<ArgumentDefinitionNode>>,
   ): GraphQLFieldConfigArgumentMap {
     const argsNodes = /* c8 ignore next */ args ?? [];
 
@@ -224,7 +222,7 @@ export function extendSchemaImpl(
   }
 
   function buildInputFieldMap(
-    fields: ReadonlyArray<InputValueDefinitionNode>,
+    fields: ReadonlyArray<DataFieldDefinitionNode>,
   ): ObjMap<IrisDataVariantField> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
@@ -233,7 +231,6 @@ export function extendSchemaImpl(
         {
           type,
           description: field.description?.value,
-          defaultValue: valueFromAST(field.defaultValue, type),
           deprecationReason: getDeprecationReason(field),
           astNode: field,
         },
@@ -273,18 +270,9 @@ export function extendSchemaImpl(
           astNode,
         });
       }
-      case Kind.SCALAR_TYPE_DEFINITION: {
-        return new GraphQLScalarType({
-          name,
-          description: astNode.description?.value,
-          specifiedByURL: getSpecifiedByURL(astNode),
-          astNode,
-        });
-      }
       case Kind.DATA_TYPE_DEFINITION: {
         const [variant, ...ext] = astNode.variants;
-
-        if (ext.length === 0 && variant.fields.length > 0) {
+        if (ext.length === 0 && (variant.fields?.length ?? 0) > 0) {
           return new IrisDataType({
             name,
             description: astNode.description?.value,
@@ -292,7 +280,8 @@ export function extendSchemaImpl(
             variants: [
               {
                 name,
-                fields: () => buildInputFieldMap(astNode.variants[0].fields),
+                fields: () =>
+                  buildInputFieldMap(astNode.variants[0].fields ?? []),
               },
             ],
           });
@@ -324,18 +313,9 @@ const stdTypeMap = keyMap(
  * deprecation reason.
  */
 function getDeprecationReason(
-  node: FieldDefinitionNode | InputValueDefinitionNode | VariantDefinitionNode,
+  node: FieldDefinitionNode | ArgumentDefinitionNode | VariantDefinitionNode,
 ): Maybe<string> {
   const deprecated = getDirectiveValues(GraphQLDeprecatedDirective, node);
   // @ts-expect-error validated by `getDirectiveValues`
   return deprecated?.reason;
-}
-
-/**
- * Given a scalar node, returns the string value for the specifiedByURL.
- */
-function getSpecifiedByURL(node: ScalarTypeDefinitionNode): Maybe<string> {
-  const specifiedBy = getDirectiveValues(GraphQLSpecifiedByDirective, node);
-  // @ts-expect-error validated by `getDirectiveValues`
-  return specifiedBy?.url;
 }

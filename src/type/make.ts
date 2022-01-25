@@ -2,9 +2,12 @@ import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
   GraphQLFieldConfig,
-  GraphQLInputField,
   GraphQLIsTypeOfFn,
+  GraphQLScalarLiteralParser,
+  GraphQLScalarSerializer,
+  GraphQLScalarValueParser,
   GraphQLTypeResolver,
+  IrisDataVariantField,
   IrisResolverVariantConfig,
   ThunkObjMap,
 } from './definition';
@@ -12,7 +15,7 @@ import { IrisDataType, IrisResolverType } from './definition';
 
 type InputC = {
   name: string;
-  fields: ObjMap<Omit<GraphQLInputField, 'name'>>;
+  fields: ObjMap<Omit<IrisDataVariantField, 'name'>>;
 };
 
 export const emptyDataType = (name: string) => new IrisDataType({ name });
@@ -67,4 +70,15 @@ const gqlUnion = ({ name, types, resolveType }: GQLUnion) =>
     resolveType,
   });
 
-export { gqlInput, gqlEnum, gqlObject, gqlUnion };
+type GQLScalar<I = unknown, O = I> = {
+  name: string;
+  description?: string;
+  serialize?: GraphQLScalarSerializer<O>;
+  parseValue?: GraphQLScalarValueParser<I>;
+  parseLiteral?: GraphQLScalarLiteralParser<I>;
+};
+
+const gqlScalar = <T>(x: GQLScalar<T>) =>
+  new IrisDataType<T>({ ...x, isPrimitive: true });
+
+export { gqlInput, gqlEnum, gqlObject, gqlUnion, gqlScalar };

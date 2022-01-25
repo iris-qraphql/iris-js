@@ -42,27 +42,15 @@ export enum Kind {
   SCHEMA_DEFINITION = 'SchemaDefinition',
   OPERATION_TYPE_DEFINITION = 'OperationTypeDefinition',
 
+  ARGUMENT_DEFINITION = 'InputValueDefinition',
   /** Type Definitions */
-  SCALAR_TYPE_DEFINITION = 'ScalarTypeDefinition',
   FIELD_DEFINITION = 'FieldDefinition',
-  INPUT_VALUE_DEFINITION = 'InputValueDefinition',
   RESOLVER_TYPE_DEFINITION = 'ResolverTypeDefinition',
   DATA_TYPE_DEFINITION = 'DataTypeDefinition',
+  VARIANT_DEFINITION = 'VariantDefinition',
 
   /** Directive Definitions */
   DIRECTIVE_DEFINITION = 'DirectiveDefinition',
-
-  /** Type System Extensions */
-  SCHEMA_EXTENSION = 'SchemaExtension',
-
-  /** Type Extensions */
-  SCALAR_TYPE_EXTENSION = 'ScalarTypeExtension',
-  OBJECT_TYPE_EXTENSION = 'ObjectTypeExtension',
-  INTERFACE_TYPE_EXTENSION = 'InterfaceTypeExtension',
-  UNION_TYPE_EXTENSION = 'UnionTypeExtension',
-  ENUM_TYPE_EXTENSION = 'EnumTypeExtension',
-  INPUT_OBJECT_TYPE_EXTENSION = 'InputObjectTypeExtension',
-  VARIANT_DEFINITION = 'VariantDefinition',
 }
 
 /**

@@ -128,7 +128,7 @@ describe('Validate: Known type names', () => {
           someScalar: SomeScalar
         }
 
-        scalar SomeScalar
+        data SomeScalar = String
 
         resolver Query = {
           someUnion: SomeUnion

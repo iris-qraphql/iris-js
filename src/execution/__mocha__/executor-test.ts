@@ -13,13 +13,12 @@ import {
   GraphQLList,
   GraphQLNonNull,
   IrisResolverType,
-  GraphQLScalarType,
 } from '../../type/definition';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
 import { execute, executeSync } from '../execute';
-import { gqlObject, gqlUnion } from '../../type/make';
+import { gqlObject, gqlScalar, gqlUnion } from '../../type/make';
 
 describe('Execute: Handles basic execution tasks', () => {
   it('throws if no document is provided', () => {
@@ -1146,7 +1145,7 @@ describe('Execute: Handles basic execution tasks', () => {
   });
 
   it('fails when serialize of custom scalar does not return a value', () => {
-    const customScalar = new GraphQLScalarType({
+    const customScalar = gqlScalar({
       name: 'CustomScalar',
       serialize() {
         /* returns nothing */

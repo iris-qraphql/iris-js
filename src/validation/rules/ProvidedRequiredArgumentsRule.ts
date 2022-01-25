@@ -4,7 +4,7 @@ import type { ObjMap } from '../../jsutils/ObjMap';
 
 import { GraphQLError } from '../../error/GraphQLError';
 
-import type { InputValueDefinitionNode } from '../../language/ast';
+import type { ArgumentDefinitionNode } from '../../language/ast';
 import { Kind } from '../../language/kinds';
 import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
@@ -66,7 +66,7 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
   context: ValidationContext | SDLValidationContext,
 ): ASTVisitor {
   const requiredArgsMap: ObjMap<
-    ObjMap<GraphQLArgument | InputValueDefinitionNode>
+    ObjMap<GraphQLArgument | ArgumentDefinitionNode>
   > = Object.create(null);
 
   const schema = context.getSchema();
@@ -122,6 +122,6 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
   };
 }
 
-function isRequiredArgumentNode(arg: InputValueDefinitionNode): boolean {
+function isRequiredArgumentNode(arg: ArgumentDefinitionNode): boolean {
   return arg.type.kind === Kind.NON_NULL_TYPE && arg.defaultValue == null;
 }

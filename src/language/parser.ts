@@ -4,6 +4,7 @@ import type { GraphQLError } from '../error/GraphQLError';
 import { syntaxError } from '../error/syntaxError';
 
 import type {
+  ArgumentDefinitionNode,
   ArgumentNode,
   BooleanValueNode,
   ConstArgumentNode,
@@ -22,7 +23,6 @@ import type {
   FragmentDefinitionNode,
   FragmentSpreadNode,
   InlineFragmentNode,
-  InputValueDefinitionNode,
   IntValueNode,
   ListTypeNode,
   ListValueNode,
@@ -34,7 +34,6 @@ import type {
   ObjectValueNode,
   OperationDefinitionNode,
   OperationTypeDefinitionNode,
-  ScalarTypeDefinitionNode,
   SelectionNode,
   SelectionSetNode,
   StringValueNode,
@@ -748,27 +747,7 @@ export class Parser {
     });
   }
 
-  /**
-   * ScalarTypeDefinition : Description? scalar Name Directives[Const]?
-   */
-  parseScalarTypeDefinition(): ScalarTypeDefinitionNode {
-    const start = this._lexer.token;
-    const description = this.parseDescription();
-    this.expectKeyword('scalar');
-    const name = this.parseName();
-    const directives = this.parseConstDirectives();
-    return this.node<ScalarTypeDefinitionNode>(start, {
-      kind: Kind.SCALAR_TYPE_DEFINITION,
-      description,
-      name,
-      directives,
-    });
-  }
-
-  /**
-   * ArgumentsDefinition : ( InputValueDefinition+ )
-   */
-  parseArgumentDefs(): Array<InputValueDefinitionNode> {
+  parseArgumentDefs(): Array<ArgumentDefinitionNode> {
     return this.optionalMany(
       TokenKind.PAREN_L,
       this.parseInputValueDef,
@@ -780,7 +759,7 @@ export class Parser {
    * InputValueDefinition :
    *   - Description? Name : Type DefaultValue? Directives[Const]?
    */
-  parseInputValueDef(): InputValueDefinitionNode {
+  parseInputValueDef(): ArgumentDefinitionNode {
     const start = this._lexer.token;
     const description = this.parseDescription();
     const name = this.parseName();
@@ -791,8 +770,8 @@ export class Parser {
       defaultValue = this.parseConstValueLiteral();
     }
     const directives = this.parseConstDirectives();
-    return this.node<InputValueDefinitionNode>(start, {
-      kind: Kind.INPUT_VALUE_DEFINITION,
+    return this.node<ArgumentDefinitionNode>(start, {
+      kind: Kind.ARGUMENT_DEFINITION,
       description,
       name,
       type,

@@ -33,10 +33,10 @@ export { version, versionInfo } from './version';
 export type { GraphQLArgs } from './iris';
 export { graphql, graphqlSync } from './iris';
 
+export type { GraphQLScalarType } from './type/index';
 export {
   GraphQLSchema,
   GraphQLDirective,
-  GraphQLScalarType,
   GraphQLList,
   GraphQLNonNull,
   specifiedScalarTypes,
@@ -69,7 +69,6 @@ export {
   isSchema,
   isDirective,
   isType,
-  isScalarType,
   isObjectType,
   isUnionType,
   isEnumType,
@@ -91,7 +90,6 @@ export {
   isSpecifiedDirective,
   assertSchema,
   assertDirective,
-  assertScalarType,
   assertObjectType,
   assertResolverType,
   assertListType,
@@ -131,11 +129,9 @@ export type {
   GraphQLFieldConfigMap,
   GraphQLFieldMap,
   GraphQLFieldResolver,
-  GraphQLInputField,
   GraphQLIsTypeOfFn,
   GraphQLResolveInfo,
   ResponsePath,
-  GraphQLScalarTypeConfig,
   GraphQLTypeResolver,
   GraphQLScalarSerializer,
   GraphQLScalarValueParser,
@@ -234,9 +230,8 @@ export type {
   SchemaDefinitionNode,
   OperationTypeDefinitionNode,
   TypeDefinitionNode,
-  ScalarTypeDefinitionNode,
   FieldDefinitionNode,
-  InputValueDefinitionNode,
+  ArgumentDefinitionNode,
   ResolverTypeDefinitionNode,
   DirectiveDefinitionNode,
 } from './language/index';

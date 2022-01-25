@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import type { ASTNode } from '../ast';
 import { Kind } from '../kinds';
 import { parseValue } from '../parser';
@@ -24,11 +21,10 @@ function filterNodes(predicate: (node: ASTNode) => boolean): Array<string> {
 
 describe('AST node predicates', () => {
   it('isDefinitionNode', () => {
-    expect(filterNodes(isDefinitionNode)).to.deep.equal([
+    expect(filterNodes(isDefinitionNode)).toEqual([
       'OperationDefinition',
       'FragmentDefinition',
       'SchemaDefinition',
-      'ScalarTypeDefinition',
       'ResolverTypeDefinition',
       'DataTypeDefinition',
       'DirectiveDefinition',
@@ -36,14 +32,14 @@ describe('AST node predicates', () => {
   });
 
   it('isExecutableDefinitionNode', () => {
-    expect(filterNodes(isExecutableDefinitionNode)).to.deep.equal([
+    expect(filterNodes(isExecutableDefinitionNode)).toEqual([
       'OperationDefinition',
       'FragmentDefinition',
     ]);
   });
 
   it('isSelectionNode', () => {
-    expect(filterNodes(isSelectionNode)).to.deep.equal([
+    expect(filterNodes(isSelectionNode)).toEqual([
       'Field',
       'FragmentSpread',
       'InlineFragment',
@@ -51,7 +47,7 @@ describe('AST node predicates', () => {
   });
 
   it('isValueNode', () => {
-    expect(filterNodes(isValueNode)).to.deep.equal([
+    expect(filterNodes(isValueNode)).toEqual([
       'Variable',
       'IntValue',
       'FloatValue',
@@ -65,18 +61,18 @@ describe('AST node predicates', () => {
   });
 
   it('isConstValueNode', () => {
-    expect(isConstValueNode(parseValue('"value"'))).to.equal(true);
-    expect(isConstValueNode(parseValue('$var'))).to.equal(false);
+    expect(isConstValueNode(parseValue('"value"'))).toEqual(true);
+    expect(isConstValueNode(parseValue('$var'))).toEqual(false);
 
-    expect(isConstValueNode(parseValue('{ field: "value" }'))).to.equal(true);
-    expect(isConstValueNode(parseValue('{ field: $var }'))).to.equal(false);
+    expect(isConstValueNode(parseValue('{ field: "value" }'))).toEqual(true);
+    expect(isConstValueNode(parseValue('{ field: $var }'))).toEqual(false);
 
-    expect(isConstValueNode(parseValue('[ "value" ]'))).to.equal(true);
-    expect(isConstValueNode(parseValue('[ $var ]'))).to.equal(false);
+    expect(isConstValueNode(parseValue('[ "value" ]'))).toEqual(true);
+    expect(isConstValueNode(parseValue('[ $var ]'))).toEqual(false);
   });
 
   it('isTypeNode', () => {
-    expect(filterNodes(isTypeNode)).to.deep.equal([
+    expect(filterNodes(isTypeNode)).toEqual([
       'NamedType',
       'ListType',
       'NonNullType',
@@ -84,9 +80,8 @@ describe('AST node predicates', () => {
   });
 
   it('isTypeSystemDefinitionNode', () => {
-    expect(filterNodes(isTypeSystemDefinitionNode)).to.deep.equal([
+    expect(filterNodes(isTypeSystemDefinitionNode)).toEqual([
       'SchemaDefinition',
-      'ScalarTypeDefinition',
       'ResolverTypeDefinition',
       'DataTypeDefinition',
       'DirectiveDefinition',
@@ -94,8 +89,7 @@ describe('AST node predicates', () => {
   });
 
   it('isTypeDefinitionNode', () => {
-    expect(filterNodes(isTypeDefinitionNode)).to.deep.equal([
-      'ScalarTypeDefinition',
+    expect(filterNodes(isTypeDefinitionNode)).toEqual([
       'ResolverTypeDefinition',
       'DataTypeDefinition',
     ]);

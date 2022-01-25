@@ -133,7 +133,7 @@ describe('Schema Parser', () => {
   });
 
   it('Scalar', () => {
-    snapshot('scalar Hello');
+    snapshot('data Hello = String');
   });
 
   it('Simple data object', () => {
