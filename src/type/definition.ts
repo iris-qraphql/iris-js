@@ -510,10 +510,6 @@ export class IrisResolverType<TSource = any, TContext = any> {
   }
 }
 
-export type GraphQLInputField = IrisDataVariantField & {
-  defaultValue?: unknown;
-};
-
 export type IrisDataVariantField = {
   name: string;
   description?: Maybe<string>;
@@ -723,6 +719,5 @@ function didYouMeanEnumValue(
   return didYouMean('the enum value', suggestedValues);
 }
 
-export function isRequiredInputField(field: GraphQLInputField): boolean {
-  return isNonNullType(field.type) && field.defaultValue === undefined;
-}
+export const isRequiredInputField = (field: IrisDataVariantField): boolean =>
+  isNonNullType(field.type);
