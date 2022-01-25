@@ -252,14 +252,13 @@ export const GraphQLID = gqlScalar<string>({
   },
 });
 
-export const specifiedScalarTypes: ReadonlyArray<IrisDataType> =
-  Object.freeze([
-    GraphQLString,
-    GraphQLInt,
-    GraphQLFloat,
-    GraphQLBoolean,
-    GraphQLID,
-  ]);
+export const specifiedScalarTypes: ReadonlyArray<IrisDataType> = Object.freeze([
+  GraphQLString,
+  GraphQLInt,
+  GraphQLFloat,
+  GraphQLBoolean,
+  GraphQLID,
+]);
 
 export function isSpecifiedScalarType(type: GraphQLNamedType): boolean {
   return specifiedScalarTypes.some(({ name }) => type.name === name);
