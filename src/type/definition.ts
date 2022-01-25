@@ -237,18 +237,10 @@ export function getNullableType(
   }
 }
 
-/**
- * These named types do not include modifiers like List or NonNull.
- */
-export type GraphQLNamedType = GraphQLNamedInputType | GraphQLNamedOutputType;
-
-export type GraphQLNamedInputType = IrisDataType;
-
-export type GraphQLNamedOutputType = IrisResolverType | IrisDataType;
+export type GraphQLNamedType = IrisResolverType | IrisDataType;
 
 export function getNamedType(type: undefined | null): void;
-export function getNamedType(type: GraphQLInputType): GraphQLNamedInputType;
-export function getNamedType(type: GraphQLOutputType): GraphQLNamedOutputType;
+export function getNamedType(type: GraphQLInputType): IrisDataType;
 export function getNamedType(type: GraphQLType): GraphQLNamedType;
 export function getNamedType(
   type: Maybe<GraphQLType>,
@@ -265,11 +257,6 @@ export function getNamedType(
   }
 }
 
-/**
- * Used while defining GraphQL types to allow for circular references in
- * otherwise immutable type definitions.
- */
-export type ThunkReadonlyArray<T> = Thunk<ReadonlyArray<T>>;
 export type ThunkObjMap<T> = Thunk<ObjMap<T>>;
 export type Thunk<T> = (() => T) | T;
 
