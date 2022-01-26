@@ -216,37 +216,12 @@ export type {
   DirectiveDefinitionNode,
 } from './language/index';
 
-// Execute GraphQL queries.
-export {
-  execute,
-  executeSync,
-  defaultFieldResolver,
-  defaultTypeResolver,
-  responsePathAsArray,
-  getDirectiveValues,
-  subscribe,
-  createSourceEventStream,
-} from './execution/index';
-
-export type {
-  ExecutionArgs,
-  ExecutionResult,
-  FormattedExecutionResult,
-} from './execution/index';
-
-export type { SubscriptionArgs } from './subscription/index';
-
 // Create, format, and print GraphQL errors.
 
 // Utilities for operating on GraphQL type schema and parsed sources.
 export {
   // Produce the GraphQL query recommended for a full schema introspection.
   // Accepts optional IntrospectionOptions.
-  getIntrospectionQuery,
-  // Gets the target Operation from a Document.
-  getOperationAST,
-  // Gets the Type for the target Operation AST.
-  getOperationRootType,
   // Build a GraphQLSchema from an introspection result.
   // Build a GraphQLSchema from a parsed GraphQL Schema language AST.
   buildASTSchema,
@@ -271,10 +246,6 @@ export {
   visitWithTypeInfo,
   // Coerces a JavaScript value to a GraphQL type, or produces errors.
   coerceInputValue,
-  // Concatenates multiple AST together.
-  concatAST,
-  // Separates an AST into an AST per Operation.
-  separateOperations,
   // Strips characters that are not significant to the validity or execution of a GraphQL document.
   stripIgnoredCharacters,
   // Comparators for types
@@ -287,29 +258,4 @@ export {
   isValidNameError,
 } from './utilities/index';
 
-export type {
-  IntrospectionOptions,
-  IntrospectionQuery,
-  IntrospectionSchema,
-  IntrospectionType,
-  IntrospectionInputType,
-  IntrospectionOutputType,
-  IntrospectionScalarType,
-  IntrospectionObjectType,
-  IntrospectionInterfaceType,
-  IntrospectionUnionType,
-  IntrospectionEnumType,
-  IntrospectionInputObjectType,
-  IntrospectionTypeRef,
-  IntrospectionInputTypeRef,
-  IntrospectionOutputTypeRef,
-  IntrospectionNamedTypeRef,
-  IntrospectionListTypeRef,
-  IntrospectionNonNullTypeRef,
-  IntrospectionField,
-  IntrospectionInputValue,
-  IntrospectionEnumValue,
-  IntrospectionDirective,
-  BuildSchemaOptions,
-  TypedQueryDocumentNode,
-} from './utilities/index';
+export type { BuildSchemaOptions } from './utilities/index';

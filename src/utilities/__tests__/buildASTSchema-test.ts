@@ -1,7 +1,6 @@
 import { dedent } from '../../__testUtils__/dedent';
 
 import { Kind } from '../../language/kinds';
-import { parse } from '../../language/parser';
 
 import { assertDataType, assertResolverType } from '../../type/definition';
 import {
@@ -21,8 +20,6 @@ import {
 import { GraphQLSchema } from '../../type/schema';
 import { validateSchema } from '../../type/validate';
 
-import { graphqlSync } from '../../iris';
-
 import { buildASTSchema, buildSchema } from '../buildASTSchema';
 import { printSchema } from '../printSchema';
 
@@ -36,39 +33,6 @@ function cycleSDL(sdl: string): string {
 }
 
 describe('Schema Builder', () => {
-  it('can use built schema for limited execution', () => {
-    const schema = buildASTSchema(
-      parse(`
-        resolver Query = {
-          str: String
-        }
-      `),
-    );
-
-    const result = graphqlSync({
-      schema,
-      source: '{ str }',
-      rootValue: { str: 123 },
-    });
-    expect(result.data).toEqual({ str: '123' });
-  });
-
-  it('can build a schema directly from the source', () => {
-    const schema = buildSchema(`
-      resolver Query = {
-        add(x: Int, y: Int): Int
-      }
-    `);
-
-    const source = '{ add(x: 34, y: 55) }';
-    const rootValue = {
-      add: ({ x, y }: { x: number; y: number }) => x + y,
-    };
-    expect(graphqlSync({ schema, source, rootValue })).toEqual({
-      data: { add: 89 },
-    });
-  });
-
   it('Match order of default types and directives', () => {
     const schema = new GraphQLSchema({});
     const sdlSchema = buildASTSchema({

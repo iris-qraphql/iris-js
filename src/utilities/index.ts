@@ -1,36 +1,4 @@
-// Produce the GraphQL query recommended for a full schema introspection.
-export { getIntrospectionQuery } from './getIntrospectionQuery';
-
-export type {
-  IntrospectionOptions,
-  IntrospectionQuery,
-  IntrospectionSchema,
-  IntrospectionType,
-  IntrospectionInputType,
-  IntrospectionOutputType,
-  IntrospectionScalarType,
-  IntrospectionObjectType,
-  IntrospectionInterfaceType,
-  IntrospectionUnionType,
-  IntrospectionEnumType,
-  IntrospectionInputObjectType,
-  IntrospectionTypeRef,
-  IntrospectionInputTypeRef,
-  IntrospectionOutputTypeRef,
-  IntrospectionNamedTypeRef,
-  IntrospectionListTypeRef,
-  IntrospectionNonNullTypeRef,
-  IntrospectionField,
-  IntrospectionInputValue,
-  IntrospectionEnumValue,
-  IntrospectionDirective,
-} from './getIntrospectionQuery';
-
-// Gets the target Operation from a Document.
-export { getOperationAST } from './getOperationAST';
-
 // Gets the Type for the target Operation AST.
-export { getOperationRootType } from './getOperationRootType';
 
 // Build a GraphQLSchema from GraphQL Schema language.
 export { buildASTSchema, buildSchema } from './buildASTSchema';
@@ -61,12 +29,6 @@ export { TypeInfo, visitWithTypeInfo } from './TypeInfo';
 // Coerces a JavaScript value to a GraphQL type, or produces errors.
 export { coerceInputValue } from './coerceInputValue';
 
-// Concatenates multiple AST together.
-export { concatAST } from './concatAST';
-
-// Separates an AST into an AST per Operation.
-export { separateOperations } from './separateOperations';
-
 // Strips characters that are not significant to the validity or execution of a GraphQL document.
 export { stripIgnoredCharacters } from './stripIgnoredCharacters';
 
@@ -77,10 +39,4 @@ export {
   doTypesOverlap,
 } from './typeComparators';
 
-// Asserts that a string is a valid GraphQL name
 export { assertValidName, isValidNameError } from './assertValidName';
-
-// Compares two GraphQLSchemas and detects breaking changes.
-
-// Wrapper type that contains DocumentNode and types that can be deduced from it.
-export type { TypedQueryDocumentNode } from './typedQueryDocumentNode';

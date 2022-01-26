@@ -43,11 +43,10 @@ import type {
   GraphQLSchemaValidationOptions,
 } from '../type/schema';
 
-import { getDirectiveValues } from '../execution/values';
-
 import type { ConfigMap } from '../utils/type-level';
 
 import { valueFromAST } from './valueFromAST';
+import { getDirectiveValues } from './values';
 
 interface Options extends GraphQLSchemaValidationOptions {
   /**
