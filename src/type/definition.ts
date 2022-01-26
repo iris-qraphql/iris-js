@@ -11,8 +11,6 @@ import type { Path } from '../jsutils/Path';
 import type { PromiseOrValue } from '../jsutils/PromiseOrValue';
 import { suggestionList } from '../jsutils/suggestionList';
 
-import { GraphQLError } from '../error/GraphQLError';
-
 import type {
   ArgumentDefinitionNode,
   DataFieldDefinitionNode,
@@ -30,6 +28,7 @@ import { print } from '../language/printer';
 
 import { valueFromASTUntyped } from '../utilities/valueFromASTUntyped';
 
+import { GraphQLError } from '../error';
 import type { ConfigMap, ConfigMapValue, Override } from '../utils/type-level';
 
 import { assertName } from './assertName';

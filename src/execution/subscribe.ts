@@ -4,13 +4,12 @@ import { isAsyncIterable } from '../jsutils/isAsyncIterable';
 import type { Maybe } from '../jsutils/Maybe';
 import { addPath, pathToArray } from '../jsutils/Path';
 
-import { GraphQLError } from '../error/GraphQLError';
-import { locatedError } from '../error/locatedError';
-
 import type { DocumentNode } from '../language/ast';
 
 import type { GraphQLFieldResolver } from '../type/definition';
 import type { GraphQLSchema } from '../type/schema';
+
+import { GraphQLError,locatedError  } from '../error';
 
 import { collectFields } from './collectFields';
 import type {

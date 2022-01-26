@@ -1,8 +1,6 @@
 import { didYouMean } from '../../jsutils/didYouMean';
 import { suggestionList } from '../../jsutils/suggestionList';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { ASTNode } from '../../language/ast';
 import {
   isTypeDefinitionNode,
@@ -12,6 +10,8 @@ import type { ASTVisitor } from '../../language/visitor';
 
 import { introspectionTypes } from '../../type/introspection';
 import { specifiedScalarTypes } from '../../type/scalars';
+
+import { GraphQLError } from '../../error';
 
 import type {
   SDLValidationContext,

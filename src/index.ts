@@ -236,65 +236,7 @@ export type {
 
 export type { SubscriptionArgs } from './subscription/index';
 
-// Validate GraphQL documents.
-export {
-  validate,
-  ValidationContext,
-  // All validation rules in the GraphQL Specification.
-  specifiedRules,
-  // Individual validation rules.
-  ExecutableDefinitionsRule,
-  FieldsOnCorrectTypeRule,
-  FragmentsOnCompositeTypesRule,
-  KnownArgumentNamesRule,
-  KnownDirectivesRule,
-  KnownFragmentNamesRule,
-  KnownTypeNamesRule,
-  LoneAnonymousOperationRule,
-  NoFragmentCyclesRule,
-  NoUndefinedVariablesRule,
-  NoUnusedFragmentsRule,
-  NoUnusedVariablesRule,
-  OverlappingFieldsCanBeMergedRule,
-  PossibleFragmentSpreadsRule,
-  ProvidedRequiredArgumentsRule,
-  ScalarLeafsRule,
-  SingleFieldSubscriptionsRule,
-  UniqueArgumentNamesRule,
-  UniqueDirectivesPerLocationRule,
-  UniqueFragmentNamesRule,
-  UniqueInputFieldNamesRule,
-  UniqueOperationNamesRule,
-  UniqueVariableNamesRule,
-  ValuesOfCorrectTypeRule,
-  VariablesAreInputTypesRule,
-  VariablesInAllowedPositionRule,
-  // SDL-specific validation rules
-  LoneSchemaDefinitionRule,
-  UniqueTypeNamesRule,
-  UniqueVariantAndFieldDefinitionNamesRule,
-  UniqueArgumentDefinitionNamesRule,
-  UniqueDirectiveNamesRule,
-  // Custom validation rules
-  NoDeprecatedCustomRule,
-  NoSchemaIntrospectionCustomRule,
-} from './validation/index';
-
-export type { ValidationRule } from './validation/index';
-
 // Create, format, and print GraphQL errors.
-export {
-  GraphQLError,
-  syntaxError,
-  locatedError,
-  printError,
-  formatError,
-} from './error/index';
-
-export type {
-  GraphQLFormattedError,
-  GraphQLErrorExtensions,
-} from './error/index';
 
 // Utilities for operating on GraphQL type schema and parsed sources.
 export {

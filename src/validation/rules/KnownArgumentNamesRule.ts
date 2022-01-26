@@ -1,12 +1,12 @@
 import { didYouMean } from '../../jsutils/didYouMean';
 import { suggestionList } from '../../jsutils/suggestionList';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import { Kind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
+
+import { GraphQLError } from '../../error';
 
 import type {
   SDLValidationContext,

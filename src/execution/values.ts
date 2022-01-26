@@ -4,8 +4,6 @@ import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { printPathArray } from '../jsutils/printPathArray';
 
-import { GraphQLError } from '../error/GraphQLError';
-
 import type {
   DirectiveNode,
   FieldNode,
@@ -22,6 +20,8 @@ import type { GraphQLSchema } from '../type/schema';
 import { coerceInputValue } from '../utilities/coerceInputValue';
 import { typeFromAST } from '../utilities/typeFromAST';
 import { valueFromAST } from '../utilities/valueFromAST';
+
+import { GraphQLError } from '../error';
 
 type CoercedVariableValues =
   | { errors: ReadonlyArray<GraphQLError>; coerced?: never }

@@ -1,11 +1,11 @@
 import { inspect } from '../../jsutils/inspect';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { FieldNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { getNamedType, isDataType } from '../../type/definition';
+
+import { GraphQLError } from '../../error';
 
 import type { ValidationContext } from '../ValidationContext';
 

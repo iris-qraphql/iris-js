@@ -1,5 +1,3 @@
-import { GraphQLError } from '../error/GraphQLError';
-
 import type {
   OperationDefinitionNode,
   OperationTypeDefinitionNode,
@@ -7,6 +5,8 @@ import type {
 
 import type { IrisResolverType } from '../type/definition';
 import type { GraphQLSchema } from '../type/schema';
+
+import { GraphQLError } from '../error';
 
 /**
  * Extracts the root type of the operation from the schema.

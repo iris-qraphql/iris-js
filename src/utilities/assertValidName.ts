@@ -1,8 +1,8 @@
 import { devAssert } from '../jsutils/devAssert';
 
-import { GraphQLError } from '../error/GraphQLError';
-
 import { assertName } from '../type/assertName';
+
+import { GraphQLError } from '../error';
 
 /* c8 ignore start */
 /**

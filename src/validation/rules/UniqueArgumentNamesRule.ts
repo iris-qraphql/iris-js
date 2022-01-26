@@ -1,9 +1,9 @@
 import { groupBy } from '../../jsutils/groupBy';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { ArgumentNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
+
+import { GraphQLError } from '../../error';
 
 import type { ASTValidationContext } from '../ValidationContext';
 

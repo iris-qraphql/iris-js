@@ -3,8 +3,6 @@ import { inspect } from '../../jsutils/inspect';
 import { keyMap } from '../../jsutils/keyMap';
 import { suggestionList } from '../../jsutils/suggestionList';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { ValueNode } from '../../language/ast';
 import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
@@ -19,6 +17,7 @@ import {
   isRequiredInputField,
 } from '../../type/definition';
 
+import { GraphQLError } from '../../error';
 import { lookupObjectTypename } from '../../utils/type-level';
 
 import type { ValidationContext } from '../ValidationContext';

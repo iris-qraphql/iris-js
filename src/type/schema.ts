@@ -5,10 +5,10 @@ import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
-import type { GraphQLError } from '../error/GraphQLError';
-
 import type { SchemaDefinitionNode } from '../language/ast';
 import { OperationTypeNode } from '../language/ast';
+
+import type { GraphQLError } from '../error';
 
 import type {
   GraphQLNamedType,

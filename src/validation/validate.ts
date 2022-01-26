@@ -1,8 +1,6 @@
 import { devAssert } from '../jsutils/devAssert';
 import type { Maybe } from '../jsutils/Maybe';
 
-import { GraphQLError } from '../error/GraphQLError';
-
 import type { DocumentNode } from '../language/ast';
 import { visit, visitInParallel } from '../language/visitor';
 
@@ -11,7 +9,9 @@ import { assertValidSchema } from '../type/validate';
 
 import { TypeInfo, visitWithTypeInfo } from '../utilities/TypeInfo';
 
-import { specifiedRules, specifiedSDLRules } from './specifiedRules';
+import { GraphQLError } from '../error';
+
+import { specifiedSDLRules } from './specifiedRules';
 import type { SDLValidationRule, ValidationRule } from './ValidationContext';
 import { SDLValidationContext, ValidationContext } from './ValidationContext';
 
@@ -38,7 +38,7 @@ import { SDLValidationContext, ValidationContext } from './ValidationContext';
 export function validate(
   schema: GraphQLSchema,
   documentAST: DocumentNode,
-  rules: ReadonlyArray<ValidationRule> = specifiedRules,
+  rules: ReadonlyArray<ValidationRule> = [],
   options?: { maxErrors?: number },
 
   /** @deprecated will be removed in 17.0.0 */

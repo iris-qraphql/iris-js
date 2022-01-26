@@ -1,10 +1,10 @@
 import { inspect } from '../jsutils/inspect';
 import { isObjectLike } from '../jsutils/isObjectLike';
 
-import { GraphQLError } from '../error/GraphQLError';
-
 import { Kind } from '../language/kinds';
 import { print } from '../language/printer';
+
+import { GraphQLError } from '../error';
 
 import type { GraphQLNamedType, IrisDataType } from './definition';
 import { gqlScalar } from './make';

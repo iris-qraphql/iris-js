@@ -1,7 +1,7 @@
 import type { Maybe } from '../jsutils/Maybe';
 
-import type { GraphQLError } from '../error/GraphQLError';
-import { syntaxError } from '../error/syntaxError';
+import type { GraphQLError } from '../error';
+import { syntaxError } from '../error';
 
 import type {
   ArgumentDefinitionNode,

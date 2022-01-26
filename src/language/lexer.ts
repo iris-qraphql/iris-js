@@ -1,4 +1,4 @@
-import { syntaxError } from '../error/syntaxError';
+import { syntaxError } from '../error';
 
 import { Token } from './ast';
 import { dedentBlockStringLines } from './blockString';

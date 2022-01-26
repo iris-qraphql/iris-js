@@ -13,10 +13,6 @@ import { promiseForObject } from '../jsutils/promiseForObject';
 import type { PromiseOrValue } from '../jsutils/PromiseOrValue';
 import { promiseReduce } from '../jsutils/promiseReduce';
 
-import type { GraphQLFormattedError } from '../error/GraphQLError';
-import { GraphQLError } from '../error/GraphQLError';
-import { locatedError } from '../error/locatedError';
-
 import type {
   DocumentNode,
   FieldNode,
@@ -50,6 +46,9 @@ import {
 } from '../type/introspection';
 import type { GraphQLSchema } from '../type/schema';
 import { assertValidSchema } from '../type/validate';
+
+import type { GraphQLFormattedError } from '../error';
+import { GraphQLError , locatedError } from '../error';
 
 import {
   collectFields,

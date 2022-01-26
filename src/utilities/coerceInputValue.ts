@@ -8,10 +8,10 @@ import { addPath, pathToArray } from '../jsutils/Path';
 import { printPathArray } from '../jsutils/printPathArray';
 import { suggestionList } from '../jsutils/suggestionList';
 
-import { GraphQLError } from '../error/GraphQLError';
-
 import type { GraphQLInputType } from '../type/definition';
 import { isDataType, isListType, isNonNullType } from '../type/definition';
+
+import { GraphQLError } from '../error';
 
 type OnErrorCB = (
   path: ReadonlyArray<string | number>,

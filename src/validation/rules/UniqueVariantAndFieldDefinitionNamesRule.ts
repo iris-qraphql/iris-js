@@ -1,5 +1,3 @@
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type {
   ArgumentDefinitionNode,
   DataTypeDefinitionNode,
@@ -8,6 +6,8 @@ import type {
   ResolverTypeDefinitionNode,
 } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
+
+import { GraphQLError } from '../../error';
 
 import type { SDLValidationContext } from '../ValidationContext';
 

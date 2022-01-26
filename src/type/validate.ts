@@ -1,8 +1,6 @@
 import { inspect } from '../jsutils/inspect';
 import type { Maybe } from '../jsutils/Maybe';
 
-import { GraphQLError } from '../error/GraphQLError';
-
 import type {
   ASTNode,
   DirectiveNode,
@@ -10,6 +8,8 @@ import type {
   ResolverTypeDefinitionNode,
 } from '../language/ast';
 import { OperationTypeNode } from '../language/ast';
+
+import { GraphQLError } from '../error';
 
 import type {
   IrisDataType,
