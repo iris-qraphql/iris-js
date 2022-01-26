@@ -72,7 +72,7 @@ if (require.main === module) {
   fs.writeFileSync(
     path.join('./npmDist', notSupportedTSVersionFile),
     // Provoke syntax error to show this message
-    `"Package 'graphql' support only TS versions that are ${supportedTSVersions[0]}".`,
+    `"Package 'iris' support only TS versions that are ${supportedTSVersions[0]}".`,
   );
   packageJSON.typesVersions = {
     ...packageJSON.typesVersions,

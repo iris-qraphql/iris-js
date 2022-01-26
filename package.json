@@ -82,7 +82,8 @@
   },
   "dependencies": {
     "@types/chai": "^4.3.0",
-    "ramda": "^0.27.2"
+    "ramda": "^0.27.2",
+    "graphql": "^v16.3.0"
   },
   "jest": {
     "preset": "ts-jest",

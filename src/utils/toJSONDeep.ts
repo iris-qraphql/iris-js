@@ -1,5 +1,5 @@
-import { isObjectLike } from './isObjectLike';
-import { mapValue } from './mapValue';
+import { isObjectLike } from '../jsutils/isObjectLike';
+import { mapValue } from '../jsutils/mapValue';
 
 export function toJSONDeep(value: unknown): unknown {
   if (!isObjectLike(value)) {

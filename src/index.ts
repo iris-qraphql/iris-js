@@ -19,8 +19,8 @@
  * following two import statements are equivalent:
  *
  * ```ts
- * import { parse } from 'graphql';
- * import { parse } from 'graphql/language';
+ * import { parse } from 'iris';
+ * import { parse } from 'iris/language';
  * ```
  *
  * @packageDocumentation
