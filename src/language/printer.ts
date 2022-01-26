@@ -14,80 +14,13 @@ export function print(ast: ASTNode): string {
   return visit(ast, printDocASTReducer);
 }
 
-const MAX_LINE_LENGTH = 80;
-
 const printDocASTReducer: ASTReducer<string> = {
   Name: { leave: (node) => node.value },
   Variable: { leave: (node) => '$' + node.name },
-
-  // Document
-
   Document: {
     leave: (node) => join(node.definitions, '\n\n'),
   },
-
-  VariableDefinition: {
-    leave: ({ variable, type, defaultValue, directives }) =>
-      variable +
-      ': ' +
-      type +
-      wrap(' = ', defaultValue) +
-      wrap(' ', join(directives, ' ')),
-  },
-  SelectionSet: { leave: ({ selections }) => block(selections) },
-
-  Field: {
-    leave({ alias, name, arguments: args, directives, selectionSet }) {
-      const prefix = wrap('', alias, ': ') + name;
-      let argsLine = prefix + wrap('(', join(args, ', '), ')');
-
-      if (argsLine.length > MAX_LINE_LENGTH) {
-        argsLine = prefix + wrap('(\n', indent(join(args, '\n')), '\n)');
-      }
-
-      return join([argsLine, join(directives, ' '), selectionSet], ' ');
-    },
-  },
-
   Argument: { leave: ({ name, value }) => name + ': ' + value },
-
-  // Fragments
-
-  FragmentSpread: {
-    leave: ({ name, directives }) =>
-      '...' + name + wrap(' ', join(directives, ' ')),
-  },
-
-  InlineFragment: {
-    leave: ({ typeCondition, directives, selectionSet }) =>
-      join(
-        [
-          '...',
-          wrap('on ', typeCondition),
-          join(directives, ' '),
-          selectionSet,
-        ],
-        ' ',
-      ),
-  },
-
-  FragmentDefinition: {
-    leave: ({
-      name,
-      typeCondition,
-      variableDefinitions,
-      directives,
-      selectionSet,
-    }) =>
-      // Note: fragment variable definitions are experimental and may be changed
-      // or removed in the future.
-      `fragment ${name}${wrap('(', join(variableDefinitions, ', '), ')')} ` +
-      `on ${typeCondition} ${wrap('', join(directives, ' '), ' ')}` +
-      selectionSet,
-  },
-
-  // Value
-
   IntValue: { leave: ({ value }) => value },
   FloatValue: { leave: ({ value }) => value },
   StringValue: {
@@ -117,16 +50,6 @@ const printDocASTReducer: ASTReducer<string> = {
   NonNullType: { leave: ({ type }) => type + '!' },
 
   // Type System Definitions
-
-  SchemaDefinition: {
-    leave: ({ description, directives, operationTypes }) =>
-      wrap('', description, '\n') +
-      join(['schema', join(directives, ' '), block(operationTypes)], ' '),
-  },
-
-  OperationTypeDefinition: {
-    leave: ({ operation, type }) => operation + ': ' + type,
-  },
 
   FieldDefinition: {
     leave: ({ description, name, arguments: args, type, directives }) =>
@@ -163,13 +86,6 @@ const printDocASTReducer: ASTReducer<string> = {
       ),
   },
 
-  // ObjectTypeDefinition: {
-  //   leave: ({ description, name, directives, fields }) =>
-  //     wrap('', description, '\n') +
-  //     join(['type', name, join(directives, ' '), block(fields)], ' '),
-  // },
-
-  // TODO: consider variants with fields
   VariantDefinition: { leave: ({ name }) => name },
 
   DataTypeDefinition: {

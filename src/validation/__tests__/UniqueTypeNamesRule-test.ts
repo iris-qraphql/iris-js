@@ -1,14 +1,15 @@
 import type { GraphQLSchema } from '../../type/schema';
 
-import { expectSDLValidationErrors } from '../__mocha__/harness';
+import { getSDLValidationErrors } from '../../utils/harness';
+
 import { UniqueTypeNamesRule } from '../rules/UniqueTypeNamesRule';
 
 function expectSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
-  return expectSDLValidationErrors(schema, UniqueTypeNamesRule, sdlStr);
+  return expect(getSDLValidationErrors(schema, UniqueTypeNamesRule, sdlStr));
 }
 
 function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {
-  expectSDLErrors(sdlStr, schema).toDeepEqual([]);
+  expectSDLErrors(sdlStr, schema).toEqual([]);
 }
 
 describe('Validate: Unique type names', () => {
@@ -32,22 +33,12 @@ describe('Validate: Unique type names', () => {
     `);
   });
 
-  it('type and non-type definitions named the same', () => {
-    expectValidSDL(`
-      query Foo { __typename }
-      fragment Foo on Query { __typename }
-      directive @Foo on SCHEMA
-
-      resolver Foo
-    `);
-  });
-
   it('types named the same', () => {
     expectSDLErrors(`
       resolver Foo
       data Foo
       data Foo
-    `).toDeepEqual([
+    `).toEqual([
       {
         message: 'There can be only one type named "Foo".',
         locations: [

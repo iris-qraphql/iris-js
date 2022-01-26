@@ -104,7 +104,7 @@ function validateRootTypes(context: SchemaValidationContext): void {
   const schema = context.schema;
   const queryType = schema.getQueryType();
   if (!queryType) {
-    context.reportError('Query root type must be provided.', schema.astNode);
+    context.reportError('Query root type must be provided.');
   } else if (!isObjectType(queryType)) {
     context.reportError(
       `Query root type must be Object type, it cannot be ${inspect(
@@ -137,14 +137,10 @@ function validateRootTypes(context: SchemaValidationContext): void {
 }
 
 function getOperationTypeNode(
-  schema: GraphQLSchema,
-  operation: OperationTypeNode,
+  _schema: GraphQLSchema,
+  _operation: OperationTypeNode,
 ): Maybe<ASTNode> {
-  return [schema.astNode]
-    .flatMap(
-      (schemaNode) => /* c8 ignore next */ schemaNode?.operationTypes ?? [],
-    )
-    .find((operationNode) => operationNode.operation === operation)?.type;
+  return undefined;
 }
 
 function validateDirectives(context: SchemaValidationContext): void {

@@ -18,11 +18,7 @@ import type {
   DirectiveNode,
   DocumentNode,
   EnumValueNode,
-  FieldNode,
   FloatValueNode,
-  FragmentDefinitionNode,
-  FragmentSpreadNode,
-  InlineFragmentNode,
   IntValueNode,
   ListTypeNode,
   ListValueNode,
@@ -32,15 +28,10 @@ import type {
   NullValueNode,
   ObjectFieldNode,
   ObjectValueNode,
-  OperationDefinitionNode,
-  OperationTypeDefinitionNode,
-  SelectionNode,
-  SelectionSetNode,
   StringValueNode,
   Token,
   TypeNode,
   ValueNode,
-  VariableDefinitionNode,
   VariableNode,
 } from './ast';
 import { Location, OperationTypeNode } from './ast';
@@ -199,10 +190,6 @@ export class Parser {
   }
 
   parseDefinition(): DefinitionNode {
-    if (this.peek(TokenKind.BRACE_L)) {
-      return this.parseOperationDefinition();
-    }
-
     // Many definitions begin with a description and require a lookahead.
     const hasDescription = this.peekDescription();
     const keywordToken = hasDescription
@@ -222,15 +209,6 @@ export class Parser {
           'Unexpected description, descriptions are supported only on type definitions.',
         );
       }
-
-      switch (keywordToken.value) {
-        case 'query':
-        case 'mutation':
-        case 'subscription':
-          return this.parseOperationDefinition();
-        case 'fragment':
-          return this.parseFragmentDefinition();
-      }
     }
 
     throw this.unexpected(keywordToken);
@@ -242,40 +220,6 @@ export class Parser {
       this._lexer.token.start,
       `${getTokenDesc(this._lexer.token)} ${message}.`,
     );
-  }
-
-  // Implements the parsing rules in the Operations section.
-
-  /**
-   * OperationDefinition :
-   *  - SelectionSet
-   *  - OperationType Name? VariableDefinitions? Directives? SelectionSet
-   */
-  parseOperationDefinition(): OperationDefinitionNode {
-    const start = this._lexer.token;
-    if (this.peek(TokenKind.BRACE_L)) {
-      return this.node<OperationDefinitionNode>(start, {
-        kind: Kind.OPERATION_DEFINITION,
-        operation: OperationTypeNode.QUERY,
-        name: undefined,
-        variableDefinitions: [],
-        directives: [],
-        selectionSet: this.parseSelectionSet(),
-      });
-    }
-    const operation = this.parseOperationType();
-    let name;
-    if (this.peek(TokenKind.NAME)) {
-      name = this.parseName();
-    }
-    return this.node<OperationDefinitionNode>(start, {
-      kind: Kind.OPERATION_DEFINITION,
-      operation,
-      name,
-      variableDefinitions: this.parseVariableDefinitions(),
-      directives: this.parseDirectives(false),
-      selectionSet: this.parseSelectionSet(),
-    });
   }
 
   /**
@@ -296,32 +240,6 @@ export class Parser {
   }
 
   /**
-   * VariableDefinitions : ( VariableDefinition+ )
-   */
-  parseVariableDefinitions(): Array<VariableDefinitionNode> {
-    return this.optionalMany(
-      TokenKind.PAREN_L,
-      this.parseVariableDefinition,
-      TokenKind.PAREN_R,
-    );
-  }
-
-  /**
-   * VariableDefinition : Variable : Type DefaultValue? Directives[Const]?
-   */
-  parseVariableDefinition(): VariableDefinitionNode {
-    return this.node<VariableDefinitionNode>(this._lexer.token, {
-      kind: Kind.VARIABLE_DEFINITION,
-      variable: this.parseVariable(),
-      type: (this.expectToken(TokenKind.COLON), this.parseTypeReference()),
-      defaultValue: this.expectOptionalToken(TokenKind.EQUALS)
-        ? this.parseConstValueLiteral()
-        : undefined,
-      directives: this.parseConstDirectives(),
-    });
-  }
-
-  /**
    * Variable : $ Name
    */
   parseVariable(): VariableNode {
@@ -330,64 +248,6 @@ export class Parser {
     return this.node<VariableNode>(start, {
       kind: Kind.VARIABLE,
       name: this.parseName(),
-    });
-  }
-
-  /**
-   * ```
-   * SelectionSet : { Selection+ }
-   * ```
-   */
-  parseSelectionSet(): SelectionSetNode {
-    return this.node<SelectionSetNode>(this._lexer.token, {
-      kind: Kind.SELECTION_SET,
-      selections: this.many(
-        TokenKind.BRACE_L,
-        this.parseSelection,
-        TokenKind.BRACE_R,
-      ),
-    });
-  }
-
-  /**
-   * Selection :
-   *   - Field
-   *   - FragmentSpread
-   *   - InlineFragment
-   */
-  parseSelection(): SelectionNode {
-    return this.peek(TokenKind.SPREAD)
-      ? this.parseFragment()
-      : this.parseField();
-  }
-
-  /**
-   * Field : Alias? Name Arguments? Directives? SelectionSet?
-   *
-   * Alias : Name :
-   */
-  parseField(): FieldNode {
-    const start = this._lexer.token;
-
-    const nameOrAlias = this.parseName();
-    let alias;
-    let name;
-    if (this.expectOptionalToken(TokenKind.COLON)) {
-      alias = nameOrAlias;
-      name = this.parseName();
-    } else {
-      name = nameOrAlias;
-    }
-
-    return this.node<FieldNode>(start, {
-      kind: Kind.FIELD,
-      alias,
-      name,
-      arguments: this.parseArguments(false),
-      directives: this.parseDirectives(false),
-      selectionSet: this.peek(TokenKind.BRACE_L)
-        ? this.parseSelectionSet()
-        : undefined,
     });
   }
 
@@ -420,66 +280,6 @@ export class Parser {
 
   parseConstArgument(): ConstArgumentNode {
     return this.parseArgument(true);
-  }
-
-  // Implements the parsing rules in the Fragments section.
-
-  /**
-   * Corresponds to both FragmentSpread and InlineFragment in the spec.
-   *
-   * FragmentSpread : ... FragmentName Directives?
-   *
-   * InlineFragment : ... TypeCondition? Directives? SelectionSet
-   */
-  parseFragment(): FragmentSpreadNode | InlineFragmentNode {
-    const start = this._lexer.token;
-    this.expectToken(TokenKind.SPREAD);
-
-    const hasTypeCondition = this.expectOptionalKeyword('on');
-    if (!hasTypeCondition && this.peek(TokenKind.NAME)) {
-      return this.node<FragmentSpreadNode>(start, {
-        kind: Kind.FRAGMENT_SPREAD,
-        name: this.parseFragmentName(),
-        directives: this.parseDirectives(false),
-      });
-    }
-    return this.node<InlineFragmentNode>(start, {
-      kind: Kind.INLINE_FRAGMENT,
-      typeCondition: hasTypeCondition ? this.parseNamedType() : undefined,
-      directives: this.parseDirectives(false),
-      selectionSet: this.parseSelectionSet(),
-    });
-  }
-
-  /**
-   * FragmentDefinition :
-   *   - fragment FragmentName on TypeCondition Directives? SelectionSet
-   *
-   * TypeCondition : NamedType
-   */
-  parseFragmentDefinition(): FragmentDefinitionNode {
-    const start = this._lexer.token;
-    this.expectKeyword('fragment');
-    // Legacy support for defining variables within fragments changes
-    // the grammar of FragmentDefinition:
-    //   - fragment FragmentName VariableDefinitions? on TypeCondition Directives? SelectionSet
-    if (this._options?.allowLegacyFragmentVariables === true) {
-      return this.node<FragmentDefinitionNode>(start, {
-        kind: Kind.FRAGMENT_DEFINITION,
-        name: this.parseFragmentName(),
-        variableDefinitions: this.parseVariableDefinitions(),
-        typeCondition: (this.expectKeyword('on'), this.parseNamedType()),
-        directives: this.parseDirectives(false),
-        selectionSet: this.parseSelectionSet(),
-      });
-    }
-    return this.node<FragmentDefinitionNode>(start, {
-      kind: Kind.FRAGMENT_DEFINITION,
-      name: this.parseFragmentName(),
-      typeCondition: (this.expectKeyword('on'), this.parseNamedType()),
-      directives: this.parseDirectives(false),
-      selectionSet: this.parseSelectionSet(),
-    });
   }
 
   /**
@@ -730,21 +530,6 @@ export class Parser {
     if (this.peekDescription()) {
       return this.parseStringLiteral();
     }
-  }
-
-  /**
-   * OperationTypeDefinition : OperationType : NamedType
-   */
-  parseOperationTypeDefinition(): OperationTypeDefinitionNode {
-    const start = this._lexer.token;
-    const operation = this.parseOperationType();
-    this.expectToken(TokenKind.COLON);
-    const type = this.parseNamedType();
-    return this.node<OperationTypeDefinitionNode>(start, {
-      kind: Kind.OPERATION_TYPE_DEFINITION,
-      operation,
-      type,
-    });
   }
 
   parseArgumentDefs(): Array<ArgumentDefinitionNode> {

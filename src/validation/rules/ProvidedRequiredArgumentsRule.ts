@@ -19,45 +19,6 @@ import type {
 } from '../ValidationContext';
 
 /**
- * Provided required arguments
- *
- * A field or directive is only valid if all required (non-null without a
- * default value) field arguments have been provided.
- */
-export function ProvidedRequiredArgumentsRule(
-  context: ValidationContext,
-): ASTVisitor {
-  return {
-    // eslint-disable-next-line new-cap
-    ...ProvidedRequiredArgumentsOnDirectivesRule(context),
-    Field: {
-      // Validate on leave to allow for deeper errors to appear first.
-      leave(fieldNode) {
-        const fieldDef = context.getFieldDef();
-        if (!fieldDef) {
-          return false;
-        }
-
-        const providedArgs = new Set(
-          fieldNode.arguments?.map((arg) => arg.name.value),
-        );
-        for (const argDef of fieldDef.args) {
-          if (!providedArgs.has(argDef.name) && isRequiredArgument(argDef)) {
-            const argTypeStr = inspect(argDef.type);
-            context.reportError(
-              new GraphQLError(
-                `Field "${fieldDef.name}" argument "${argDef.name}" of type "${argTypeStr}" is required, but it was not provided.`,
-                fieldNode,
-              ),
-            );
-          }
-        }
-      },
-    },
-  };
-}
-
-/**
  * @internal
  */
 export function ProvidedRequiredArgumentsOnDirectivesRule(

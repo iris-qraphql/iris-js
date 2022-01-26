@@ -1,18 +1,21 @@
 import type { GraphQLSchema } from '../../type/schema';
 
-import { expectSDLValidationErrors } from '../__mocha__/harness';
+import { getSDLValidationErrors } from '../../utils/harness';
+
 import { UniqueVariantAndFieldDefinitionNamesRule } from '../rules/UniqueVariantAndFieldDefinitionNamesRule';
 
 function expectSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
-  return expectSDLValidationErrors(
-    schema,
-    UniqueVariantAndFieldDefinitionNamesRule,
-    sdlStr,
+  return expect(
+    getSDLValidationErrors(
+      schema,
+      UniqueVariantAndFieldDefinitionNamesRule,
+      sdlStr,
+    ),
   );
 }
 
 function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {
-  expectSDLErrors(sdlStr, schema).toDeepEqual([]);
+  expectSDLErrors(sdlStr, schema).toEqual([]);
 }
 
 describe('Validate: Unique field definition names', () => {
@@ -62,7 +65,7 @@ describe('Validate: Unique field definition names', () => {
         bar: String
         foo: String
       }
-    `).toDeepEqual([
+    `).toEqual([
       {
         message: 'Field "SomeObject.foo" can only be defined once.',
         locations: [

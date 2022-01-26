@@ -4,8 +4,6 @@ import { parseValue } from '../parser';
 import {
   isConstValueNode,
   isDefinitionNode,
-  isExecutableDefinitionNode,
-  isSelectionNode,
   isTypeDefinitionNode,
   isTypeNode,
   isTypeSystemDefinitionNode,
@@ -22,27 +20,9 @@ function filterNodes(predicate: (node: ASTNode) => boolean): Array<string> {
 describe('AST node predicates', () => {
   it('isDefinitionNode', () => {
     expect(filterNodes(isDefinitionNode)).toEqual([
-      'OperationDefinition',
-      'FragmentDefinition',
-      'SchemaDefinition',
       'ResolverTypeDefinition',
       'DataTypeDefinition',
       'DirectiveDefinition',
-    ]);
-  });
-
-  it('isExecutableDefinitionNode', () => {
-    expect(filterNodes(isExecutableDefinitionNode)).toEqual([
-      'OperationDefinition',
-      'FragmentDefinition',
-    ]);
-  });
-
-  it('isSelectionNode', () => {
-    expect(filterNodes(isSelectionNode)).toEqual([
-      'Field',
-      'FragmentSpread',
-      'InlineFragment',
     ]);
   });
 
@@ -81,7 +61,6 @@ describe('AST node predicates', () => {
 
   it('isTypeSystemDefinitionNode', () => {
     expect(filterNodes(isTypeSystemDefinitionNode)).toEqual([
-      'SchemaDefinition',
       'ResolverTypeDefinition',
       'DataTypeDefinition',
       'DirectiveDefinition',

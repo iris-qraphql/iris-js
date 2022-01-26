@@ -3,7 +3,7 @@ import { keyMap } from '../jsutils/keyMap';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
-import type { DirectiveNode, FieldNode } from '../language/ast';
+import type { DirectiveNode } from '../language/ast';
 import { Kind } from '../language/kinds';
 import { print } from '../language/printer';
 
@@ -17,7 +17,7 @@ import { valueFromAST } from './valueFromAST';
 
 export function getArgumentValues(
   def: GraphQLField | GraphQLDirective,
-  node: FieldNode | DirectiveNode,
+  node: DirectiveNode,
   variableValues?: Maybe<ObjMap<unknown>>,
 ): Record<string, unknown> {
   const coercedValues: Record<string, unknown> = {};

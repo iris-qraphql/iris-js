@@ -16,9 +16,6 @@ import type {
   DataFieldDefinitionNode,
   DataTypeDefinitionNode,
   FieldDefinitionNode,
-  FieldNode,
-  FragmentDefinitionNode,
-  OperationDefinitionNode,
   ResolverTypeDefinitionNode,
   ValueNode,
   VariantDefinitionNode,
@@ -351,14 +348,11 @@ export type GraphQLFieldResolver<
 
 export type GraphQLResolveInfo = {
   readonly fieldName: string;
-  readonly fieldNodes: ReadonlyArray<FieldNode>;
   readonly returnType: GraphQLOutputType;
   readonly parentType: IrisResolverType;
   readonly path: Path;
   readonly schema: GraphQLSchema;
-  readonly fragments: ObjMap<FragmentDefinitionNode>;
   readonly rootValue: unknown;
-  readonly operation: OperationDefinitionNode;
   readonly variableValues: Record<string, unknown>;
 };
 

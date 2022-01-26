@@ -2,7 +2,6 @@ import { inspect } from '../../jsutils/inspect';
 import { invariant } from '../../jsutils/invariant';
 
 import type { ASTNode } from '../../language/ast';
-import { OperationTypeNode } from '../../language/ast';
 import { DirectiveLocation } from '../../language/directiveLocation';
 import { Kind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
@@ -76,20 +75,6 @@ function getDirectiveLocationForASTPath(
   invariant('kind' in appliedTo);
 
   switch (appliedTo.kind) {
-    case Kind.OPERATION_DEFINITION:
-      return getDirectiveLocationForOperation(appliedTo.operation);
-    case Kind.FIELD:
-      return DirectiveLocation.FIELD;
-    case Kind.FRAGMENT_SPREAD:
-      return DirectiveLocation.FRAGMENT_SPREAD;
-    case Kind.INLINE_FRAGMENT:
-      return DirectiveLocation.INLINE_FRAGMENT;
-    case Kind.FRAGMENT_DEFINITION:
-      return DirectiveLocation.FRAGMENT_DEFINITION;
-    case Kind.VARIABLE_DEFINITION:
-      return DirectiveLocation.VARIABLE_DEFINITION;
-    case Kind.SCHEMA_DEFINITION:
-      return DirectiveLocation.SCHEMA;
     case Kind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
     case Kind.RESOLVER_TYPE_DEFINITION:
@@ -109,18 +94,5 @@ function getDirectiveLocationForASTPath(
     /* c8 ignore next */
     default:
       invariant(false, 'Unexpected kind: ' + inspect(appliedTo.kind));
-  }
-}
-
-function getDirectiveLocationForOperation(
-  operation: OperationTypeNode,
-): DirectiveLocation {
-  switch (operation) {
-    case OperationTypeNode.QUERY:
-      return DirectiveLocation.QUERY;
-    case OperationTypeNode.MUTATION:
-      return DirectiveLocation.MUTATION;
-    case OperationTypeNode.SUBSCRIPTION:
-      return DirectiveLocation.SUBSCRIPTION;
   }
 }

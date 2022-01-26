@@ -63,25 +63,23 @@ export function buildASTSchema(
   };
   const config = extendSchemaImpl(emptySchemaConfig, documentAST, options);
 
-  if (config.astNode == null) {
-    for (const type of config.types) {
-      switch (type.name) {
-        // Note: While this could make early assertions to get the correctly
-        // typed values below, that would throw immediately while type system
-        // validation with validateSchema() will produce more actionable results.
-        case 'Query':
-          // @ts-expect-error validated in `validateSchema`
-          config.query = type;
-          break;
-        case 'Mutation':
-          // @ts-expect-error validated in `validateSchema`
-          config.mutation = type;
-          break;
-        case 'Subscription':
-          // @ts-expect-error validated in `validateSchema`
-          config.subscription = type;
-          break;
-      }
+  for (const type of config.types) {
+    switch (type.name) {
+      // Note: While this could make early assertions to get the correctly
+      // typed values below, that would throw immediately while type system
+      // validation with validateSchema() will produce more actionable results.
+      case 'Query':
+        // @ts-expect-error validated in `validateSchema`
+        config.query = type;
+        break;
+      case 'Mutation':
+        // @ts-expect-error validated in `validateSchema`
+        config.mutation = type;
+        break;
+      case 'Subscription':
+        // @ts-expect-error validated in `validateSchema`
+        config.subscription = type;
+        break;
     }
   }
 
