@@ -1,10 +1,10 @@
 import { invariant } from '../../../jsutils/invariant';
 
-import { GraphQLError } from '../../../error/GraphQLError';
-
 import type { ASTVisitor } from '../../../language/visitor';
 
-import { getNamedType, isInputObjectType } from '../../../type/definition';
+import { getNamedType, isDataType } from '../../../type/definition';
+
+import { GraphQLError } from '../../../error';
 
 import type { ValidationContext } from '../../ValidationContext';
 
@@ -60,14 +60,14 @@ export function NoDeprecatedCustomRule(context: ValidationContext): ASTVisitor {
       }
     },
     ObjectField(node) {
-      const inputObjectDef = getNamedType(context.getParentInputType());
-      if (isInputObjectType(inputObjectDef)) {
-        const inputFieldDef = inputObjectDef.getFields()[node.name.value];
+      const def = getNamedType(context.getParentInputType());
+      if (isDataType(def) && def.isVariantType()) {
+        const inputFieldDef = def.variantBy().fields?.[node.name.value];
         const deprecationReason = inputFieldDef?.deprecationReason;
         if (deprecationReason != null) {
           context.reportError(
             new GraphQLError(
-              `The input field ${inputObjectDef.name}.${inputFieldDef.name} is deprecated. ${deprecationReason}`,
+              `The input field ${def.name}.${inputFieldDef?.name} is deprecated. ${deprecationReason}`,
               node,
             ),
           );

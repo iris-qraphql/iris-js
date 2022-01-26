@@ -1,3 +1,6 @@
+import type { ExecutionResult } from 'graphql/execution';
+import { execute } from 'graphql/execution';
+
 import { devAssert } from './jsutils/devAssert';
 import { isPromise } from './jsutils/isPromise';
 import type { Maybe } from './jsutils/Maybe';
@@ -14,9 +17,6 @@ import type { GraphQLSchema } from './type/schema';
 import { validateSchema } from './type/validate';
 
 import { validate } from './validation/validate';
-
-import type { ExecutionResult } from './execution/execute';
-import { execute } from './execution/execute';
 
 /**
  * This is the primary entry point function for fulfilling GraphQL operations
@@ -111,6 +111,7 @@ function graphqlImpl(args: GraphQLArgs): PromiseOrValue<ExecutionResult> {
   // Validate Schema
   const schemaValidationErrors = validateSchema(schema);
   if (schemaValidationErrors.length > 0) {
+    // @ts-expect-error
     return { errors: schemaValidationErrors };
   }
 
@@ -125,18 +126,23 @@ function graphqlImpl(args: GraphQLArgs): PromiseOrValue<ExecutionResult> {
   // Validate
   const validationErrors = validate(schema, document);
   if (validationErrors.length > 0) {
+    // @ts-expect-error
     return { errors: validationErrors };
   }
 
   // Execute
   return execute({
+    // @ts-expect-error
     schema,
+    // @ts-expect-error
     document,
     rootValue,
     contextValue,
     variableValues,
     operationName,
+    // @ts-expect-error
     fieldResolver,
+    // @ts-expect-error
     typeResolver,
   });
 }

@@ -4,13 +4,6 @@ The JavaScript implementation for Iris
 
 ## Getting Started
 
-A general overview of GraphQL is available in the
-[README](https://github.com/graphql/graphql-spec/blob/main/README.md) for the
-[Specification for GraphQL](https://github.com/graphql/graphql-spec). That overview
-describes a simple set of GraphQL examples that exist as [tests](src/__tests__)
-in this repository. A good way to get started with this repository is to walk
-through that README and the corresponding tests in parallel.
-
 ### Using GraphQL.js
 
 Install GraphQL.js from npm
@@ -27,13 +20,13 @@ or using yarn:
 yarn add iris
 ```
 
-GraphQL.js provides two important capabilities: building a type schema and
+iris.js provides two important capabilities: building a type schema and
 serving queries against that type schema.
 
-First, build a GraphQL type schema which maps to your codebase.
+First, build a Iris type schema which maps to your codebase.
 
 ```js
-import { graphql, IrisSchema, IrisResolverType, GraphQLString } from 'graphql';
+import { graphql, IrisSchema, IrisResolverType, GraphQLString } from 'iris';
 
 var schema = new IrisSchema({
   query: new IrisResolver({
@@ -88,11 +81,3 @@ graphql({ schema, source }).then((result) => {
 ```
 
 **Note**: Please don't forget to set `NODE_ENV=production` if you are running a production server. It will disable some checks that can be useful during development but will significantly improve performance.
-
-### Changelog
-
-Changes are tracked as [GitHub releases](https://github.com/graphql/graphql-js/releases).
-
-### License
-
-GraphQL.js is [MIT-licensed](./LICENSE).

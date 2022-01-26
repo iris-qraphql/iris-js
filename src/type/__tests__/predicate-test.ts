@@ -6,20 +6,16 @@ import type {
   IrisDataVariantField,
 } from '../definition';
 import {
-  assertAbstractType,
-  assertLeafType,
   assertListType,
   assertNonNullType,
-  assertObjectType,
   getNamedType,
   getNullableType,
   GraphQLList,
   GraphQLNonNull,
-  isAbstractType,
+  isDataType,
   isEnumType,
   isInputObjectType,
   isInputType,
-  isLeafType,
   isListType,
   isNamedType,
   isNonNullType,
@@ -98,12 +94,10 @@ describe('Type predicates', () => {
   describe('isObjectType', () => {
     it('returns true for object type', () => {
       expect(isObjectType(ObjectType)).toEqual(true);
-      expect(() => assertObjectType(ObjectType)).not.toThrow();
     });
 
     it('returns false for wrapped object type', () => {
       expect(isObjectType(new GraphQLList(ObjectType))).toEqual(false);
-      expect(() => assertObjectType(new GraphQLList(ObjectType))).toThrow();
     });
   });
 
@@ -255,27 +249,22 @@ describe('Type predicates', () => {
     });
   });
 
-  describe('isLeafType', () => {
+  describe('isDataType', () => {
     it('returns true for scalar and enum types', () => {
-      expect(isLeafType(ScalarType)).toEqual(true);
-      expect(() => assertLeafType(ScalarType)).not.toThrow();
-      expect(isLeafType(EnumType)).toEqual(true);
-      expect(() => assertLeafType(EnumType)).not.toThrow();
+      expect(isDataType(ScalarType)).toEqual(true);
+      expect(isDataType(EnumType)).toEqual(true);
     });
 
     it('returns false for wrapped leaf type', () => {
-      expect(isLeafType(new GraphQLList(ScalarType))).toEqual(false);
-      expect(() => assertLeafType(new GraphQLList(ScalarType))).toThrow();
+      expect(isDataType(new GraphQLList(ScalarType))).toEqual(false);
     });
 
     it('returns false for non-leaf type', () => {
-      expect(isLeafType(ObjectType)).toEqual(false);
-      expect(() => assertLeafType(ObjectType)).toThrow();
+      expect(isDataType(ObjectType)).toEqual(false);
     });
 
     it('returns false for wrapped non-leaf type', () => {
-      expect(isLeafType(new GraphQLList(ObjectType))).toEqual(false);
-      expect(() => assertLeafType(new GraphQLList(ObjectType))).toThrow();
+      expect(isDataType(new GraphQLList(ObjectType))).toEqual(false);
     });
   });
 
@@ -295,23 +284,6 @@ describe('Type predicates', () => {
 
     it('returns false for wrapped non-composite type', () => {
       expect(isResolverType(new GraphQLList(InputObjectType))).toEqual(false);
-    });
-  });
-
-  describe('isAbstractType', () => {
-    it('returns true for interface and union types', () => {
-      expect(isAbstractType(UnionType)).toEqual(true);
-      expect(() => assertAbstractType(UnionType)).not.toThrow();
-    });
-
-    it('returns false for non-abstract type', () => {
-      expect(isAbstractType(ObjectType)).toEqual(false);
-      expect(() => assertAbstractType(ObjectType)).toThrow();
-    });
-
-    it('returns false for wrapped non-abstract type', () => {
-      expect(isAbstractType(new GraphQLList(ObjectType))).toEqual(false);
-      expect(() => assertAbstractType(new GraphQLList(ObjectType))).toThrow();
     });
   });
 

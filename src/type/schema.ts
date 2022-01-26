@@ -5,10 +5,10 @@ import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
-import type { GraphQLError } from '../error/GraphQLError';
-
 import type { SchemaDefinitionNode } from '../language/ast';
 import { OperationTypeNode } from '../language/ast';
+
+import type { GraphQLError } from '../error';
 
 import type {
   GraphQLNamedType,
@@ -17,7 +17,7 @@ import type {
 } from './definition';
 import {
   getNamedType,
-  isInputObjectType,
+  isDataType,
   isResolverType,
   isUnionType,
 } from './definition';
@@ -253,7 +253,7 @@ export class GraphQLSchema {
   getPossibleTypes(
     abstractType: IrisResolverType,
   ): ReadonlyArray<IrisResolverType> {
-    return isUnionType(abstractType) ? abstractType.getTypes() : [];
+    return abstractType.getTypes();
   }
 
   isSubType(
@@ -337,7 +337,7 @@ function collectReferencedTypes(
     typeSet.add(namedType);
     if (isResolverType(namedType)) {
       if (namedType.isVariantType()) {
-        for (const field of Object.values(namedType.getFields())) {
+        for (const field of Object.values(namedType.getResolverFields())) {
           collectReferencedTypes(field.type, typeSet);
           for (const arg of field.args) {
             collectReferencedTypes(arg.type, typeSet);
@@ -348,10 +348,11 @@ function collectReferencedTypes(
           collectReferencedTypes(memberType, typeSet);
         }
       }
-    } else if (isInputObjectType(namedType)) {
-      for (const field of Object.values(namedType.getFields())) {
-        collectReferencedTypes(field.type, typeSet);
-      }
+    } else if (isDataType(namedType)) {
+      namedType
+        .getVariants()
+        .flatMap((x) => Object.values(x.fields ?? {}))
+        .forEach((field) => collectReferencedTypes(field.type, typeSet));
     }
   }
 

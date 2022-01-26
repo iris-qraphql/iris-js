@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { identityFunc } from '../identityFunc';
 import { isObjectLike } from '../isObjectLike';
 
 describe('isObjectLike', () => {
@@ -17,6 +16,5 @@ describe('isObjectLike', () => {
     expect(isObjectLike(null)).to.equal(false);
     expect(isObjectLike(true)).to.equal(false);
     expect(isObjectLike('')).to.equal(false);
-    expect(isObjectLike(identityFunc)).to.equal(false);
   });
 });

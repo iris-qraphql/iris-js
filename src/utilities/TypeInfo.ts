@@ -13,12 +13,12 @@ import type {
   GraphQLOutputType,
   GraphQLType,
   IrisDataVariant,
-  IrisDataVariantField,
   IrisResolverType,
 } from '../type/definition';
 import {
   getNamedType,
   getNullableType,
+  isDataType,
   isEnumType,
   isInputObjectType,
   isInputType,
@@ -47,7 +47,7 @@ export class TypeInfo {
   private _typeStack: Array<Maybe<GraphQLOutputType>>;
   private _parentTypeStack: Array<Maybe<IrisResolverType>>;
   private _inputTypeStack: Array<Maybe<GraphQLInputType>>;
-  private _fieldDefStack: Array<Maybe<GraphQLField<unknown, unknown>>>;
+  private _fieldDefStack: Array<Maybe<GraphQLField>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
   private _directive: Maybe<GraphQLDirective>;
   private _argument: Maybe<GraphQLArgument>;
@@ -116,7 +116,7 @@ export class TypeInfo {
     }
   }
 
-  getFieldDef(): Maybe<GraphQLField<unknown, unknown>> {
+  getFieldDef(): Maybe<GraphQLField> {
     if (this._fieldDefStack.length > 0) {
       return this._fieldDefStack[this._fieldDefStack.length - 1];
     }
@@ -220,19 +220,13 @@ export class TypeInfo {
         break;
       }
       case Kind.OBJECT_FIELD: {
-        const objectType: unknown = getNamedType(this.getInputType());
-        let inputFieldType: GraphQLInputType | undefined;
-        let inputField: IrisDataVariantField | undefined;
-
-        if (isInputObjectType(objectType)) {
-          inputField = objectType.getFields()[node.name.value];
-          if (inputField) {
-            inputFieldType = inputField.type;
-          }
+        const type: unknown = getNamedType(this.getInputType());
+        if (isDataType(type) && type.isVariantType()) {
+          const fieldType = type.variantBy().fields?.[node.name.value]?.type;
+          this._inputTypeStack.push(
+            isInputType(fieldType) ? fieldType : undefined,
+          );
         }
-        this._inputTypeStack.push(
-          isInputType(inputFieldType) ? inputFieldType : undefined,
-        );
         break;
       }
       case Kind.ENUM: {
@@ -294,7 +288,7 @@ type GetFieldDefFn = (
   schema: GraphQLSchema,
   parentType: GraphQLType,
   fieldNode: FieldNode,
-) => Maybe<GraphQLField<unknown, unknown>>;
+) => Maybe<GraphQLField>;
 
 /**
  * Not exactly the same as the executor's definition of getFieldDef, in this
@@ -305,7 +299,7 @@ function getFieldDef(
   schema: GraphQLSchema,
   parentType: GraphQLType,
   fieldNode: FieldNode,
-): Maybe<GraphQLField<unknown, unknown>> {
+): Maybe<GraphQLField> {
   const name = fieldNode.name.value;
   if (
     name === SchemaMetaFieldDef.name &&
@@ -320,7 +314,7 @@ function getFieldDef(
     return TypeNameMetaFieldDef;
   }
   if (isObjectType(parentType)) {
-    return parentType.getFields()[name];
+    return parentType.getResolverFields()[name];
   }
 }
 

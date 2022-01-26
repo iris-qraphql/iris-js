@@ -1,8 +1,6 @@
 import { inspect } from '../../jsutils/inspect';
 import { invariant } from '../../jsutils/invariant';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { ASTNode } from '../../language/ast';
 import { OperationTypeNode } from '../../language/ast';
 import { DirectiveLocation } from '../../language/directiveLocation';
@@ -10,6 +8,8 @@ import { Kind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
+
+import { GraphQLError } from '../../error';
 
 import type {
   SDLValidationContext,

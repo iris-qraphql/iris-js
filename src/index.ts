@@ -19,8 +19,8 @@
  * following two import statements are equivalent:
  *
  * ```ts
- * import { parse } from 'graphql';
- * import { parse } from 'graphql/language';
+ * import { parse } from 'iris';
+ * import { parse } from 'iris/language';
  * ```
  *
  * @packageDocumentation
@@ -33,7 +33,6 @@ export { version, versionInfo } from './version';
 export type { GraphQLArgs } from './iris';
 export { graphql, graphqlSync } from './iris';
 
-export type { GraphQLScalarType } from './type/index';
 export {
   GraphQLSchema,
   GraphQLDirective,
@@ -71,32 +70,25 @@ export {
   isType,
   isObjectType,
   isUnionType,
-  isEnumType,
   isInputObjectType,
   isListType,
   isNonNullType,
   isInputType,
   isOutputType,
-  isLeafType,
+  isDataType,
   isResolverType,
-  isAbstractType,
   isWrappingType,
   isNullableType,
   isNamedType,
   isRequiredArgument,
-  isRequiredInputField,
   isSpecifiedScalarType,
   isIntrospectionType,
   isSpecifiedDirective,
   assertSchema,
   assertDirective,
-  assertObjectType,
   assertResolverType,
   assertListType,
   assertNonNullType,
-  assertLeafType,
-  assertCompositeType,
-  assertAbstractType,
   getNullableType,
   getNamedType,
   validateSchema,
@@ -114,28 +106,16 @@ export type {
   GraphQLWrappingType,
   GraphQLNullableType,
   GraphQLNamedType,
-  GraphQLNamedInputType,
-  GraphQLNamedOutputType,
-  ThunkObjMap,
   GraphQLSchemaConfig,
   GraphQLSchemaExtensions,
   GraphQLDirectiveConfig,
   GraphQLDirectiveExtensions,
   GraphQLArgument,
-  GraphQLArgumentConfig,
   GraphQLField,
-  GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
-  GraphQLFieldConfigMap,
-  GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLIsTypeOfFn,
-  GraphQLResolveInfo,
   ResponsePath,
   GraphQLTypeResolver,
-  GraphQLScalarSerializer,
-  GraphQLScalarValueParser,
-  GraphQLScalarLiteralParser,
 } from './type/index';
 
 // Parse and operate on GraphQL language source files.
@@ -236,95 +216,12 @@ export type {
   DirectiveDefinitionNode,
 } from './language/index';
 
-// Execute GraphQL queries.
-export {
-  execute,
-  executeSync,
-  defaultFieldResolver,
-  defaultTypeResolver,
-  responsePathAsArray,
-  getDirectiveValues,
-  subscribe,
-  createSourceEventStream,
-} from './execution/index';
-
-export type {
-  ExecutionArgs,
-  ExecutionResult,
-  FormattedExecutionResult,
-} from './execution/index';
-
-export type { SubscriptionArgs } from './subscription/index';
-
-// Validate GraphQL documents.
-export {
-  validate,
-  ValidationContext,
-  // All validation rules in the GraphQL Specification.
-  specifiedRules,
-  // Individual validation rules.
-  ExecutableDefinitionsRule,
-  FieldsOnCorrectTypeRule,
-  FragmentsOnCompositeTypesRule,
-  KnownArgumentNamesRule,
-  KnownDirectivesRule,
-  KnownFragmentNamesRule,
-  KnownTypeNamesRule,
-  LoneAnonymousOperationRule,
-  NoFragmentCyclesRule,
-  NoUndefinedVariablesRule,
-  NoUnusedFragmentsRule,
-  NoUnusedVariablesRule,
-  OverlappingFieldsCanBeMergedRule,
-  PossibleFragmentSpreadsRule,
-  ProvidedRequiredArgumentsRule,
-  ScalarLeafsRule,
-  SingleFieldSubscriptionsRule,
-  UniqueArgumentNamesRule,
-  UniqueDirectivesPerLocationRule,
-  UniqueFragmentNamesRule,
-  UniqueInputFieldNamesRule,
-  UniqueOperationNamesRule,
-  UniqueVariableNamesRule,
-  ValuesOfCorrectTypeRule,
-  VariablesAreInputTypesRule,
-  VariablesInAllowedPositionRule,
-  // SDL-specific validation rules
-  LoneSchemaDefinitionRule,
-  UniqueTypeNamesRule,
-  UniqueVariantAndFieldDefinitionNamesRule,
-  UniqueArgumentDefinitionNamesRule,
-  UniqueDirectiveNamesRule,
-  // Custom validation rules
-  NoDeprecatedCustomRule,
-  NoSchemaIntrospectionCustomRule,
-} from './validation/index';
-
-export type { ValidationRule } from './validation/index';
-
 // Create, format, and print GraphQL errors.
-export {
-  GraphQLError,
-  syntaxError,
-  locatedError,
-  printError,
-  formatError,
-} from './error/index';
-
-export type {
-  GraphQLFormattedError,
-  GraphQLErrorExtensions,
-} from './error/index';
 
 // Utilities for operating on GraphQL type schema and parsed sources.
 export {
   // Produce the GraphQL query recommended for a full schema introspection.
   // Accepts optional IntrospectionOptions.
-  getIntrospectionQuery,
-  // Gets the target Operation from a Document.
-  getOperationAST,
-  // Gets the Type for the target Operation AST.
-  getOperationRootType,
   // Build a GraphQLSchema from an introspection result.
   // Build a GraphQLSchema from a parsed GraphQL Schema language AST.
   buildASTSchema,
@@ -349,10 +246,6 @@ export {
   visitWithTypeInfo,
   // Coerces a JavaScript value to a GraphQL type, or produces errors.
   coerceInputValue,
-  // Concatenates multiple AST together.
-  concatAST,
-  // Separates an AST into an AST per Operation.
-  separateOperations,
   // Strips characters that are not significant to the validity or execution of a GraphQL document.
   stripIgnoredCharacters,
   // Comparators for types
@@ -365,29 +258,4 @@ export {
   isValidNameError,
 } from './utilities/index';
 
-export type {
-  IntrospectionOptions,
-  IntrospectionQuery,
-  IntrospectionSchema,
-  IntrospectionType,
-  IntrospectionInputType,
-  IntrospectionOutputType,
-  IntrospectionScalarType,
-  IntrospectionObjectType,
-  IntrospectionInterfaceType,
-  IntrospectionUnionType,
-  IntrospectionEnumType,
-  IntrospectionInputObjectType,
-  IntrospectionTypeRef,
-  IntrospectionInputTypeRef,
-  IntrospectionOutputTypeRef,
-  IntrospectionNamedTypeRef,
-  IntrospectionListTypeRef,
-  IntrospectionNonNullTypeRef,
-  IntrospectionField,
-  IntrospectionInputValue,
-  IntrospectionEnumValue,
-  IntrospectionDirective,
-  BuildSchemaOptions,
-  TypedQueryDocumentNode,
-} from './utilities/index';
+export type { BuildSchemaOptions } from './utilities/index';

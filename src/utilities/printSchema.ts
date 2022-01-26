@@ -73,7 +73,7 @@ export function printType(type: GraphQLNamedType): string {
 }
 
 function printObject(type: IrisResolverType): string {
-  const fields = type.getFields();
+  const fields = type.getResolverFields();
   return (
     printDescription(type) +
     `resolver ${type.name}${
@@ -129,7 +129,7 @@ function printDataVariant(variant: IrisDataVariant): string {
   );
 }
 
-function printFields(fs: GraphQLFieldMap<any, any>): string {
+const printFields = (fs: GraphQLFieldMap<any, any>): string => {
   const fields = Object.values(fs).map(
     (f, i) =>
       printDescription(f, '  ', !i) +
@@ -141,7 +141,7 @@ function printFields(fs: GraphQLFieldMap<any, any>): string {
       printDeprecated(f.deprecationReason),
   );
   return printBlock(fields);
-}
+};
 
 function printBlock(items: ReadonlyArray<string>): string {
   return items.length !== 0 ? ' {\n' + items.join('\n') + '\n}' : '';

@@ -4,11 +4,11 @@ import { keyMap } from '../jsutils/keyMap';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
-import type { ValueNode } from '../language/ast';
+import type { ObjectValueNode, ValueNode } from '../language/ast';
 import { Kind } from '../language/kinds';
 
-import type { GraphQLInputType } from '../type/definition';
-import { isLeafType, isListType, isNonNullType } from '../type/definition';
+import type { GraphQLInputType, IrisDataVariant } from '../type/definition';
+import { isDataType, isListType, isNonNullType } from '../type/definition';
 
 /**
  * Produces a JavaScript value given a GraphQL Value AST.
@@ -98,35 +98,26 @@ export function valueFromAST(
     return [coercedValue];
   }
 
-  if (isLeafType(type)) {
-    if (type.isVariantType()) {
-      if (valueNode.kind !== Kind.OBJECT) {
-        return; // Invalid: intentionally return no value.
+  if (isDataType(type)) {
+    if (valueNode.kind === Kind.OBJECT && !type.isPrimitive) {
+      const variantName = valueNode.fields.find(
+        (x) => x.name.value === '__typename',
+      )?.value;
+
+      if (variantName && variantName.kind !== Kind.STRING) {
+        return undefined;
       }
-      const coercedObj = Object.create(null);
-      const fieldNodes = keyMap(valueNode.fields, (field) => field.name.value);
-      for (const field of Object.values(type.getFields())) {
-        const fieldNode = fieldNodes[field.name];
-        if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
-          if (isNonNullType(field.type)) {
-            return; // Invalid: intentionally return no value.
-          }
-          continue;
-        }
-        const fieldValue = valueFromAST(fieldNode.value, field.type, variables);
-        if (fieldValue === undefined) {
-          return; // Invalid: intentionally return no value.
-        }
-        coercedObj[field.name] = fieldValue;
-      }
-      return coercedObj;
+
+      const variant = type.variantBy(variantName?.value);
+      return parseVariantValue(variant, valueNode, variables);
     }
+
     // Scalars and Enums fulfill parsing a literal value via parseLiteral().
     // Invalid values represent a failure to parse correctly, in which case
     // no value is returned.
     let result;
     try {
-      result = type.parseLiteral(valueNode /* variables */);
+      result = type.parseLiteral(valueNode);
     } catch (_error) {
       return; // Invalid: intentionally return no value.
     }
@@ -151,3 +142,27 @@ function isMissingVariable(
     (variables == null || variables[valueNode.name.value] === undefined)
   );
 }
+
+const parseVariantValue = (
+  variant: IrisDataVariant,
+  valueNode: ObjectValueNode,
+  variables: Maybe<ObjMap<unknown>>,
+): Maybe<ObjectValueNode> => {
+  const coercedObj = Object.create(null);
+  const fieldNodes = keyMap(valueNode.fields, (field) => field.name.value);
+  for (const field of Object.values(variant.fields ?? {})) {
+    const fieldNode = fieldNodes[field.name];
+    if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
+      if (isNonNullType(field.type)) {
+        return; // Invalid: intentionally return no value.
+      }
+      continue;
+    }
+    const fieldValue = valueFromAST(fieldNode.value, field.type, variables);
+    if (fieldValue === undefined) {
+      return; // Invalid: intentionally return no value.
+    }
+    coercedObj[field.name] = fieldValue;
+  }
+  return coercedObj;
+};

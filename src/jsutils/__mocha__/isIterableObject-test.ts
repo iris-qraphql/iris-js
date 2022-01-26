@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
+import { identity } from 'ramda';
 
-import { identityFunc } from '../identityFunc';
 import { isIterableObject } from '../isIterableObject';
 
 describe('isIterableObject', () => {
@@ -17,7 +17,7 @@ describe('isIterableObject', () => {
     }
     expect(isIterableObject(getArguments())).to.equal(true);
 
-    const iterable = { [Symbol.iterator]: identityFunc };
+    const iterable = { [Symbol.iterator]: identity };
     expect(isIterableObject(iterable)).to.equal(true);
 
     function* generatorFunc() {
@@ -51,11 +51,11 @@ describe('isIterableObject', () => {
     expect(isIterableObject({})).to.equal(false);
     expect(isIterableObject({ iterable: true })).to.equal(false);
 
-    const iteratorWithoutSymbol = { next: identityFunc };
+    const iteratorWithoutSymbol = { next: identity };
     expect(isIterableObject(iteratorWithoutSymbol)).to.equal(false);
 
     const invalidIterable = {
-      [Symbol.iterator]: { next: identityFunc },
+      [Symbol.iterator]: { next: identity },
     };
     expect(isIterableObject(invalidIterable)).to.equal(false);
 

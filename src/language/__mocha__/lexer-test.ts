@@ -6,7 +6,7 @@ import { expectToThrowJSON } from '../../__testUtils__/__mocha__/expectJSON';
 
 import { inspect } from '../../jsutils/inspect';
 
-import { GraphQLError } from '../../error/GraphQLError';
+import { GraphQLError } from '../../error';
 
 import type { Token } from '../ast';
 import { isPunctuatorTokenKind, Lexer } from '../lexer';

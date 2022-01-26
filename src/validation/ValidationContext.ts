@@ -1,8 +1,6 @@
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
-import type { GraphQLError } from '../error/GraphQLError';
-
 import type {
   DocumentNode,
   FragmentDefinitionNode,
@@ -27,6 +25,8 @@ import type { GraphQLDirective } from '../type/directives';
 import type { GraphQLSchema } from '../type/schema';
 
 import { TypeInfo, visitWithTypeInfo } from '../utilities/TypeInfo';
+
+import type { GraphQLError } from '../error';
 
 type NodeWithSelectionSet = OperationDefinitionNode | FragmentDefinitionNode;
 type VariableUsage = {
@@ -249,7 +249,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getParentInputType();
   }
 
-  getFieldDef(): Maybe<GraphQLField<unknown, unknown>> {
+  getFieldDef(): Maybe<GraphQLField> {
     return this._typeInfo.getFieldDef();
   }
 

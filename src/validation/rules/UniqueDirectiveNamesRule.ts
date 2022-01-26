@@ -1,6 +1,6 @@
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { ASTVisitor } from '../../language/visitor';
+
+import { GraphQLError } from '../../error';
 
 import type { SDLValidationContext } from '../ValidationContext';
 

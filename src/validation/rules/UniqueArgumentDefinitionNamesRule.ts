@@ -1,13 +1,13 @@
 import { groupBy } from '../../jsutils/groupBy';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type {
   ArgumentDefinitionNode,
   FieldDefinitionNode,
   NameNode,
 } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
+
+import { GraphQLError } from '../../error';
 
 import type { SDLValidationContext } from '../ValidationContext';
 

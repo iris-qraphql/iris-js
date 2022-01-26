@@ -1,7 +1,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
+import { ObjMap } from '../../jsutils/ObjMap';
 
-import type { GraphQLFieldConfigMap } from '../../type/definition';
+import type { GraphQLFieldConfig } from '../../type/definition';
 import { GraphQLList, GraphQLNonNull } from '../../type/definition';
 import { gqlObject, gqlUnion } from '../../type/make';
 import { GraphQLFloat, GraphQLInt, GraphQLString } from '../../type/scalars';
@@ -48,7 +49,7 @@ describe('typeComparators', () => {
   });
 
   describe('isTypeSubTypeOf', () => {
-    function testSchema(fields: GraphQLFieldConfigMap<unknown, unknown>) {
+    function testSchema(fields: ObjMap<GraphQLFieldConfig<unknown, unknown>>) {
       return new GraphQLSchema({
         query: gqlObject({
           name: 'Query',

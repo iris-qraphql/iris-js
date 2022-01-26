@@ -2,8 +2,6 @@ import { didYouMean } from '../../jsutils/didYouMean';
 import { naturalCompare } from '../../jsutils/naturalCompare';
 import { suggestionList } from '../../jsutils/suggestionList';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { FieldNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
@@ -11,8 +9,10 @@ import type {
   GraphQLOutputType,
   IrisResolverType,
 } from '../../type/definition';
-import { isAbstractType, isObjectType } from '../../type/definition';
+import { isObjectType, isUnionType } from '../../type/definition';
 import type { GraphQLSchema } from '../../type/schema';
+
+import { GraphQLError } from '../../error';
 
 import type { ValidationContext } from '../ValidationContext';
 
@@ -72,7 +72,7 @@ function getSuggestedTypeNames(
   type: GraphQLOutputType,
   fieldName: string,
 ): Array<string> {
-  if (!isAbstractType(type)) {
+  if (!isUnionType(type)) {
     // Must be an Object type, which does not have possible fields.
     return [];
   }
@@ -80,7 +80,7 @@ function getSuggestedTypeNames(
   const suggestedTypes: Set<IrisResolverType> = new Set();
   const usageCount = Object.create(null);
   for (const possibleType of schema.getPossibleTypes(type)) {
-    if (!possibleType.getFields()[fieldName]) {
+    if (!possibleType.getResolverFields()[fieldName]) {
       continue;
     }
 
@@ -111,7 +111,7 @@ function getSuggestedFieldNames(
   fieldName: string,
 ): Array<string> {
   if (isObjectType(type)) {
-    const possibleFieldNames = Object.keys(type.getFields());
+    const possibleFieldNames = Object.keys(type.getResolverFields());
     return suggestionList(fieldName, possibleFieldNames);
   }
   // Otherwise, must be a Union type, which does not define fields.

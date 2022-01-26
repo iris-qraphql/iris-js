@@ -1,9 +1,9 @@
 import type { GraphQLType, IrisResolverType } from '../type/definition';
 import {
-  isAbstractType,
   isListType,
   isNonNullType,
   isObjectType,
+  isUnionType,
 } from '../type/definition';
 import type { GraphQLSchema } from '../type/schema';
 
@@ -71,7 +71,7 @@ export function isTypeSubTypeOf(
   // If superType type is an abstract type, check if it is super type of maybeSubType.
   // Otherwise, the child type is not a valid subtype of the parent type.
   return (
-    isAbstractType(superType) &&
+    isUnionType(superType) &&
     isObjectType(maybeSubType) &&
     schema.isSubType(superType, maybeSubType)
   );
@@ -96,8 +96,8 @@ export function doTypesOverlap(
     return true;
   }
 
-  if (isAbstractType(typeA)) {
-    if (isAbstractType(typeB)) {
+  if (isUnionType(typeA)) {
+    if (isUnionType(typeB)) {
       // If both types are abstract, then determine if there is any intersection
       // between possible concrete types of each.
       return schema
@@ -108,7 +108,7 @@ export function doTypesOverlap(
     return schema.isSubType(typeA, typeB);
   }
 
-  if (isAbstractType(typeB)) {
+  if (isUnionType(typeB)) {
     // Determine if the former type is a possible concrete type of the latter.
     return schema.isSubType(typeB, typeA);
   }

@@ -19,8 +19,8 @@ import { Kind } from '../language/kinds';
 import { isTypeDefinitionNode } from '../language/predicates';
 
 import type {
-  GraphQLFieldConfigArgumentMap,
-  GraphQLFieldConfigMap,
+  GraphQLArgument,
+  GraphQLFieldConfig,
   GraphQLNamedType,
   GraphQLType,
   IrisDataVariantField,
@@ -43,9 +43,10 @@ import type {
   GraphQLSchemaValidationOptions,
 } from '../type/schema';
 
-import { getDirectiveValues } from '../execution/values';
+import type { ConfigMap } from '../utils/type-level';
 
 import { valueFromAST } from './valueFromAST';
+import { getDirectiveValues } from './values';
 
 interface Options extends GraphQLSchemaValidationOptions {
   /**
@@ -180,7 +181,7 @@ export function extendSchemaImpl(
 
   function buildFieldMap(
     node: ResolverVariantDefinitionNode,
-  ): GraphQLFieldConfigMap<unknown, unknown> {
+  ): ObjMap<GraphQLFieldConfig<unknown, unknown>> {
     const fieldConfigMap = Object.create(null);
     const nodeFields = node.fields ?? [];
     for (const field of nodeFields) {
@@ -200,7 +201,7 @@ export function extendSchemaImpl(
 
   function buildArgumentMap(
     args: Maybe<ReadonlyArray<ArgumentDefinitionNode>>,
-  ): GraphQLFieldConfigArgumentMap {
+  ): ConfigMap<GraphQLArgument> {
     const argsNodes = /* c8 ignore next */ args ?? [];
 
     const argConfigMap = Object.create(null);

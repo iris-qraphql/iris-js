@@ -8,6 +8,8 @@ import {
   GraphQLString,
 } from '../../type/scalars';
 
+import { toJSONError } from '../../utils/toJSONDeep';
+
 import { astFromValue } from '../astFromValue';
 
 describe('astFromValue', () => {
@@ -350,6 +352,8 @@ describe('astFromValue', () => {
   });
 
   it('does not converts non-object values as input objects', () => {
-    expect(astFromValue(5, inputObj)).toEqual(null);
+    expect(toJSONError(() => astFromValue(5, inputObj))).toEqual({
+      message: 'Data "MyInputObj" cannot represent value: 5',
+    });
   });
 });

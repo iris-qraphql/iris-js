@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
+import { identity } from 'ramda';
 
-import { identityFunc } from '../identityFunc';
 import { isAsyncIterable } from '../isAsyncIterable';
 
 describe('isAsyncIterable', () => {
   it('should return `true` for AsyncIterable', () => {
-    const asyncIterable = { [Symbol.asyncIterator]: identityFunc };
+    const asyncIterable = { [Symbol.asyncIterator]: identity };
     expect(isAsyncIterable(asyncIterable)).to.equal(true);
 
     async function* asyncGeneratorFunc() {
@@ -33,10 +33,10 @@ describe('isAsyncIterable', () => {
     expect(isAsyncIterable({})).to.equal(false);
     expect(isAsyncIterable({ iterable: true })).to.equal(false);
 
-    const asyncIteratorWithoutSymbol = { next: identityFunc };
+    const asyncIteratorWithoutSymbol = { next: identity };
     expect(isAsyncIterable(asyncIteratorWithoutSymbol)).to.equal(false);
 
-    const nonAsyncIterable = { [Symbol.iterator]: identityFunc };
+    const nonAsyncIterable = { [Symbol.iterator]: identity };
     expect(isAsyncIterable(nonAsyncIterable)).to.equal(false);
 
     function* generatorFunc() {
@@ -45,7 +45,7 @@ describe('isAsyncIterable', () => {
     expect(isAsyncIterable(generatorFunc())).to.equal(false);
 
     const invalidAsyncIterable = {
-      [Symbol.asyncIterator]: { next: identityFunc },
+      [Symbol.asyncIterator]: { next: identity },
     };
     expect(isAsyncIterable(invalidAsyncIterable)).to.equal(false);
   });

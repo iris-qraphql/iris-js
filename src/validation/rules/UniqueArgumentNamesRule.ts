@@ -1,9 +1,9 @@
 import { groupBy } from '../../jsutils/groupBy';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { ArgumentNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
+
+import { GraphQLError } from '../../error';
 
 import type { ASTValidationContext } from '../ValidationContext';
 
@@ -26,8 +26,6 @@ export function UniqueArgumentNamesRule(
   function checkArgUniqueness(parentNode: {
     arguments?: ReadonlyArray<ArgumentNode>;
   }) {
-    // FIXME: https://github.com/graphql/graphql-js/issues/2203
-    /* c8 ignore next */
     const argumentNodes = parentNode.arguments ?? [];
 
     const seenArgs = groupBy(argumentNodes, (arg) => arg.name.value);
