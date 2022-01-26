@@ -19,7 +19,6 @@ export function UniqueArgumentNamesRule(
   context: ASTValidationContext,
 ): ASTVisitor {
   return {
-    Field: checkArgUniqueness,
     Directive: checkArgUniqueness,
   };
 

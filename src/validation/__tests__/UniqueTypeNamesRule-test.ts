@@ -32,16 +32,6 @@ describe('Validate: Unique type names', () => {
     `);
   });
 
-  it('type and non-type definitions named the same', () => {
-    expectValidSDL(`
-      query Foo { __typename }
-      fragment Foo on Query { __typename }
-      directive @Foo on SCHEMA
-
-      resolver Foo
-    `);
-  });
-
   it('types named the same', () => {
     expectSDLErrors(`
       resolver Foo

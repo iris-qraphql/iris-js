@@ -1,6 +1,6 @@
 import type { Maybe } from '../jsutils/Maybe';
 
-import type { ASTNode, FieldNode } from '../language/ast';
+import type { ASTNode } from '../language/ast';
 import { isNode } from '../language/ast';
 import { Kind } from '../language/kinds';
 import type { ASTVisitor } from '../language/visitor';
@@ -23,19 +23,11 @@ import {
   isInputObjectType,
   isInputType,
   isListType,
-  isObjectType,
   isOutputType,
   isResolverType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
-import {
-  SchemaMetaFieldDef,
-  TypeMetaFieldDef,
-  TypeNameMetaFieldDef,
-} from '../type/introspection';
 import type { GraphQLSchema } from '../type/schema';
-
-import { typeFromAST } from './typeFromAST';
 
 /**
  * TypeInfo is a utility class which, given a GraphQL schema, can keep track
@@ -52,7 +44,6 @@ export class TypeInfo {
   private _directive: Maybe<GraphQLDirective>;
   private _argument: Maybe<GraphQLArgument>;
   private _enumValue: Maybe<IrisDataVariant>;
-  private _getFieldDef: GetFieldDefFn;
 
   constructor(
     schema: GraphQLSchema,
@@ -61,9 +52,6 @@ export class TypeInfo {
      *  beginning somewhere other than documents.
      */
     initialType?: Maybe<GraphQLType>,
-
-    /** @deprecated will be removed in 17.0.0 */
-    getFieldDefFn?: GetFieldDefFn,
   ) {
     this._schema = schema;
     this._typeStack = [];
@@ -74,7 +62,6 @@ export class TypeInfo {
     this._directive = null;
     this._argument = null;
     this._enumValue = null;
-    this._getFieldDef = getFieldDefFn ?? getFieldDef;
     if (initialType) {
       if (isInputType(initialType)) {
         this._inputTypeStack.push(initialType);
@@ -147,51 +134,9 @@ export class TypeInfo {
     // checked before continuing since TypeInfo is used as part of validation
     // which occurs before guarantees of schema and document validity.
     switch (node.kind) {
-      case Kind.SELECTION_SET: {
-        const namedType: unknown = getNamedType(this.getType());
-        this._parentTypeStack.push(
-          isResolverType(namedType) ? namedType : undefined,
-        );
-        break;
-      }
-      case Kind.FIELD: {
-        const parentType = this.getParentType();
-        let fieldDef;
-        let fieldType: unknown;
-        if (parentType) {
-          fieldDef = this._getFieldDef(schema, parentType, node);
-          if (fieldDef) {
-            fieldType = fieldDef.type;
-          }
-        }
-        this._fieldDefStack.push(fieldDef);
-        this._typeStack.push(isOutputType(fieldType) ? fieldType : undefined);
-        break;
-      }
       case Kind.DIRECTIVE:
         this._directive = schema.getDirective(node.name.value);
         break;
-      case Kind.OPERATION_DEFINITION: {
-        const rootType = schema.getRootType(node.operation);
-        this._typeStack.push(isObjectType(rootType) ? rootType : undefined);
-        break;
-      }
-      case Kind.INLINE_FRAGMENT:
-      case Kind.FRAGMENT_DEFINITION: {
-        const typeConditionAST = node.typeCondition;
-        const outputType: unknown = typeConditionAST
-          ? typeFromAST(schema, typeConditionAST)
-          : getNamedType(this.getType());
-        this._typeStack.push(isOutputType(outputType) ? outputType : undefined);
-        break;
-      }
-      case Kind.VARIABLE_DEFINITION: {
-        const inputType: unknown = typeFromAST(schema, node.type);
-        this._inputTypeStack.push(
-          isInputType(inputType) ? inputType : undefined,
-        );
-        break;
-      }
       case Kind.ARGUMENT: {
         let argDef;
         let argType: unknown;
@@ -247,23 +192,8 @@ export class TypeInfo {
 
   leave(node: ASTNode) {
     switch (node.kind) {
-      case Kind.SELECTION_SET:
-        this._parentTypeStack.pop();
-        break;
-      case Kind.FIELD:
-        this._fieldDefStack.pop();
-        this._typeStack.pop();
-        break;
       case Kind.DIRECTIVE:
         this._directive = null;
-        break;
-      case Kind.OPERATION_DEFINITION:
-      case Kind.INLINE_FRAGMENT:
-      case Kind.FRAGMENT_DEFINITION:
-        this._typeStack.pop();
-        break;
-      case Kind.VARIABLE_DEFINITION:
-        this._inputTypeStack.pop();
         break;
       case Kind.ARGUMENT:
         this._argument = null;
@@ -281,40 +211,6 @@ export class TypeInfo {
       default:
       // Ignore other nodes
     }
-  }
-}
-
-type GetFieldDefFn = (
-  schema: GraphQLSchema,
-  parentType: GraphQLType,
-  fieldNode: FieldNode,
-) => Maybe<GraphQLField>;
-
-/**
- * Not exactly the same as the executor's definition of getFieldDef, in this
- * statically evaluated environment we do not always have an Object type,
- * and need to handle Interface and Union types.
- */
-function getFieldDef(
-  schema: GraphQLSchema,
-  parentType: GraphQLType,
-  fieldNode: FieldNode,
-): Maybe<GraphQLField> {
-  const name = fieldNode.name.value;
-  if (
-    name === SchemaMetaFieldDef.name &&
-    schema.getQueryType() === parentType
-  ) {
-    return SchemaMetaFieldDef;
-  }
-  if (name === TypeMetaFieldDef.name && schema.getQueryType() === parentType) {
-    return TypeMetaFieldDef;
-  }
-  if (name === TypeNameMetaFieldDef.name && isResolverType(parentType)) {
-    return TypeNameMetaFieldDef;
-  }
-  if (isObjectType(parentType)) {
-    return parentType.getResolverFields()[name];
   }
 }
 

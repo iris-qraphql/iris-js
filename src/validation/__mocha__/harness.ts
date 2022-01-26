@@ -1,13 +1,14 @@
 import { expectJSON } from '../../__testUtils__/__mocha__/expectJSON';
 
 import type { Maybe } from '../../jsutils/Maybe';
-import { toJSONDeep } from '../../utils/toJSONDeep';
 
 import { parse } from '../../language/parser';
 
 import type { GraphQLSchema } from '../../type/schema';
 
 import { buildSchema } from '../../utilities/buildASTSchema';
+
+import { toJSONDeep } from '../../utils/toJSONDeep';
 
 import { validate, validateSDL } from '../validate';
 import type { SDLValidationRule, ValidationRule } from '../ValidationContext';

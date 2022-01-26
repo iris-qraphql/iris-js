@@ -2,8 +2,6 @@ import type {
   ASTNode,
   ConstValueNode,
   DefinitionNode,
-  ExecutableDefinitionNode,
-  SelectionNode,
   TypeDefinitionNode,
   TypeNode,
   TypeSystemDefinitionNode,
@@ -12,24 +10,7 @@ import type {
 import { Kind } from './kinds';
 
 export function isDefinitionNode(node: ASTNode): node is DefinitionNode {
-  return isExecutableDefinitionNode(node) || isTypeSystemDefinitionNode(node);
-}
-
-export function isExecutableDefinitionNode(
-  node: ASTNode,
-): node is ExecutableDefinitionNode {
-  return (
-    node.kind === Kind.OPERATION_DEFINITION ||
-    node.kind === Kind.FRAGMENT_DEFINITION
-  );
-}
-
-export function isSelectionNode(node: ASTNode): node is SelectionNode {
-  return (
-    node.kind === Kind.FIELD ||
-    node.kind === Kind.FRAGMENT_SPREAD ||
-    node.kind === Kind.INLINE_FRAGMENT
-  );
+  return isTypeSystemDefinitionNode(node);
 }
 
 export function isValueNode(node: ASTNode): node is ValueNode {

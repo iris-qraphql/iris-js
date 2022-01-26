@@ -20,20 +20,6 @@ import type { ValidationContext } from '../../ValidationContext';
  */
 export function NoDeprecatedCustomRule(context: ValidationContext): ASTVisitor {
   return {
-    Field(node) {
-      const fieldDef = context.getFieldDef();
-      const deprecationReason = fieldDef?.deprecationReason;
-      if (fieldDef && deprecationReason != null) {
-        const parentType = context.getParentType();
-        invariant(parentType != null);
-        context.reportError(
-          new GraphQLError(
-            `The field ${parentType.name}.${fieldDef.name} is deprecated. ${deprecationReason}`,
-            node,
-          ),
-        );
-      }
-    },
     Argument(node) {
       const argDef = context.getArgument();
       const deprecationReason = argDef?.deprecationReason;

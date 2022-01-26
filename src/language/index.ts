@@ -71,8 +71,6 @@ export type {
 
 export {
   isDefinitionNode,
-  isExecutableDefinitionNode,
-  isSelectionNode,
   isValueNode,
   isConstValueNode,
   isTypeNode,
