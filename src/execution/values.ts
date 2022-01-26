@@ -158,7 +158,7 @@ function coerceVariableValues(
  * @internal
  */
 export function getArgumentValues(
-  def: GraphQLField<unknown, unknown> | GraphQLDirective,
+  def: GraphQLField | GraphQLDirective,
   node: FieldNode | DirectiveNode,
   variableValues?: Maybe<ObjMap<unknown>>,
 ): Record<string, unknown> {

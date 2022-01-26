@@ -532,6 +532,33 @@ const resolveVariant = (v: IrisDataVariantConfig): IrisDataVariant => ({
 
 const PRIMITIVES = ['Int', 'Boolean', 'String', 'Float'];
 
+const lookupVariant = <V extends { name: string }>(
+  typeName: string,
+  variants: ReadonlyArray<V>,
+  name?: string,
+): V => {
+  if (!name) {
+    if (variants.length !== 1) {
+      throw new GraphQLError(
+        `Object ${inspect(
+          name,
+        )} must provide variant name for type "${typeName}"`,
+      );
+    }
+    return variants[0];
+  }
+
+  const variant = variants.find((x) => x.name === name);
+
+  if (!variant) {
+    throw new GraphQLError(
+      `TODO: "${typeName}" cannot represent value: ${inspect(name)}`,
+    );
+  }
+
+  return variant;
+};
+
 export class IrisDataType<I = unknown, O = I> {
   name: string;
   description: Maybe<string>;
@@ -583,6 +610,10 @@ export class IrisDataType<I = unknown, O = I> {
 
   getVariants(): ReadonlyArray<IrisDataVariant> {
     return this._variants.map(resolveVariant);
+  }
+
+  variantBy(name?: string): IrisDataVariant {
+    return resolveVariant(lookupVariant(this.name, this._variants, name));
   }
 
   getFields(): ObjMap<IrisDataVariantField> {

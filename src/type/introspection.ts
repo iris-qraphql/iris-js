@@ -18,7 +18,6 @@ import {
   GraphQLNonNull,
   IrisDataType,
   isDataType,
-  isInputObjectType,
   isListType,
   isNonNullType,
   isObjectType,
@@ -277,8 +276,8 @@ export const __Type: IrisResolverType = gqlObject<GraphQLType>({
         },
       },
       resolve(type, { includeDeprecated }) {
-        if (isInputObjectType(type)) {
-          const values = Object.values(type.getFields());
+        if (isDataType(type)) {
+          const values = Object.values(type.variantBy().fields ?? {});
           return includeDeprecated
             ? values
             : values.filter((field) => field.deprecationReason == null);

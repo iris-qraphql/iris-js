@@ -473,15 +473,6 @@ describe('Schema Builder', () => {
       }),
     );
 
-    const inputFields = assertDataType(schema.getType('MyInput')).getFields();
-
-    const newInput = inputFields.newInput;
-    expect(newInput).toEqual(
-      expect.objectContaining({
-        deprecationReason: undefined,
-      }),
-    );
-
     const field3OldArg = rootFields.field3.args[0];
     expect(field3OldArg).toEqual(
       expect.objectContaining({

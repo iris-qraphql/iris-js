@@ -13,6 +13,7 @@ import { OperationTypeNode } from '../language/ast';
 
 import type {
   IrisDataType,
+  IrisDataVariant,
   IrisDataVariantField,
   IrisResolverType,
 } from './definition';
@@ -313,17 +314,17 @@ const validateDataType = (
   context: SchemaValidationContext,
   type: IrisDataType,
 ): void => {
-  if (!type.isVariantType()) {
-    type.getVariants().forEach((enumValue) => validateName(context, enumValue));
-  }
-  return validateInputFields(context, type);
+  type.getVariants().forEach((variant) => {
+    validateName(context, variant);
+    validateDataFields(context, variant);
+  });
 };
 
-function validateInputFields(
+function validateDataFields(
   context: SchemaValidationContext,
-  inputObj: IrisDataType,
+  variant: IrisDataVariant,
 ): void {
-  const fields = Object.values(inputObj.getFields());
+  const fields = Object.values(variant.fields ?? {});
 
   // Ensure the arguments are valid
   for (const field of fields) {
@@ -333,7 +334,7 @@ function validateInputFields(
     // Ensure the type is an input type
     if (!isInputType(field.type)) {
       context.reportError(
-        `The type of ${inputObj.name}.${field.name} must be Input Type ` +
+        `The type of ${variant.name}.${field.name} must be Input Type ` +
           `but got: ${inspect(field.type)}.`,
         field.astNode?.type,
       );
@@ -341,7 +342,7 @@ function validateInputFields(
 
     if (isRequiredInputField(field) && field.deprecationReason != null) {
       context.reportError(
-        `Required input field ${inputObj.name}.${field.name} cannot be deprecated.`,
+        `Required input field ${variant.name}.${field.name} cannot be deprecated.`,
         [getDeprecatedDirectiveNode(field.astNode), field.astNode?.type],
       );
     }
@@ -375,26 +376,30 @@ function createInputObjectCircularRefsValidator(
     visitedTypes[inputObj.name] = true;
     fieldPathIndexByTypeName[inputObj.name] = fieldPath.length;
 
-    const fields = Object.values(inputObj.getFields());
-    for (const field of fields) {
-      if (isNonNullType(field.type) && isInputObjectType(field.type.ofType)) {
-        const fieldType = field.type.ofType;
-        const cycleIndex = fieldPathIndexByTypeName[fieldType.name];
+    inputObj.getVariants().forEach((variant) => {
+      const fields = Object.values(variant.fields ?? {});
+      for (const field of fields) {
+        if (isNonNullType(field.type) && isInputObjectType(field.type.ofType)) {
+          const fieldType = field.type.ofType;
+          const cycleIndex = fieldPathIndexByTypeName[fieldType.name];
 
-        fieldPath.push(field);
-        if (cycleIndex === undefined) {
-          detectCycleRecursive(fieldType);
-        } else {
-          const cyclePath = fieldPath.slice(cycleIndex);
-          const pathStr = cyclePath.map((fieldObj) => fieldObj.name).join('.');
-          context.reportError(
-            `Cannot reference Input Object "${fieldType.name}" within itself through a series of non-null fields: "${pathStr}".`,
-            cyclePath.map((fieldObj) => fieldObj.astNode),
-          );
+          fieldPath.push(field);
+          if (cycleIndex === undefined) {
+            detectCycleRecursive(fieldType);
+          } else {
+            const cyclePath = fieldPath.slice(cycleIndex);
+            const pathStr = cyclePath
+              .map((fieldObj) => fieldObj.name)
+              .join('.');
+            context.reportError(
+              `Cannot reference Input Object "${fieldType.name}" within itself through a series of non-null fields: "${pathStr}".`,
+              cyclePath.map((fieldObj) => fieldObj.astNode),
+            );
+          }
+          fieldPath.pop();
         }
-        fieldPath.pop();
       }
-    }
+    });
 
     fieldPathIndexByTypeName[inputObj.name] = undefined;
   }

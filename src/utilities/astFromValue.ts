@@ -4,10 +4,14 @@ import { isIterableObject } from '../jsutils/isIterableObject';
 import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 
-import type { ObjectFieldNode, ValueNode } from '../language/ast';
+import type {
+  ObjectFieldNode,
+  ObjectValueNode,
+  ValueNode,
+} from '../language/ast';
 import { Kind } from '../language/kinds';
 
-import type { GraphQLInputType } from '../type/definition';
+import type { GraphQLInputType, IrisDataVariant } from '../type/definition';
 import { isDataType, isListType, isNonNullType } from '../type/definition';
 import { GraphQLID } from '../type/scalars';
 
@@ -72,24 +76,10 @@ export function astFromValue(
   }
 
   if (isDataType(type)) {
-    // Populate the fields of the input object by creating ASTs from each value
-    // in the JavaScript object according to the fields in the input type.
-    if (type.isVariantType()) {
-      if (!isObjectLike(value)) {
-        return null;
-      }
-      const fieldNodes: Array<ObjectFieldNode> = [];
-      for (const field of Object.values(type.getFields())) {
-        const fieldValue = astFromValue(value[field.name], field.type);
-        if (fieldValue) {
-          fieldNodes.push({
-            kind: Kind.OBJECT_FIELD,
-            name: { kind: Kind.NAME, value: field.name },
-            value: fieldValue,
-          });
-        }
-      }
-      return { kind: Kind.OBJECT, fields: fieldNodes };
+    if (!type.isPrimitive && isObjectLike(value)) {
+      const variantName = value.__typename as string | undefined;
+      const variant = type.variantBy(variantName);
+      return parseVariantValue(value, variant);
     }
 
     // Since value is an internally represented value, it must be serialized
@@ -142,3 +132,22 @@ export function astFromValue(
  *   - NegativeSign? NonZeroDigit ( Digit+ )?
  */
 const integerStringRegExp = /^-?(?:0|[1-9][0-9]*)$/;
+
+const parseVariantValue = (
+  value: Record<string, unknown>,
+  variant: IrisDataVariant,
+): ObjectValueNode => {
+  const fieldNodes: Array<ObjectFieldNode> = [];
+
+  for (const field of Object.values(variant.fields ?? {})) {
+    const fieldValue = astFromValue(value[field.name], field.type);
+    if (fieldValue) {
+      fieldNodes.push({
+        kind: Kind.OBJECT_FIELD,
+        name: { kind: Kind.NAME, value: field.name },
+        value: fieldValue,
+      });
+    }
+  }
+  return { kind: Kind.OBJECT, fields: fieldNodes };
+};

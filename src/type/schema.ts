@@ -15,15 +15,12 @@ import type {
   GraphQLType,
   IrisResolverType,
 } from './definition';
-import {
-  getNamedType,
-  isInputObjectType,
-  isResolverType,
-  isUnionType,
-} from './definition';
+import { getNamedType, isResolverType, isUnionType } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective, specifiedDirectives } from './directives';
 import { __Schema } from './introspection';
+
+import { isDataType } from '.';
 
 /**
  * Test if the given value is a GraphQL schema.
@@ -348,10 +345,11 @@ function collectReferencedTypes(
           collectReferencedTypes(memberType, typeSet);
         }
       }
-    } else if (isInputObjectType(namedType)) {
-      for (const field of Object.values(namedType.getFields())) {
-        collectReferencedTypes(field.type, typeSet);
-      }
+    } else if (isDataType(namedType)) {
+      namedType
+        .getVariants()
+        .flatMap((x) => Object.values(x.fields ?? {}))
+        .forEach((field) => collectReferencedTypes(field.type, typeSet));
     }
   }
 

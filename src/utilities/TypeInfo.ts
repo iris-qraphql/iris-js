@@ -13,12 +13,12 @@ import type {
   GraphQLOutputType,
   GraphQLType,
   IrisDataVariant,
-  IrisDataVariantField,
   IrisResolverType,
 } from '../type/definition';
 import {
   getNamedType,
   getNullableType,
+  isDataType,
   isEnumType,
   isInputObjectType,
   isInputType,
@@ -220,19 +220,13 @@ export class TypeInfo {
         break;
       }
       case Kind.OBJECT_FIELD: {
-        const objectType: unknown = getNamedType(this.getInputType());
-        let inputFieldType: GraphQLInputType | undefined;
-        let inputField: IrisDataVariantField | undefined;
-
-        if (isInputObjectType(objectType)) {
-          inputField = objectType.getFields()[node.name.value];
-          if (inputField) {
-            inputFieldType = inputField.type;
-          }
+        const type: unknown = getNamedType(this.getInputType());
+        if (isDataType(type) && type.isVariantType()) {
+          const fieldType = type.variantBy().fields?.[node.name.value]?.type;
+          this._inputTypeStack.push(
+            isInputType(fieldType) ? fieldType : undefined,
+          );
         }
-        this._inputTypeStack.push(
-          isInputType(inputFieldType) ? inputFieldType : undefined,
-        );
         break;
       }
       case Kind.ENUM: {

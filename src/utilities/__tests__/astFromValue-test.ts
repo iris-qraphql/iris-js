@@ -1,3 +1,5 @@
+import { toJSONError } from '../../jsutils/toJSONDeep';
+
 import { GraphQLList, GraphQLNonNull } from '../../type/definition';
 import { gqlEnum, gqlInput, gqlScalar } from '../../type/make';
 import {
@@ -350,6 +352,8 @@ describe('astFromValue', () => {
   });
 
   it('does not converts non-object values as input objects', () => {
-    expect(astFromValue(5, inputObj)).toEqual(null);
+    expect(toJSONError(() => astFromValue(5, inputObj))).toEqual({
+      message: 'Data "MyInputObj" cannot represent value: 5',
+    });
   });
 });

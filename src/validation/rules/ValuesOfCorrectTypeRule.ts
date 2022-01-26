@@ -19,6 +19,8 @@ import {
   isRequiredInputField,
 } from '../../type/definition';
 
+import { lookupObjectTypename } from '../../utils/type-level';
+
 import type { ValidationContext } from '../ValidationContext';
 
 /**
@@ -44,24 +46,29 @@ export function ValuesOfCorrectTypeRule(
     },
     ObjectValue(node) {
       const type = getNamedType(context.getInputType());
-      if (!isInputObjectType(type)) {
+      if (!(isDataType(type) && !type.isPrimitive)) {
         isValidValueNode(context, node);
         return false; // Don't traverse further.
       }
       // Ensure every required field exists.
-      const fieldNodeMap = keyMap(node.fields, (field) => field.name.value);
-      for (const fieldDef of Object.values(type.getFields())) {
-        const fieldNode = fieldNodeMap[fieldDef.name];
-        if (!fieldNode && isRequiredInputField(fieldDef)) {
-          const typeStr = inspect(fieldDef.type);
-          context.reportError(
-            new GraphQLError(
-              `Field "${type.name}.${fieldDef.name}" of required type "${typeStr}" was not provided.`,
-              node,
-            ),
-          );
-        }
-      }
+      const nodeFields = keyMap(node.fields, (field) => field.name.value);
+      const variantName = lookupObjectTypename(nodeFields);
+      Object.values(type.variantBy(variantName).fields ?? {}).forEach(
+        (fieldDef) => {
+          if (!nodeFields[fieldDef.name] && isRequiredInputField(fieldDef)) {
+            context.reportError(
+              new GraphQLError(
+                `Field "${type.name}.${
+                  fieldDef.name
+                }" of required type "${inspect(
+                  fieldDef.type,
+                )}" was not provided.`,
+                node,
+              ),
+            );
+          }
+        },
+      );
     },
     ObjectField(node) {
       const parentType = getNamedType(context.getParentInputType());
@@ -69,7 +76,7 @@ export function ValuesOfCorrectTypeRule(
       if (!fieldType && isInputObjectType(parentType)) {
         const suggestions = suggestionList(
           node.name.value,
-          Object.keys(parentType.getFields()),
+          Object.keys(parentType.variantBy().fields ?? {}),
         );
         context.reportError(
           new GraphQLError(

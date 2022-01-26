@@ -9,9 +9,6 @@ import type {
 } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
-import type { GraphQLNamedType } from '../../type/definition';
-import { isInputObjectType, isObjectType } from '../../type/definition';
-
 import type { SDLValidationContext } from '../ValidationContext';
 
 /**
@@ -22,8 +19,6 @@ import type { SDLValidationContext } from '../ValidationContext';
 export function UniqueVariantAndFieldDefinitionNamesRule(
   context: SDLValidationContext,
 ): ASTVisitor {
-  const schema = context.getSchema();
-  const existingTypeMap = schema ? schema.getTypeMap() : Object.create(null);
   const knownFieldNames = Object.create(null);
 
   return {
@@ -69,22 +64,13 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
       knownFieldNames[typeName] = Object.create(null);
     }
 
-    // FIXME: https://github.com/graphql/graphql-js/issues/2203
-    /* c8 ignore next */
     const fieldNodes = node.fields ?? [];
     const fieldNames = knownFieldNames[typeName];
 
     for (const fieldDef of fieldNodes) {
       const fieldName = fieldDef.name.value;
 
-      if (hasField(existingTypeMap[typeName], fieldName)) {
-        context.reportError(
-          new GraphQLError(
-            `Field "${typeName}.${fieldName}" already exists in the schema. It cannot also be defined in this type extension.`,
-            fieldDef.name,
-          ),
-        );
-      } else if (fieldNames[fieldName]) {
+      if (fieldNames[fieldName]) {
         context.reportError(
           new GraphQLError(
             `Field "${typeName}.${fieldName}" can only be defined once.`,
@@ -98,14 +84,4 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
 
     return false;
   }
-}
-
-function hasField(type: GraphQLNamedType, fieldName: string): boolean {
-  if (isObjectType(type)) {
-    return type.getResolverFields()[fieldName] != null;
-  }
-  if (isInputObjectType(type)) {
-    return type.getFields()[fieldName] != null;
-  }
-  return false;
 }
