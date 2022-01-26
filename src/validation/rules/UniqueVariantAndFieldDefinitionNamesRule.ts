@@ -101,7 +101,10 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
 }
 
 function hasField(type: GraphQLNamedType, fieldName: string): boolean {
-  if (isObjectType(type) || isInputObjectType(type)) {
+  if (isObjectType(type)) {
+    return type.getResolverFields()[fieldName] != null;
+  }
+  if (isInputObjectType(type)) {
     return type.getFields()[fieldName] != null;
   }
   return false;

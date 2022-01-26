@@ -337,7 +337,7 @@ function collectReferencedTypes(
     typeSet.add(namedType);
     if (isResolverType(namedType)) {
       if (namedType.isVariantType()) {
-        for (const field of Object.values(namedType.getFields())) {
+        for (const field of Object.values(namedType.getResolverFields())) {
           collectReferencedTypes(field.type, typeSet);
           for (const arg of field.args) {
             collectReferencedTypes(arg.type, typeSet);

@@ -244,7 +244,7 @@ function validateFields(
   context: SchemaValidationContext,
   type: IrisResolverType,
 ): void {
-  const fields = Object.values(type.getFields());
+  const fields = Object.values(type.getResolverFields());
 
   for (const field of fields) {
     // Ensure they are named correctly.

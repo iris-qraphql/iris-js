@@ -80,7 +80,7 @@ function getSuggestedTypeNames(
   const suggestedTypes: Set<IrisResolverType> = new Set();
   const usageCount = Object.create(null);
   for (const possibleType of schema.getPossibleTypes(type)) {
-    if (!possibleType.getFields()[fieldName]) {
+    if (!possibleType.getResolverFields()[fieldName]) {
       continue;
     }
 
@@ -111,7 +111,7 @@ function getSuggestedFieldNames(
   fieldName: string,
 ): Array<string> {
   if (isObjectType(type)) {
-    const possibleFieldNames = Object.keys(type.getFields());
+    const possibleFieldNames = Object.keys(type.getResolverFields());
     return suggestionList(fieldName, possibleFieldNames);
   }
   // Otherwise, must be a Union type, which does not define fields.

@@ -459,7 +459,9 @@ describe('Schema Builder', () => {
       }),
     );
 
-    const rootFields = assertResolverType(schema.getType('Query')).getFields();
+    const rootFields = assertResolverType(
+      schema.getType('Query'),
+    ).getResolverFields();
     expect(rootFields.field1).toEqual(
       expect.objectContaining({
         deprecationReason: 'No longer supported',
@@ -524,7 +526,7 @@ describe('Schema Builder', () => {
     `);
 
     const queryType = assertResolverType(schema.getType('Query'));
-    expect(queryType.getFields()).toMatchSnapshot();
+    expect(queryType.getResolverFields()).toMatchSnapshot();
   });
 
   it('Rejects invalid SDL', () => {

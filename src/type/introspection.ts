@@ -239,7 +239,7 @@ export const __Type: IrisResolverType = gqlObject<GraphQLType>({
       },
       resolve(type, { includeDeprecated }) {
         if (isObjectType(type)) {
-          const fields = Object.values(type.getFields());
+          const fields = Object.values(type.getResolverFields());
           return includeDeprecated
             ? fields
             : fields.filter((field) => field.deprecationReason == null);

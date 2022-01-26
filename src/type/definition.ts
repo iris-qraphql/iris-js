@@ -469,7 +469,7 @@ export class IrisResolverType<TSource = any, TContext = any> {
 
   isVariantType = (): boolean => this._isVariantType;
 
-  getFields(): GraphQLFieldMap<TSource, TContext> {
+  getResolverFields(): GraphQLFieldMap<TSource, TContext> {
     if (typeof this._fields === 'function') {
       this._fields = this._fields();
     }

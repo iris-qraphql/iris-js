@@ -73,7 +73,7 @@ export function printType(type: GraphQLNamedType): string {
 }
 
 function printObject(type: IrisResolverType): string {
-  const fields = type.getFields();
+  const fields = type.getResolverFields();
   return (
     printDescription(type) +
     `resolver ${type.name}${

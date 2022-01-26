@@ -320,7 +320,7 @@ function getFieldDef(
     return TypeNameMetaFieldDef;
   }
   if (isObjectType(parentType)) {
-    return parentType.getFields()[name];
+    return parentType.getResolverFields()[name];
   }
 }
 

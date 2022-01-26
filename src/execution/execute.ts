@@ -1050,5 +1050,5 @@ export function getFieldDef(
   } else if (fieldName === TypeNameMetaFieldDef.name) {
     return TypeNameMetaFieldDef;
   }
-  return parentType.getFields()[fieldName];
+  return parentType.getResolverFields()[fieldName];
 }

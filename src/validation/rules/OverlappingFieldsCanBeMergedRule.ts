@@ -746,7 +746,7 @@ function _collectFieldsAndFragmentNames(
         const fieldName = selection.name.value;
         let fieldDef;
         if (isObjectType(parentType)) {
-          fieldDef = parentType.getFields()[fieldName];
+          fieldDef = parentType.getResolverFields()[fieldName];
         }
         const responseName = selection.alias
           ? selection.alias.value
