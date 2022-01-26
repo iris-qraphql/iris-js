@@ -1,5 +1,3 @@
-import { toJSONError } from '../../jsutils/toJSONDeep';
-
 import { GraphQLList, GraphQLNonNull } from '../../type/definition';
 import { gqlEnum, gqlInput, gqlScalar } from '../../type/make';
 import {
@@ -9,6 +7,8 @@ import {
   GraphQLInt,
   GraphQLString,
 } from '../../type/scalars';
+
+import { toJSONError } from '../../utils/toJSONDeep';
 
 import { astFromValue } from '../astFromValue';
 

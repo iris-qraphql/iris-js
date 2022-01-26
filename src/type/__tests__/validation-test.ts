@@ -1,12 +1,12 @@
 import { dedent } from '../../__testUtils__/dedent';
 
 import { inspect } from '../../jsutils/inspect';
-import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
 import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { buildSchema } from '../../utilities/buildASTSchema';
 
+import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { ConfigMapValue } from '../../utils/type-level';
 
 import type {

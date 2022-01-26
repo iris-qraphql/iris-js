@@ -1,7 +1,7 @@
 import { expectJSON } from '../../__testUtils__/__mocha__/expectJSON';
 
 import type { Maybe } from '../../jsutils/Maybe';
-import { toJSONDeep } from '../../jsutils/toJSONDeep';
+import { toJSONDeep } from '../../utils/toJSONDeep';
 
 import { parse } from '../../language/parser';
 

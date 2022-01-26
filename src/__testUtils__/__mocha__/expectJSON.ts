@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { toJSONDeep } from '../../jsutils/toJSONDeep';
+import { toJSONDeep } from '../../utils/toJSONDeep';
 
 export function expectJSON(actual: unknown) {
   const actualJSON = toJSONDeep(actual);

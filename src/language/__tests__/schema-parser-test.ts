@@ -1,6 +1,6 @@
 import { dedent } from '../../__testUtils__/dedent';
 
-import { toJSONDeep, toJSONError } from '../../jsutils/toJSONDeep';
+import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
 import { parse } from '../parser';
 

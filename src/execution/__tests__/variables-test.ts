@@ -1,6 +1,5 @@
 import { inspect } from '../../jsutils/inspect';
 import { invariant } from '../../jsutils/invariant';
-import { toJSONDeep } from '../../jsutils/toJSONDeep';
 
 import { Kind } from '../../language/kinds';
 import { parse } from '../../language/parser';
@@ -14,6 +13,7 @@ import { gqlEnum, gqlInput, gqlObject, gqlScalar } from '../../type/make';
 import { GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
+import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { ConfigMapValue } from '../../utils/type-level';
 
 import { executeSync } from '../execute';

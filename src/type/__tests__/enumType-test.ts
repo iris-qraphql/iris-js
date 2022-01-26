@@ -1,6 +1,5 @@
-import { toJSONDeep } from '../../jsutils/toJSONDeep';
-
 import { graphqlSync } from '../../iris';
+import { toJSONDeep } from '../../utils/toJSONDeep';
 
 import { gqlEnum, gqlObject } from '../make';
 import { GraphQLInt } from '../scalars';
