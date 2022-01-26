@@ -139,15 +139,8 @@ export class Token {
 export type ASTNode =
   | NameNode
   | DocumentNode
-  | OperationDefinitionNode
-  | VariableDefinitionNode
   | VariableNode
-  | SelectionSetNode
-  | FieldNode
   | ArgumentNode
-  | FragmentSpreadNode
-  | InlineFragmentNode
-  | FragmentDefinitionNode
   | IntValueNode
   | FloatValueNode
   | StringValueNode
@@ -184,31 +177,9 @@ export const QueryDocumentKeys: {
   [NodeT in ASTNode as NodeT['kind']]: ReadonlyArray<keyof NodeT>;
 } = {
   Name: [],
-
   Document: ['definitions'],
-  OperationDefinition: [
-    'name',
-    'variableDefinitions',
-    'directives',
-    'selectionSet',
-  ],
-  VariableDefinition: ['variable', 'type', 'defaultValue', 'directives'],
   Variable: ['name'],
-  SelectionSet: ['selections'],
-  Field: ['alias', 'name', 'arguments', 'directives', 'selectionSet'],
   Argument: ['name', 'value'],
-
-  FragmentSpread: ['name', 'directives'],
-  InlineFragment: ['typeCondition', 'directives', 'selectionSet'],
-  FragmentDefinition: [
-    'name',
-    // Note: fragment variable definitions are deprecated and will removed in v17.0.0
-    'variableDefinitions',
-    'typeCondition',
-    'directives',
-    'selectionSet',
-  ],
-
   IntValue: [],
   FloatValue: [],
   StringValue: [],
@@ -266,23 +237,7 @@ export interface DocumentNode {
   readonly definitions: ReadonlyArray<DefinitionNode>;
 }
 
-export type DefinitionNode =
-  | ExecutableDefinitionNode
-  | TypeSystemDefinitionNode;
-
-export type ExecutableDefinitionNode =
-  | OperationDefinitionNode
-  | FragmentDefinitionNode;
-
-export interface OperationDefinitionNode {
-  readonly kind: Kind.OPERATION_DEFINITION;
-  readonly loc?: Location;
-  readonly operation: OperationTypeNode;
-  readonly name?: NameNode;
-  readonly variableDefinitions?: ReadonlyArray<VariableDefinitionNode>;
-  readonly directives?: ReadonlyArray<DirectiveNode>;
-  readonly selectionSet: SelectionSetNode;
-}
+export type DefinitionNode = TypeSystemDefinitionNode;
 
 export enum OperationTypeNode {
   QUERY = 'query',
@@ -290,37 +245,10 @@ export enum OperationTypeNode {
   SUBSCRIPTION = 'subscription',
 }
 
-export interface VariableDefinitionNode {
-  readonly kind: Kind.VARIABLE_DEFINITION;
-  readonly loc?: Location;
-  readonly variable: VariableNode;
-  readonly type: TypeNode;
-  readonly defaultValue?: ConstValueNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-}
-
 export interface VariableNode {
   readonly kind: Kind.VARIABLE;
   readonly loc?: Location;
   readonly name: NameNode;
-}
-
-export interface SelectionSetNode {
-  kind: Kind.SELECTION_SET;
-  loc?: Location;
-  selections: ReadonlyArray<SelectionNode>;
-}
-
-export type SelectionNode = FieldNode | FragmentSpreadNode | InlineFragmentNode;
-
-export interface FieldNode {
-  readonly kind: Kind.FIELD;
-  readonly loc?: Location;
-  readonly alias?: NameNode;
-  readonly name: NameNode;
-  readonly arguments?: ReadonlyArray<ArgumentNode>;
-  readonly directives?: ReadonlyArray<DirectiveNode>;
-  readonly selectionSet?: SelectionSetNode;
 }
 
 export interface ArgumentNode {
@@ -335,34 +263,6 @@ export interface ConstArgumentNode {
   readonly loc?: Location;
   readonly name: NameNode;
   readonly value: ConstValueNode;
-}
-
-/** Fragments */
-
-export interface FragmentSpreadNode {
-  readonly kind: Kind.FRAGMENT_SPREAD;
-  readonly loc?: Location;
-  readonly name: NameNode;
-  readonly directives?: ReadonlyArray<DirectiveNode>;
-}
-
-export interface InlineFragmentNode {
-  readonly kind: Kind.INLINE_FRAGMENT;
-  readonly loc?: Location;
-  readonly typeCondition?: NamedTypeNode;
-  readonly directives?: ReadonlyArray<DirectiveNode>;
-  readonly selectionSet: SelectionSetNode;
-}
-
-export interface FragmentDefinitionNode {
-  readonly kind: Kind.FRAGMENT_DEFINITION;
-  readonly loc?: Location;
-  readonly name: NameNode;
-  /** @deprecated variableDefinitions will be removed in v17.0.0 */
-  readonly variableDefinitions?: ReadonlyArray<VariableDefinitionNode>;
-  readonly typeCondition: NamedTypeNode;
-  readonly directives?: ReadonlyArray<DirectiveNode>;
-  readonly selectionSet: SelectionSetNode;
 }
 
 /** Values */

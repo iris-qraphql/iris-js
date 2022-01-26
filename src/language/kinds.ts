@@ -7,16 +7,8 @@ export enum Kind {
 
   /** Document */
   DOCUMENT = 'Document',
-  OPERATION_DEFINITION = 'OperationDefinition',
-  VARIABLE_DEFINITION = 'VariableDefinition',
-  SELECTION_SET = 'SelectionSet',
   FIELD = 'Field',
   ARGUMENT = 'Argument',
-
-  /** Fragments */
-  FRAGMENT_SPREAD = 'FragmentSpread',
-  INLINE_FRAGMENT = 'InlineFragment',
-  FRAGMENT_DEFINITION = 'FragmentDefinition',
 
   /** Values */
   VARIABLE = 'Variable',
