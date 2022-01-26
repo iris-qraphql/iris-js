@@ -1,6 +1,7 @@
 import type { GraphQLSchema } from '../../type/schema';
 
-import { expectSDLValidationErrors } from '../__mocha__/harness';
+import { expectSDLValidationErrors } from '../../utils/harness';
+
 import { UniqueTypeNamesRule } from '../rules/UniqueTypeNamesRule';
 
 function expectSDLErrors(sdlStr: string, schema?: GraphQLSchema) {

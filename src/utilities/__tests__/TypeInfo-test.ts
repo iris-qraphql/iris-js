@@ -1,40 +1,12 @@
 import { invariant } from '../../jsutils/invariant';
 
-import { parse, parseValue } from '../../language/parser';
+import { parseValue } from '../../language/parser';
 import { visit } from '../../language/visitor';
 
 import { GraphQLSchema } from '../../type/schema';
 
 import { buildSchema } from '../buildASTSchema';
 import { TypeInfo, visitWithTypeInfo } from '../TypeInfo';
-
-const testSchema = buildSchema(`
-  resolver Pet = {
-    name: String
-  }
-
-  resolver Dog = {
-    name: String
-  }
-
-  resolver Cat = {
-    name: String
-  }
-
-  resolver Human = {
-    name: String
-    pets: [Pet]
-  }
-
-  resolver Alien = {
-    name(surname: Boolean): String
-  }
-
-  resolver Query = {
-    human(id: ID): Human
-    alien: Alien
-  }
-`);
 
 describe('TypeInfo', () => {
   const schema = new GraphQLSchema({});

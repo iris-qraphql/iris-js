@@ -1,6 +1,7 @@
 import type { GraphQLSchema } from '../../type/schema';
 
-import { getSDLValidationErrors } from '../__mocha__/harness';
+import { getSDLValidationErrors } from '../../utils/harness';
+
 import { KnownTypeNamesRule } from '../rules/KnownTypeNamesRule';
 
 function getSDLErrors(sdlStr: string, schema?: GraphQLSchema) {

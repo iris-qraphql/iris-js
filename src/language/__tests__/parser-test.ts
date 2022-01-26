@@ -1,5 +1,5 @@
-import { expectJSON } from '../../__testUtils__/__mocha__/expectJSON';
 import { dedent } from '../../__testUtils__/dedent';
+import { expectJSON } from '../../__testUtils__/expectJSON';
 
 import { toJSONError } from '../../utils/toJSONDeep';
 

@@ -1,17 +1,17 @@
-import { expectJSON } from '../../__testUtils__/__mocha__/expectJSON';
+import { expectJSON } from '../__testUtils__/expectJSON';
 
-import type { Maybe } from '../../jsutils/Maybe';
+import type { Maybe } from '../jsutils/Maybe';
 
-import { parse } from '../../language/parser';
+import { parse } from '../language/parser';
 
-import type { GraphQLSchema } from '../../type/schema';
+import type { GraphQLSchema } from '../type/schema';
 
-import { buildSchema } from '../../utilities/buildASTSchema';
+import { validateSDL } from '../validation/validate';
+import type { SDLValidationRule } from '../validation/ValidationContext';
 
-import { toJSONDeep } from '../../utils/toJSONDeep';
+import { buildSchema } from '../utilities/buildASTSchema';
 
-import { validate, validateSDL } from '../validate';
-import type { SDLValidationRule, ValidationRule } from '../ValidationContext';
+import { toJSONDeep } from './toJSONDeep';
 
 export const testSchema: GraphQLSchema = buildSchema(`
   resolver Pet = {
@@ -95,23 +95,6 @@ export const testSchema: GraphQLSchema = buildSchema(`
 
   directive @onField on FIELD
 `);
-
-export function expectValidationErrorsWithSchema(
-  schema: GraphQLSchema,
-  rule: ValidationRule,
-  queryStr: string,
-): any {
-  const doc = parse(queryStr);
-  const errors = validate(schema, doc, [rule]);
-  return expectJSON(errors);
-}
-
-export function expectValidationErrors(
-  rule: ValidationRule,
-  queryStr: string,
-): any {
-  return expectValidationErrorsWithSchema(testSchema, rule, queryStr);
-}
 
 export function expectSDLValidationErrors(
   schema: Maybe<GraphQLSchema>,

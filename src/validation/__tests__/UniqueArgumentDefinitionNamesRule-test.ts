@@ -1,4 +1,5 @@
-import { expectSDLValidationErrors } from '../__mocha__/harness';
+import { expectSDLValidationErrors } from '../../utils/harness';
+
 import { UniqueArgumentDefinitionNamesRule } from '../rules/UniqueArgumentDefinitionNamesRule';
 
 function expectSDLErrors(sdlStr: string) {
