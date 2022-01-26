@@ -51,16 +51,6 @@ const printDocASTReducer: ASTReducer<string> = {
 
   // Type System Definitions
 
-  SchemaDefinition: {
-    leave: ({ description, directives, operationTypes }) =>
-      wrap('', description, '\n') +
-      join(['schema', join(directives, ' '), block(operationTypes)], ' '),
-  },
-
-  OperationTypeDefinition: {
-    leave: ({ operation, type }) => operation + ': ' + type,
-  },
-
   FieldDefinition: {
     leave: ({ description, name, arguments: args, type, directives }) =>
       wrap('', description, '\n') +

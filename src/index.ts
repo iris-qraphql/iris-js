@@ -196,8 +196,6 @@ export type {
   ListTypeNode,
   NonNullTypeNode,
   TypeSystemDefinitionNode,
-  SchemaDefinitionNode,
-  OperationTypeDefinitionNode,
   TypeDefinitionNode,
   FieldDefinitionNode,
   ArgumentDefinitionNode,

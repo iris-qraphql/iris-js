@@ -1,7 +1,6 @@
 import { KnownArgumentNamesOnDirectivesRule } from './rules/KnownArgumentNamesRule';
 import { KnownDirectivesRule } from './rules/KnownDirectivesRule';
 import { KnownTypeNamesRule } from './rules/KnownTypeNamesRule';
-import { LoneSchemaDefinitionRule } from './rules/LoneSchemaDefinitionRule';
 import { ProvidedRequiredArgumentsOnDirectivesRule } from './rules/ProvidedRequiredArgumentsRule';
 import { UniqueArgumentDefinitionNamesRule } from './rules/UniqueArgumentDefinitionNamesRule';
 // Spec Section: "Argument Uniqueness"
@@ -19,7 +18,6 @@ import type { SDLValidationRule } from './ValidationContext';
  */
 export const specifiedSDLRules: ReadonlyArray<SDLValidationRule> =
   Object.freeze([
-    LoneSchemaDefinitionRule,
     UniqueTypeNamesRule,
     UniqueVariantAndFieldDefinitionNamesRule,
     UniqueArgumentDefinitionNamesRule,

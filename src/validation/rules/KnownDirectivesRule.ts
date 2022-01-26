@@ -75,8 +75,6 @@ function getDirectiveLocationForASTPath(
   invariant('kind' in appliedTo);
 
   switch (appliedTo.kind) {
-    case Kind.SCHEMA_DEFINITION:
-      return DirectiveLocation.SCHEMA;
     case Kind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
     case Kind.RESOLVER_TYPE_DEFINITION:

@@ -20,7 +20,6 @@ function filterNodes(predicate: (node: ASTNode) => boolean): Array<string> {
 describe('AST node predicates', () => {
   it('isDefinitionNode', () => {
     expect(filterNodes(isDefinitionNode)).toEqual([
-      'SchemaDefinition',
       'ResolverTypeDefinition',
       'DataTypeDefinition',
       'DirectiveDefinition',
@@ -62,7 +61,6 @@ describe('AST node predicates', () => {
 
   it('isTypeSystemDefinitionNode', () => {
     expect(filterNodes(isTypeSystemDefinitionNode)).toEqual([
-      'SchemaDefinition',
       'ResolverTypeDefinition',
       'DataTypeDefinition',
       'DirectiveDefinition',

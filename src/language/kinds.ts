@@ -7,7 +7,6 @@ export enum Kind {
 
   /** Document */
   DOCUMENT = 'Document',
-  FIELD = 'Field',
   ARGUMENT = 'Argument',
 
   /** Values */
@@ -29,10 +28,6 @@ export enum Kind {
   NAMED_TYPE = 'NamedType',
   LIST_TYPE = 'ListType',
   NON_NULL_TYPE = 'NonNullType',
-
-  /** Type System Definitions */
-  SCHEMA_DEFINITION = 'SchemaDefinition',
-  OPERATION_TYPE_DEFINITION = 'OperationTypeDefinition',
 
   ARGUMENT_DEFINITION = 'InputValueDefinition',
   /** Type Definitions */

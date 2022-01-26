@@ -39,7 +39,6 @@ export function UniqueDirectivesPerLocationRule(
     }
   }
 
-  const schemaDirectives = Object.create(null);
   const typeDirectivesMap = Object.create(null);
 
   return {
@@ -52,9 +51,7 @@ export function UniqueDirectivesPerLocationRule(
       }
 
       let seenDirectives;
-      if (node.kind === Kind.SCHEMA_DEFINITION) {
-        seenDirectives = schemaDirectives;
-      } else if (isTypeDefinitionNode(node)) {
+      if (isTypeDefinitionNode(node)) {
         const typeName = node.name.value;
         seenDirectives = typeDirectivesMap[typeName];
         if (seenDirectives === undefined) {

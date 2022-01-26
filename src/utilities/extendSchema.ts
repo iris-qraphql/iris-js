@@ -10,7 +10,6 @@ import type {
   FieldDefinitionNode,
   NamedTypeNode,
   ResolverVariantDefinitionNode,
-  SchemaDefinitionNode,
   TypeDefinitionNode,
   TypeNode,
   VariantDefinitionNode,
@@ -86,7 +85,6 @@ export function extendSchemaImpl(
   // have the same name. For example, a type named "skip".
   const directiveDefs: Array<DirectiveDefinitionNode> = [];
 
-  let schemaDef: Maybe<SchemaDefinitionNode>;
   // Schema extensions are collected which may add additional operation types.
 
   for (const def of documentAST.definitions) {
@@ -102,8 +100,7 @@ export function extendSchemaImpl(
   if (
     Object.keys(typeExtensionsMap).length === 0 &&
     typeDefs.length === 0 &&
-    directiveDefs.length === 0 &&
-    schemaDef == null
+    directiveDefs.length === 0
   ) {
     return schemaConfig;
   }
@@ -128,7 +125,7 @@ export function extendSchemaImpl(
 
   // Then produce and return a Schema config with these types.
   return {
-    description: schemaDef?.description?.value,
+    description: undefined,
     ...operationTypes,
     types: Object.values(typeMap),
     directives: [
@@ -136,7 +133,6 @@ export function extendSchemaImpl(
       ...directiveDefs.map(buildDirective),
     ],
     extensions: Object.create(null),
-    astNode: schemaDef ?? schemaConfig.astNode,
     assumeValid: options?.assumeValid ?? false,
   };
 

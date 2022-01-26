@@ -1,17 +1,19 @@
-import { expectSDLValidationErrors } from '../../utils/harness';
+import { getSDLValidationErrors } from '../../utils/harness';
 
 import { UniqueArgumentDefinitionNamesRule } from '../rules/UniqueArgumentDefinitionNamesRule';
 
 function expectSDLErrors(sdlStr: string) {
-  return expectSDLValidationErrors(
-    undefined,
-    UniqueArgumentDefinitionNamesRule,
-    sdlStr,
+  return expect(
+    getSDLValidationErrors(
+      undefined,
+      UniqueArgumentDefinitionNamesRule,
+      sdlStr,
+    ),
   );
 }
 
 function expectValidSDL(sdlStr: string) {
-  expectSDLErrors(sdlStr).toDeepEqual([]);
+  expectSDLErrors(sdlStr).toEqual([]);
 }
 
 describe('Validate: Unique argument definition names', () => {
@@ -66,7 +68,7 @@ describe('Validate: Unique argument definition names', () => {
         bar: String
         foo: String
       ) on QUERY
-    `).toDeepEqual([
+    `).toEqual([
       {
         message:
           'Argument "SomeObject.someField(foo:)" can only be defined once.',

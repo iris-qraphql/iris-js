@@ -154,8 +154,6 @@ export type ASTNode =
   | NamedTypeNode
   | ListTypeNode
   | NonNullTypeNode
-  | SchemaDefinitionNode
-  | OperationTypeDefinitionNode
   | FieldDefinitionNode
   | ArgumentDefinitionNode
   | ResolverTypeDefinitionNode
@@ -195,9 +193,6 @@ export const QueryDocumentKeys: {
   NamedType: ['name'],
   ListType: ['type'],
   NonNullType: ['type'],
-
-  SchemaDefinition: ['description', 'directives', 'operationTypes'],
-  OperationTypeDefinition: ['type'],
   FieldDefinition: ['description', 'name', 'arguments', 'type', 'directives'],
   InputValueDefinition: [
     'description',
@@ -405,21 +400,6 @@ export interface NonNullTypeNode {
 export type TypeSystemDefinitionNode =
   | TypeDefinitionNode
   | DirectiveDefinitionNode;
-
-export interface SchemaDefinitionNode {
-  readonly kind: Kind.SCHEMA_DEFINITION;
-  readonly loc?: Location;
-  readonly description?: StringValueNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly operationTypes: ReadonlyArray<OperationTypeDefinitionNode>;
-}
-
-export interface OperationTypeDefinitionNode {
-  readonly kind: Kind.OPERATION_TYPE_DEFINITION;
-  readonly loc?: Location;
-  readonly operation: OperationTypeNode;
-  readonly type: NamedTypeNode;
-}
 
 /** Type Definition */
 

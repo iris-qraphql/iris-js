@@ -28,7 +28,6 @@ import type {
   NullValueNode,
   ObjectFieldNode,
   ObjectValueNode,
-  OperationTypeDefinitionNode,
   StringValueNode,
   Token,
   TypeNode,
@@ -531,21 +530,6 @@ export class Parser {
     if (this.peekDescription()) {
       return this.parseStringLiteral();
     }
-  }
-
-  /**
-   * OperationTypeDefinition : OperationType : NamedType
-   */
-  parseOperationTypeDefinition(): OperationTypeDefinitionNode {
-    const start = this._lexer.token;
-    const operation = this.parseOperationType();
-    this.expectToken(TokenKind.COLON);
-    const type = this.parseNamedType();
-    return this.node<OperationTypeDefinitionNode>(start, {
-      kind: Kind.OPERATION_TYPE_DEFINITION,
-      operation,
-      type,
-    });
   }
 
   parseArgumentDefs(): Array<ArgumentDefinitionNode> {

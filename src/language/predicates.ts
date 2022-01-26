@@ -49,11 +49,7 @@ export function isTypeNode(node: ASTNode): node is TypeNode {
 export function isTypeSystemDefinitionNode(
   node: ASTNode,
 ): node is TypeSystemDefinitionNode {
-  return (
-    node.kind === Kind.SCHEMA_DEFINITION ||
-    isTypeDefinitionNode(node) ||
-    node.kind === Kind.DIRECTIVE_DEFINITION
-  );
+  return isTypeDefinitionNode(node) || node.kind === Kind.DIRECTIVE_DEFINITION;
 }
 
 export function isTypeDefinitionNode(

@@ -5,7 +5,6 @@ import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
-import type { SchemaDefinitionNode } from '../language/ast';
 import { OperationTypeNode } from '../language/ast';
 
 import type { GraphQLError } from '../error';
@@ -116,7 +115,6 @@ export type GraphQLSchemaExtensions = Record<string, unknown>;
 export class GraphQLSchema {
   description: Maybe<string>;
   extensions: Readonly<GraphQLSchemaExtensions>;
-  astNode: Maybe<SchemaDefinitionNode>;
 
   // Used as a cache for validateSchema().
   __validationErrors: Maybe<ReadonlyArray<GraphQLError>>;
@@ -150,7 +148,6 @@ export class GraphQLSchema {
 
     this.description = config.description;
     this.extensions = { ...config.extensions };
-    this.astNode = config.astNode;
 
     this._queryType = config.query;
     this._mutationType = config.mutation;
@@ -313,7 +310,6 @@ export interface GraphQLSchemaConfig extends GraphQLSchemaValidationOptions {
   types?: Maybe<ReadonlyArray<GraphQLNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
   extensions?: Maybe<Readonly<GraphQLSchemaExtensions>>;
-  astNode?: Maybe<SchemaDefinitionNode>;
 }
 
 /**

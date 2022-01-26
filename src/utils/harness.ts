@@ -1,5 +1,3 @@
-import { expectJSON } from '../__testUtils__/expectJSON';
-
 import type { Maybe } from '../jsutils/Maybe';
 
 import { parse } from '../language/parser';
@@ -95,16 +93,6 @@ export const testSchema: GraphQLSchema = buildSchema(`
 
   directive @onField on FIELD
 `);
-
-export function expectSDLValidationErrors(
-  schema: Maybe<GraphQLSchema>,
-  rule: SDLValidationRule,
-  sdlStr: string,
-): any {
-  const doc = parse(sdlStr);
-  const errors = validateSDL(doc, schema, [rule]);
-  return expectJSON(errors);
-}
 
 export function getSDLValidationErrors(
   schema: Maybe<GraphQLSchema>,

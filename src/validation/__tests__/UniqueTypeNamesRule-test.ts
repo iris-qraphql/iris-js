@@ -1,15 +1,15 @@
 import type { GraphQLSchema } from '../../type/schema';
 
-import { expectSDLValidationErrors } from '../../utils/harness';
+import { getSDLValidationErrors } from '../../utils/harness';
 
 import { UniqueTypeNamesRule } from '../rules/UniqueTypeNamesRule';
 
 function expectSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
-  return expectSDLValidationErrors(schema, UniqueTypeNamesRule, sdlStr);
+  return expect(getSDLValidationErrors(schema, UniqueTypeNamesRule, sdlStr));
 }
 
 function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {
-  expectSDLErrors(sdlStr, schema).toDeepEqual([]);
+  expectSDLErrors(sdlStr, schema).toEqual([]);
 }
 
 describe('Validate: Unique type names', () => {
@@ -38,7 +38,7 @@ describe('Validate: Unique type names', () => {
       resolver Foo
       data Foo
       data Foo
-    `).toDeepEqual([
+    `).toEqual([
       {
         message: 'There can be only one type named "Foo".',
         locations: [
