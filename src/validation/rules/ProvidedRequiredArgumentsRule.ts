@@ -39,8 +39,6 @@ export function ProvidedRequiredArgumentsRule(
         }
 
         const providedArgs = new Set(
-          // FIXME: https://github.com/graphql/graphql-js/issues/2203
-          /* c8 ignore next */
           fieldNode.arguments?.map((arg) => arg.name.value),
         );
         for (const argDef of fieldDef.args) {
@@ -81,8 +79,6 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
   const astDefinitions = context.getDocument().definitions;
   for (const def of astDefinitions) {
     if (def.kind === Kind.DIRECTIVE_DEFINITION) {
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
-      /* c8 ignore next */
       const argNodes = def.arguments ?? [];
 
       requiredArgsMap[def.name.value] = keyMap(
@@ -99,8 +95,6 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
         const directiveName = directiveNode.name.value;
         const requiredArgs = requiredArgsMap[directiveName];
         if (requiredArgs) {
-          // FIXME: https://github.com/graphql/graphql-js/issues/2203
-          /* c8 ignore next */
           const argNodes = directiveNode.arguments ?? [];
           const argNodeMap = new Set(argNodes.map((arg) => arg.name.value));
           for (const [argName, argDef] of Object.entries(requiredArgs)) {

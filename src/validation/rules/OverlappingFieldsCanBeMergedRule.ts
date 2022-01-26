@@ -582,7 +582,7 @@ function findConflict(
       ];
     }
 
-    // FIXME https://github.com/graphql/graphql-js/issues/2203
+    // FIXME https://github.com/iris-ql/iris-js/issues/2203
     const args1 = /* c8 ignore next */ node1.arguments ?? [];
     const args2 = /* c8 ignore next */ node2.arguments ?? [];
 

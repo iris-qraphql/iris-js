@@ -142,7 +142,6 @@ function getOperationTypeNode(
 ): Maybe<ASTNode> {
   return [schema.astNode]
     .flatMap(
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
       (schemaNode) => /* c8 ignore next */ schemaNode?.operationTypes ?? [],
     )
     .find((operationNode) => operationNode.operation === operation)?.type;

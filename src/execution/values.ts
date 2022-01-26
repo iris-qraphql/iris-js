@@ -164,7 +164,6 @@ export function getArgumentValues(
 ): Record<string, unknown> {
   const coercedValues: Record<string, unknown> = {};
 
-  // FIXME: https://github.com/graphql/graphql-js/issues/2203
   /* c8 ignore next */
   const argumentNodes = node.arguments ?? [];
   const argNodeMap = keyMap(argumentNodes, (arg) => arg.name.value);
