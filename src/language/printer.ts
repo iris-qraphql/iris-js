@@ -26,24 +26,6 @@ const printDocASTReducer: ASTReducer<string> = {
     leave: (node) => join(node.definitions, '\n\n'),
   },
 
-  OperationDefinition: {
-    leave(node) {
-      const varDefs = wrap('(', join(node.variableDefinitions, ', '), ')');
-      const prefix = join(
-        [
-          node.operation,
-          join([node.name, varDefs]),
-          join(node.directives, ' '),
-        ],
-        ' ',
-      );
-
-      // Anonymous queries with no directives or variable definitions can use
-      // the query short form.
-      return (prefix === 'query' ? '' : prefix + ' ') + node.selectionSet;
-    },
-  },
-
   VariableDefinition: {
     leave: ({ variable, type, defaultValue, directives }) =>
       variable +

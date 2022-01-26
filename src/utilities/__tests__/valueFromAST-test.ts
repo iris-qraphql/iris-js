@@ -1,4 +1,5 @@
-import { identityFunc } from '../../jsutils/identityFunc';
+import { identity } from 'ramda';
+
 import { invariant } from '../../jsutils/invariant';
 import type { ObjMap } from '../../jsutils/ObjMap';
 
@@ -61,7 +62,7 @@ describe('valueFromAST', () => {
         invariant(node.kind === 'StringValue');
         return node.value;
       },
-      parseValue: identityFunc,
+      parseValue: identity,
     });
 
     expectValueFrom('"value"', passthroughScalar).toEqual('value');
@@ -71,7 +72,7 @@ describe('valueFromAST', () => {
       parseLiteral() {
         throw new Error('Test');
       },
-      parseValue: identityFunc,
+      parseValue: identity,
     });
 
     expectValueFrom('value', throwScalar).toEqual(undefined);
@@ -81,7 +82,7 @@ describe('valueFromAST', () => {
       parseLiteral() {
         return undefined;
       },
-      parseValue: identityFunc,
+      parseValue: identity,
     });
 
     expectValueFrom('value', returnUndefinedScalar).toEqual(undefined);

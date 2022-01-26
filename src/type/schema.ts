@@ -15,12 +15,15 @@ import type {
   GraphQLType,
   IrisResolverType,
 } from './definition';
-import { getNamedType, isResolverType, isUnionType } from './definition';
+import {
+  getNamedType,
+  isDataType,
+  isResolverType,
+  isUnionType,
+} from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective, specifiedDirectives } from './directives';
 import { __Schema } from './introspection';
-
-import { isDataType } from '.';
 
 /**
  * Test if the given value is a GraphQL schema.
@@ -250,7 +253,7 @@ export class GraphQLSchema {
   getPossibleTypes(
     abstractType: IrisResolverType,
   ): ReadonlyArray<IrisResolverType> {
-    return isUnionType(abstractType) ? abstractType.getTypes() : [];
+    return abstractType.getTypes();
   }
 
   isSubType(

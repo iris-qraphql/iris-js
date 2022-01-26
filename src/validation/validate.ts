@@ -15,26 +15,6 @@ import { specifiedSDLRules } from './specifiedRules';
 import type { SDLValidationRule, ValidationRule } from './ValidationContext';
 import { SDLValidationContext, ValidationContext } from './ValidationContext';
 
-/**
- * Implements the "Validation" section of the spec.
- *
- * Validation runs synchronously, returning an array of encountered errors, or
- * an empty array if no errors were encountered and the document is valid.
- *
- * A list of specific validation rules may be provided. If not provided, the
- * default list of rules defined by the GraphQL specification will be used.
- *
- * Each validation rules is a function which returns a visitor
- * (see the language/visitor API). Visitor methods are expected to return
- * GraphQLErrors, or Arrays of GraphQLErrors when invalid.
- *
- * Validate will stop validation after a `maxErrors` limit has been reached.
- * Attackers can send pathologically invalid queries to induce a DoS attack,
- * so by default `maxErrors` set to 100 errors.
- *
- * Optionally a custom TypeInfo instance may be provided. If not provided, one
- * will be created from the provided schema.
- */
 export function validate(
   schema: GraphQLSchema,
   documentAST: DocumentNode,
@@ -105,33 +85,4 @@ export function validateSDL(
   const visitors = rules.map((rule) => rule(context));
   visit(documentAST, visitInParallel(visitors));
   return errors;
-}
-
-/**
- * Utility function which asserts a SDL document is valid by throwing an error
- * if it is invalid.
- *
- * @internal
- */
-export function assertValidSDL(documentAST: DocumentNode): void {
-  const errors = validateSDL(documentAST);
-  if (errors.length !== 0) {
-    throw new Error(errors.map((error) => error.message).join('\n\n'));
-  }
-}
-
-/**
- * Utility function which asserts a SDL document is valid by throwing an error
- * if it is invalid.
- *
- * @internal
- */
-export function assertValidSDLExtension(
-  documentAST: DocumentNode,
-  schema: GraphQLSchema,
-): void {
-  const errors = validateSDL(documentAST, schema);
-  if (errors.length !== 0) {
-    throw new Error(errors.map((error) => error.message).join('\n\n'));
-  }
 }

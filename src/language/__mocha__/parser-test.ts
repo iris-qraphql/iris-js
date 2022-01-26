@@ -86,41 +86,6 @@ describe('Parser', () => {
     `);
   });
 
-  it('parses variable inline values', () => {
-    expect(() =>
-      parse('{ field(complex: { a: { b: [ $var ] } }) }'),
-    ).to.not.throw();
-  });
-
-  it('parses constant default values', () => {
-    expectSyntaxError(
-      'query Foo($x: Complex = { a: { b: [ $var ] } }) { field }',
-    ).to.deep.equal({
-      message: 'Syntax Error: Unexpected variable "$var" in constant value.',
-      locations: [{ line: 1, column: 37 }],
-    });
-  });
-
-  it('parses variable definition directives', () => {
-    expect(() =>
-      parse('query Foo($x: Boolean = false @bar) { field }'),
-    ).to.not.throw();
-  });
-
-  it('does not accept fragments named "on"', () => {
-    expectSyntaxError('fragment on on on { on }').to.deep.equal({
-      message: 'Syntax Error: Unexpected Name "on".',
-      locations: [{ line: 1, column: 10 }],
-    });
-  });
-
-  it('does not accept fragments spread of "on"', () => {
-    expectSyntaxError('{ ...on }').to.deep.equal({
-      message: 'Syntax Error: Expected Name, found "}".',
-      locations: [{ line: 1, column: 9 }],
-    });
-  });
-
   it('does not allow "true", "false", or "null" as Enum value', () => {
     expectSyntaxError('data Test = VALID | true ').to.deep.equal({
       message:

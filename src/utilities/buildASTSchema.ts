@@ -10,7 +10,7 @@ import { specifiedDirectives } from '../type/directives';
 import type { GraphQLSchemaValidationOptions } from '../type/schema';
 import { GraphQLSchema } from '../type/schema';
 
-import { assertValidSDL } from '../validation/validate';
+import { validateSDL } from '../validation/validate';
 
 import { extendSchemaImpl } from './extendSchema';
 
@@ -21,6 +21,13 @@ export interface BuildSchemaOptions extends GraphQLSchemaValidationOptions {
    * Default: false
    */
   assumeValidSDL?: boolean;
+}
+
+export function assertValidSDL(documentAST: DocumentNode): void {
+  const errors = validateSDL(documentAST);
+  if (errors.length !== 0) {
+    throw new Error(errors.map((error) => error.message).join('\n\n'));
+  }
 }
 
 /**
