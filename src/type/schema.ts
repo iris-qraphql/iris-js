@@ -5,8 +5,6 @@ import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
-import { OperationTypeNode } from '../language/ast';
-
 import type { GraphQLError } from '../error';
 
 import type {
@@ -22,7 +20,6 @@ import {
 } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective, specifiedDirectives } from './directives';
-import { __Schema } from './introspection';
 
 /**
  * Test if the given value is a GraphQL schema.
@@ -185,7 +182,7 @@ export class GraphQLSchema {
         }
       }
     }
-    collectReferencedTypes(__Schema, allReferencedTypes);
+    // collectReferencedTypes({}, allReferencedTypes);
 
     // Storing the resulting map for reference by the schema.
     this._typeMap = Object.create(null);
@@ -226,17 +223,6 @@ export class GraphQLSchema {
 
   getSubscriptionType(): Maybe<IrisResolverType> {
     return this._subscriptionType;
-  }
-
-  getRootType(operation: OperationTypeNode): Maybe<IrisResolverType> {
-    switch (operation) {
-      case OperationTypeNode.QUERY:
-        return this.getQueryType();
-      case OperationTypeNode.MUTATION:
-        return this.getMutationType();
-      case OperationTypeNode.SUBSCRIPTION:
-        return this.getSubscriptionType();
-    }
   }
 
   getTypeMap(): TypeMap {

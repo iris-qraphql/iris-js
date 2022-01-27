@@ -5,20 +5,13 @@ export { buildASTSchema, buildSchema } from './buildASTSchema';
 export type { BuildSchemaOptions } from './buildASTSchema';
 
 // Print a GraphQLSchema to GraphQL Schema language.
-export {
-  printSchema,
-  printType,
-  printIntrospectionSchema,
-} from './printSchema';
+export { printSchema, printType } from './printSchema';
 
 // Create a GraphQLType from a GraphQL language AST.
 export { typeFromAST } from './typeFromAST';
 
 // Create a JavaScript value from a GraphQL language AST with a type.
 export { valueFromAST } from './valueFromAST';
-
-// Create a JavaScript value from a GraphQL language AST without a type.
-export { valueFromASTUntyped } from './valueFromASTUntyped';
 
 // Create a GraphQL language AST from a JavaScript value.
 export { astFromValue } from './astFromValue';

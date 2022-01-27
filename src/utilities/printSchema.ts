@@ -1,10 +1,11 @@
+import { Kind } from 'graphql';
+
 import { inspect } from '../jsutils/inspect';
 import { invariant } from '../jsutils/invariant';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import { isPrintableAsBlockString } from '../language/blockString';
-import { Kind } from '../language/kinds';
 import { print } from '../language/printer';
 
 import type {
@@ -22,7 +23,6 @@ import {
   DEFAULT_DEPRECATION_REASON,
   isSpecifiedDirective,
 } from '../type/directives';
-import { isIntrospectionType } from '../type/introspection';
 import { isSpecifiedScalarType } from '../type/scalars';
 import type { GraphQLSchema } from '../type/schema';
 
@@ -36,12 +36,8 @@ export function printSchema(schema: GraphQLSchema): string {
   );
 }
 
-export function printIntrospectionSchema(schema: GraphQLSchema): string {
-  return printFilteredSchema(schema, isSpecifiedDirective, isIntrospectionType);
-}
-
 function isDefinedType(type: GraphQLNamedType): boolean {
-  return !isSpecifiedScalarType(type) && !isIntrospectionType(type);
+  return !isSpecifiedScalarType(type);
 }
 
 function printFilteredSchema(

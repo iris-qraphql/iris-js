@@ -4,7 +4,7 @@ import type {
   NonNullTypeNode,
   TypeNode,
 } from '../language/ast';
-import { Kind } from '../language/kinds';
+import { IrisKind } from '../language/kinds';
 
 import type { GraphQLNamedType, GraphQLType } from '../type/definition';
 import { GraphQLList, GraphQLNonNull } from '../type/definition';
@@ -38,15 +38,15 @@ export function typeFromAST(
   typeNode: TypeNode,
 ): GraphQLType | undefined {
   switch (typeNode.kind) {
-    case Kind.LIST_TYPE: {
+    case IrisKind.LIST_TYPE: {
       const innerType = typeFromAST(schema, typeNode.type);
       return innerType && new GraphQLList(innerType);
     }
-    case Kind.NON_NULL_TYPE: {
+    case IrisKind.NON_NULL_TYPE: {
       const innerType = typeFromAST(schema, typeNode.type);
       return innerType && new GraphQLNonNull(innerType);
     }
-    case Kind.NAMED_TYPE:
+    case IrisKind.NAMED_TYPE:
       return schema.getType(typeNode.name.value);
   }
 }

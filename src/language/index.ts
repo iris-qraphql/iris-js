@@ -1,20 +1,9 @@
-export { Source } from './source';
-
-export { getLocation } from './location';
-export type { SourceLocation } from './location';
-
-export { printLocation, printSourceLocation } from './printLocation';
-
-export { Kind } from './kinds';
-export type { KindEnum } from './kinds';
-
-export { TokenKind } from './tokenKind';
-export type { TokenKindEnum } from './tokenKind';
+export type { SourceLocation, Kind } from 'graphql';
+export { TokenKind, getLocation, Source } from 'graphql';
 
 export { Lexer } from './lexer';
 
 export { parse, parseValue, parseConstValue, parseType } from './parser';
-export type { ParseOptions } from './parser';
 
 export { print } from './printer';
 
@@ -23,14 +12,11 @@ export {
   visitInParallel,
   getVisitFn,
   getEnterLeaveForKind,
-  BREAK,
 } from './visitor';
-export type { ASTVisitor, ASTVisitFn, ASTVisitorKeyMap } from './visitor';
+export type { ASTVisitor, ASTVisitorKeyMap } from './visitor';
 
-export { Location, Token, OperationTypeNode } from './ast';
 export type {
   ASTNode,
-  ASTKindToNode,
   // Each kind of AST node
   NameNode,
   DocumentNode,
@@ -40,7 +26,6 @@ export type {
   ConstArgumentNode,
   ValueNode,
   ConstValueNode,
-  IntValueNode,
   FloatValueNode,
   StringValueNode,
   BooleanValueNode,
@@ -68,7 +53,6 @@ export type {
 } from './ast';
 
 export {
-  isDefinitionNode,
   isValueNode,
   isConstValueNode,
   isTypeNode,

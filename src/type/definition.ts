@@ -1,3 +1,4 @@
+import { Kind, valueFromASTUntyped } from 'graphql';
 import { contains, identity, isNil, pluck } from 'ramda';
 
 import { devAssert } from '../jsutils/devAssert';
@@ -20,10 +21,7 @@ import type {
   ValueNode,
   VariantDefinitionNode,
 } from '../language/ast';
-import { Kind } from '../language/kinds';
 import { print } from '../language/printer';
-
-import { valueFromASTUntyped } from '../utilities/valueFromASTUntyped';
 
 import { GraphQLError } from '../error';
 import type { ConfigMap, ConfigMapValue, Override } from '../utils/type-level';

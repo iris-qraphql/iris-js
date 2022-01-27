@@ -8,7 +8,6 @@ import {
 } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { introspectionTypes } from '../../type/introspection';
 import { specifiedScalarTypes } from '../../type/scalars';
 
 import { GraphQLError } from '../../error';
@@ -94,9 +93,7 @@ export function KnownTypeNamesRule(
   };
 }
 
-const standardTypeNames = [...specifiedScalarTypes, ...introspectionTypes].map(
-  (type) => type.name,
-);
+const standardTypeNames = [...specifiedScalarTypes].map((type) => type.name);
 
 function isSDLNode(value: ASTNode | ReadonlyArray<ASTNode>): boolean {
   return 'kind' in value && isTypeSystemDefinitionNode(value);

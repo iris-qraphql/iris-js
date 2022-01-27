@@ -51,20 +51,7 @@ export {
   GraphQLSkipDirective,
   GraphQLDeprecatedDirective,
   GraphQLSpecifiedByDirective,
-  TypeKind,
   DEFAULT_DEPRECATION_REASON,
-  introspectionTypes,
-  __Schema,
-  __Directive,
-  __DirectiveLocation,
-  __Type,
-  __Field,
-  __InputValue,
-  __EnumValue,
-  __TypeKind,
-  SchemaMetaFieldDef,
-  TypeMetaFieldDef,
-  TypeNameMetaFieldDef,
   isSchema,
   isDirective,
   isType,
@@ -82,7 +69,6 @@ export {
   isNamedType,
   isRequiredArgument,
   isSpecifiedScalarType,
-  isIntrospectionType,
   isSpecifiedDirective,
   assertSchema,
   assertDirective,
@@ -120,17 +106,10 @@ export type {
 
 // Parse and operate on GraphQL language source files.
 export {
-  Token,
   Source,
-  Location,
-  OperationTypeNode,
-  getLocation,
   // Print source location.
-  printLocation,
-  printSourceLocation,
   // Lex
   Lexer,
-  TokenKind,
   // Parse
   parse,
   parseValue,
@@ -143,11 +122,8 @@ export {
   visitInParallel,
   getVisitFn,
   getEnterLeaveForKind,
-  BREAK,
-  Kind,
   DirectiveLocation,
   // Predicates
-  isDefinitionNode,
   isValueNode,
   isConstValueNode,
   isTypeNode,
@@ -156,18 +132,13 @@ export {
 } from './language/index';
 
 export type {
-  ParseOptions,
   SourceLocation,
-  TokenKindEnum,
-  KindEnum,
   DirectiveLocationEnum,
   // Visitor utilities
   ASTVisitor,
-  ASTVisitFn,
   ASTVisitorKeyMap,
   // AST nodes
   ASTNode,
-  ASTKindToNode,
   // Each kind of AST node
   NameNode,
   DocumentNode,
@@ -177,7 +148,6 @@ export type {
   ConstArgumentNode,
   ValueNode,
   ConstValueNode,
-  IntValueNode,
   FloatValueNode,
   StringValueNode,
   BooleanValueNode,
@@ -219,13 +189,11 @@ export {
   // Print a GraphQLType to GraphQL Schema language.
   printType,
   // Prints the built-in introspection schema in the Schema Language format.
-  printIntrospectionSchema,
   // Create a GraphQLType from a GraphQL language AST.
   typeFromAST,
   // Create a JavaScript value from a GraphQL language AST with a Type.
   valueFromAST,
   // Create a JavaScript value from a GraphQL language AST without a Type.
-  valueFromASTUntyped,
   // Create a GraphQL language AST from a JavaScript value.
   astFromValue,
   // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.

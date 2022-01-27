@@ -1,3 +1,6 @@
+import type { ParseOptions } from 'graphql';
+import { Kind, Location, TokenKind } from 'graphql';
+
 import type { Maybe } from '../jsutils/Maybe';
 
 import type { GraphQLError } from '../error';
@@ -34,42 +37,11 @@ import type {
   ValueNode,
   VariableNode,
 } from './ast';
-import { Location, OperationTypeNode } from './ast';
 import { parseDefinitions } from './definitions';
 import { DirectiveLocation } from './directiveLocation';
-import { Kind } from './kinds';
+import { IrisKind } from './kinds';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { isSource, Source } from './source';
-import { TokenKind } from './tokenKind';
-
-/**
- * Configuration options to control parser behavior
- */
-export type ParseOptions = {
-  /**
-   * By default, the parser creates AST nodes that know the location
-   * in the source that they correspond to. This configuration flag
-   * disables that behavior for performance or testing.
-   */
-  noLocation?: boolean;
-
-  /**
-   * @deprecated will be removed in the v17.0.0
-   *
-   * If enabled, the parser will understand and parse variable definitions
-   * contained in a fragment definition. They'll be represented in the
-   * `variableDefinitions` field of the FragmentDefinitionNode.
-   *
-   * The syntax is identical to normal, query-defined variables. For example:
-   *
-   * ```graphql
-   * fragment A($var: Boolean = false) on T {
-   *   ...
-   * }
-   * ```
-   */
-  allowLegacyFragmentVariables?: boolean;
-};
 
 /**
  * Given a GraphQL source, parses it into a Document.
@@ -180,7 +152,7 @@ export class Parser {
    */
   parseDocument(): DocumentNode {
     return this.node<DocumentNode>(this._lexer.token, {
-      kind: Kind.DOCUMENT,
+      kind: IrisKind.DOCUMENT,
       definitions: this.many(
         TokenKind.SOF,
         this.parseDefinition,
@@ -220,23 +192,6 @@ export class Parser {
       this._lexer.token.start,
       `${getTokenDesc(this._lexer.token)} ${message}.`,
     );
-  }
-
-  /**
-   * OperationType : one of query mutation subscription
-   */
-  parseOperationType(): OperationTypeNode {
-    const operationToken = this.expectToken(TokenKind.NAME);
-    switch (operationToken.value) {
-      case 'query':
-        return OperationTypeNode.QUERY;
-      case 'mutation':
-        return OperationTypeNode.MUTATION;
-      case 'subscription':
-        return OperationTypeNode.SUBSCRIPTION;
-    }
-
-    throw this.unexpected(operationToken);
   }
 
   /**
@@ -280,16 +235,6 @@ export class Parser {
 
   parseConstArgument(): ConstArgumentNode {
     return this.parseArgument(true);
-  }
-
-  /**
-   * FragmentName : Name but not `on`
-   */
-  parseFragmentName(): NameNode {
-    if (this._lexer.token.value === 'on') {
-      throw this.unexpected();
-    }
-    return this.parseName();
   }
 
   // Implements the parsing rules in the Values section.
@@ -490,7 +435,7 @@ export class Parser {
       const innerType = this.parseTypeReference();
       this.expectToken(TokenKind.BRACKET_R);
       type = this.node<ListTypeNode>(start, {
-        kind: Kind.LIST_TYPE,
+        kind: IrisKind.LIST_TYPE,
         type: innerType,
       });
     } else {
@@ -499,7 +444,7 @@ export class Parser {
 
     if (this.expectOptionalToken(TokenKind.BANG)) {
       return this.node<NonNullTypeNode>(start, {
-        kind: Kind.NON_NULL_TYPE,
+        kind: IrisKind.NON_NULL_TYPE,
         type,
       });
     }
@@ -512,7 +457,7 @@ export class Parser {
    */
   parseNamedType(): NamedTypeNode {
     return this.node<NamedTypeNode>(this._lexer.token, {
-      kind: Kind.NAMED_TYPE,
+      kind: IrisKind.NAMED_TYPE,
       name: this.parseName(),
     });
   }
@@ -556,7 +501,7 @@ export class Parser {
     }
     const directives = this.parseConstDirectives();
     return this.node<ArgumentDefinitionNode>(start, {
-      kind: Kind.ARGUMENT_DEFINITION,
+      kind: IrisKind.ARGUMENT_DEFINITION,
       description,
       name,
       type,
@@ -582,7 +527,7 @@ export class Parser {
     this.expectKeyword('on');
     const locations = this.parseDirectiveLocations();
     return this.node<DirectiveDefinitionNode>(start, {
-      kind: Kind.DIRECTIVE_DEFINITION,
+      kind: IrisKind.DIRECTIVE_DEFINITION,
       description,
       name,
       arguments: args,

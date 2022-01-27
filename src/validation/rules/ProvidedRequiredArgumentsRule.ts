@@ -3,7 +3,7 @@ import { keyMap } from '../../jsutils/keyMap';
 import type { ObjMap } from '../../jsutils/ObjMap';
 
 import type { ArgumentDefinitionNode } from '../../language/ast';
-import { Kind } from '../../language/kinds';
+import { IrisKind } from '../../language/kinds';
 import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
 
@@ -39,7 +39,7 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
 
   const astDefinitions = context.getDocument().definitions;
   for (const def of astDefinitions) {
-    if (def.kind === Kind.DIRECTIVE_DEFINITION) {
+    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       const argNodes = def.arguments ?? [];
 
       requiredArgsMap[def.name.value] = keyMap(
@@ -78,5 +78,5 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
 }
 
 function isRequiredArgumentNode(arg: ArgumentDefinitionNode): boolean {
-  return arg.type.kind === Kind.NON_NULL_TYPE && arg.defaultValue == null;
+  return arg.type.kind === IrisKind.NON_NULL_TYPE && arg.defaultValue == null;
 }

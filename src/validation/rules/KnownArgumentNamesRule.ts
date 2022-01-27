@@ -1,7 +1,7 @@
 import { didYouMean } from '../../jsutils/didYouMean';
 import { suggestionList } from '../../jsutils/suggestionList';
 
-import { Kind } from '../../language/kinds';
+import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
@@ -65,7 +65,7 @@ export function KnownArgumentNamesOnDirectivesRule(
 
   const astDefinitions = context.getDocument().definitions;
   for (const def of astDefinitions) {
-    if (def.kind === Kind.DIRECTIVE_DEFINITION) {
+    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       const argsNodes = def.arguments ?? [];
 
       directiveArgs[def.name.value] = argsNodes.map((arg) => arg.name.value);

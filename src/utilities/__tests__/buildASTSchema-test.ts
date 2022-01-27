@@ -1,6 +1,6 @@
 import { dedent } from '../../__testUtils__/dedent';
 
-import { Kind } from '../../language/kinds';
+import { IrisKind } from '../../language/kinds';
 
 import { assertDataType, assertResolverType } from '../../type/definition';
 import {
@@ -9,7 +9,6 @@ import {
   GraphQLSkipDirective,
   GraphQLSpecifiedByDirective,
 } from '../../type/directives';
-import { __Schema } from '../../type/introspection';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -36,7 +35,7 @@ describe('Schema Builder', () => {
   it('Match order of default types and directives', () => {
     const schema = new GraphQLSchema({});
     const sdlSchema = buildASTSchema({
-      kind: Kind.DOCUMENT,
+      kind: IrisKind.DOCUMENT,
       definitions: [],
     });
 
@@ -465,23 +464,9 @@ describe('Schema Builder', () => {
 
     const schema = buildSchema(`
       data ID = String
-
-      data __Schema
     `);
 
     expect(schema.getType('ID')).toEqual(GraphQLID);
-    expect(schema.getType('__Schema')).toEqual(__Schema);
-  });
-
-  it('Allows to reference introspection types', () => {
-    const schema = buildSchema(`
-      resolver Query = {
-        introspectionField: __EnumValue
-      }
-    `);
-
-    const queryType = assertResolverType(schema.getType('Query'));
-    expect(queryType.getResolverFields()).toMatchSnapshot();
   });
 
   it('Rejects invalid SDL', () => {

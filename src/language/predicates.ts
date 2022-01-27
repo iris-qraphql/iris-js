@@ -1,17 +1,14 @@
+import { Kind } from 'graphql';
+
 import type {
   ASTNode,
   ConstValueNode,
-  DefinitionNode,
   TypeDefinitionNode,
   TypeNode,
   TypeSystemDefinitionNode,
   ValueNode,
 } from './ast';
-import { Kind } from './kinds';
-
-export function isDefinitionNode(node: ASTNode): node is DefinitionNode {
-  return isTypeSystemDefinitionNode(node);
-}
+import { IrisKind } from './kinds';
 
 export function isValueNode(node: ASTNode): node is ValueNode {
   return (
@@ -40,23 +37,25 @@ export function isConstValueNode(node: ASTNode): node is ConstValueNode {
 
 export function isTypeNode(node: ASTNode): node is TypeNode {
   return (
-    node.kind === Kind.NAMED_TYPE ||
-    node.kind === Kind.LIST_TYPE ||
-    node.kind === Kind.NON_NULL_TYPE
+    node.kind === IrisKind.NAMED_TYPE ||
+    node.kind === IrisKind.LIST_TYPE ||
+    node.kind === IrisKind.NON_NULL_TYPE
   );
 }
 
 export function isTypeSystemDefinitionNode(
   node: ASTNode,
 ): node is TypeSystemDefinitionNode {
-  return isTypeDefinitionNode(node) || node.kind === Kind.DIRECTIVE_DEFINITION;
+  return (
+    isTypeDefinitionNode(node) || node.kind === IrisKind.DIRECTIVE_DEFINITION
+  );
 }
 
 export function isTypeDefinitionNode(
   node: ASTNode,
 ): node is TypeDefinitionNode {
   return (
-    node.kind === Kind.RESOLVER_TYPE_DEFINITION ||
-    node.kind === Kind.DATA_TYPE_DEFINITION
+    node.kind === IrisKind.RESOLVER_TYPE_DEFINITION ||
+    node.kind === IrisKind.DATA_TYPE_DEFINITION
   );
 }

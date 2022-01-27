@@ -1,3 +1,5 @@
+import { Kind } from 'graphql';
+
 import { inspect } from '../jsutils/inspect';
 import { invariant } from '../jsutils/invariant';
 import { isIterableObject } from '../jsutils/isIterableObject';
@@ -9,7 +11,6 @@ import type {
   ObjectValueNode,
   ValueNode,
 } from '../language/ast';
-import { Kind } from '../language/kinds';
 
 import type { GraphQLInputType, IrisDataVariant } from '../type/definition';
 import { isDataType, isListType, isNonNullType } from '../type/definition';

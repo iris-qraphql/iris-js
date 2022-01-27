@@ -1,3 +1,5 @@
+import { TokenKind } from 'graphql';
+
 import type {
   DataFieldDefinitionNode,
   DataTypeDefinitionNode,
@@ -9,9 +11,8 @@ import type {
   Role,
   VariantDefinitionNode,
 } from './ast';
-import { Kind } from './kinds';
+import { IrisKind } from './kinds';
 import type { Parser } from './parser';
-import { TokenKind } from './tokenKind';
 
 export const parseDefinitions = (
   parser: Parser,
@@ -42,11 +43,11 @@ const parseResolverTypeDefinition = (
 
   if (!isEquals) {
     return parser.node<ResolverTypeDefinitionNode>(start, {
-      kind: Kind.RESOLVER_TYPE_DEFINITION,
+      kind: IrisKind.RESOLVER_TYPE_DEFINITION,
       description,
       name,
       directives,
-      variants: [{ kind: Kind.VARIANT_DEFINITION, name, fields: [] }],
+      variants: [{ kind: IrisKind.VARIANT_DEFINITION, name, fields: [] }],
     });
   }
 
@@ -62,7 +63,7 @@ const parseResolverTypeDefinition = (
     );
 
     return parser.node<ResolverTypeDefinitionNode>(start, {
-      kind: Kind.RESOLVER_TYPE_DEFINITION,
+      kind: IrisKind.RESOLVER_TYPE_DEFINITION,
       description,
       name,
       directives,
@@ -73,11 +74,11 @@ const parseResolverTypeDefinition = (
   const fields = parseFieldsDefinition(parser);
 
   return parser.node<ResolverTypeDefinitionNode>(start, {
-    kind: Kind.RESOLVER_TYPE_DEFINITION,
+    kind: IrisKind.RESOLVER_TYPE_DEFINITION,
     description,
     name,
     directives,
-    variants: [{ kind: Kind.VARIANT_DEFINITION, name, fields }],
+    variants: [{ kind: IrisKind.VARIANT_DEFINITION, name, fields }],
   });
 };
 
@@ -91,7 +92,7 @@ const parseResolverVariantDefinition = (
   const directives = parser.parseConstDirectives();
   const fields = parseFieldsDefinition(parser);
   return parser.node<ResolverVariantDefinitionNode>(start, {
-    kind: Kind.VARIANT_DEFINITION,
+    kind: IrisKind.VARIANT_DEFINITION,
     description,
     name,
     directives,
@@ -119,7 +120,7 @@ const parseFieldDefinition = (parser: Parser) => (): FieldDefinitionNode => {
   const type = parser.parseTypeReference();
   const directives = parser.parseConstDirectives();
   return parser.node<FieldDefinitionNode>(start, {
-    kind: Kind.FIELD_DEFINITION,
+    kind: IrisKind.FIELD_DEFINITION,
     description,
     name,
     arguments: args,
@@ -146,7 +147,7 @@ export const parseDataTypeDefinition = (
         )
       : [parseVariantDefinition(parser, name)];
   return parser.node<DataTypeDefinitionNode>(start, {
-    kind: Kind.DATA_TYPE_DEFINITION,
+    kind: IrisKind.DATA_TYPE_DEFINITION,
     description,
     name,
     directives,
@@ -172,7 +173,7 @@ const parseVariantDefinition = (
   const directives = parser.parseConstDirectives();
   const fields = parseVariantFields(parser);
   return parser.node<VariantDefinitionNode>(start, {
-    kind: Kind.VARIANT_DEFINITION,
+    kind: IrisKind.VARIANT_DEFINITION,
     description,
     name,
     directives,
@@ -201,7 +202,7 @@ const parseDataFieldDefinition = (parser: Parser): DataFieldDefinitionNode => {
   const type = parser.parseTypeReference();
   const directives = parser.parseConstDirectives();
   return parser.node<DataFieldDefinitionNode>(start, {
-    kind: Kind.FIELD_DEFINITION,
+    kind: IrisKind.FIELD_DEFINITION,
     description,
     name,
     type,

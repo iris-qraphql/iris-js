@@ -1,8 +1,9 @@
+import { Kind } from 'graphql';
+
 import type { Maybe } from '../jsutils/Maybe';
 
 import type { ASTNode } from '../language/ast';
 import { isNode } from '../language/ast';
-import { Kind } from '../language/kinds';
 import type { ASTVisitor } from '../language/visitor';
 import { getEnterLeaveForKind } from '../language/visitor';
 
