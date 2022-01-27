@@ -41,22 +41,6 @@ export function valueFromAST(
     return;
   }
 
-  if (valueNode.kind === Kind.VARIABLE) {
-    const variableName = valueNode.name.value;
-    if (variables == null || variables[variableName] === undefined) {
-      // No valid return value.
-      return;
-    }
-    const variableValue = variables[variableName];
-    if (variableValue === null && isNonNullType(type)) {
-      return; // Invalid: intentionally return no value.
-    }
-    // Note: This does no further checking that this variable is correct.
-    // This assumes that this query has been validated and the variable
-    // usage here is of the correct type.
-    return variableValue;
-  }
-
   if (isNonNullType(type)) {
     if (valueNode.kind === Kind.NULL) {
       return; // Invalid: intentionally return no value.
@@ -74,20 +58,11 @@ export function valueFromAST(
     if (valueNode.kind === Kind.LIST) {
       const coercedValues = [];
       for (const itemNode of valueNode.values) {
-        if (isMissingVariable(itemNode, variables)) {
-          // If an array contains a missing variable, it is either coerced to
-          // null or if the item type is non-null, it considered invalid.
-          if (isNonNullType(itemType)) {
-            return; // Invalid: intentionally return no value.
-          }
-          coercedValues.push(null);
-        } else {
-          const itemValue = valueFromAST(itemNode, itemType, variables);
-          if (itemValue === undefined) {
-            return; // Invalid: intentionally return no value.
-          }
-          coercedValues.push(itemValue);
+        const itemValue = valueFromAST(itemNode, itemType, variables);
+        if (itemValue === undefined) {
+          return; // Invalid: intentionally return no value.
         }
+        coercedValues.push(itemValue);
       }
       return coercedValues;
     }
@@ -133,15 +108,6 @@ export function valueFromAST(
 
 // Returns true if the provided valueNode is a variable which is not defined
 // in the set of variables.
-function isMissingVariable(
-  valueNode: ValueNode,
-  variables: Maybe<ObjMap<unknown>>,
-): boolean {
-  return (
-    valueNode.kind === Kind.VARIABLE &&
-    (variables == null || variables[valueNode.name.value] === undefined)
-  );
-}
 
 const parseVariantValue = (
   variant: IrisDataVariant,
@@ -152,12 +118,6 @@ const parseVariantValue = (
   const fieldNodes = keyMap(valueNode.fields, (field) => field.name.value);
   for (const field of Object.values(variant.fields ?? {})) {
     const fieldNode = fieldNodes[field.name];
-    if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
-      if (isNonNullType(field.type)) {
-        return; // Invalid: intentionally return no value.
-      }
-      continue;
-    }
     const fieldValue = valueFromAST(fieldNode.value, field.type, variables);
     if (fieldValue === undefined) {
       return; // Invalid: intentionally return no value.

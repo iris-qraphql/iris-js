@@ -116,34 +116,6 @@ describe('Parser', () => {
       });
     });
 
-    it('allows variables', () => {
-      const result = parseValue('{ field: $var }');
-      expectJSON(result).toEqual({
-        kind: Kind.OBJECT,
-        loc: { start: 0, end: 15 },
-        fields: [
-          {
-            kind: Kind.OBJECT_FIELD,
-            loc: { start: 2, end: 13 },
-            name: {
-              kind: Kind.NAME,
-              loc: { start: 2, end: 7 },
-              value: 'field',
-            },
-            value: {
-              kind: Kind.VARIABLE,
-              loc: { start: 9, end: 13 },
-              name: {
-                kind: Kind.NAME,
-                loc: { start: 10, end: 13 },
-                value: 'var',
-              },
-            },
-          },
-        ],
-      });
-    });
-
     it('correct message for incomplete variable', () => {
       expect(() => parseValue('$')).toThrow();
       // .to.deep.include({

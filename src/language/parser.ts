@@ -32,7 +32,6 @@ import type {
   Token,
   TypeNode,
   ValueNode,
-  VariableNode,
 } from './ast';
 import { Location, OperationTypeNode } from './ast';
 import { parseDefinitions } from './definitions';
@@ -240,18 +239,6 @@ export class Parser {
   }
 
   /**
-   * Variable : $ Name
-   */
-  parseVariable(): VariableNode {
-    const start = this._lexer.token;
-    this.expectToken(TokenKind.DOLLAR);
-    return this.node<VariableNode>(start, {
-      kind: Kind.VARIABLE,
-      name: this.parseName(),
-    });
-  }
-
-  /**
    * Arguments[Const] : ( Argument[?Const]+ )
    */
   parseArguments(isConst: true): Array<ConstArgumentNode>;
@@ -357,21 +344,6 @@ export class Parser {
               value: token.value,
             });
         }
-      case TokenKind.DOLLAR:
-        if (isConst) {
-          this.expectToken(TokenKind.DOLLAR);
-          if (this._lexer.token.kind === TokenKind.NAME) {
-            const varName = this._lexer.token.value;
-            throw syntaxError(
-              this._lexer.source,
-              token.start,
-              `Unexpected variable "$${varName}" in constant value.`,
-            );
-          } else {
-            throw this.unexpected(token);
-          }
-        }
-        return this.parseVariable();
       default:
         throw this.unexpected();
     }

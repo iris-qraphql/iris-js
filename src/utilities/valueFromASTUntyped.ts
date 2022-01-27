@@ -46,7 +46,5 @@ export function valueFromASTUntyped(
           valueFromASTUntyped(value, variables),
         ]),
       );
-    case Kind.VARIABLE:
-      return variables?.[valueNode.name.value];
   }
 }

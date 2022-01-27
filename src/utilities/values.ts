@@ -45,27 +45,7 @@ export function getArgumentValues(
     }
 
     const valueNode = argumentNode.value;
-    let isNull = valueNode.kind === Kind.NULL;
-
-    if (valueNode.kind === Kind.VARIABLE) {
-      const variableName = valueNode.name.value;
-      if (
-        variableValues == null ||
-        !hasOwnProperty(variableValues, variableName)
-      ) {
-        if (argDef.defaultValue !== undefined) {
-          coercedValues[name] = argDef.defaultValue;
-        } else if (isNonNullType(argType)) {
-          throw new GraphQLError(
-            `Argument "${name}" of required type "${inspect(argType)}" ` +
-              `was provided the variable "$${variableName}" which was not provided a runtime value.`,
-            valueNode,
-          );
-        }
-        continue;
-      }
-      isNull = variableValues[variableName] == null;
-    }
+    const isNull = valueNode.kind === Kind.NULL;
 
     if (isNull && isNonNullType(argType)) {
       throw new GraphQLError(
@@ -113,8 +93,4 @@ export function getDirectiveValues(
   if (directiveNode) {
     return getArgumentValues(directiveDef, directiveNode, variableValues);
   }
-}
-
-function hasOwnProperty(obj: unknown, prop: string): boolean {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
 }

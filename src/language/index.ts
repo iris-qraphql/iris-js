@@ -35,7 +35,6 @@ export type {
   NameNode,
   DocumentNode,
   DefinitionNode,
-  VariableNode,
   ArgumentNode,
   ConstArgumentNode,
   ValueNode,

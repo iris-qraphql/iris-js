@@ -139,7 +139,6 @@ export class Token {
 export type ASTNode =
   | NameNode
   | DocumentNode
-  | VariableNode
   | ArgumentNode
   | IntValueNode
   | FloatValueNode
@@ -176,7 +175,6 @@ export const QueryDocumentKeys: {
 } = {
   Name: [],
   Document: ['definitions'],
-  Variable: ['name'],
   Argument: ['name', 'value'],
   IntValue: [],
   FloatValue: [],
@@ -240,12 +238,6 @@ export enum OperationTypeNode {
   SUBSCRIPTION = 'subscription',
 }
 
-export interface VariableNode {
-  readonly kind: Kind.VARIABLE;
-  readonly loc?: Location;
-  readonly name: NameNode;
-}
-
 export interface ArgumentNode {
   readonly kind: Kind.ARGUMENT;
   readonly loc?: Location;
@@ -263,7 +255,6 @@ export interface ConstArgumentNode {
 /** Values */
 
 export type ValueNode =
-  | VariableNode
   | IntValueNode
   | FloatValueNode
   | StringValueNode

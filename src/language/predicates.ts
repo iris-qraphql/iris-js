@@ -15,7 +15,6 @@ export function isDefinitionNode(node: ASTNode): node is DefinitionNode {
 
 export function isValueNode(node: ASTNode): node is ValueNode {
   return (
-    node.kind === Kind.VARIABLE ||
     node.kind === Kind.INT ||
     node.kind === Kind.FLOAT ||
     node.kind === Kind.STRING ||
@@ -34,7 +33,7 @@ export function isConstValueNode(node: ASTNode): node is ConstValueNode {
       ? node.values.some(isConstValueNode)
       : node.kind === Kind.OBJECT
       ? node.fields.some((field) => isConstValueNode(field.value))
-      : node.kind !== Kind.VARIABLE)
+      : true)
   );
 }
 

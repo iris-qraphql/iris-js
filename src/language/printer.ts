@@ -16,7 +16,6 @@ export function print(ast: ASTNode): string {
 
 const printDocASTReducer: ASTReducer<string> = {
   Name: { leave: (node) => node.value },
-  Variable: { leave: (node) => '$' + node.name },
   Document: {
     leave: (node) => join(node.definitions, '\n\n'),
   },

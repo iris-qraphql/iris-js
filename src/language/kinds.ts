@@ -10,7 +10,6 @@ export enum Kind {
   ARGUMENT = 'Argument',
 
   /** Values */
-  VARIABLE = 'Variable',
   INT = 'IntValue',
   FLOAT = 'FloatValue',
   STRING = 'StringValue',
