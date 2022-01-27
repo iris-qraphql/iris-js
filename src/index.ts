@@ -238,7 +238,6 @@ export {
   isTypeSubTypeOf,
   doTypesOverlap,
   // Asserts a string is a valid GraphQL name.
-  assertValidName,
   // Determine if a string is a valid GraphQL name.
   isValidNameError,
 } from './utilities/index';
