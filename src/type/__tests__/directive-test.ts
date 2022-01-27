@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { GraphQLDirective } from '../directives';
@@ -13,12 +10,7 @@ describe('Type System: Directive', () => {
       locations: [DirectiveLocation.QUERY],
     });
 
-    expect(directive).to.deep.include({
-      name: 'Foo',
-      args: [],
-      isRepeatable: false,
-      locations: ['QUERY'],
-    });
+    expect({ ...directive }).toMatchSnapshot();
   });
 
   it('defines a directive with multiple args', () => {
@@ -31,29 +23,7 @@ describe('Type System: Directive', () => {
       locations: [DirectiveLocation.QUERY],
     });
 
-    expect(directive).to.deep.include({
-      name: 'Foo',
-      args: [
-        {
-          name: 'foo',
-          description: undefined,
-          type: GraphQLString,
-          defaultValue: undefined,
-          deprecationReason: undefined,
-          astNode: undefined,
-        },
-        {
-          name: 'bar',
-          description: undefined,
-          type: GraphQLInt,
-          defaultValue: undefined,
-          deprecationReason: undefined,
-          astNode: undefined,
-        },
-      ],
-      isRepeatable: false,
-      locations: ['QUERY'],
-    });
+    expect({ ...directive }).toMatchSnapshot();
   });
 
   it('defines a repeatable directive', () => {
@@ -63,12 +33,7 @@ describe('Type System: Directive', () => {
       locations: [DirectiveLocation.QUERY],
     });
 
-    expect(directive).to.deep.include({
-      name: 'Foo',
-      args: [],
-      isRepeatable: true,
-      locations: ['QUERY'],
-    });
+    expect({ ...directive }).toMatchSnapshot();
   });
 
   it('can be stringified, JSON.stringified and Object.toStringified', () => {
@@ -77,9 +42,9 @@ describe('Type System: Directive', () => {
       locations: [DirectiveLocation.QUERY],
     });
 
-    expect(String(directive)).to.equal('@Foo');
-    expect(JSON.stringify(directive)).to.equal('"@Foo"');
-    expect(Object.prototype.toString.call(directive)).to.equal(
+    expect(String(directive)).toEqual('@Foo');
+    expect(JSON.stringify(directive)).toEqual('"@Foo"');
+    expect(Object.prototype.toString.call(directive)).toEqual(
       '[object GraphQLDirective]',
     );
   });
@@ -91,7 +56,7 @@ describe('Type System: Directive', () => {
           name: 'bad-name',
           locations: [DirectiveLocation.QUERY],
         }),
-    ).to.throw('Names must only contain [_a-zA-Z0-9] but "bad-name" does not.');
+    ).toThrow('Names must only contain [_a-zA-Z0-9] but "bad-name" does not.');
   });
 
   it('rejects a directive with incorrectly typed args', () => {
@@ -103,7 +68,7 @@ describe('Type System: Directive', () => {
           // @ts-expect-error
           args: [],
         }),
-    ).to.throw('@Foo args must be an object with argument names as keys.');
+    ).toThrow('@Foo args must be an object with argument names as keys.');
   });
 
   it('rejects a directive with incorrectly named arg', () => {
@@ -116,19 +81,19 @@ describe('Type System: Directive', () => {
             'bad-name': { type: GraphQLString },
           },
         }),
-    ).to.throw('Names must only contain [_a-zA-Z0-9] but "bad-name" does not.');
+    ).toThrow('Names must only contain [_a-zA-Z0-9] but "bad-name" does not.');
   });
 
   it('rejects a directive with undefined locations', () => {
     // @ts-expect-error
-    expect(() => new GraphQLDirective({ name: 'Foo' })).to.throw(
+    expect(() => new GraphQLDirective({ name: 'Foo' })).toThrow(
       '@Foo locations must be an Array.',
     );
   });
 
   it('rejects a directive with incorrectly typed locations', () => {
     // @ts-expect-error
-    expect(() => new GraphQLDirective({ name: 'Foo', locations: {} })).to.throw(
+    expect(() => new GraphQLDirective({ name: 'Foo', locations: {} })).toThrow(
       '@Foo locations must be an Array.',
     );
   });
