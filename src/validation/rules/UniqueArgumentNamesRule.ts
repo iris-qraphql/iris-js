@@ -1,4 +1,4 @@
-import { groupBy } from '../../jsutils/groupBy';
+import { forEachObjIndexed, groupBy } from 'ramda';
 
 import type { ArgumentNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
@@ -27,9 +27,9 @@ export function UniqueArgumentNamesRule(
   }) {
     const argumentNodes = parentNode.arguments ?? [];
 
-    const seenArgs = groupBy(argumentNodes, (arg) => arg.name.value);
+    const seenArgs = groupBy((arg) => arg.name.value, argumentNodes);
 
-    for (const [argName, argNodes] of seenArgs) {
+    forEachObjIndexed((argNodes, argName) => {
       if (argNodes.length > 1) {
         context.reportError(
           new GraphQLError(
@@ -38,6 +38,6 @@ export function UniqueArgumentNamesRule(
           ),
         );
       }
-    }
+    }, seenArgs);
   }
 }

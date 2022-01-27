@@ -31,7 +31,7 @@ export { version, versionInfo } from './version';
 
 // The primary entry point into fulfilling a GraphQL request.
 export type { GraphQLArgs } from './iris';
-export { graphql, graphqlSync } from './iris';
+export { graphql } from './iris';
 
 export {
   GraphQLSchema,
@@ -236,10 +236,7 @@ export {
   // Comparators for types
   isEqualType,
   isTypeSubTypeOf,
-  doTypesOverlap,
-  // Asserts a string is a valid GraphQL name.
-  // Determine if a string is a valid GraphQL name.
-  isValidNameError,
+  doTypesOverlap, // Asserts a string is a valid GraphQL name. // Determine if a string is a valid GraphQL name.
 } from './utilities/index';
 
 export type { BuildSchemaOptions } from './utilities/index';
