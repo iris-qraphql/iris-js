@@ -16,15 +16,3 @@ export function expectJSON(actual: unknown) {
     },
   };
 }
-
-export function expectToThrowJSON(fn: () => unknown) {
-  function mapException(): unknown {
-    try {
-      return fn();
-    } catch (error) {
-      throw toJSONDeep(error);
-    }
-  }
-
-  return expect(mapException).to.throw();
-}

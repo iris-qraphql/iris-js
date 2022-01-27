@@ -1,0 +1,235 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Lexer ignores BOM header 1`] = `
+Object {
+  "column": 3,
+  "end": 5,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 2,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer records line and column 1`] = `
+Object {
+  "column": 3,
+  "end": 11,
+  "kind": "Name",
+  "line": 4,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 8,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer skips whitespace and comments 1`] = `
+Object {
+  "column": 5,
+  "end": 9,
+  "kind": "Name",
+  "line": 3,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 6,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer skips whitespace and comments 2`] = `
+Object {
+  "column": 3,
+  "end": 5,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 2,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer skips whitespace and comments 3`] = `
+Object {
+  "column": 5,
+  "end": 21,
+  "kind": "Name",
+  "line": 3,
+  "next": null,
+  "prev": Object {
+    "column": 5,
+    "kind": "Comment",
+    "line": 2,
+    "value": "comment",
+  },
+  "start": 18,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer skips whitespace and comments 4`] = `
+Object {
+  "column": 4,
+  "end": 6,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 3,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 1`] = `
+Object {
+  "column": 1,
+  "end": 3,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 2`] = `
+Object {
+  "column": 1,
+  "end": 4,
+  "kind": "Name",
+  "line": 2,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 1,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 3`] = `
+Object {
+  "column": 1,
+  "end": 4,
+  "kind": "Name",
+  "line": 2,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 1,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 4`] = `
+Object {
+  "column": 1,
+  "end": 5,
+  "kind": "Name",
+  "line": 2,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 2,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 5`] = `
+Object {
+  "column": 1,
+  "end": 5,
+  "kind": "Name",
+  "line": 3,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 2,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 6`] = `
+Object {
+  "column": 1,
+  "end": 7,
+  "kind": "Name",
+  "line": 4,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 4,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 7`] = `
+Object {
+  "column": 1,
+  "end": 7,
+  "kind": "Name",
+  "line": 5,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 4,
+  "value": "foo",
+}
+`;
