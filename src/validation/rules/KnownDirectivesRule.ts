@@ -1,9 +1,11 @@
+import type { Kind } from 'graphql';
+
 import { inspect } from '../../jsutils/inspect';
 import { invariant } from '../../jsutils/invariant';
 
 import type { ASTNode } from '../../language/ast';
 import { DirectiveLocation } from '../../language/directiveLocation';
-import { IrisKind, Kind } from '../../language/kinds';
+import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
@@ -38,7 +40,7 @@ export function KnownDirectivesRule(
 
   const astDefinitions = context.getDocument().definitions;
   for (const def of astDefinitions) {
-    if (def.kind === Kind.DIRECTIVE_DEFINITION) {
+    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       locationsMap[def.name.value] = def.locations.map((name) => name.value);
     }
   }
@@ -75,23 +77,23 @@ function getDirectiveLocationForASTPath(
   invariant('kind' in appliedTo);
 
   switch (appliedTo.kind) {
-    case Kind.FIELD_DEFINITION:
+    case IrisKind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
-    case Kind.RESOLVER_TYPE_DEFINITION:
+    case IrisKind.RESOLVER_TYPE_DEFINITION:
       return DirectiveLocation.UNION;
-    case Kind.DATA_TYPE_DEFINITION:
+    case IrisKind.DATA_TYPE_DEFINITION:
       return DirectiveLocation.INPUT_OBJECT;
     case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
-      return [Kind.DATA_TYPE_DEFINITION, Kind.VARIANT_DEFINITION].includes(
-        parentNode.kind,
-      )
+      const kinds: ReadonlyArray<IrisKind | Kind> = [
+        IrisKind.DATA_TYPE_DEFINITION,
+        IrisKind.VARIANT_DEFINITION,
+      ];
+      return kinds.includes(parentNode.kind)
         ? DirectiveLocation.INPUT_FIELD_DEFINITION
         : DirectiveLocation.ARGUMENT_DEFINITION;
     }
-    // Not reachable, all possible types have been considered.
-    /* c8 ignore next */
     default:
       invariant(false, 'Unexpected kind: ' + inspect(appliedTo.kind));
   }

@@ -1,7 +1,5 @@
 export enum IrisKind {
-  NAME = 'Name',
   ARGUMENT_DEFINITION = 'InputValueDefinition',
-  ARGUMENT = 'Argument',
   NAMED_TYPE = 'NamedType',
   LIST_TYPE = 'ListType',
   NON_NULL_TYPE = 'NonNullType',
@@ -10,4 +8,5 @@ export enum IrisKind {
   DATA_TYPE_DEFINITION = 'DataTypeDefinition',
   VARIANT_DEFINITION = 'VariantDefinition',
   DIRECTIVE_DEFINITION = 'DirectiveDefinition',
+  DOCUMENT = 'Document',
 }

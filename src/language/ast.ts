@@ -110,7 +110,7 @@ export interface NameNode {
 /** Document */
 
 export interface DocumentNode {
-  readonly kind: Kind.DOCUMENT;
+  readonly kind: IrisKind.DOCUMENT;
   readonly loc?: Location;
   readonly definitions: ReadonlyArray<DefinitionNode>;
 }
@@ -179,19 +179,19 @@ export interface ConstDirectiveNode {
 export type TypeNode = NamedTypeNode | ListTypeNode | NonNullTypeNode;
 
 export interface NamedTypeNode {
-  readonly kind: Kind.NAMED_TYPE;
+  readonly kind: IrisKind.NAMED_TYPE;
   readonly loc?: Location;
   readonly name: NameNode;
 }
 
 export interface ListTypeNode {
-  readonly kind: Kind.LIST_TYPE;
+  readonly kind: IrisKind.LIST_TYPE;
   readonly loc?: Location;
   readonly type: TypeNode;
 }
 
 export interface NonNullTypeNode {
-  readonly kind: Kind.NON_NULL_TYPE;
+  readonly kind: IrisKind.NON_NULL_TYPE;
   readonly loc?: Location;
   readonly type: NamedTypeNode | ListTypeNode;
 }
@@ -249,7 +249,7 @@ export type VariantDefinition<F> = {
 };
 
 export type DataFieldDefinitionNode = {
-  readonly kind: Kind.FIELD_DEFINITION;
+  readonly kind: IrisKind.FIELD_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
@@ -268,7 +268,7 @@ export type ResolverVariantDefinitionNode =
 /** Directive Definitions */
 
 export interface DirectiveDefinitionNode {
-  readonly kind: Kind.DIRECTIVE_DEFINITION;
+  readonly kind: IrisKind.DIRECTIVE_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;

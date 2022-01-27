@@ -5,6 +5,7 @@ import { inspect } from '../jsutils/inspect';
 
 import type { ASTNode } from './ast';
 import { isNode, QueryDocumentKeys } from './ast';
+import type { IrisKind } from './kinds';
 
 /**
  * A visitor is provided to visit, it contains the collection of
@@ -377,7 +378,7 @@ export function visitInParallel(
  */
 export function getEnterLeaveForKind(
   visitor: ASTVisitor,
-  kind: Kind,
+  kind: Kind | IrisKind,
 ): EnterLeaveVisitor<ASTNode> {
   const kindVisitor:
     | ASTVisitFn<ASTNode>

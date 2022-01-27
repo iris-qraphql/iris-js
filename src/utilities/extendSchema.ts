@@ -14,7 +14,7 @@ import type {
   TypeNode,
   VariantDefinitionNode,
 } from '../language/ast';
-import { Kind } from '../language/kinds';
+import { IrisKind } from '../language/kinds';
 import { isTypeDefinitionNode } from '../language/predicates';
 
 import type {
@@ -89,7 +89,7 @@ export function extendSchemaImpl(
   for (const def of documentAST.definitions) {
     if (isTypeDefinitionNode(def)) {
       typeDefs.push(def);
-    } else if (def.kind === Kind.DIRECTIVE_DEFINITION) {
+    } else if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       directiveDefs.push(def);
     }
   }
@@ -153,10 +153,10 @@ export function extendSchemaImpl(
   }
 
   function getWrappedType(node: TypeNode): GraphQLType {
-    if (node.kind === Kind.LIST_TYPE) {
+    if (node.kind === IrisKind.LIST_TYPE) {
       return new GraphQLList(getWrappedType(node.type));
     }
-    if (node.kind === Kind.NON_NULL_TYPE) {
+    if (node.kind === IrisKind.NON_NULL_TYPE) {
       return new GraphQLNonNull(getWrappedType(node.type));
     }
     return getNamedType(node);
@@ -258,7 +258,7 @@ export function extendSchemaImpl(
     const name = astNode.name.value;
 
     switch (astNode.kind) {
-      case Kind.RESOLVER_TYPE_DEFINITION: {
+      case IrisKind.RESOLVER_TYPE_DEFINITION: {
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
@@ -266,7 +266,7 @@ export function extendSchemaImpl(
           astNode,
         });
       }
-      case Kind.DATA_TYPE_DEFINITION: {
+      case IrisKind.DATA_TYPE_DEFINITION: {
         const [variant, ...ext] = astNode.variants;
         if (ext.length === 0 && (variant.fields?.length ?? 0) > 0) {
           return new IrisDataType({

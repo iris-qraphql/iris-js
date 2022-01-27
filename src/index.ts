@@ -122,10 +122,8 @@ export {
   visitInParallel,
   getVisitFn,
   getEnterLeaveForKind,
-  Kind,
   DirectiveLocation,
   // Predicates
-  isDefinitionNode,
   isValueNode,
   isConstValueNode,
   isTypeNode,

@@ -53,7 +53,6 @@ export type {
 } from './ast';
 
 export {
-  isDefinitionNode,
   isValueNode,
   isConstValueNode,
   isTypeNode,

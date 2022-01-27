@@ -1,4 +1,4 @@
-import { Kind, TokenKind } from 'graphql';
+import { TokenKind } from 'graphql';
 
 import type {
   DataFieldDefinitionNode,
@@ -120,7 +120,7 @@ const parseFieldDefinition = (parser: Parser) => (): FieldDefinitionNode => {
   const type = parser.parseTypeReference();
   const directives = parser.parseConstDirectives();
   return parser.node<FieldDefinitionNode>(start, {
-    kind: Kind.FIELD_DEFINITION,
+    kind: IrisKind.FIELD_DEFINITION,
     description,
     name,
     arguments: args,
@@ -202,7 +202,7 @@ const parseDataFieldDefinition = (parser: Parser): DataFieldDefinitionNode => {
   const type = parser.parseTypeReference();
   const directives = parser.parseConstDirectives();
   return parser.node<DataFieldDefinitionNode>(start, {
-    kind: Kind.FIELD_DEFINITION,
+    kind: IrisKind.FIELD_DEFINITION,
     description,
     name,
     type,

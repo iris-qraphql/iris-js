@@ -1,4 +1,4 @@
-import { Kind } from '../../language/kinds';
+import { IrisKind } from '../../language/kinds';
 import { isTypeDefinitionNode } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
@@ -34,7 +34,7 @@ export function UniqueDirectivesPerLocationRule(
 
   const astDefinitions = context.getDocument().definitions;
   for (const def of astDefinitions) {
-    if (def.kind === Kind.DIRECTIVE_DEFINITION) {
+    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       uniqueDirectiveMap[def.name.value] = !def.repeatable;
     }
   }

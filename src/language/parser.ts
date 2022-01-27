@@ -152,7 +152,7 @@ export class Parser {
    */
   parseDocument(): DocumentNode {
     return this.node<DocumentNode>(this._lexer.token, {
-      kind: Kind.DOCUMENT,
+      kind: IrisKind.DOCUMENT,
       definitions: this.many(
         TokenKind.SOF,
         this.parseDefinition,
@@ -435,7 +435,7 @@ export class Parser {
       const innerType = this.parseTypeReference();
       this.expectToken(TokenKind.BRACKET_R);
       type = this.node<ListTypeNode>(start, {
-        kind: Kind.LIST_TYPE,
+        kind: IrisKind.LIST_TYPE,
         type: innerType,
       });
     } else {
@@ -444,7 +444,7 @@ export class Parser {
 
     if (this.expectOptionalToken(TokenKind.BANG)) {
       return this.node<NonNullTypeNode>(start, {
-        kind: Kind.NON_NULL_TYPE,
+        kind: IrisKind.NON_NULL_TYPE,
         type,
       });
     }
@@ -457,7 +457,7 @@ export class Parser {
    */
   parseNamedType(): NamedTypeNode {
     return this.node<NamedTypeNode>(this._lexer.token, {
-      kind: Kind.NAMED_TYPE,
+      kind: IrisKind.NAMED_TYPE,
       name: this.parseName(),
     });
   }
@@ -527,7 +527,7 @@ export class Parser {
     this.expectKeyword('on');
     const locations = this.parseDirectiveLocations();
     return this.node<DirectiveDefinitionNode>(start, {
-      kind: Kind.DIRECTIVE_DEFINITION,
+      kind: IrisKind.DIRECTIVE_DEFINITION,
       description,
       name,
       arguments: args,

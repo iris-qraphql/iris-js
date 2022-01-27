@@ -1,9 +1,10 @@
+import { Kind } from 'graphql';
+
 import type { ASTNode } from '../ast';
-import { Kind } from '../kinds';
+import { IrisKind } from '../kinds';
 import { parseValue } from '../parser';
 import {
   isConstValueNode,
-  isDefinitionNode,
   isTypeDefinitionNode,
   isTypeNode,
   isTypeSystemDefinitionNode,
@@ -11,21 +12,13 @@ import {
 } from '../predicates';
 
 function filterNodes(predicate: (node: ASTNode) => boolean): Array<string> {
-  return Object.values(Kind).filter(
+  return Object.values({ ...Kind, ...IrisKind }).filter(
     // @ts-expect-error create node only with kind
     (kind) => predicate({ kind }),
   );
 }
 
 describe('AST node predicates', () => {
-  it('isDefinitionNode', () => {
-    expect(filterNodes(isDefinitionNode)).toEqual([
-      'ResolverTypeDefinition',
-      'DataTypeDefinition',
-      'DirectiveDefinition',
-    ]);
-  });
-
   it('isValueNode', () => {
     expect(filterNodes(isValueNode)).toEqual([
       'Variable',
@@ -61,9 +54,9 @@ describe('AST node predicates', () => {
 
   it('isTypeSystemDefinitionNode', () => {
     expect(filterNodes(isTypeSystemDefinitionNode)).toEqual([
+      'DirectiveDefinition',
       'ResolverTypeDefinition',
       'DataTypeDefinition',
-      'DirectiveDefinition',
     ]);
   });
 

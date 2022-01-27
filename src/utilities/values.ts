@@ -1,10 +1,11 @@
+import { Kind } from 'graphql';
+
 import { inspect } from '../jsutils/inspect';
 import { keyMap } from '../jsutils/keyMap';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import type { DirectiveNode } from '../language/ast';
-import { Kind } from '../language/kinds';
 import { print } from '../language/printer';
 
 import type { GraphQLField } from '../type/definition';

@@ -1,10 +1,11 @@
+import { Kind } from 'graphql';
+
 import { inspect } from '../jsutils/inspect';
 import { invariant } from '../jsutils/invariant';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import { isPrintableAsBlockString } from '../language/blockString';
-import { Kind } from '../language/kinds';
 import { print } from '../language/printer';
 
 import type {
