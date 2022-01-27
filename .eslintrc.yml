@@ -654,14 +654,14 @@ overrides:
   - files: 'src/**/__*__/**'
     rules:
       internal-rules/require-to-string-tag: off
-      node/no-unpublished-import: [error, { allowModules: ['chai', 'mocha'] }]
+      node/no-unpublished-import: [error, { allowModules: [] }]
       import/no-deprecated: off
       import/no-restricted-paths: off
       import/no-extraneous-dependencies: [error, { devDependencies: true }]
   - files: 'integrationTests/*'
     rules:
       node/no-sync: off
-      node/no-unpublished-require: [error, { allowModules: ['mocha'] }]
+      node/no-unpublished-require: [error, { allowModules: [] }]
       import/no-extraneous-dependencies: [error, { devDependencies: true }]
       import/no-nodejs-modules: off
   - files: 'integrationTests/*/**'
