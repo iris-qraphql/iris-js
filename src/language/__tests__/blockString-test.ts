@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import {
   dedentBlockStringLines,
   isPrintableAsBlockString,
@@ -17,29 +14,29 @@ describe('dedentBlockStringLines', () => {
   }
 
   it('handles empty string', () => {
-    expectDedent(['']).to.deep.equal([]);
+    expectDedent(['']).toEqual([]);
   });
 
   it('do not dedent first line', () => {
-    expectDedent(['  a']).to.deep.equal(['  a']);
-    expectDedent([' a', '  b']).to.deep.equal([' a', 'b']);
+    expectDedent(['  a']).toEqual(['  a']);
+    expectDedent([' a', '  b']).toEqual([' a', 'b']);
   });
 
   it('removes minimal indentation length', () => {
-    expectDedent(['', ' a', '  b']).to.deep.equal(['a', ' b']);
-    expectDedent(['', '  a', ' b']).to.deep.equal([' a', 'b']);
-    expectDedent(['', '  a', ' b', 'c']).to.deep.equal(['  a', ' b', 'c']);
+    expectDedent(['', ' a', '  b']).toEqual(['a', ' b']);
+    expectDedent(['', '  a', ' b']).toEqual([' a', 'b']);
+    expectDedent(['', '  a', ' b', 'c']).toEqual(['  a', ' b', 'c']);
   });
 
   it('dedent both tab and space as single character', () => {
-    expectDedent(['', '\ta', '          b']).to.deep.equal(['a', '         b']);
-    expectDedent(['', '\t a', '          b']).to.deep.equal(['a', '        b']);
-    expectDedent(['', ' \t a', '          b']).to.deep.equal(['a', '       b']);
+    expectDedent(['', '\ta', '          b']).toEqual(['a', '         b']);
+    expectDedent(['', '\t a', '          b']).toEqual(['a', '        b']);
+    expectDedent(['', ' \t a', '          b']).toEqual(['a', '       b']);
   });
 
   it('dedent do not take empty lines into account', () => {
-    expectDedent(['a', '', ' b']).to.deep.equal(['a', '', 'b']);
-    expectDedent(['a', ' ', '  b']).to.deep.equal(['a', '', 'b']);
+    expectDedent(['a', '', ' b']).toEqual(['a', '', 'b']);
+    expectDedent(['a', ' ', '  b']).toEqual(['a', '', 'b']);
   });
 
   it('removes uniform indentation from a string', () => {
@@ -51,7 +48,7 @@ describe('dedentBlockStringLines', () => {
       '    Yours,',
       '      GraphQL.',
     ];
-    expectDedent(lines).to.deep.equal([
+    expectDedent(lines).toEqual([
       'Hello,',
       '  World!',
       '',
@@ -72,7 +69,7 @@ describe('dedentBlockStringLines', () => {
       '',
       '',
     ];
-    expectDedent(lines).to.deep.equal([
+    expectDedent(lines).toEqual([
       'Hello,',
       '  World!',
       '',
@@ -93,7 +90,7 @@ describe('dedentBlockStringLines', () => {
       '        ',
       '  ',
     ];
-    expectDedent(lines).to.deep.equal([
+    expectDedent(lines).toEqual([
       'Hello,',
       '  World!',
       '',
@@ -110,7 +107,7 @@ describe('dedentBlockStringLines', () => {
       '    Yours,',
       '      GraphQL.',
     ];
-    expectDedent(lines).to.deep.equal([
+    expectDedent(lines).toEqual([
       '    Hello,',
       '  World!',
       '',
@@ -129,7 +126,7 @@ describe('dedentBlockStringLines', () => {
       '      GraphQL. ',
       '               ',
     ];
-    expectDedent(lines).to.deep.equal([
+    expectDedent(lines).toEqual([
       'Hello,     ',
       '  World!   ',
       '           ',
@@ -141,11 +138,11 @@ describe('dedentBlockStringLines', () => {
 
 describe('isPrintableAsBlockString', () => {
   function expectPrintable(str: string) {
-    return expect(isPrintableAsBlockString(str)).to.equal(true);
+    return expect(isPrintableAsBlockString(str)).toEqual(true);
   }
 
   function expectNonPrintable(str: string) {
-    return expect(isPrintableAsBlockString(str)).to.equal(false);
+    return expect(isPrintableAsBlockString(str)).toEqual(false);
   }
 
   it('accepts valid strings', () => {
@@ -211,8 +208,8 @@ describe('printBlockString', () => {
             ? { readable: expected, minimize: expected }
             : expected;
 
-        expect(printBlockString(str)).to.equal(readable);
-        expect(printBlockString(str, { minimize: true })).to.equal(minimize);
+        expect(printBlockString(str)).toEqual(readable);
+        expect(printBlockString(str, { minimize: true })).toEqual(minimize);
       },
     };
   }
