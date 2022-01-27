@@ -1,12 +1,10 @@
-import type { Source } from 'graphql';
-import { printLocation, printSourceLocation } from 'graphql';
+import type { Source, SourceLocation } from 'graphql';
+import { getLocation, printLocation, printSourceLocation } from 'graphql';
 
 import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 
 import type { ASTNode, Location } from '../language/ast';
-import type { SourceLocation } from '../language/location';
-import { getLocation } from '../language/location';
 
 /**
  * Custom extensions

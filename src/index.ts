@@ -110,9 +110,7 @@ export {
   Source,
   Location,
   OperationTypeNode,
-  getLocation,
   // Print source location.
-  printSourceLocation,
   // Lex
   Lexer,
   // Parse

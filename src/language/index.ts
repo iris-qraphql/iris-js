@@ -1,9 +1,7 @@
-export { TokenKind } from 'graphql';
+export type { SourceLocation } from 'graphql';
+export { TokenKind, getLocation } from 'graphql';
 
 export { Source } from './source';
-
-export { getLocation } from './location';
-export type { SourceLocation } from './location';
 
 export { Kind } from './kinds';
 export type { KindEnum } from './kinds';
