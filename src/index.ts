@@ -31,7 +31,7 @@ export { version, versionInfo } from './version';
 
 // The primary entry point into fulfilling a GraphQL request.
 export type { GraphQLArgs } from './iris';
-export { graphql, graphqlSync } from './iris';
+export { graphql } from './iris';
 
 export {
   GraphQLSchema,
@@ -231,18 +231,12 @@ export {
   // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.
   TypeInfo,
   visitWithTypeInfo,
-  // Coerces a JavaScript value to a GraphQL type, or produces errors.
-  coerceInputValue,
   // Strips characters that are not significant to the validity or execution of a GraphQL document.
   stripIgnoredCharacters,
   // Comparators for types
   isEqualType,
   isTypeSubTypeOf,
-  doTypesOverlap,
-  // Asserts a string is a valid GraphQL name.
-  assertValidName,
-  // Determine if a string is a valid GraphQL name.
-  isValidNameError,
+  doTypesOverlap, // Asserts a string is a valid GraphQL name. // Determine if a string is a valid GraphQL name.
 } from './utilities/index';
 
 export type { BuildSchemaOptions } from './utilities/index';

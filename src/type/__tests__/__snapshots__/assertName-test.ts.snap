@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`assertEnumValueName passthrough valid name 1`] = `"received is not a function"`;
+
+exports[`assertEnumValueName throws for names starting with invalid characters 1`] = `"Names must start with [_a-zA-Z] but \\"42MeaningsOfLife\\" does not."`;
+
+exports[`assertEnumValueName throws for names with invalid characters 1`] = `"Names must only contain [_a-zA-Z0-9] but \\">--()-->\\" does not."`;
+
+exports[`assertEnumValueName throws for restricted names 1`] = `"Enum values cannot be named: true"`;
+
+exports[`assertEnumValueName throws for restricted names 2`] = `"Enum values cannot be named: false"`;
+
+exports[`assertEnumValueName throws for restricted names 3`] = `"Enum values cannot be named: null"`;
+
+exports[`assertEnumValueName throws on empty strings 1`] = `"Expected name to be a non-empty string."`;
+
+exports[`assertName throws for names starting with invalid characters 1`] = `"Names must start with [_a-zA-Z] but \\"42MeaningsOfLife\\" does not."`;
+
+exports[`assertName throws for names with invalid characters 1`] = `"Names must only contain [_a-zA-Z0-9] but \\">--()-->\\" does not."`;
+
+exports[`assertName throws for non-strings 1`] = `"Expected name to be a string."`;
+
+exports[`assertName throws on empty strings 1`] = `"Expected name to be a non-empty string."`;

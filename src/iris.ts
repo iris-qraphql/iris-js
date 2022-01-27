@@ -2,7 +2,6 @@ import type { ExecutionResult } from 'graphql/execution';
 import { execute } from 'graphql/execution';
 
 import { devAssert } from './jsutils/devAssert';
-import { isPromise } from './jsutils/isPromise';
 import type { Maybe } from './jsutils/Maybe';
 import type { PromiseOrValue } from './jsutils/PromiseOrValue';
 
@@ -71,23 +70,6 @@ export interface GraphQLArgs {
 export function graphql(args: GraphQLArgs): Promise<ExecutionResult> {
   // Always return a Promise for a consistent API.
   return new Promise((resolve) => resolve(graphqlImpl(args)));
-}
-
-/**
- * The graphqlSync function also fulfills GraphQL operations by parsing,
- * validating, and executing a GraphQL document along side a GraphQL schema.
- * However, it guarantees to complete synchronously (or throw an error) assuming
- * that all field resolvers are also synchronous.
- */
-export function graphqlSync(args: GraphQLArgs): ExecutionResult {
-  const result = graphqlImpl(args);
-
-  // Assert that the execution was synchronous.
-  if (isPromise(result)) {
-    throw new Error('GraphQL execution failed to complete synchronously.');
-  }
-
-  return result;
 }
 
 function graphqlImpl(args: GraphQLArgs): PromiseOrValue<ExecutionResult> {

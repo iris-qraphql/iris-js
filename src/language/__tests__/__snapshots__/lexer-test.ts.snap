@@ -1,0 +1,1340 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Lexer advance line after lexing multiline block string 1`] = `
+Object {
+  "column": 6,
+  "kind": "Name",
+  "line": 8,
+  "value": "second_token",
+}
+`;
+
+exports[`Lexer advance line after lexing multiline block string 2`] = `
+Object {
+  "column": 2,
+  "kind": "Name",
+  "line": 8,
+  "value": "second_token",
+}
+`;
+
+exports[`Lexer ignores BOM header 1`] = `
+Object {
+  "column": 3,
+  "end": 5,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 2,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer lex reports useful information for dashes in names 1`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "a",
+}
+`;
+
+exports[`Lexer lexes block strings 1`] = `
+Object {
+  "column": 1,
+  "end": 6,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "",
+}
+`;
+
+exports[`Lexer lexes block strings 2`] = `
+Object {
+  "column": 1,
+  "end": 12,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "simple",
+}
+`;
+
+exports[`Lexer lexes block strings 3`] = `
+Object {
+  "column": 1,
+  "end": 19,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": " white space ",
+}
+`;
+
+exports[`Lexer lexes block strings 4`] = `
+Object {
+  "column": 1,
+  "end": 22,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "contains \\" quote",
+}
+`;
+
+exports[`Lexer lexes block strings 5`] = `
+Object {
+  "column": 1,
+  "end": 32,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "contains \\"\\"\\" triple quote",
+}
+`;
+
+exports[`Lexer lexes block strings 6`] = `
+Object {
+  "column": 1,
+  "end": 16,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "multi
+line",
+}
+`;
+
+exports[`Lexer lexes block strings 7`] = `
+Object {
+  "column": 1,
+  "end": 28,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "multi
+line
+normalized",
+}
+`;
+
+exports[`Lexer lexes block strings 8`] = `
+Object {
+  "column": 1,
+  "end": 32,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "unescaped \\\\n\\\\r\\\\b\\\\t\\\\f\\\\u1234",
+}
+`;
+
+exports[`Lexer lexes block strings 9`] = `
+Object {
+  "column": 1,
+  "end": 38,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "unescaped unicode outside BMP 😀",
+}
+`;
+
+exports[`Lexer lexes block strings 10`] = `
+Object {
+  "column": 1,
+  "end": 19,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "slashes \\\\\\\\ \\\\/",
+}
+`;
+
+exports[`Lexer lexes block strings 11`] = `
+Object {
+  "column": 1,
+  "end": 68,
+  "kind": "BlockString",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "spans
+  multiple
+    lines",
+}
+`;
+
+exports[`Lexer lexes comments 1`] = `
+Object {
+  "column": 1,
+  "kind": "Comment",
+  "line": 1,
+  "value": " Comment",
+}
+`;
+
+exports[`Lexer lexes comments 2`] = `
+Object {
+  "column": 1,
+  "kind": "Comment",
+  "line": 1,
+  "value": " Comment",
+}
+`;
+
+exports[`Lexer lexes comments 3`] = `
+Object {
+  "column": 1,
+  "kind": "Comment",
+  "line": 1,
+  "value": " Comment",
+}
+`;
+
+exports[`Lexer lexes comments 4`] = `
+Object {
+  "column": 1,
+  "kind": "Comment",
+  "line": 1,
+  "value": " Comment 😀",
+}
+`;
+
+exports[`Lexer lexes numbers 1`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "Int",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "4",
+}
+`;
+
+exports[`Lexer lexes numbers 2`] = `
+Object {
+  "column": 1,
+  "end": 5,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "4.123",
+}
+`;
+
+exports[`Lexer lexes numbers 3`] = `
+Object {
+  "column": 1,
+  "end": 2,
+  "kind": "Int",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "-4",
+}
+`;
+
+exports[`Lexer lexes numbers 4`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "Int",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "9",
+}
+`;
+
+exports[`Lexer lexes numbers 5`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "Int",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "0",
+}
+`;
+
+exports[`Lexer lexes numbers 6`] = `
+Object {
+  "column": 1,
+  "end": 6,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "-4.123",
+}
+`;
+
+exports[`Lexer lexes numbers 7`] = `
+Object {
+  "column": 1,
+  "end": 5,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "0.123",
+}
+`;
+
+exports[`Lexer lexes numbers 8`] = `
+Object {
+  "column": 1,
+  "end": 5,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "123e4",
+}
+`;
+
+exports[`Lexer lexes numbers 9`] = `
+Object {
+  "column": 1,
+  "end": 5,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "123E4",
+}
+`;
+
+exports[`Lexer lexes numbers 10`] = `
+Object {
+  "column": 1,
+  "end": 6,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "123e-4",
+}
+`;
+
+exports[`Lexer lexes numbers 11`] = `
+Object {
+  "column": 1,
+  "end": 6,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "123e+4",
+}
+`;
+
+exports[`Lexer lexes numbers 12`] = `
+Object {
+  "column": 1,
+  "end": 8,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "-1.123e4",
+}
+`;
+
+exports[`Lexer lexes numbers 13`] = `
+Object {
+  "column": 1,
+  "end": 8,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "-1.123E4",
+}
+`;
+
+exports[`Lexer lexes numbers 14`] = `
+Object {
+  "column": 1,
+  "end": 9,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "-1.123e-4",
+}
+`;
+
+exports[`Lexer lexes numbers 15`] = `
+Object {
+  "column": 1,
+  "end": 9,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "-1.123e+4",
+}
+`;
+
+exports[`Lexer lexes numbers 16`] = `
+Object {
+  "column": 1,
+  "end": 11,
+  "kind": "Float",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "-1.123e4567",
+}
+`;
+
+exports[`Lexer lexes punctuation 1`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "!",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 2`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "$",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 3`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "(",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 4`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": ")",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 5`] = `
+Object {
+  "column": 1,
+  "end": 3,
+  "kind": "...",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 6`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": ":",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 7`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "=",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 8`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "@",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 9`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "[",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 10`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "]",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 11`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "{",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 12`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "|",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes punctuation 13`] = `
+Object {
+  "column": 1,
+  "end": 1,
+  "kind": "}",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": undefined,
+}
+`;
+
+exports[`Lexer lexes strings 1`] = `
+Object {
+  "column": 1,
+  "end": 2,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "",
+}
+`;
+
+exports[`Lexer lexes strings 2`] = `
+Object {
+  "column": 1,
+  "end": 8,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "simple",
+}
+`;
+
+exports[`Lexer lexes strings 3`] = `
+Object {
+  "column": 1,
+  "end": 15,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": " white space ",
+}
+`;
+
+exports[`Lexer lexes strings 4`] = `
+Object {
+  "column": 1,
+  "end": 10,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "quote \\"",
+}
+`;
+
+exports[`Lexer lexes strings 5`] = `
+Object {
+  "column": 1,
+  "end": 20,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "escaped 
+
+	",
+}
+`;
+
+exports[`Lexer lexes strings 6`] = `
+Object {
+  "column": 1,
+  "end": 15,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "slashes \\\\ /",
+}
+`;
+
+exports[`Lexer lexes strings 7`] = `
+Object {
+  "column": 1,
+  "end": 34,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "unescaped unicode outside BMP 😀",
+}
+`;
+
+exports[`Lexer lexes strings 8`] = `
+Object {
+  "column": 1,
+  "end": 42,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "unescaped maximal unicode outside BMP 􏿿",
+}
+`;
+
+exports[`Lexer lexes strings 9`] = `
+Object {
+  "column": 1,
+  "end": 34,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "unicode ሴ噸邫췯",
+}
+`;
+
+exports[`Lexer lexes strings 10`] = `
+Object {
+  "column": 1,
+  "end": 42,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "unicode ሴ噸邫췯",
+}
+`;
+
+exports[`Lexer lexes strings 11`] = `
+Object {
+  "column": 1,
+  "end": 50,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "string with unicode escape outside BMP 😀",
+}
+`;
+
+exports[`Lexer lexes strings 12`] = `
+Object {
+  "column": 1,
+  "end": 42,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "string with minimal unicode escape  ",
+}
+`;
+
+exports[`Lexer lexes strings 13`] = `
+Object {
+  "column": 1,
+  "end": 47,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "string with maximal unicode escape 􏿿",
+}
+`;
+
+exports[`Lexer lexes strings 14`] = `
+Object {
+  "column": 1,
+  "end": 57,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "string with maximal minimal unicode escape  ",
+}
+`;
+
+exports[`Lexer lexes strings 15`] = `
+Object {
+  "column": 1,
+  "end": 56,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "string with unicode surrogate pair escape 😀",
+}
+`;
+
+exports[`Lexer lexes strings 16`] = `
+Object {
+  "column": 1,
+  "end": 56,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "string with minimal surrogate pair escape 𐀀",
+}
+`;
+
+exports[`Lexer lexes strings 17`] = `
+Object {
+  "column": 1,
+  "end": 56,
+  "kind": "String",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "string with maximal surrogate pair escape 􏿿",
+}
+`;
+
+exports[`Lexer records line and column 1`] = `
+Object {
+  "column": 3,
+  "end": 11,
+  "kind": "Name",
+  "line": 4,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 8,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer skips whitespace and comments 1`] = `
+Object {
+  "column": 5,
+  "end": 9,
+  "kind": "Name",
+  "line": 3,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 6,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer skips whitespace and comments 2`] = `
+Object {
+  "column": 3,
+  "end": 5,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 2,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer skips whitespace and comments 3`] = `
+Object {
+  "column": 5,
+  "end": 21,
+  "kind": "Name",
+  "line": 3,
+  "next": null,
+  "prev": Object {
+    "column": 5,
+    "kind": "Comment",
+    "line": 2,
+    "value": "comment",
+  },
+  "start": 18,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer skips whitespace and comments 4`] = `
+Object {
+  "column": 4,
+  "end": 6,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 3,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 1`] = `
+Object {
+  "column": 1,
+  "end": 3,
+  "kind": "Name",
+  "line": 1,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 0,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 2`] = `
+Object {
+  "column": 1,
+  "end": 4,
+  "kind": "Name",
+  "line": 2,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 1,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 3`] = `
+Object {
+  "column": 1,
+  "end": 4,
+  "kind": "Name",
+  "line": 2,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 1,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 4`] = `
+Object {
+  "column": 1,
+  "end": 5,
+  "kind": "Name",
+  "line": 2,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 2,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 5`] = `
+Object {
+  "column": 1,
+  "end": 5,
+  "kind": "Name",
+  "line": 3,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 2,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 6`] = `
+Object {
+  "column": 1,
+  "end": 7,
+  "kind": "Name",
+  "line": 4,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 4,
+  "value": "foo",
+}
+`;
+
+exports[`Lexer tracks line breaks 7`] = `
+Object {
+  "column": 1,
+  "end": 7,
+  "kind": "Name",
+  "line": 5,
+  "next": null,
+  "prev": Object {
+    "column": 0,
+    "kind": "<SOF>",
+    "line": 0,
+    "value": undefined,
+  },
+  "start": 4,
+  "value": "foo",
+}
+`;
