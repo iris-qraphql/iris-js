@@ -1,5 +1,3 @@
-import { describe, it } from 'mocha';
-
 import { dedent } from '../../__testUtils__/dedent';
 import { genFuzzStrings } from '../../__testUtils__/genFuzzStrings';
 import { inspectStr } from '../../__testUtils__/inspectStr';
@@ -47,5 +45,5 @@ describe('stripIgnoredCharacters', () => {
         `,
       );
     }
-  }).timeout(20000);
+  });
 });
