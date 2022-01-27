@@ -1,4 +1,3 @@
-import { keyValMap } from '../jsutils/keyValMap';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 
@@ -41,10 +40,11 @@ export function valueFromASTUntyped(
         valueFromASTUntyped(node, variables),
       );
     case Kind.OBJECT:
-      return keyValMap(
-        valueNode.fields,
-        (field) => field.name.value,
-        (field) => valueFromASTUntyped(field.value, variables),
+      return Object.fromEntries(
+        valueNode.fields.map(({ name, value }) => [
+          name.value,
+          valueFromASTUntyped(value, variables),
+        ]),
       );
     case Kind.VARIABLE:
       return variables?.[valueNode.name.value];
