@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { instanceOf } from '../instanceOf';
 
 describe('instanceOf', () => {
@@ -11,9 +8,9 @@ describe('instanceOf', () => {
       }
     }
 
-    expect(instanceOf(true, Foo)).to.equal(false);
-    expect(instanceOf(null, Foo)).to.equal(false);
-    expect(instanceOf(Object.create(null), Foo)).to.equal(false);
+    expect(instanceOf(true, Foo)).toEqual(false);
+    expect(instanceOf(null, Foo)).toEqual(false);
+    expect(instanceOf(Object.create(null), Foo)).toEqual(false);
   });
 
   it('detect name clashes with older versions of this lib', () => {
@@ -33,8 +30,8 @@ describe('instanceOf', () => {
 
     const NewClass = newVersion();
     const OldClass = oldVersion();
-    expect(instanceOf(new NewClass(), NewClass)).to.equal(true);
-    expect(() => instanceOf(new OldClass(), NewClass)).to.throw();
+    expect(instanceOf(new NewClass(), NewClass)).toEqual(true);
+    expect(() => instanceOf(new OldClass(), NewClass)).toThrow();
   });
 
   it('allows instances to have share the same constructor name', () => {
@@ -49,12 +46,12 @@ describe('instanceOf', () => {
 
     const Foo = getMinifiedClass('Foo');
     const Bar = getMinifiedClass('Bar');
-    expect(instanceOf(new Foo(), Bar)).to.equal(false);
-    expect(instanceOf(new Bar(), Foo)).to.equal(false);
+    expect(instanceOf(new Foo(), Bar)).toEqual(false);
+    expect(instanceOf(new Bar(), Foo)).toEqual(false);
 
     const DuplicateOfFoo = getMinifiedClass('Foo');
-    expect(() => instanceOf(new DuplicateOfFoo(), Foo)).to.throw();
-    expect(() => instanceOf(new Foo(), DuplicateOfFoo)).to.throw();
+    expect(() => instanceOf(new DuplicateOfFoo(), Foo)).toThrow();
+    expect(() => instanceOf(new Foo(), DuplicateOfFoo)).toThrow();
   });
 
   it('fails with descriptive error message', () => {
@@ -69,10 +66,10 @@ describe('instanceOf', () => {
     const Foo1 = getFoo();
     const Foo2 = getFoo();
 
-    expect(() => instanceOf(new Foo1(), Foo2)).to.throw(
+    expect(() => instanceOf(new Foo1(), Foo2)).toThrow(
       /^Cannot use Foo "{}" from another module or realm./m,
     );
-    expect(() => instanceOf(new Foo2(), Foo1)).to.throw(
+    expect(() => instanceOf(new Foo2(), Foo1)).toThrow(
       /^Cannot use Foo "{}" from another module or realm./m,
     );
   });

@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { genFuzzStrings } from '../genFuzzStrings';
 
 function expectFuzzStrings(options: {
@@ -12,27 +9,22 @@ function expectFuzzStrings(options: {
 
 describe('genFuzzStrings', () => {
   it('always provide empty string', () => {
-    expectFuzzStrings({ allowedChars: [], maxLength: 0 }).to.deep.equal(['']);
-    expectFuzzStrings({ allowedChars: [], maxLength: 1 }).to.deep.equal(['']);
-    expectFuzzStrings({ allowedChars: ['a'], maxLength: 0 }).to.deep.equal([
-      '',
-    ]);
+    expectFuzzStrings({ allowedChars: [], maxLength: 0 }).toEqual(['']);
+    expectFuzzStrings({ allowedChars: [], maxLength: 1 }).toEqual(['']);
+    expectFuzzStrings({ allowedChars: ['a'], maxLength: 0 }).toEqual(['']);
   });
 
   it('generate strings with single character', () => {
-    expectFuzzStrings({ allowedChars: ['a'], maxLength: 1 }).to.deep.equal([
-      '',
-      'a',
-    ]);
+    expectFuzzStrings({ allowedChars: ['a'], maxLength: 1 }).toEqual(['', 'a']);
 
     expectFuzzStrings({
       allowedChars: ['a', 'b', 'c'],
       maxLength: 1,
-    }).to.deep.equal(['', 'a', 'b', 'c']);
+    }).toEqual(['', 'a', 'b', 'c']);
   });
 
   it('generate strings with multiple character', () => {
-    expectFuzzStrings({ allowedChars: ['a'], maxLength: 2 }).to.deep.equal([
+    expectFuzzStrings({ allowedChars: ['a'], maxLength: 2 }).toEqual([
       '',
       'a',
       'aa',
@@ -41,7 +33,7 @@ describe('genFuzzStrings', () => {
     expectFuzzStrings({
       allowedChars: ['a', 'b', 'c'],
       maxLength: 2,
-    }).to.deep.equal([
+    }).toEqual([
       '',
       'a',
       'b',
@@ -62,7 +54,7 @@ describe('genFuzzStrings', () => {
     expectFuzzStrings({
       allowedChars: ['a', 'b'],
       maxLength: 3,
-    }).to.deep.equal([
+    }).toEqual([
       '',
       'a',
       'b',

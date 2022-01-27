@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { dedent, dedentString } from '../dedent';
 
 describe('dedentString', () => {
@@ -15,7 +12,7 @@ describe('dedentString', () => {
         name: String
       }
     `);
-    expect(output).to.equal(
+    expect(output).toEqual(
       [
         'resolver Query = {',
         '  me: User',
@@ -36,7 +33,7 @@ describe('dedentString', () => {
                 third
                   fourth
     `);
-    expect(output).to.equal(
+    expect(output).toEqual(
       ['first', '  second', '    third', '      fourth'].join('\n'),
     );
   });
@@ -47,7 +44,7 @@ describe('dedentString', () => {
         field(arg: String = "wi\th de\fault"): String
       }
     `);
-    expect(output).to.equal(
+    expect(output).toEqual(
       [
         'resolver Root = {',
         '  field(arg: String = "wi\th de\fault"): String',
@@ -62,7 +59,7 @@ describe('dedentString', () => {
         \t\t      me: User
         \t\t    }
     `);
-    expect(output).to.equal(
+    expect(output).toEqual(
       ['resolver Query = {', '  me: User', '}'].join('\n'),
     );
   });
@@ -77,7 +74,7 @@ describe('dedentString', () => {
 
 
     `);
-    expect(output).to.equal(
+    expect(output).toEqual(
       ['resolver Query = {', '  me: User', '}'].join('\n'),
     );
   });
@@ -88,7 +85,7 @@ describe('dedentString', () => {
         me: User
       }
           \t\t  \t `);
-    expect(output).to.equal(
+    expect(output).toEqual(
       ['resolver Query = {', '  me: User', '}'].join('\n'),
     );
   });
@@ -98,7 +95,7 @@ describe('dedentString', () => {
         me: User
       }
     `);
-    expect(output).to.equal(
+    expect(output).toEqual(
       ['resolver Query = {', '  me: User', '}'].join('\n'),
     );
   });
@@ -111,7 +108,7 @@ describe('dedent', () => {
         me: User
       }
     `;
-    expect(output).to.equal(
+    expect(output).toEqual(
       ['resolver Query = {', '  me: User', '}'].join('\n'),
     );
   });
@@ -127,7 +124,7 @@ describe('dedent', () => {
         }
       }
     `;
-    expect(output).to.equal(
+    expect(output).toEqual(
       [
         '{',
         '  "me": {',

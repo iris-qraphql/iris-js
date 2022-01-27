@@ -35,7 +35,7 @@
     "fuzzonly": "mocha --full-trace src/**/__tests__/**/*-fuzz.ts",
     "changelog": "node resources/gen-changelog.js",
     "benchmark": "node benchmark/benchmark.js",
-    "test": "npm run lint && npm run check && jest && npm run testonly && npm run prettier:check && npm run check:spelling",
+    "test": "npm run lint && npm run check && npm run testonly && npm run prettier:check && npm run check:spelling",
     "lint": "eslint --cache --max-warnings 0 . --ignore-pattern **/__mocha__/*",
     "check": "tsc --pretty",
     "testonly": "jest && mocha --full-trace ./src/**/__mocha__/**/*-test.ts",

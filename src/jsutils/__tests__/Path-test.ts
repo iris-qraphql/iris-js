@@ -1,13 +1,10 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { addPath, pathToArray } from '../Path';
 
 describe('Path', () => {
   it('can create a Path', () => {
     const first = addPath(undefined, 1, 'First');
 
-    expect(first).to.deep.equal({
+    expect(first).toEqual({
       prev: undefined,
       key: 1,
       typename: 'First',
@@ -18,7 +15,7 @@ describe('Path', () => {
     const first = addPath(undefined, 1, 'First');
     const second = addPath(first, 'two', 'Second');
 
-    expect(second).to.deep.equal({
+    expect(second).toEqual({
       prev: first,
       key: 'two',
       typename: 'Second',
@@ -31,6 +28,6 @@ describe('Path', () => {
     const second = addPath(first, 2, 'Second');
 
     const path = pathToArray(second);
-    expect(path).to.deep.equal([0, 'one', 2]);
+    expect(path).toEqual([0, 'one', 2]);
   });
 });
