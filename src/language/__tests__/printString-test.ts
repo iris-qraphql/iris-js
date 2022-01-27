@@ -1,43 +1,40 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { printString } from '../printString';
 
 describe('printString', () => {
   it('prints a simple string', () => {
-    expect(printString('hello world')).to.equal('"hello world"');
+    expect(printString('hello world')).toEqual('"hello world"');
   });
 
   it('escapes quotes', () => {
-    expect(printString('"hello world"')).to.equal('"\\"hello world\\""');
+    expect(printString('"hello world"')).toEqual('"\\"hello world\\""');
   });
 
   it('does not escape single quote', () => {
-    expect(printString("who's test")).to.equal('"who\'s test"');
+    expect(printString("who's test")).toEqual('"who\'s test"');
   });
 
   it('escapes backslashes', () => {
-    expect(printString('escape: \\')).to.equal('"escape: \\\\"');
+    expect(printString('escape: \\')).toEqual('"escape: \\\\"');
   });
 
   it('escapes well-known control chars', () => {
-    expect(printString('\b\f\n\r\t')).to.equal('"\\b\\f\\n\\r\\t"');
+    expect(printString('\b\f\n\r\t')).toEqual('"\\b\\f\\n\\r\\t"');
   });
 
   it('escapes zero byte', () => {
-    expect(printString('\x00')).to.equal('"\\u0000"');
+    expect(printString('\x00')).toEqual('"\\u0000"');
   });
 
   it('does not escape space', () => {
-    expect(printString(' ')).to.equal('" "');
+    expect(printString(' ')).toEqual('" "');
   });
 
   it('does not escape non-ascii character', () => {
-    expect(printString('\u21BB')).to.equal('"\u21BB"');
+    expect(printString('\u21BB')).toEqual('"\u21BB"');
   });
 
   it('does not escape supplementary character', () => {
-    expect(printString('\u{1f600}')).to.equal('"\u{1f600}"');
+    expect(printString('\u{1f600}')).toEqual('"\u{1f600}"');
   });
 
   it('escapes all control chars', () => {
@@ -65,7 +62,7 @@ describe('printString', () => {
           '\u0090\u0091\u0092\u0093\u0094\u0095\u0096\u0097' +
           '\u0098\u0099\u009A\u009B\u009C\u009D\u009E\u009F',
       ),
-    ).to.equal(
+    ).toEqual(
       '"\\u0000\\u0001\\u0002\\u0003\\u0004\\u0005\\u0006\\u0007' +
         '\\b\\t\\n\\u000B\\f\\r\\u000E\\u000F' +
         '\\u0010\\u0011\\u0012\\u0013\\u0014\\u0015\\u0016\\u0017' +

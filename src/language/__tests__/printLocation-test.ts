@@ -1,6 +1,3 @@
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { dedent } from '../../__testUtils__/dedent';
 
 import { printSourceLocation } from '../printLocation';
@@ -16,7 +13,7 @@ describe('printSourceLocation', () => {
       line: 1,
       column: minifiedSource.body.indexOf('FIRST_ERROR_HERE') + 1,
     });
-    expect(firstLocation).to.equal(dedent`
+    expect(firstLocation).toEqual(dedent`
       GraphQL request:1:53
       1 | query SomeMinifiedQueryWithErrorInside($foo:String!=FIRST_ERROR_HERE$bar:String)
         |                                                     ^
@@ -27,7 +24,7 @@ describe('printSourceLocation', () => {
       line: 1,
       column: minifiedSource.body.indexOf('SECOND_ERROR_HERE') + 1,
     });
-    expect(secondLocation).to.equal(dedent`
+    expect(secondLocation).toEqual(dedent`
       GraphQL request:1:114
       1 | query SomeMinifiedQueryWithErrorInside($foo:String!=FIRST_ERROR_HERE$bar:String)
         | {someField(foo:$foo bar:$bar baz:SECOND_ERROR_HERE){fieldA fieldB{fieldC fieldD.
@@ -39,7 +36,7 @@ describe('printSourceLocation', () => {
       line: 1,
       column: minifiedSource.body.indexOf('THIRD_ERROR_HERE') + 1,
     });
-    expect(thirdLocation).to.equal(dedent`
+    expect(thirdLocation).toEqual(dedent`
       GraphQL request:1:166
       1 | query SomeMinifiedQueryWithErrorInside($foo:String!=FIRST_ERROR_HERE$bar:String)
         | {someField(foo:$foo bar:$bar baz:SECOND_ERROR_HERE){fieldA fieldB{fieldC fieldD.
@@ -54,7 +51,7 @@ describe('printSourceLocation', () => {
       { line: 1, column: 1 },
     );
 
-    expect(result).to.equal(dedent`
+    expect(result).toEqual(dedent`
       Test:9:1
       9 | *
         | ^
@@ -67,7 +64,7 @@ describe('printSourceLocation', () => {
       { line: 1, column: 1 },
     );
 
-    expect(result).to.equal(dedent`
+    expect(result).toEqual(dedent`
       Test:9:1
        9 | *
          | ^
