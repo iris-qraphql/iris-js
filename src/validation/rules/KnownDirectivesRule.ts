@@ -3,7 +3,7 @@ import { invariant } from '../../jsutils/invariant';
 
 import type { ASTNode } from '../../language/ast';
 import { DirectiveLocation } from '../../language/directiveLocation';
-import { Kind } from '../../language/kinds';
+import { IrisKind, Kind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
@@ -81,7 +81,7 @@ function getDirectiveLocationForASTPath(
       return DirectiveLocation.UNION;
     case Kind.DATA_TYPE_DEFINITION:
       return DirectiveLocation.INPUT_OBJECT;
-    case Kind.ARGUMENT_DEFINITION: {
+    case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
       return [Kind.DATA_TYPE_DEFINITION, Kind.VARIANT_DEFINITION].includes(

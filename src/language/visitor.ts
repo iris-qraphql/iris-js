@@ -1,11 +1,10 @@
-import { BREAK } from 'graphql';
+import { BREAK, Kind } from 'graphql';
 
 import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 
 import type { ASTNode } from './ast';
 import { isNode, QueryDocumentKeys } from './ast';
-import { Kind } from './kinds';
 
 /**
  * A visitor is provided to visit, it contains the collection of

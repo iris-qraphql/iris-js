@@ -106,10 +106,7 @@ export type {
 
 // Parse and operate on GraphQL language source files.
 export {
-  Token,
   Source,
-  Location,
-  OperationTypeNode,
   // Print source location.
   // Lex
   Lexer,
@@ -144,7 +141,6 @@ export type {
   ASTVisitorKeyMap,
   // AST nodes
   ASTNode,
-  ASTKindToNode,
   // Each kind of AST node
   NameNode,
   DocumentNode,
@@ -154,7 +150,6 @@ export type {
   ConstArgumentNode,
   ValueNode,
   ConstValueNode,
-  IntValueNode,
   FloatValueNode,
   StringValueNode,
   BooleanValueNode,

@@ -1,5 +1,5 @@
 import type { ParseOptions } from 'graphql';
-import { TokenKind } from 'graphql';
+import { Kind, Location, TokenKind } from 'graphql';
 
 import type { Maybe } from '../jsutils/Maybe';
 
@@ -37,10 +37,9 @@ import type {
   ValueNode,
   VariableNode,
 } from './ast';
-import { Location, OperationTypeNode } from './ast';
 import { parseDefinitions } from './definitions';
 import { DirectiveLocation } from './directiveLocation';
-import { Kind } from './kinds';
+import { IrisKind } from './kinds';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { isSource, Source } from './source';
 
@@ -196,23 +195,6 @@ export class Parser {
   }
 
   /**
-   * OperationType : one of query mutation subscription
-   */
-  parseOperationType(): OperationTypeNode {
-    const operationToken = this.expectToken(TokenKind.NAME);
-    switch (operationToken.value) {
-      case 'query':
-        return OperationTypeNode.QUERY;
-      case 'mutation':
-        return OperationTypeNode.MUTATION;
-      case 'subscription':
-        return OperationTypeNode.SUBSCRIPTION;
-    }
-
-    throw this.unexpected(operationToken);
-  }
-
-  /**
    * Variable : $ Name
    */
   parseVariable(): VariableNode {
@@ -253,16 +235,6 @@ export class Parser {
 
   parseConstArgument(): ConstArgumentNode {
     return this.parseArgument(true);
-  }
-
-  /**
-   * FragmentName : Name but not `on`
-   */
-  parseFragmentName(): NameNode {
-    if (this._lexer.token.value === 'on') {
-      throw this.unexpected();
-    }
-    return this.parseName();
   }
 
   // Implements the parsing rules in the Values section.
@@ -529,7 +501,7 @@ export class Parser {
     }
     const directives = this.parseConstDirectives();
     return this.node<ArgumentDefinitionNode>(start, {
-      kind: Kind.ARGUMENT_DEFINITION,
+      kind: IrisKind.ARGUMENT_DEFINITION,
       description,
       name,
       type,

@@ -1,3 +1,5 @@
+import { OperationTypeNode } from 'graphql';
+
 import { inspect } from '../jsutils/inspect';
 import type { Maybe } from '../jsutils/Maybe';
 
@@ -7,7 +9,6 @@ import type {
   NameNode,
   ResolverTypeDefinitionNode,
 } from '../language/ast';
-import { OperationTypeNode } from '../language/ast';
 
 import { GraphQLError } from '../error';
 

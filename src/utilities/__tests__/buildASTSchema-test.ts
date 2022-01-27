@@ -1,6 +1,6 @@
 import { dedent } from '../../__testUtils__/dedent';
 
-import { Kind } from '../../language/kinds';
+import { IrisKind } from '../../language/kinds';
 
 import { assertDataType, assertResolverType } from '../../type/definition';
 import {
@@ -35,7 +35,7 @@ describe('Schema Builder', () => {
   it('Match order of default types and directives', () => {
     const schema = new GraphQLSchema({});
     const sdlSchema = buildASTSchema({
-      kind: Kind.DOCUMENT,
+      kind: IrisKind.DOCUMENT,
       definitions: [],
     });
 

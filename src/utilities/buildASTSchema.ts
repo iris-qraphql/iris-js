@@ -1,8 +1,9 @@
+import type { ParseOptions } from 'graphql';
+
 import { devAssert } from '../jsutils/devAssert';
 
 import type { DocumentNode } from '../language/ast';
-import { Kind } from '../language/kinds';
-import type { ParseOptions } from '../language/parser';
+import { IrisKind } from '../language/kinds';
 import { parse } from '../language/parser';
 import type { Source } from '../language/source';
 
@@ -45,7 +46,7 @@ export function buildASTSchema(
   options?: BuildSchemaOptions,
 ): GraphQLSchema {
   devAssert(
-    documentAST != null && documentAST.kind === Kind.DOCUMENT,
+    documentAST != null && documentAST.kind === IrisKind.DOCUMENT,
     'Must provide valid Document AST.',
   );
 

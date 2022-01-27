@@ -1,3 +1,5 @@
+import { Kind } from 'graphql';
+
 import type {
   ASTNode,
   ConstValueNode,
@@ -7,7 +9,7 @@ import type {
   TypeSystemDefinitionNode,
   ValueNode,
 } from './ast';
-import { Kind } from './kinds';
+import { IrisKind } from './kinds';
 
 export function isDefinitionNode(node: ASTNode): node is DefinitionNode {
   return isTypeSystemDefinitionNode(node);
@@ -56,7 +58,7 @@ export function isTypeDefinitionNode(
   node: ASTNode,
 ): node is TypeDefinitionNode {
   return (
-    node.kind === Kind.RESOLVER_TYPE_DEFINITION ||
-    node.kind === Kind.DATA_TYPE_DEFINITION
+    node.kind === IrisKind.RESOLVER_TYPE_DEFINITION ||
+    node.kind === IrisKind.DATA_TYPE_DEFINITION
   );
 }

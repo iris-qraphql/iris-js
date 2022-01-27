@@ -1,4 +1,4 @@
-import { TokenKind } from 'graphql';
+import { Kind, TokenKind } from 'graphql';
 
 import type {
   DataFieldDefinitionNode,
@@ -11,7 +11,7 @@ import type {
   Role,
   VariantDefinitionNode,
 } from './ast';
-import { Kind } from './kinds';
+import { IrisKind } from './kinds';
 import type { Parser } from './parser';
 
 export const parseDefinitions = (
@@ -43,11 +43,11 @@ const parseResolverTypeDefinition = (
 
   if (!isEquals) {
     return parser.node<ResolverTypeDefinitionNode>(start, {
-      kind: Kind.RESOLVER_TYPE_DEFINITION,
+      kind: IrisKind.RESOLVER_TYPE_DEFINITION,
       description,
       name,
       directives,
-      variants: [{ kind: Kind.VARIANT_DEFINITION, name, fields: [] }],
+      variants: [{ kind: IrisKind.VARIANT_DEFINITION, name, fields: [] }],
     });
   }
 
@@ -63,7 +63,7 @@ const parseResolverTypeDefinition = (
     );
 
     return parser.node<ResolverTypeDefinitionNode>(start, {
-      kind: Kind.RESOLVER_TYPE_DEFINITION,
+      kind: IrisKind.RESOLVER_TYPE_DEFINITION,
       description,
       name,
       directives,
@@ -74,11 +74,11 @@ const parseResolverTypeDefinition = (
   const fields = parseFieldsDefinition(parser);
 
   return parser.node<ResolverTypeDefinitionNode>(start, {
-    kind: Kind.RESOLVER_TYPE_DEFINITION,
+    kind: IrisKind.RESOLVER_TYPE_DEFINITION,
     description,
     name,
     directives,
-    variants: [{ kind: Kind.VARIANT_DEFINITION, name, fields }],
+    variants: [{ kind: IrisKind.VARIANT_DEFINITION, name, fields }],
   });
 };
 
@@ -92,7 +92,7 @@ const parseResolverVariantDefinition = (
   const directives = parser.parseConstDirectives();
   const fields = parseFieldsDefinition(parser);
   return parser.node<ResolverVariantDefinitionNode>(start, {
-    kind: Kind.VARIANT_DEFINITION,
+    kind: IrisKind.VARIANT_DEFINITION,
     description,
     name,
     directives,
@@ -147,7 +147,7 @@ export const parseDataTypeDefinition = (
         )
       : [parseVariantDefinition(parser, name)];
   return parser.node<DataTypeDefinitionNode>(start, {
-    kind: Kind.DATA_TYPE_DEFINITION,
+    kind: IrisKind.DATA_TYPE_DEFINITION,
     description,
     name,
     directives,
@@ -173,7 +173,7 @@ const parseVariantDefinition = (
   const directives = parser.parseConstDirectives();
   const fields = parseVariantFields(parser);
   return parser.node<VariantDefinitionNode>(start, {
-    kind: Kind.VARIANT_DEFINITION,
+    kind: IrisKind.VARIANT_DEFINITION,
     description,
     name,
     directives,

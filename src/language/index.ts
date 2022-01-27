@@ -1,7 +1,6 @@
-export type { SourceLocation } from 'graphql';
+export type { SourceLocation, Kind } from 'graphql';
 export { TokenKind, getLocation, Source } from 'graphql';
 
-export { Kind } from './kinds';
 export { Lexer } from './lexer';
 
 export { parse, parseValue, parseConstValue, parseType } from './parser';
@@ -16,10 +15,8 @@ export {
 } from './visitor';
 export type { ASTVisitor, ASTVisitorKeyMap } from './visitor';
 
-export { Location, Token, OperationTypeNode } from './ast';
 export type {
   ASTNode,
-  ASTKindToNode,
   // Each kind of AST node
   NameNode,
   DocumentNode,
@@ -29,7 +26,6 @@ export type {
   ConstArgumentNode,
   ValueNode,
   ConstValueNode,
-  IntValueNode,
   FloatValueNode,
   StringValueNode,
   BooleanValueNode,
