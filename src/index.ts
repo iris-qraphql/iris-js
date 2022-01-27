@@ -112,7 +112,6 @@ export {
   OperationTypeNode,
   getLocation,
   // Print source location.
-  printLocation,
   printSourceLocation,
   // Lex
   Lexer,
@@ -147,7 +146,6 @@ export type {
   DirectiveLocationEnum,
   // Visitor utilities
   ASTVisitor,
-  ASTVisitFn,
   ASTVisitorKeyMap,
   // AST nodes
   ASTNode,

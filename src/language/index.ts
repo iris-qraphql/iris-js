@@ -5,8 +5,6 @@ export { Source } from './source';
 export { getLocation } from './location';
 export type { SourceLocation } from './location';
 
-export { printLocation, printSourceLocation } from './printLocation';
-
 export { Kind } from './kinds';
 export type { KindEnum } from './kinds';
 
@@ -24,7 +22,7 @@ export {
   getEnterLeaveForKind,
   BREAK,
 } from './visitor';
-export type { ASTVisitor, ASTVisitFn, ASTVisitorKeyMap } from './visitor';
+export type { ASTVisitor, ASTVisitorKeyMap } from './visitor';
 
 export { Location, Token, OperationTypeNode } from './ast';
 export type {
