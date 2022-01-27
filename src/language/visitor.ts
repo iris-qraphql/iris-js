@@ -1,11 +1,12 @@
-import { BREAK, Kind } from 'graphql';
+import { BREAK } from 'graphql';
 
 import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 
 import type { ASTNode } from './ast';
 import { isNode, QueryDocumentKeys } from './ast';
-import type { IrisKind } from './kinds';
+import type { KIND } from './kinds';
+import { KINDS } from './kinds';
 
 /**
  * A visitor is provided to visit, it contains the collection of
@@ -181,8 +182,8 @@ export function visit(
   visitor: ASTVisitor | ASTReducer<any>,
   visitorKeys: ASTVisitorKeyMap = QueryDocumentKeys,
 ): any {
-  const enterLeaveMap = new Map<Kind, EnterLeaveVisitor<ASTNode>>();
-  for (const kind of Object.values(Kind)) {
+  const enterLeaveMap = new Map<KIND, EnterLeaveVisitor<ASTNode>>();
+  for (const kind of KINDS) {
     enterLeaveMap.set(kind, getEnterLeaveForKind(visitor, kind));
   }
 
@@ -318,7 +319,7 @@ export function visitInParallel(
   const skipping = new Array(visitors.length).fill(null);
   const mergedVisitor = Object.create(null);
 
-  for (const kind of Object.values(Kind)) {
+  for (const kind of KINDS) {
     let hasVisitor = false;
     const enterList = new Array(visitors.length).fill(undefined);
     const leaveList = new Array(visitors.length).fill(undefined);
@@ -378,7 +379,7 @@ export function visitInParallel(
  */
 export function getEnterLeaveForKind(
   visitor: ASTVisitor,
-  kind: Kind | IrisKind,
+  kind: KIND,
 ): EnterLeaveVisitor<ASTNode> {
   const kindVisitor:
     | ASTVisitFn<ASTNode>
@@ -406,7 +407,7 @@ export function getEnterLeaveForKind(
 /* c8 ignore next 8 */
 export function getVisitFn(
   visitor: ASTVisitor,
-  kind: Kind,
+  kind: KIND,
   isLeaving: boolean,
 ): ASTVisitFn<ASTNode> | undefined {
   const { enter, leave } = getEnterLeaveForKind(visitor, kind);

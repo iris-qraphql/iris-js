@@ -1,7 +1,5 @@
-import { Kind } from 'graphql';
-
 import type { ASTNode } from '../ast';
-import { IrisKind } from '../kinds';
+import { KINDS } from '../kinds';
 import { parseValue } from '../parser';
 import {
   isConstValueNode,
@@ -12,7 +10,7 @@ import {
 } from '../predicates';
 
 function filterNodes(predicate: (node: ASTNode) => boolean): Array<string> {
-  return Object.values({ ...Kind, ...IrisKind }).filter(
+  return KINDS.filter(
     // @ts-expect-error create node only with kind
     (kind) => predicate({ kind }),
   );
