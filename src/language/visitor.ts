@@ -1,3 +1,5 @@
+import { BREAK } from 'graphql';
+
 import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 
@@ -85,8 +87,6 @@ type ReducedField<T, R> = T extends null | undefined
 export type ASTVisitorKeyMap = {
   [NodeT in ASTNode as NodeT['kind']]?: ReadonlyArray<keyof NodeT>;
 };
-
-export const BREAK: unknown = Object.freeze({});
 
 /**
  * visit() will walk through an AST using a depth-first traversal, calling

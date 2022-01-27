@@ -125,7 +125,6 @@ export {
   visitInParallel,
   getVisitFn,
   getEnterLeaveForKind,
-  BREAK,
   Kind,
   DirectiveLocation,
   // Predicates
@@ -138,9 +137,7 @@ export {
 } from './language/index';
 
 export type {
-  ParseOptions,
   SourceLocation,
-  KindEnum,
   DirectiveLocationEnum,
   // Visitor utilities
   ASTVisitor,

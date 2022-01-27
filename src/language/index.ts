@@ -1,15 +1,10 @@
 export type { SourceLocation } from 'graphql';
-export { TokenKind, getLocation } from 'graphql';
-
-export { Source } from './source';
+export { TokenKind, getLocation, Source } from 'graphql';
 
 export { Kind } from './kinds';
-export type { KindEnum } from './kinds';
-
 export { Lexer } from './lexer';
 
 export { parse, parseValue, parseConstValue, parseType } from './parser';
-export type { ParseOptions } from './parser';
 
 export { print } from './printer';
 
@@ -18,7 +13,6 @@ export {
   visitInParallel,
   getVisitFn,
   getEnterLeaveForKind,
-  BREAK,
 } from './visitor';
 export type { ASTVisitor, ASTVisitorKeyMap } from './visitor';
 

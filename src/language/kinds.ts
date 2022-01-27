@@ -39,10 +39,3 @@ export enum Kind {
   /** Directive Definitions */
   DIRECTIVE_DEFINITION = 'DirectiveDefinition',
 }
-
-/**
- * The Enum type representing the possible kind values of AST nodes.
- *
- * @deprecated Please use `Kind`. Will be remove in v17.
- */
-export type KindEnum = typeof Kind;

@@ -1,3 +1,4 @@
+import type { ParseOptions } from 'graphql';
 import { TokenKind } from 'graphql';
 
 import type { Maybe } from '../jsutils/Maybe';
@@ -42,35 +43,6 @@ import { DirectiveLocation } from './directiveLocation';
 import { Kind } from './kinds';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { isSource, Source } from './source';
-
-/**
- * Configuration options to control parser behavior
- */
-export type ParseOptions = {
-  /**
-   * By default, the parser creates AST nodes that know the location
-   * in the source that they correspond to. This configuration flag
-   * disables that behavior for performance or testing.
-   */
-  noLocation?: boolean;
-
-  /**
-   * @deprecated will be removed in the v17.0.0
-   *
-   * If enabled, the parser will understand and parse variable definitions
-   * contained in a fragment definition. They'll be represented in the
-   * `variableDefinitions` field of the FragmentDefinitionNode.
-   *
-   * The syntax is identical to normal, query-defined variables. For example:
-   *
-   * ```graphql
-   * fragment A($var: Boolean = false) on T {
-   *   ...
-   * }
-   * ```
-   */
-  allowLegacyFragmentVariables?: boolean;
-};
 
 /**
  * Given a GraphQL source, parses it into a Document.
