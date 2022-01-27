@@ -22,7 +22,6 @@ import {
 } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective, specifiedDirectives } from './directives';
-import { __Schema } from './introspection';
 
 /**
  * Test if the given value is a GraphQL schema.
@@ -185,7 +184,7 @@ export class GraphQLSchema {
         }
       }
     }
-    collectReferencedTypes(__Schema, allReferencedTypes);
+    // collectReferencedTypes({}, allReferencedTypes);
 
     // Storing the resulting map for reference by the schema.
     this._typeMap = Object.create(null);

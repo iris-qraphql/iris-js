@@ -1,3 +1,5 @@
+import { TokenKind } from 'graphql';
+
 import type { Maybe } from '../jsutils/Maybe';
 
 import type { GraphQLError } from '../error';
@@ -40,7 +42,6 @@ import { DirectiveLocation } from './directiveLocation';
 import { Kind } from './kinds';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { isSource, Source } from './source';
-import { TokenKind } from './tokenKind';
 
 /**
  * Configuration options to control parser behavior

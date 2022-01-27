@@ -90,27 +90,6 @@ export {
   GRAPHQL_MIN_INT,
 } from './scalars';
 
-export {
-  // Predicate
-  isIntrospectionType,
-  // GraphQL Types for introspection.
-  introspectionTypes,
-  __Schema,
-  __Directive,
-  __DirectiveLocation,
-  __Type,
-  __Field,
-  __InputValue,
-  __EnumValue,
-  __TypeKind,
-  // "Enum" of Type Kinds
-  TypeKind,
-  // Meta-field definitions.
-  SchemaMetaFieldDef,
-  TypeMetaFieldDef,
-  TypeNameMetaFieldDef,
-} from './introspection';
-
 // Validate GraphQL schema.
 export { validateSchema, assertValidSchema } from './validate';
 

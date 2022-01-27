@@ -22,7 +22,6 @@ import {
   DEFAULT_DEPRECATION_REASON,
   isSpecifiedDirective,
 } from '../type/directives';
-import { isIntrospectionType } from '../type/introspection';
 import { isSpecifiedScalarType } from '../type/scalars';
 import type { GraphQLSchema } from '../type/schema';
 
@@ -36,12 +35,8 @@ export function printSchema(schema: GraphQLSchema): string {
   );
 }
 
-export function printIntrospectionSchema(schema: GraphQLSchema): string {
-  return printFilteredSchema(schema, isSpecifiedDirective, isIntrospectionType);
-}
-
 function isDefinedType(type: GraphQLNamedType): boolean {
-  return !isSpecifiedScalarType(type) && !isIntrospectionType(type);
+  return !isSpecifiedScalarType(type);
 }
 
 function printFilteredSchema(

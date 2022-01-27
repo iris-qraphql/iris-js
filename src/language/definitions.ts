@@ -1,3 +1,5 @@
+import { TokenKind } from 'graphql';
+
 import type {
   DataFieldDefinitionNode,
   DataTypeDefinitionNode,
@@ -11,7 +13,6 @@ import type {
 } from './ast';
 import { Kind } from './kinds';
 import type { Parser } from './parser';
-import { TokenKind } from './tokenKind';
 
 export const parseDefinitions = (
   parser: Parser,

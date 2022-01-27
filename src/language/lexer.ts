@@ -1,10 +1,11 @@
+import { TokenKind } from 'graphql';
+
 import { syntaxError } from '../error';
 
 import { Token } from './ast';
 import { dedentBlockStringLines } from './blockString';
 import { isDigit, isNameContinue, isNameStart } from './characterClasses';
 import type { Source } from './source';
-import { TokenKind } from './tokenKind';
 
 /**
  * Given a Source object, creates a Lexer for that source.

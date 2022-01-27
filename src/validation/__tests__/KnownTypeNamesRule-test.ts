@@ -22,7 +22,6 @@ describe('Validate: Known type names', () => {
           float: Float
           boolean: Boolean
           id: ID
-          introspectionType: __EnumValue
         }
       `);
     });

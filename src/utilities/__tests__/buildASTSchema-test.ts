@@ -9,7 +9,6 @@ import {
   GraphQLSkipDirective,
   GraphQLSpecifiedByDirective,
 } from '../../type/directives';
-import { __Schema } from '../../type/introspection';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -465,23 +464,9 @@ describe('Schema Builder', () => {
 
     const schema = buildSchema(`
       data ID = String
-
-      data __Schema
     `);
 
     expect(schema.getType('ID')).toEqual(GraphQLID);
-    expect(schema.getType('__Schema')).toEqual(__Schema);
-  });
-
-  it('Allows to reference introspection types', () => {
-    const schema = buildSchema(`
-      resolver Query = {
-        introspectionField: __EnumValue
-      }
-    `);
-
-    const queryType = assertResolverType(schema.getType('Query'));
-    expect(queryType.getResolverFields()).toMatchSnapshot();
   });
 
   it('Rejects invalid SDL', () => {

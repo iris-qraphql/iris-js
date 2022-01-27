@@ -1,3 +1,5 @@
+import { TokenKind } from 'graphql';
+
 import { dedent } from '../../__testUtils__/dedent';
 
 import { inspect } from '../../jsutils/inspect';
@@ -7,7 +9,6 @@ import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { Token } from '../ast';
 import { isPunctuatorTokenKind, Lexer } from '../lexer';
 import { Source } from '../source';
-import { TokenKind } from '../tokenKind';
 
 export function expectToThrowJSON(fn: () => unknown) {
   function mapException(): unknown {

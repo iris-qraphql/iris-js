@@ -30,7 +30,6 @@ import {
   isResolverType,
 } from './definition';
 import { GraphQLDeprecatedDirective, isDirective } from './directives';
-import { isIntrospectionType } from './introspection';
 import type { GraphQLSchema } from './schema';
 import { assertSchema } from './schema';
 
@@ -208,11 +207,6 @@ function validateTypes(context: SchemaValidationContext): void {
         (type as any).astNode,
       );
       continue;
-    }
-
-    // Ensure it is named correctly (excluding introspection types).
-    if (!isIntrospectionType(type)) {
-      validateName(context, type);
     }
 
     if (isResolverType(type)) {

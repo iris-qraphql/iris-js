@@ -1,6 +1,7 @@
+import type { TokenKind } from 'graphql';
+
 import type { Kind } from './kinds';
 import type { Source } from './source';
-import type { TokenKind } from './tokenKind';
 
 /**
  * Contains a range of UTF-8 character offsets and token references that

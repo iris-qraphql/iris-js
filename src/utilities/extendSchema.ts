@@ -35,7 +35,6 @@ import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,
 } from '../type/directives';
-import { introspectionTypes } from '../type/introspection';
 import { specifiedScalarTypes } from '../type/scalars';
 import type {
   GraphQLSchemaNormalizedConfig,
@@ -300,10 +299,7 @@ export function extendSchemaImpl(
   }
 }
 
-const stdTypeMap = keyMap(
-  [...specifiedScalarTypes, ...introspectionTypes],
-  (type) => type.name,
-);
+const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
 
 /**
  * Given a field or enum value node, returns the string value for the
