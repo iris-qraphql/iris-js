@@ -18,8 +18,9 @@ export function expectToThrowJSON(fn: () => unknown) {
     }
   }
 
-  return expect(mapException);
+  return expect(mapException());
 }
+
 function lexOne(str: string) {
   const lexer = new Lexer(new Source(str));
   return { ...lexer.advance() };
@@ -147,140 +148,50 @@ describe('Lexer', () => {
   });
 
   it('lexes strings', () => {
-    expect(lexOne('""')).toEqual(
-      expect.objectContaining({
-        kind: TokenKind.STRING,
-        start: 0,
-        end: 2,
-        value: '',
-      }),
-    );
-
-    expect(lexOne('"simple"')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 8,
-      value: 'simple',
-    });
-
-    expect(lexOne('" white space "')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 15,
-      value: ' white space ',
-    });
-
-    expect(lexOne('"quote \\""')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 10,
-      value: 'quote "',
-    });
-
-    expect(lexOne('"escaped \\n\\r\\b\\t\\f"')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 20,
-      value: 'escaped \n\r\b\t\f',
-    });
-
-    expect(lexOne('"slashes \\\\ \\/"')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 15,
-      value: 'slashes \\ /',
-    });
-
-    expect(lexOne('"unescaped unicode outside BMP \u{1f600}"')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 34,
-      value: 'unescaped unicode outside BMP \u{1f600}',
-    });
+    expect(lexOne('""')).toMatchSnapshot();
+    expect(lexOne('"simple"')).toMatchSnapshot();
+    expect(lexOne('" white space "')).toMatchSnapshot();
+    expect(lexOne('"quote \\""')).toMatchSnapshot();
+    expect(lexOne('"escaped \\n\\r\\b\\t\\f"')).toMatchSnapshot();
+    expect(lexOne('"slashes \\\\ \\/"')).toMatchSnapshot();
+    expect(
+      lexOne('"unescaped unicode outside BMP \u{1f600}"'),
+    ).toMatchSnapshot();
 
     expect(
       lexOne('"unescaped maximal unicode outside BMP \u{10ffff}"'),
-    ).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 42,
-      value: 'unescaped maximal unicode outside BMP \u{10ffff}',
-    });
+    ).toMatchSnapshot();
 
-    expect(lexOne('"unicode \\u1234\\u5678\\u90AB\\uCDEF"')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 34,
-      value: 'unicode \u1234\u5678\u90AB\uCDEF',
-    });
+    expect(lexOne('"unicode \\u1234\\u5678\\u90AB\\uCDEF"')).toMatchSnapshot();
 
-    expect(lexOne('"unicode \\u{1234}\\u{5678}\\u{90AB}\\u{CDEF}"')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 42,
-      value: 'unicode \u1234\u5678\u90AB\uCDEF',
-    });
+    expect(
+      lexOne('"unicode \\u{1234}\\u{5678}\\u{90AB}\\u{CDEF}"'),
+    ).toMatchSnapshot();
 
     expect(
       lexOne('"string with unicode escape outside BMP \\u{1F600}"'),
-    ).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 50,
-      value: 'string with unicode escape outside BMP \u{1f600}',
-    });
-
-    expect(lexOne('"string with minimal unicode escape \\u{0}"')).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 42,
-      value: 'string with minimal unicode escape \u{0}',
-    });
+    ).toMatchSnapshot();
 
     expect(
+      lexOne('"string with minimal unicode escape \\u{0}"'),
+    ).toMatchSnapshot();
+    expect(
       lexOne('"string with maximal unicode escape \\u{10FFFF}"'),
-    ).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 47,
-      value: 'string with maximal unicode escape \u{10FFFF}',
-    });
+    ).toMatchSnapshot();
 
     expect(
       lexOne('"string with maximal minimal unicode escape \\u{00000000}"'),
-    ).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 57,
-      value: 'string with maximal minimal unicode escape \u{0}',
-    });
+    ).toMatchSnapshot();
 
     expect(
       lexOne('"string with unicode surrogate pair escape \\uD83D\\uDE00"'),
-    ).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 56,
-      value: 'string with unicode surrogate pair escape \u{1f600}',
-    });
-
+    ).toMatchSnapshot();
     expect(
       lexOne('"string with minimal surrogate pair escape \\uD800\\uDC00"'),
-    ).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 56,
-      value: 'string with minimal surrogate pair escape \u{10000}',
-    });
-
+    ).toMatchSnapshot();
     expect(
       lexOne('"string with maximal surrogate pair escape \\uDBFF\\uDFFF"'),
-    ).toContain({
-      kind: TokenKind.STRING,
-      start: 0,
-      end: 56,
-      value: 'string with maximal surrogate pair escape \u{10FFFF}',
-    });
+    ).toMatchSnapshot();
   });
 
   it('lex reports useful string errors', () => {
@@ -451,96 +362,22 @@ describe('Lexer', () => {
   });
 
   it('lexes block strings', () => {
-    expect(lexOne('""""""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 6,
-      line: 1,
-      column: 1,
-      value: '',
-    });
+    expect(lexOne('""""""')).toMatchSnapshot();
+    expect(lexOne('"""simple"""')).toMatchSnapshot();
 
-    expect(lexOne('"""simple"""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 12,
-      line: 1,
-      column: 1,
-      value: 'simple',
-    });
+    expect(lexOne('""" white space """')).toMatchSnapshot();
 
-    expect(lexOne('""" white space """')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 19,
-      line: 1,
-      column: 1,
-      value: ' white space ',
-    });
+    expect(lexOne('"""contains " quote"""')).toMatchSnapshot();
+    expect(lexOne('"""contains \\""" triple quote"""')).toMatchSnapshot();
+    expect(lexOne('"""multi\nline"""')).toMatchSnapshot();
 
-    expect(lexOne('"""contains " quote"""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 22,
-      line: 1,
-      column: 1,
-      value: 'contains " quote',
-    });
+    expect(lexOne('"""multi\rline\r\nnormalized"""')).toMatchSnapshot();
+    expect(lexOne('"""unescaped \\n\\r\\b\\t\\f\\u1234"""')).toMatchSnapshot();
 
-    expect(lexOne('"""contains \\""" triple quote"""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 32,
-      line: 1,
-      column: 1,
-      value: 'contains """ triple quote',
-    });
-
-    expect(lexOne('"""multi\nline"""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 16,
-      line: 1,
-      column: 1,
-      value: 'multi\nline',
-    });
-
-    expect(lexOne('"""multi\rline\r\nnormalized"""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 28,
-      line: 1,
-      column: 1,
-      value: 'multi\nline\nnormalized',
-    });
-
-    expect(lexOne('"""unescaped \\n\\r\\b\\t\\f\\u1234"""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 32,
-      line: 1,
-      column: 1,
-      value: 'unescaped \\n\\r\\b\\t\\f\\u1234',
-    });
-
-    expect(lexOne('"""unescaped unicode outside BMP \u{1f600}"""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 38,
-      line: 1,
-      column: 1,
-      value: 'unescaped unicode outside BMP \u{1f600}',
-    });
-
-    expect(lexOne('"""slashes \\\\ \\/"""')).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 19,
-      line: 1,
-      column: 1,
-      value: 'slashes \\\\ \\/',
-    });
-
+    expect(
+      lexOne('"""unescaped unicode outside BMP \u{1f600}"""'),
+    ).toMatchSnapshot();
+    expect(lexOne('"""slashes \\\\ \\/"""')).toMatchSnapshot();
     expect(
       lexOne(`"""
 
@@ -549,14 +386,7 @@ describe('Lexer', () => {
             lines
 
         """`),
-    ).toContain({
-      kind: TokenKind.BLOCK_STRING,
-      start: 0,
-      end: 68,
-      line: 1,
-      column: 1,
-      value: 'spans\n  multiple\n    lines',
-    });
+    ).toMatchSnapshot();
   });
 
   it('advance line after lexing multiline block string', () => {
@@ -568,14 +398,7 @@ describe('Lexer', () => {
             lines
 
         \n """ second_token`),
-    ).toContain({
-      kind: TokenKind.NAME,
-      start: 71,
-      end: 83,
-      line: 8,
-      column: 6,
-      value: 'second_token',
-    });
+    ).toMatchSnapshot();
 
     expect(
       lexSecond(
@@ -587,14 +410,7 @@ describe('Lexer', () => {
           '"""\n second_token',
         ].join(''),
       ),
-    ).toContain({
-      kind: TokenKind.NAME,
-      start: 37,
-      end: 49,
-      line: 8,
-      column: 2,
-      value: 'second_token',
-    });
+    ).toMatchSnapshot();
   });
 
   it('lex reports useful block string errors', () => {
@@ -615,117 +431,33 @@ describe('Lexer', () => {
   });
 
   it('lexes numbers', () => {
-    expect(lexOne('4')).toContain({
-      kind: TokenKind.INT,
-      start: 0,
-      end: 1,
-      value: '4',
-    });
+    expect(lexOne('4')).toMatchSnapshot();
 
-    expect(lexOne('4.123')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 5,
-      value: '4.123',
-    });
+    expect(lexOne('4.123')).toMatchSnapshot();
 
-    expect(lexOne('-4')).toContain({
-      kind: TokenKind.INT,
-      start: 0,
-      end: 2,
-      value: '-4',
-    });
+    expect(lexOne('-4')).toMatchSnapshot();
+    expect(lexOne('9')).toMatchSnapshot();
 
-    expect(lexOne('9')).toContain({
-      kind: TokenKind.INT,
-      start: 0,
-      end: 1,
-      value: '9',
-    });
+    expect(lexOne('0')).toMatchSnapshot();
 
-    expect(lexOne('0')).toContain({
-      kind: TokenKind.INT,
-      start: 0,
-      end: 1,
-      value: '0',
-    });
+    expect(lexOne('-4.123')).toMatchSnapshot();
 
-    expect(lexOne('-4.123')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 6,
-      value: '-4.123',
-    });
+    expect(lexOne('0.123')).toMatchSnapshot();
 
-    expect(lexOne('0.123')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 5,
-      value: '0.123',
-    });
+    expect(lexOne('123e4')).toMatchSnapshot();
 
-    expect(lexOne('123e4')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 5,
-      value: '123e4',
-    });
+    expect(lexOne('123E4')).toMatchSnapshot();
 
-    expect(lexOne('123E4')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 5,
-      value: '123E4',
-    });
+    expect(lexOne('123e-4')).toMatchSnapshot();
+    expect(lexOne('123e+4')).toMatchSnapshot();
+    expect(lexOne('-1.123e4')).toMatchSnapshot();
 
-    expect(lexOne('123e-4')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 6,
-      value: '123e-4',
-    });
+    expect(lexOne('-1.123E4')).toMatchSnapshot();
 
-    expect(lexOne('123e+4')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 6,
-      value: '123e+4',
-    });
+    expect(lexOne('-1.123e-4')).toMatchSnapshot();
+    expect(lexOne('-1.123e+4')).toMatchSnapshot();
 
-    expect(lexOne('-1.123e4')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 8,
-      value: '-1.123e4',
-    });
-
-    expect(lexOne('-1.123E4')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 8,
-      value: '-1.123E4',
-    });
-
-    expect(lexOne('-1.123e-4')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 9,
-      value: '-1.123e-4',
-    });
-
-    expect(lexOne('-1.123e+4')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 9,
-      value: '-1.123e+4',
-    });
-
-    expect(lexOne('-1.123e4567')).toContain({
-      kind: TokenKind.FLOAT,
-      start: 0,
-      end: 11,
-      value: '-1.123e4567',
-    });
+    expect(lexOne('-1.123e4567')).toMatchSnapshot();
   });
 
   it('lex reports useful number errors', () => {
@@ -847,96 +579,19 @@ describe('Lexer', () => {
   });
 
   it('lexes punctuation', () => {
-    expect(lexOne('!')).toContain({
-      kind: TokenKind.BANG,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('$')).toContain({
-      kind: TokenKind.DOLLAR,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('(')).toContain({
-      kind: TokenKind.PAREN_L,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne(')')).toContain({
-      kind: TokenKind.PAREN_R,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('...')).toContain({
-      kind: TokenKind.SPREAD,
-      start: 0,
-      end: 3,
-      value: undefined,
-    });
-
-    expect(lexOne(':')).toContain({
-      kind: TokenKind.COLON,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('=')).toContain({
-      kind: TokenKind.EQUALS,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('@')).toContain({
-      kind: TokenKind.AT,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('[')).toContain({
-      kind: TokenKind.BRACKET_L,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne(']')).toContain({
-      kind: TokenKind.BRACKET_R,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('{')).toContain({
-      kind: TokenKind.BRACE_L,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('|')).toContain({
-      kind: TokenKind.PIPE,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
-
-    expect(lexOne('}')).toContain({
-      kind: TokenKind.BRACE_R,
-      start: 0,
-      end: 1,
-      value: undefined,
-    });
+    expect(lexOne('!')).toMatchSnapshot();
+    expect(lexOne('$')).toMatchSnapshot();
+    expect(lexOne('(')).toMatchSnapshot();
+    expect(lexOne(')')).toMatchSnapshot();
+    expect(lexOne('...')).toMatchSnapshot();
+    expect(lexOne(':')).toMatchSnapshot();
+    expect(lexOne('=')).toMatchSnapshot();
+    expect(lexOne('@')).toMatchSnapshot();
+    expect(lexOne('[')).toMatchSnapshot();
+    expect(lexOne(']')).toMatchSnapshot();
+    expect(lexOne('{')).toMatchSnapshot();
+    expect(lexOne('|')).toMatchSnapshot();
+    expect(lexOne('}')).toMatchSnapshot();
   });
 
   it('lex reports useful unknown character error', () => {
@@ -1005,12 +660,7 @@ describe('Lexer', () => {
     const source = new Source('a-b');
     const lexer = new Lexer(source);
     const firstToken = lexer.advance();
-    expect(firstToken).toContain({
-      kind: TokenKind.NAME,
-      start: 0,
-      end: 1,
-      value: 'a',
-    });
+    expect({ ...firstToken }).toMatchSnapshot();
 
     expectToThrowJSON(() => lexer.advance()).toEqual({
       message: 'Syntax Error: Invalid number, expected digit but got: "b".',
@@ -1031,9 +681,6 @@ describe('Lexer', () => {
     let endToken;
     do {
       endToken = lexer.advance();
-      // Lexer advances over ignored comment tokens to make writing parsers
-      // easier, but will include them in the linked list result.
-      expect(endToken.kind).toEqual(TokenKind.COMMENT);
     } while (endToken.kind !== TokenKind.EOF);
 
     expect(startToken.prev).toEqual(null);
@@ -1059,30 +706,10 @@ describe('Lexer', () => {
   });
 
   it('lexes comments', () => {
-    expect(lexOne('# Comment').prev).toContain({
-      kind: TokenKind.COMMENT,
-      start: 0,
-      end: 9,
-      value: ' Comment',
-    });
-    expect(lexOne('# Comment\nAnother line').prev).toContain({
-      kind: TokenKind.COMMENT,
-      start: 0,
-      end: 9,
-      value: ' Comment',
-    });
-    expect(lexOne('# Comment\r\nAnother line').prev).toContain({
-      kind: TokenKind.COMMENT,
-      start: 0,
-      end: 9,
-      value: ' Comment',
-    });
-    expect(lexOne('# Comment \u{1f600}').prev).toContain({
-      kind: TokenKind.COMMENT,
-      start: 0,
-      end: 12,
-      value: ' Comment \u{1f600}',
-    });
+    expect(lexOne('# Comment').prev).toMatchSnapshot();
+    expect(lexOne('# Comment\nAnother line').prev).toMatchSnapshot();
+    expect(lexOne('# Comment\r\nAnother line').prev).toMatchSnapshot();
+    expect(lexOne('# Comment \u{1f600}').prev).toMatchSnapshot();
     expectSyntaxError('# Invalid surrogate \uDEAD').toEqual({
       message: 'Syntax Error: Invalid character: U+DEAD.',
       locations: [{ line: 1, column: 21 }],
