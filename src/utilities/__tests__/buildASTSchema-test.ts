@@ -1,5 +1,3 @@
-import { dedent } from '../../__testUtils__/dedent';
-
 import { IrisKind } from '../../language/kinds';
 
 import { assertDataType, assertResolverType } from '../../type/definition';
@@ -13,6 +11,8 @@ import {
 } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 import { validateSchema } from '../../type/validate';
+
+import { dedent } from '../../utils/dedent';
 
 import { buildASTSchema, buildSchema } from '../buildASTSchema';
 import { printSchema } from '../printSchema';

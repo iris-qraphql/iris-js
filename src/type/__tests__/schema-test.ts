@@ -1,8 +1,8 @@
-import { dedent } from '../../__testUtils__/dedent';
-
 import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { printSchema } from '../../utilities/printSchema';
+
+import { dedent } from '../../utils/dedent';
 
 import type { IrisResolverType } from '../definition';
 import { GraphQLList } from '../definition';

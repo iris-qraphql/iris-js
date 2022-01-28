@@ -1,7 +1,6 @@
 import { Kind, Source } from 'graphql';
 
-import { dedent } from '../../__testUtils__/dedent';
-
+import { dedent } from '../../utils/dedent';
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
 import { parse, parseConstValue, parseType, parseValue } from '../parser';
