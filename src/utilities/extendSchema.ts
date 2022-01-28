@@ -22,6 +22,7 @@ import type {
   GraphQLFieldConfig,
   GraphQLNamedType,
   GraphQLType,
+  IrisDataVariantConfig,
   IrisDataVariantField,
   IrisResolverVariantConfig,
 } from '../type/definition';
@@ -174,26 +175,6 @@ export function extendSchemaImpl(
     });
   }
 
-  function buildFieldMap(
-    node: ResolverVariantDefinitionNode,
-  ): ObjMap<GraphQLFieldConfig<unknown, unknown>> {
-    const fieldConfigMap = Object.create(null);
-    const nodeFields = node.fields ?? [];
-    for (const field of nodeFields) {
-      fieldConfigMap[field.name.value] = {
-        // Note: While this could make assertions to get the correctly typed
-        // value, that would throw immediately while type system validation
-        // with validateSchema() will produce more actionable results.
-        type: getWrappedType(field.type),
-        description: field.description?.value,
-        args: buildArgumentMap(field.arguments),
-        deprecationReason: getDeprecationReason(field),
-        astNode: field,
-      };
-    }
-    return fieldConfigMap;
-  }
-
   function buildArgumentMap(
     args: Maybe<ReadonlyArray<ArgumentDefinitionNode>>,
   ): ConfigMap<GraphQLArgument> {
@@ -217,9 +198,15 @@ export function extendSchemaImpl(
     return argConfigMap;
   }
 
-  function buildInputFieldMap(
+  function buildFieldMap(
+    node: ReadonlyArray<FieldDefinitionNode>,
+  ): ObjMap<GraphQLFieldConfig<unknown, unknown>>;
+  function buildFieldMap(
     fields: ReadonlyArray<DataFieldDefinitionNode>,
-  ): ObjMap<IrisDataVariantField> {
+  ): ObjMap<IrisDataVariantField>;
+  function buildFieldMap(
+    fields: ReadonlyArray<FieldDefinitionNode>,
+  ): ObjMap<GraphQLFieldConfig<unknown, unknown>> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
       return [
@@ -229,11 +216,27 @@ export function extendSchemaImpl(
           description: field.description?.value,
           deprecationReason: getDeprecationReason(field),
           astNode: field,
+          args: field.arguments ? buildArgumentMap(field.arguments) : undefined,
         },
       ];
     });
 
     return Object.fromEntries(entries);
+  }
+
+  function resolveDataVariant(
+    value: VariantDefinitionNode,
+  ): IrisDataVariantConfig {
+    return {
+      name: value.name.value,
+      description: value.description?.value,
+      deprecationReason: getDeprecationReason(value),
+      astNode: value,
+      // @ts-expect-error
+      fields: value.fields
+        ? () => buildFieldMap(value?.fields ?? [])
+        : undefined,
+    };
   }
 
   function buildResolverVariant(
@@ -246,7 +249,7 @@ export function extendSchemaImpl(
       return {
         name,
         description,
-        fields: () => buildFieldMap(variantNode),
+        fields: () => buildFieldMap(variantNode.fields ?? []),
       };
     }
 
@@ -270,15 +273,7 @@ export function extendSchemaImpl(
         return new IrisDataType({
           name,
           description: astNode.description?.value,
-          variants: astNode.variants.map((value) => ({
-            name: value.name.value,
-            description: value.description?.value,
-            deprecationReason: getDeprecationReason(value),
-            astNode: value,
-            fields: value.fields
-              ? () => buildInputFieldMap(value?.fields ?? [])
-              : undefined,
-          })),
+          variants: astNode.variants.map(resolveDataVariant),
           astNode,
         });
       }

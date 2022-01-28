@@ -261,6 +261,19 @@ export type FieldDefinitionNode = DataFieldDefinitionNode & {
   readonly arguments?: ReadonlyArray<ArgumentDefinitionNode>;
 };
 
+type FIELD_DEF = {
+  data: DataFieldDefinitionNode;
+  resolver: FieldDefinitionNode;
+};
+
+type VAR_DEF = {
+  data: VariantDefinitionNode;
+  resolver: ResolverVariantDefinitionNode;
+};
+
+export type _FieldDefinitionNode<T extends Role> = FIELD_DEF[T];
+export type _VariantDefinitionNode<T extends Role> = VAR_DEF[T];
+
 export type VariantDefinitionNode = VariantDefinition<FieldDefinitionNode>;
 export type ResolverVariantDefinitionNode =
   VariantDefinition<FieldDefinitionNode>;

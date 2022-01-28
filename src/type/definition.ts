@@ -385,7 +385,7 @@ export type GraphQLFieldMap<TSource, TContext> = ObjMap<
   GraphQLField<TSource, TContext>
 >;
 
-type IrisDataVariantConfig = Override<
+export type IrisDataVariantConfig = Override<
   IrisDataVariant,
   { fields?: Thunk<ConfigMap<IrisDataVariantField>> }
 >;

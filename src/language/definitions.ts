@@ -1,13 +1,13 @@
 import { TokenKind } from 'graphql';
 
 import type {
-  DataFieldDefinitionNode,
+  _FieldDefinitionNode,
+  _VariantDefinitionNode,
   DataTypeDefinitionNode,
   DefinitionNode,
   FieldDefinitionNode,
   NameNode,
   ResolverTypeDefinitionNode,
-  ResolverVariantDefinitionNode,
   Role,
   VariantDefinitionNode,
 } from './ast';
@@ -22,7 +22,7 @@ export const parseDefinitions = (
     case 'resolver':
       return parseResolverTypeDefinition(parser);
     case 'data':
-      return parseDataTypeDefinition(parser, 'data');
+      return parseDataTypeDefinition('data', parser);
     case 'directive':
       return parser.parseDirectiveDefinition();
   }
@@ -59,7 +59,7 @@ const parseResolverTypeDefinition = (
 
   if (isEquals && isUnion) {
     const variants = parser.delimitedMany(TokenKind.PIPE, () =>
-      parseResolverVariantDefinition(parser),
+      parseVariantDefinition('resolver', parser),
     );
 
     return parser.node<ResolverTypeDefinitionNode>(start, {
@@ -71,7 +71,7 @@ const parseResolverTypeDefinition = (
     });
   }
 
-  const fields = parseFieldsDefinition(parser);
+  const fields = parseFieldsDefinition('resolver', parser);
 
   return parser.node<ResolverTypeDefinitionNode>(start, {
     kind: IrisKind.RESOLVER_TYPE_DEFINITION,
@@ -82,52 +82,55 @@ const parseResolverTypeDefinition = (
   });
 };
 
-const parseResolverVariantDefinition = (
-  parser: Parser,
-  typeName?: NameNode,
-): ResolverVariantDefinitionNode => {
-  const start = parser.lookAhead();
-  const description = parser.parseDescription();
-  const name = typeName ?? parseVariantName(parser);
-  const directives = parser.parseConstDirectives();
-  const fields = parseFieldsDefinition(parser);
-  return parser.node<ResolverVariantDefinitionNode>(start, {
-    kind: IrisKind.VARIANT_DEFINITION,
-    description,
-    name,
-    directives,
-    fields,
-  });
-};
-
-type FIELD_DEF = {
-  data: DataFieldDefinitionNode;
-  resolver: FieldDefinitionNode;
-};
-
 export const parseDataTypeDefinition = (
-  parser: Parser,
   role: Role,
+  parser: Parser,
 ): DataTypeDefinitionNode => {
   const start = parser.lookAhead();
   const description = parser.parseDescription();
   parser.expectKeyword(role);
   const name = parser.parseName();
   const directives = parser.parseConstDirectives();
-  const isEquals = parser.expectOptionalToken(TokenKind.EQUALS);
-  const isUnion = parser.lookAhead().kind !== TokenKind.BRACE_L;
-  const variants: ReadonlyArray<VariantDefinitionNode> =
-    isEquals && isUnion
-      ? parser.delimitedMany(TokenKind.PIPE, () =>
-          parseVariantDefinition(parser),
-        )
-      : [parseVariantDefinition(parser, name)];
+  const variants = parseVariantsDefinition('data', name, parser);
   return parser.node<DataTypeDefinitionNode>(start, {
     kind: IrisKind.DATA_TYPE_DEFINITION,
     description,
     name,
     directives,
     variants,
+  });
+};
+
+export const parseVariantsDefinition = (
+  role: Role,
+  name: NameNode,
+  parser: Parser,
+): ReadonlyArray<VariantDefinitionNode> => {
+  const isEquals = parser.expectOptionalToken(TokenKind.EQUALS);
+  const isUnion = parser.lookAhead().kind !== TokenKind.BRACE_L;
+  return isEquals && isUnion
+    ? parser.delimitedMany(TokenKind.PIPE, () =>
+        parseVariantDefinition(role, parser),
+      )
+    : [parseVariantDefinition(role, parser, name)];
+};
+
+const parseVariantDefinition = <R extends Role>(
+  role: R,
+  parser: Parser,
+  typeName?: NameNode,
+): _VariantDefinitionNode<R> => {
+  const start = parser.lookAhead();
+  const description = parser.parseDescription();
+  const name = typeName ?? parseVariantName(parser);
+  const directives = parser.parseConstDirectives();
+  const fields = parseFieldsDefinition(role, parser);
+  return parser.node<VariantDefinitionNode>(start, {
+    kind: IrisKind.VARIANT_DEFINITION,
+    description,
+    name,
+    directives,
+    fields,
   });
 };
 
@@ -139,42 +142,14 @@ const parseVariantName = (parser: Parser): NameNode => {
   return parser.parseName();
 };
 
-const parseVariantDefinition = (
+const parseFieldsDefinition = <R extends Role>(
+  role: R,
   parser: Parser,
-  typeName?: NameNode,
-): VariantDefinitionNode => {
-  const start = parser.lookAhead();
-  const description = parser.parseDescription();
-  const name = typeName ?? parseVariantName(parser);
-  const directives = parser.parseConstDirectives();
-  const fields = parseVariantFields(parser);
-  return parser.node<VariantDefinitionNode>(start, {
-    kind: IrisKind.VARIANT_DEFINITION,
-    description,
-    name,
-    directives,
-    fields,
-  });
-};
-
-const parseFieldsDefinition = (
-  parser: Parser,
-): ReadonlyArray<FieldDefinitionNode> | undefined =>
-  parser.lookAhead().kind === TokenKind.BRACE_L
-    ? parser.optionalMany(
-        TokenKind.BRACE_L,
-        parseFieldDefinition('resolver', parser),
-        TokenKind.BRACE_R,
-      )
-    : undefined;
-
-const parseVariantFields = (
-  parser: Parser,
-): ReadonlyArray<DataFieldDefinitionNode> | undefined => {
+): ReadonlyArray<_FieldDefinitionNode<R>> | undefined => {
   const nodes = [];
   if (parser.expectOptionalToken(TokenKind.BRACE_L)) {
     while (!parser.expectOptionalToken(TokenKind.BRACE_R)) {
-      nodes.push(parseFieldDefinition('data', parser)());
+      nodes.push(parseFieldDefinition(role, parser)());
     }
     return nodes;
   }
@@ -182,8 +157,8 @@ const parseVariantFields = (
 };
 
 const parseFieldDefinition =
-  <R extends keyof FIELD_DEF>(role: R, parser: Parser) =>
-  (): FIELD_DEF[R] => {
+  <R extends Role>(role: R, parser: Parser) =>
+  (): _FieldDefinitionNode<R> => {
     const start = parser.lookAhead();
     const description = parser.parseDescription();
     const name = parser.parseName();
