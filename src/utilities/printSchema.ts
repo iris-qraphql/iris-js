@@ -99,8 +99,8 @@ function printDATA(type: IrisDataType): string {
   return start + variants.map(printDataVariant).join(' | ');
 }
 
-function printDataFields(fields: ObjMap<IrisDataVariantField>): string {
-  return printBlock(
+const printDataFields = (fields: ObjMap<IrisDataVariantField>): string =>
+  printBlock(
     Object.values(fields).map(
       (f, i) =>
         printDescription(f, '  ', !i) +
@@ -111,16 +111,12 @@ function printDataFields(fields: ObjMap<IrisDataVariantField>): string {
         printDeprecated(f.deprecationReason),
     ),
   );
-}
 
-function printDataVariant(variant: IrisDataVariant): string {
-  return (
-    printDescription(variant) +
-    variant.name +
-    printDeprecated(variant.deprecationReason) +
-    (variant.fields ? printDataFields(variant.fields) : '')
-  );
-}
+const printDataVariant = (variant: IrisDataVariant): string =>
+  printDescription(variant) +
+  variant.name +
+  printDeprecated(variant.deprecationReason) +
+  (variant.fields ? printDataFields(variant.fields) : '');
 
 const printFields = (fs: GraphQLFieldMap<any, any>): string => {
   const fields = Object.values(fs).map(

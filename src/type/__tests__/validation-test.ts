@@ -34,7 +34,7 @@ const SomeSchema = buildSchema(`
 
   resolver SomeUnion = SomeObject
 
-  data SomeEnum = ONLY
+  data SomeEnum = ONLY {}
 
   data SomeInputObject = { val: String }
 

@@ -56,11 +56,11 @@ describe('Schema Parser', () => {
   });
 
   it('Single value Enum', () => {
-    snapshot('data Hello = WORLD');
+    snapshot('data Hello = WORLD {}');
   });
 
   it('Double value Enum', () => {
-    snapshot('data Hello = WO | RLD');
+    snapshot('data Hello = WO {} | RLD {}');
   });
 
   it('Simple field with arg', () => {

@@ -225,7 +225,7 @@ describe('Schema Builder', () => {
 
   it('Multiple value Enum', () => {
     const sdl = dedent`
-      data Hello = WO | RLD
+      data Hello = WO {} | RLD {}
 
       resolver Query = {
         hello: Hello
@@ -370,7 +370,7 @@ describe('Schema Builder', () => {
 
   it('Supports @deprecated', () => {
     const sdl = dedent`
-      data MyEnum = VALUE | OLD_VALUE @deprecated | OTHER_VALUE @deprecated(reason: "Terrible reasons")
+      data MyEnum = VALUE{} | OLD_VALUE @deprecated {} | OTHER_VALUE @deprecated(reason: "Terrible reasons") {}
 
       data MyInput {
         oldInput: String @deprecated
