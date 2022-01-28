@@ -502,23 +502,30 @@ type IrisDataTypeConfig<I, O> = Readonly<{
 
 const dataVariant = (config: IrisDataVariantConfig): IrisDataVariantConfig => ({
   ...config,
-  fields: () =>
-    mapValue(resolveThunk(config.fields ?? {}), (fieldConfig, fieldName) => ({
-      name: assertName(fieldName),
-      description: fieldConfig.description,
-      type: fieldConfig.type,
-      deprecationReason: fieldConfig.deprecationReason,
-      astNode: fieldConfig.astNode,
-    })),
+  fields: config.fields
+    ? () =>
+        mapValue(
+          resolveThunk(config.fields ?? {}),
+          (fieldConfig, fieldName) => ({
+            name: assertName(fieldName),
+            description: fieldConfig.description,
+            type: fieldConfig.type,
+            deprecationReason: fieldConfig.deprecationReason,
+            astNode: fieldConfig.astNode,
+          }),
+        )
+    : undefined,
   toJSON: () => config.name,
 });
 
 const resolveVariant = (v: IrisDataVariantConfig): IrisDataVariant => ({
   ...v,
-  fields: mapValue(resolveThunk(v?.fields ?? {}), (x, name) => ({
-    ...x,
-    name,
-  })),
+  fields: v?.fields
+    ? mapValue(resolveThunk(v.fields), (x, name) => ({
+        ...x,
+        name,
+      }))
+    : undefined,
 });
 
 const PRIMITIVES = ['Int', 'Boolean', 'String', 'Float'];

@@ -100,7 +100,7 @@ describe('Schema Builder', () => {
       data MysteryScalar = Int
 
       """This is a data  object type"""
-      data FooInput {
+      data FooInput = {
         """It has a field"""
         field: Int
       }
@@ -109,7 +109,7 @@ describe('Schema Builder', () => {
       resolver BlackHole
 
       """With an Enum"""
-      data Color = RED | GREEN | BLUE
+      data Color = RED {} | GREEN {} | BLUE {}
 
       """What a great type"""
       resolver Query = {
@@ -203,7 +203,7 @@ describe('Schema Builder', () => {
 
   it('Simple output Enum', () => {
     const sdl = dedent`
-      data Hello = WORLD
+      data Hello = WORLD {}
 
       resolver Query = {
         hello: Hello
@@ -214,7 +214,7 @@ describe('Schema Builder', () => {
 
   it('Simple Enum argument', () => {
     const sdl = dedent`
-      data Hello = WORLD
+      data Hello = WORLD {}
 
       resolver Query = {
         str(hello: Hello): String
@@ -307,7 +307,7 @@ describe('Schema Builder', () => {
 
   it('Simple Input Object', () => {
     const sdl = dedent`
-      data Input {
+      data Input = {
         int: Int
       }
 
@@ -370,9 +370,9 @@ describe('Schema Builder', () => {
 
   it('Supports @deprecated', () => {
     const sdl = dedent`
-      data MyEnum = VALUE{} | OLD_VALUE @deprecated {} | OTHER_VALUE @deprecated(reason: "Terrible reasons") {}
+      data MyEnum = VALUE {} | OLD_VALUE @deprecated {} | OTHER_VALUE @deprecated(reason: "Terrible reasons") {}
 
-      data MyInput {
+      data MyInput = {
         oldInput: String @deprecated
         otherInput: String @deprecated(reason: "Use newInput")
         newInput: String

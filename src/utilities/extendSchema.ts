@@ -262,35 +262,22 @@ export function extendSchemaImpl(
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
-          variants: (astNode.variants ?? []).map(buildResolverVariant),
+          variants: astNode.variants.map(buildResolverVariant),
           astNode,
         });
       }
       case IrisKind.DATA_TYPE_DEFINITION: {
-        const [variant, ...ext] = astNode.variants;
-        if (ext.length === 0 && (variant.fields?.length ?? 0) > 0) {
-          return new IrisDataType({
-            name,
-            description: astNode.description?.value,
-            astNode,
-            variants: [
-              {
-                name,
-                fields: () =>
-                  buildInputFieldMap(astNode.variants[0].fields ?? []),
-              },
-            ],
-          });
-        }
-
         return new IrisDataType({
           name,
           description: astNode.description?.value,
-          variants: (astNode.variants ?? []).map((value) => ({
+          variants: astNode.variants.map((value) => ({
             name: value.name.value,
             description: value.description?.value,
             deprecationReason: getDeprecationReason(value),
             astNode: value,
+            fields: value.fields
+              ? () => buildInputFieldMap(value?.fields ?? [])
+              : undefined,
           })),
           astNode,
         });
