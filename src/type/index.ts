@@ -45,7 +45,6 @@ export type {
   GraphQLField,
   GraphQLFieldResolver,
   GraphQLIsTypeOfFn,
-  GraphQLTypeResolver,
 } from './definition';
 
 export {

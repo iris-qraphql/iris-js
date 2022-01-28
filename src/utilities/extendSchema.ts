@@ -1,4 +1,4 @@
-import { keyMap } from '../jsutils/keyMap';
+import { keyMap } from '../jsutils/ObjMap';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 

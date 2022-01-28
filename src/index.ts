@@ -95,7 +95,6 @@ export type {
   GraphQLField,
   GraphQLFieldResolver,
   GraphQLIsTypeOfFn,
-  GraphQLTypeResolver,
 } from './type/index';
 
 // Parse and operate on GraphQL language source files.
@@ -191,10 +190,7 @@ export {
   // Create a GraphQL language AST from a JavaScript value.
   astFromValue,
   // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.
-  TypeInfo,
-  // Comparators for types
-  isEqualType,
-  isTypeSubTypeOf,
+  TypeInfo, // Comparators for types
 } from './utilities/index';
 
 export type { BuildSchemaOptions } from './utilities/index';

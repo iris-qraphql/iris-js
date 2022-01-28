@@ -1,9 +1,9 @@
 import { Kind } from 'graphql';
 
 import { inspect } from '../jsutils/inspect';
-import { keyMap } from '../jsutils/keyMap';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
+import { keyMap } from '../jsutils/ObjMap';
 
 import type { DirectiveNode } from '../language/ast';
 import { print } from '../language/printer';

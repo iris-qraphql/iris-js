@@ -18,6 +18,3 @@ export { astFromValue } from './astFromValue';
 
 // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.
 export { TypeInfo } from './TypeInfo';
-
-// Comparators for types
-export { isEqualType, isTypeSubTypeOf } from './typeComparators';

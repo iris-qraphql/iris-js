@@ -6,46 +6,9 @@ import { gqlObject, gqlUnion } from '../../type/make';
 import { GraphQLFloat, GraphQLInt, GraphQLString } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 
-import { isEqualType, isTypeSubTypeOf } from '../typeComparators';
+import { isTypeSubTypeOf } from '../typeComparators';
 
 describe('typeComparators', () => {
-  describe('isEqualType', () => {
-    it('same reference are equal', () => {
-      expect(isEqualType(GraphQLString, GraphQLString)).toEqual(true);
-    });
-
-    it('int and float are not equal', () => {
-      expect(isEqualType(GraphQLInt, GraphQLFloat)).toEqual(false);
-    });
-
-    it('lists of same type are equal', () => {
-      expect(
-        isEqualType(new GraphQLList(GraphQLInt), new GraphQLList(GraphQLInt)),
-      ).toEqual(true);
-    });
-
-    it('lists is not equal to item', () => {
-      expect(isEqualType(new GraphQLList(GraphQLInt), GraphQLInt)).toEqual(
-        false,
-      );
-    });
-
-    it('non-null of same type are equal', () => {
-      expect(
-        isEqualType(
-          new GraphQLNonNull(GraphQLInt),
-          new GraphQLNonNull(GraphQLInt),
-        ),
-      ).toEqual(true);
-    });
-
-    it('non-null is not equal to nullable', () => {
-      expect(isEqualType(new GraphQLNonNull(GraphQLInt), GraphQLInt)).toEqual(
-        false,
-      );
-    });
-  });
-
   describe('isTypeSubTypeOf', () => {
     function testSchema(fields: ObjMap<GraphQLFieldConfig<unknown, unknown>>) {
       return new GraphQLSchema({

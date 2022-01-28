@@ -1,6 +1,6 @@
 import { inspect } from '../../jsutils/inspect';
-import { keyMap } from '../../jsutils/keyMap';
 import type { ObjMap } from '../../jsutils/ObjMap';
+import { keyMap } from '../../jsutils/ObjMap';
 
 import type { ArgumentDefinitionNode } from '../../language/ast';
 import { IrisKind } from '../../language/kinds';
