@@ -4,13 +4,12 @@ import { isPrintableAsBlockString } from 'graphql/language/blockString';
 import { inspect } from '../jsutils/inspect';
 import { invariant } from '../jsutils/invariant';
 import type { Maybe } from '../jsutils/Maybe';
-import type { ObjMap } from '../jsutils/ObjMap';
 
 import { print } from '../language/printer';
 
 import type {
   GraphQLArgument,
-  GraphQLFieldMap,
+  GraphQLField,
   GraphQLNamedType,
   IrisDataType,
   IrisDataVariant,
@@ -66,12 +65,12 @@ export function printType(type: GraphQLNamedType): string {
 }
 
 function printObject(type: IrisResolverType): string {
-  const fields = type.getResolverFields();
+  const fields = Object.values(type.getResolverFields());
   return (
     printDescription(type) +
-    `resolver ${type.name}${
-      Object.keys(fields).length > 0 ? ' =' : ''
-    }${printFields(fields)}`
+    `resolver ${type.name}${Object.keys(fields).length > 0 ? ' =' : ''}${
+      fields.length === 0 ? '' : printFields(fields)
+    }`
   );
 }
 
@@ -83,25 +82,35 @@ function printUnion(type: IrisResolverType): string {
 
 function printDATA(type: IrisDataType): string {
   const variants = type.getVariants();
-  const firstVariant = variants[0];
-  const isEmptyType =
-    !firstVariant ||
-    ((firstVariant.fields?.length ?? 0) === 0 &&
-      firstVariant.name === type.name);
+  const start = printDescription(type) + `data ${type.name}`;
 
-  const start =
-    printDescription(type) + `data ${type.name}` + (!isEmptyType ? ' = ' : '');
-
-  if (type.isVariantType()) {
-    return start + printDataFields(variants[0]?.fields ?? {});
+  if (variants.length === 0) {
+    return start;
   }
 
-  return start + variants.map(printDataVariant).join(' | ');
+  if (type.isVariantType()) {
+    const variant = variants[0];
+    const fields = Object.values(variant.fields ?? {});
+
+    if (fields.length === 0 && variant.name === type.name) {
+      return start;
+    }
+
+    return start + ' =' + printDataFields(fields);
+  }
+
+  return start + ' = ' + variants.map(printDataVariant).join(' | ');
 }
 
-function printDataFields(fields: ObjMap<IrisDataVariantField>): string {
-  return printBlock(
-    Object.values(fields).map(
+const printDataVariant = (variant: IrisDataVariant): string =>
+  printDescription(variant) +
+  variant.name +
+  printDeprecated(variant.deprecationReason) +
+  (variant.fields ? ' ' + printDataFields(Object.values(variant.fields)) : '');
+
+const printDataFields = (fields: ReadonlyArray<IrisDataVariantField>): string =>
+  printBlock(
+    fields.map(
       (f, i) =>
         printDescription(f, '  ', !i) +
         '  ' +
@@ -111,19 +120,9 @@ function printDataFields(fields: ObjMap<IrisDataVariantField>): string {
         printDeprecated(f.deprecationReason),
     ),
   );
-}
 
-function printDataVariant(variant: IrisDataVariant): string {
-  return (
-    printDescription(variant) +
-    variant.name +
-    printDeprecated(variant.deprecationReason) +
-    (variant.fields ? printDataFields(variant.fields) : '')
-  );
-}
-
-const printFields = (fs: GraphQLFieldMap<any, any>): string => {
-  const fields = Object.values(fs).map(
+const printFields = (fs: ReadonlyArray<GraphQLField<any, any>>): string => {
+  const fields = fs.map(
     (f, i) =>
       printDescription(f, '  ', !i) +
       '  ' +
@@ -136,9 +135,8 @@ const printFields = (fs: GraphQLFieldMap<any, any>): string => {
   return printBlock(fields);
 };
 
-function printBlock(items: ReadonlyArray<string>): string {
-  return items.length !== 0 ? ' {\n' + items.join('\n') + '\n}' : '';
-}
+const printBlock = (items: ReadonlyArray<string>): string =>
+  items.length !== 0 ? ' {\n' + items.join('\n') + '\n}' : '{}';
 
 function printArgs(
   args: ReadonlyArray<GraphQLArgument>,

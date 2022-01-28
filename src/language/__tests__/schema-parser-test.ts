@@ -56,11 +56,11 @@ describe('Schema Parser', () => {
   });
 
   it('Single value Enum', () => {
-    snapshot('data Hello = WORLD');
+    snapshot('data Hello = WORLD {}');
   });
 
   it('Double value Enum', () => {
-    snapshot('data Hello = WO | RLD');
+    snapshot('data Hello = WO {} | RLD {}');
   });
 
   it('Simple field with arg', () => {
@@ -137,14 +137,14 @@ describe('Schema Parser', () => {
 
   it('Simple data object', () => {
     snapshot(`
-    data Hello {
+    data Hello = {
       world: String
     }`);
   });
 
   it('Simple data object with args should fail', () => {
     expectSyntaxError(`
-      data  Hello {
+      data  Hello = {
         world(foo: Int): String
       }
     `).toEqual({

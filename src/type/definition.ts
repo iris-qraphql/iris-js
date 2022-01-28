@@ -385,7 +385,7 @@ export type GraphQLFieldMap<TSource, TContext> = ObjMap<
   GraphQLField<TSource, TContext>
 >;
 
-type IrisDataVariantConfig = Override<
+export type IrisDataVariantConfig = Override<
   IrisDataVariant,
   { fields?: Thunk<ConfigMap<IrisDataVariantField>> }
 >;
@@ -421,17 +421,17 @@ export class IrisResolverType<TSource = any, TContext = any> {
     this.description = config.description;
     this.astNode = config.astNode;
     this._isVariantType =
-      config.variants.length < 2 &&
-      config.variants[0]?.name === config.name &&
-      config.variants[0]?.fields !== undefined;
+      config.variants.length === 0 ||
+      (config.variants.length === 1 &&
+        config.variants[0]?.name === config.name &&
+        config.variants[0]?.fields !== undefined);
 
     this.isTypeOf = config.isTypeOf;
+    const configFields = config.variants[0]?.fields ?? {};
+
     this._fields = () =>
       this._isVariantType
-        ? mapValue(
-            resolveThunk(config.variants[0].fields ?? {}),
-            defineFieldFor(config.name),
-          )
+        ? mapValue(resolveThunk(configFields), defineFieldFor(config.name))
         : {};
 
     // UNION
@@ -502,23 +502,30 @@ type IrisDataTypeConfig<I, O> = Readonly<{
 
 const dataVariant = (config: IrisDataVariantConfig): IrisDataVariantConfig => ({
   ...config,
-  fields: () =>
-    mapValue(resolveThunk(config.fields ?? {}), (fieldConfig, fieldName) => ({
-      name: assertName(fieldName),
-      description: fieldConfig.description,
-      type: fieldConfig.type,
-      deprecationReason: fieldConfig.deprecationReason,
-      astNode: fieldConfig.astNode,
-    })),
+  fields: config.fields
+    ? () =>
+        mapValue(
+          resolveThunk(config.fields ?? {}),
+          (fieldConfig, fieldName) => ({
+            name: assertName(fieldName),
+            description: fieldConfig.description,
+            type: fieldConfig.type,
+            deprecationReason: fieldConfig.deprecationReason,
+            astNode: fieldConfig.astNode,
+          }),
+        )
+    : undefined,
   toJSON: () => config.name,
 });
 
 const resolveVariant = (v: IrisDataVariantConfig): IrisDataVariant => ({
   ...v,
-  fields: mapValue(resolveThunk(v?.fields ?? {}), (x, name) => ({
-    ...x,
-    name,
-  })),
+  fields: v?.fields
+    ? mapValue(resolveThunk(v.fields), (x, name) => ({
+        ...x,
+        name,
+      }))
+    : undefined,
 });
 
 const PRIMITIVES = ['Int', 'Boolean', 'String', 'Float'];

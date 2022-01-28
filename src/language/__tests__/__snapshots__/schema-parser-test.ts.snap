@@ -8,7 +8,7 @@ Object {
       "directives": Array [],
       "kind": "DataTypeDefinition",
       "loc": Object {
-        "end": 21,
+        "end": 27,
         "start": 0,
       },
       "name": Object {
@@ -26,7 +26,7 @@ Object {
           "fields": Array [],
           "kind": "VariantDefinition",
           "loc": Object {
-            "end": 15,
+            "end": 18,
             "start": 13,
           },
           "name": Object {
@@ -44,14 +44,14 @@ Object {
           "fields": Array [],
           "kind": "VariantDefinition",
           "loc": Object {
-            "end": 21,
-            "start": 18,
+            "end": 27,
+            "start": 21,
           },
           "name": Object {
             "kind": "Name",
             "loc": Object {
-              "end": 21,
-              "start": 18,
+              "end": 24,
+              "start": 21,
             },
             "value": "RLD",
           },
@@ -61,7 +61,7 @@ Object {
   ],
   "kind": "Document",
   "loc": Object {
-    "end": 21,
+    "end": 27,
     "start": 0,
   },
 }
@@ -90,7 +90,7 @@ Object {
         Object {
           "description": undefined,
           "directives": Array [],
-          "fields": Array [],
+          "fields": undefined,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 19,
@@ -124,7 +124,7 @@ Object {
       "directives": Array [],
       "kind": "DataTypeDefinition",
       "loc": Object {
-        "end": 43,
+        "end": 45,
         "start": 5,
       },
       "name": Object {
@@ -141,32 +141,33 @@ Object {
           "directives": Array [],
           "fields": Array [
             Object {
+              "arguments": undefined,
               "description": undefined,
               "directives": Array [],
               "kind": "FieldDefinition",
               "loc": Object {
-                "end": 37,
-                "start": 24,
+                "end": 39,
+                "start": 26,
               },
               "name": Object {
                 "kind": "Name",
                 "loc": Object {
-                  "end": 29,
-                  "start": 24,
+                  "end": 31,
+                  "start": 26,
                 },
                 "value": "world",
               },
               "type": Object {
                 "kind": "NamedType",
                 "loc": Object {
-                  "end": 37,
-                  "start": 31,
+                  "end": 39,
+                  "start": 33,
                 },
                 "name": Object {
                   "kind": "Name",
                   "loc": Object {
-                    "end": 37,
-                    "start": 31,
+                    "end": 39,
+                    "start": 33,
                   },
                   "value": "String",
                 },
@@ -175,8 +176,8 @@ Object {
           ],
           "kind": "VariantDefinition",
           "loc": Object {
-            "end": 43,
-            "start": 16,
+            "end": 45,
+            "start": 18,
           },
           "name": Object {
             "kind": "Name",
@@ -192,7 +193,7 @@ Object {
   ],
   "kind": "Document",
   "loc": Object {
-    "end": 43,
+    "end": 45,
     "start": 0,
   },
 }
@@ -219,6 +220,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [
@@ -289,6 +292,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 51,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -330,6 +337,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [
@@ -407,6 +416,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 58,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -448,6 +461,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [
@@ -525,6 +540,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 54,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -566,6 +585,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [
@@ -669,6 +690,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 66,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -710,6 +735,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [],
@@ -753,6 +780,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 37,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -794,6 +825,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [],
@@ -830,6 +863,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 36,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -907,7 +944,7 @@ Object {
       "directives": Array [],
       "kind": "DataTypeDefinition",
       "loc": Object {
-        "end": 18,
+        "end": 21,
         "start": 0,
       },
       "name": Object {
@@ -925,7 +962,7 @@ Object {
           "fields": Array [],
           "kind": "VariantDefinition",
           "loc": Object {
-            "end": 18,
+            "end": 21,
             "start": 13,
           },
           "name": Object {
@@ -942,7 +979,7 @@ Object {
   ],
   "kind": "Document",
   "loc": Object {
-    "end": 18,
+    "end": 21,
     "start": 0,
   },
 }
@@ -1044,6 +1081,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [],
@@ -1080,6 +1119,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 90,
+            "start": 71,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -1129,6 +1172,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [],
@@ -1165,6 +1210,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 50,
+            "start": 31,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {

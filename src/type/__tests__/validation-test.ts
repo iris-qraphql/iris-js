@@ -34,7 +34,7 @@ const SomeSchema = buildSchema(`
 
   resolver SomeUnion = SomeObject
 
-  data SomeEnum = ONLY
+  data SomeEnum = ONLY {}
 
   data SomeInputObject = { val: String }
 
@@ -115,7 +115,7 @@ describe('Type System: A Schema must have Object root types', () => {
         field: String
       }
 
-      data Mutation {
+      data Mutation = {
         test: String
       }
     `);
@@ -134,7 +134,7 @@ describe('Type System: A Schema must have Object root types', () => {
         field: String
       }
 
-      data Subscription {
+      data Subscription = {
         test: String
       }
     `);
@@ -358,7 +358,7 @@ describe('Type System: Input Objects must have fields', () => {
         field(arg: SomeInputObject): String
       }
 
-      data SomeInputObject {
+      data SomeInputObject = {
         field: String
       }
     `);
@@ -425,7 +425,7 @@ describe('Type System: Input Objects must have fields', () => {
 
       resolver SomeUnion = SomeObject
 
-      data  SomeInputObject {
+      data SomeInputObject = {
         badObject: SomeObject
         badUnion: SomeUnion
         goodInputObject: SomeInputObject
@@ -509,7 +509,7 @@ describe('Type System: Object fields must have output types', () => {
         field: [SomeInputObject]
       }
 
-      data  SomeInputObject {
+      data SomeInputObject = {
         field: String
       }
     `);
