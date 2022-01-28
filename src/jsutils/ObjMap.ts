@@ -22,3 +22,16 @@ export function keyMap<T>(
   }
   return result;
 }
+
+export function isObjectLike(value: unknown): value is Record<string, unknown> {
+  return typeof value == 'object' && value !== null;
+}
+
+export function isIterableObject(
+  maybeIterable: any,
+): maybeIterable is Iterable<unknown> {
+  return (
+    typeof maybeIterable === 'object' &&
+    typeof maybeIterable?.[Symbol.iterator] === 'function'
+  );
+}

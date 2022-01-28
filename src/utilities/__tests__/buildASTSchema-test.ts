@@ -401,7 +401,7 @@ describe('Schema Builder', () => {
     const oldValue = myEnum.getValue('OLD_VALUE');
     expect(oldValue).toEqual(
       expect.objectContaining({
-        deprecationReason: 'No longer supported',
+        deprecationReason: '',
       }),
     );
 
@@ -417,7 +417,7 @@ describe('Schema Builder', () => {
     ).getResolverFields();
     expect(rootFields.field1).toEqual(
       expect.objectContaining({
-        deprecationReason: 'No longer supported',
+        deprecationReason: '',
       }),
     );
     expect(rootFields.field2).toEqual(
@@ -429,7 +429,7 @@ describe('Schema Builder', () => {
     const field3OldArg = rootFields.field3.args[0];
     expect(field3OldArg).toEqual(
       expect.objectContaining({
-        deprecationReason: 'No longer supported',
+        deprecationReason: '',
       }),
     );
 

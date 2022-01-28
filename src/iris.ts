@@ -54,7 +54,6 @@ function graphqlImpl(args: GraphQLArgs): PromiseOrValue<ExecutionResult> {
   // Validate Schema
   const schemaValidationErrors = validateSchema(schema);
   if (schemaValidationErrors.length > 0) {
-    // @ts-expect-error
     return { errors: schemaValidationErrors };
   }
 
@@ -69,7 +68,6 @@ function graphqlImpl(args: GraphQLArgs): PromiseOrValue<ExecutionResult> {
   // Validate
   const validationErrors = validate(schema, document);
   if (validationErrors.length > 0) {
-    // @ts-expect-error
     return { errors: validationErrors };
   }
 
