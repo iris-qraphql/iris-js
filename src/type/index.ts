@@ -21,7 +21,6 @@ export {
   isResolverType,
   isWrappingType,
   isNullableType,
-  isNamedType,
   isRequiredArgument,
   assertResolverType,
   assertListType,

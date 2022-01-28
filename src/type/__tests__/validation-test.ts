@@ -400,7 +400,7 @@ describe('Type System: Input Objects must have fields', () => {
     expectedJSON(schema, []);
   });
 
-  it('rejects an Input Object with non-breakable circular reference', () => {
+  it('accept recursive data types', () => {
     const schema = buildSchema(`
       resolver Query = {
         field(arg: SomeInputObject): String
@@ -411,91 +411,7 @@ describe('Type System: Input Objects must have fields', () => {
       }
     `);
 
-    expectedJSON(schema, [
-      {
-        message:
-          'Cannot reference Input Object "SomeInputObject" within itself through a series of non-null fields: "nonNullSelf".',
-        locations: [{ line: 7, column: 9 }],
-      },
-    ]);
-  });
-
-  it('rejects Input Objects with non-breakable circular reference spread across them', () => {
-    const schema = buildSchema(`
-      resolver Query = {
-        field(arg: SomeInputObject): String
-      }
-
-      data  SomeInputObject {
-        startLoop: AnotherInputObject!
-      }
-
-      data  AnotherInputObject {
-        nextInLoop: YetAnotherInputObject!
-      }
-
-      data  YetAnotherInputObject {
-        closeLoop: SomeInputObject!
-      }
-    `);
-
-    expectedJSON(schema, [
-      {
-        message:
-          'Cannot reference Input Object "SomeInputObject" within itself through a series of non-null fields: "startLoop.nextInLoop.closeLoop".',
-        locations: [
-          { line: 7, column: 9 },
-          { line: 11, column: 9 },
-          { line: 15, column: 9 },
-        ],
-      },
-    ]);
-  });
-
-  it('rejects Input Objects with multiple non-breakable circular reference', () => {
-    const schema = buildSchema(`
-      resolver Query = {
-        field(arg: SomeInputObject): String
-      }
-
-      data SomeInputObject = {
-        startLoop: AnotherInputObject!
-      }
-
-      data AnotherInputObject = {
-        closeLoop: SomeInputObject!
-        startSecondLoop: YetAnotherInputObject!
-      }
-
-      data YetAnotherInputObject = {
-        closeSecondLoop: AnotherInputObject!
-        nonNullSelf: YetAnotherInputObject!
-      }
-    `);
-
-    expectedJSON(schema, [
-      {
-        message:
-          'Cannot reference Input Object "SomeInputObject" within itself through a series of non-null fields: "startLoop.closeLoop".',
-        locations: [
-          { line: 7, column: 9 },
-          { line: 11, column: 9 },
-        ],
-      },
-      {
-        message:
-          'Cannot reference Input Object "AnotherInputObject" within itself through a series of non-null fields: "startSecondLoop.closeSecondLoop".',
-        locations: [
-          { line: 12, column: 9 },
-          { line: 16, column: 9 },
-        ],
-      },
-      {
-        message:
-          'Cannot reference Input Object "YetAnotherInputObject" within itself through a series of non-null fields: "nonNullSelf".',
-        locations: [{ line: 17, column: 9 }],
-      },
-    ]);
+    expectedJSON(schema, []);
   });
 
   it('rejects an Input Object type with incorrectly typed fields', () => {

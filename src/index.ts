@@ -62,7 +62,6 @@ export {
   isResolverType,
   isWrappingType,
   isNullableType,
-  isNamedType,
   isRequiredArgument,
   isSpecifiedScalarType,
   isSpecifiedDirective,
@@ -193,8 +192,6 @@ export {
   astFromValue,
   // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.
   TypeInfo,
-  // Strips characters that are not significant to the validity or execution of a GraphQL document.
-  stripIgnoredCharacters,
   // Comparators for types
   isEqualType,
   isTypeSubTypeOf,

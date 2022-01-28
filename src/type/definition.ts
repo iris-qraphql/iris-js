@@ -48,11 +48,12 @@ export type GraphQLType =
   | GraphQLNonNull<IrisResolverType | IrisDataType | GraphQLList<GraphQLType>>;
 
 export function isType(type: unknown): type is GraphQLType {
-  return isNamedType(type) || isListType(type) || isNonNullType(type);
-}
-
-export function isNamedType(type: unknown): type is GraphQLNamedType {
-  return isResolverType(type) || isDataType(type);
+  return (
+    isResolverType(type) ||
+    isDataType(type) ||
+    isListType(type) ||
+    isNonNullType(type)
+  );
 }
 
 export function isResolverType(type: unknown): type is IrisResolverType {

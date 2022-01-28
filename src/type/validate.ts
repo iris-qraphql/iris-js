@@ -15,15 +15,11 @@ import { GraphQLError } from '../error';
 import type {
   IrisDataType,
   IrisDataVariant,
-  IrisDataVariantField,
   IrisResolverType,
 } from './definition';
 import {
   isDataType,
-  isInputObjectType,
   isInputType,
-  isNamedType,
-  isNonNullType,
   isObjectType,
   isOutputType,
   isRequiredArgument,
@@ -194,29 +190,20 @@ function validateName(
   }
 }
 
-function validateTypes(context: SchemaValidationContext): void {
-  const validateInputObjectCircularRefs =
-    createInputObjectCircularRefsValidator(context);
-  const typeMap = context.schema.getTypeMap();
-  for (const type of Object.values(typeMap)) {
-    // Ensure all provided types are in fact GraphQL type.
-    if (!isNamedType(type)) {
-      context.reportError(
-        `Expected GraphQL named type but got: ${inspect(type)}.`,
-        (type as any).astNode,
-      );
-      continue;
-    }
-
+function validateTypes(ctx: SchemaValidationContext): void {
+  Object.values(ctx.schema.getTypeMap()).forEach((type) => {
     if (isResolverType(type)) {
-      validateResolverType(context, type);
+      return validateResolverType(ctx, type);
+    }
+    if (isDataType(type)) {
+      return validateDataType(ctx, type);
     }
 
-    if (isDataType(type)) {
-      validateDataType(context, type);
-      validateInputObjectCircularRefs(type);
-    }
-  }
+    return ctx.reportError(
+      `Expected GraphQL named type but got: ${inspect(type)}.`,
+      (type as any).astNode,
+    );
+  });
 }
 
 const validateResolverType = (
@@ -334,62 +321,6 @@ function validateDataFields(
         [getDeprecatedDirectiveNode(field.astNode), field.astNode?.type],
       );
     }
-  }
-}
-
-function createInputObjectCircularRefsValidator(
-  context: SchemaValidationContext,
-): (inputObj: IrisDataType) => void {
-  // Modified copy of algorithm from 'src/validation/rules/NoFragmentCycles.js'.
-  // Tracks already visited types to maintain O(N) and to ensure that cycles
-  // are not redundantly reported.
-  const visitedTypes = Object.create(null);
-
-  // Array of types nodes used to produce meaningful errors
-  const fieldPath: Array<IrisDataVariantField> = [];
-
-  // Position in the type path
-  const fieldPathIndexByTypeName = Object.create(null);
-
-  return detectCycleRecursive;
-
-  // This does a straight-forward DFS to find cycles.
-  // It does not terminate when a cycle was found but continues to explore
-  // the graph to find all possible cycles.
-  function detectCycleRecursive(inputObj: IrisDataType): void {
-    if (visitedTypes[inputObj.name]) {
-      return;
-    }
-
-    visitedTypes[inputObj.name] = true;
-    fieldPathIndexByTypeName[inputObj.name] = fieldPath.length;
-
-    inputObj.getVariants().forEach((variant) => {
-      const fields = Object.values(variant.fields ?? {});
-      for (const field of fields) {
-        if (isNonNullType(field.type) && isInputObjectType(field.type.ofType)) {
-          const fieldType = field.type.ofType;
-          const cycleIndex = fieldPathIndexByTypeName[fieldType.name];
-
-          fieldPath.push(field);
-          if (cycleIndex === undefined) {
-            detectCycleRecursive(fieldType);
-          } else {
-            const cyclePath = fieldPath.slice(cycleIndex);
-            const pathStr = cyclePath
-              .map((fieldObj) => fieldObj.name)
-              .join('.');
-            context.reportError(
-              `Cannot reference Input Object "${fieldType.name}" within itself through a series of non-null fields: "${pathStr}".`,
-              cyclePath.map((fieldObj) => fieldObj.astNode),
-            );
-          }
-          fieldPath.pop();
-        }
-      }
-    });
-
-    fieldPathIndexByTypeName[inputObj.name] = undefined;
   }
 }
 

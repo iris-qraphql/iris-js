@@ -17,7 +17,6 @@ import {
   isInputObjectType,
   isInputType,
   isListType,
-  isNamedType,
   isNonNullType,
   isNullableType,
   isObjectType,
@@ -328,17 +327,6 @@ describe('Type predicates', () => {
       expect(getNullableType(new GraphQLNonNull(ObjectType))).toEqual(
         ObjectType,
       );
-    });
-  });
-
-  describe('isNamedType', () => {
-    it('returns true for unwrapped types', () => {
-      expect(isNamedType(ObjectType)).toEqual(true);
-    });
-
-    it('returns false for list and non-null types', () => {
-      expect(isNamedType(new GraphQLList(ObjectType))).toEqual(false);
-      expect(isNamedType(new GraphQLNonNull(ObjectType))).toEqual(false);
     });
   });
 
