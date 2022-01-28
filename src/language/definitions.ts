@@ -2,14 +2,13 @@ import { TokenKind } from 'graphql';
 
 import type {
   _FieldDefinitionNode,
+  _TypeDefinitionNode,
   _VariantDefinitionNode,
-  DataTypeDefinitionNode,
   DefinitionNode,
   FieldDefinitionNode,
   NameNode,
-  ResolverTypeDefinitionNode,
   Role,
-  VariantDefinitionNode,
+  TypeDefinition,
 } from './ast';
 import { IrisKind } from './kinds';
 import type { Parser } from './parser';
@@ -20,9 +19,9 @@ export const parseDefinitions = (
 ): DefinitionNode | undefined => {
   switch (keywordToken) {
     case 'resolver':
-      return parseResolverTypeDefinition(parser);
+      return parseTypeDefinition('resolver', parser);
     case 'data':
-      return parseDataTypeDefinition('data', parser);
+      return parseTypeDefinition('data', parser);
     case 'directive':
       return parser.parseDirectiveDefinition();
   }
@@ -30,70 +29,24 @@ export const parseDefinitions = (
   return undefined;
 };
 
-const parseResolverTypeDefinition = (
+const ROLE_KIND = {
+  resolver: IrisKind.RESOLVER_TYPE_DEFINITION,
+  data: IrisKind.DATA_TYPE_DEFINITION,
+} as const;
+
+export const parseTypeDefinition = <R extends Role>(
+  role: R,
   parser: Parser,
-): ResolverTypeDefinitionNode => {
-  const start = parser.lookAhead();
-  const description = parser.parseDescription();
-  parser.expectKeyword('resolver');
-  const name = parser.parseName();
-  const directives = parser.parseConstDirectives();
-  const isEquals = parser.expectOptionalToken(TokenKind.EQUALS);
-  const afterEquals = parser.lookAhead().kind;
-
-  if (!isEquals) {
-    return parser.node<ResolverTypeDefinitionNode>(start, {
-      kind: IrisKind.RESOLVER_TYPE_DEFINITION,
-      description,
-      name,
-      directives,
-      variants: [{ kind: IrisKind.VARIANT_DEFINITION, name, fields: [] }],
-    });
-  }
-
-  if (isEquals && ![TokenKind.BRACE_L, TokenKind.NAME].includes(afterEquals)) {
-    parser.throwExpected('Variant');
-  }
-
-  const isUnion = parser.lookAhead().kind !== TokenKind.BRACE_L;
-
-  if (isEquals && isUnion) {
-    const variants = parser.delimitedMany(TokenKind.PIPE, () =>
-      parseVariantDefinition('resolver', parser),
-    );
-
-    return parser.node<ResolverTypeDefinitionNode>(start, {
-      kind: IrisKind.RESOLVER_TYPE_DEFINITION,
-      description,
-      name,
-      directives,
-      variants,
-    });
-  }
-
-  const fields = parseFieldsDefinition('resolver', parser);
-
-  return parser.node<ResolverTypeDefinitionNode>(start, {
-    kind: IrisKind.RESOLVER_TYPE_DEFINITION,
-    description,
-    name,
-    directives,
-    variants: [{ kind: IrisKind.VARIANT_DEFINITION, name, fields }],
-  });
-};
-
-export const parseDataTypeDefinition = (
-  role: Role,
-  parser: Parser,
-): DataTypeDefinitionNode => {
+): TypeDefinition<R> => {
   const start = parser.lookAhead();
   const description = parser.parseDescription();
   parser.expectKeyword(role);
   const name = parser.parseName();
   const directives = parser.parseConstDirectives();
-  const variants = parseVariantsDefinition('data', name, parser);
-  return parser.node<DataTypeDefinitionNode>(start, {
-    kind: IrisKind.DATA_TYPE_DEFINITION,
+  const variants: ReadonlyArray<_VariantDefinitionNode<R>> =
+    parseVariantsDefinition(role, name, parser);
+  return parser.node<TypeDefinition<R>>(start, {
+    kind: ROLE_KIND[role],
     description,
     name,
     directives,
@@ -101,12 +54,18 @@ export const parseDataTypeDefinition = (
   });
 };
 
-export const parseVariantsDefinition = (
-  role: Role,
+export const parseVariantsDefinition = <R extends Role>(
+  role: R,
   name: NameNode,
   parser: Parser,
-): ReadonlyArray<VariantDefinitionNode> => {
+): ReadonlyArray<_VariantDefinitionNode<R>> => {
   const isEquals = parser.expectOptionalToken(TokenKind.EQUALS);
+
+  const afterEquals = parser.lookAhead().kind;
+  if (isEquals && ![TokenKind.BRACE_L, TokenKind.NAME].includes(afterEquals)) {
+    parser.throwExpected('Variant');
+  }
+
   const isUnion = parser.lookAhead().kind !== TokenKind.BRACE_L;
   return isEquals && isUnion
     ? parser.delimitedMany(TokenKind.PIPE, () =>
@@ -125,7 +84,7 @@ const parseVariantDefinition = <R extends Role>(
   const name = typeName ?? parseVariantName(parser);
   const directives = parser.parseConstDirectives();
   const fields = parseFieldsDefinition(role, parser);
-  return parser.node<VariantDefinitionNode>(start, {
+  return parser.node<_VariantDefinitionNode<R>>(start, {
     kind: IrisKind.VARIANT_DEFINITION,
     description,
     name,

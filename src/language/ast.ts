@@ -220,23 +220,22 @@ export interface ArgumentDefinitionNode {
 
 export type Role = 'resolver' | 'data';
 
-export type DataTypeDefinitionNode = TypeDefinition<
-  IrisKind.DATA_TYPE_DEFINITION,
-  VariantDefinitionNode
->;
+export type DataTypeDefinitionNode = TypeDefinition<'data'>;
 
-export type ResolverTypeDefinitionNode = TypeDefinition<
-  IrisKind.RESOLVER_TYPE_DEFINITION,
-  ResolverVariantDefinitionNode
->;
+export type ResolverTypeDefinitionNode = TypeDefinition<'resolver'>;
 
-type TypeDefinition<K, Variants> = {
-  readonly kind: K;
+type ROLE_KIND = {
+  resolver: IrisKind.RESOLVER_TYPE_DEFINITION;
+  data: IrisKind.DATA_TYPE_DEFINITION;
+};
+
+export type TypeDefinition<R extends Role> = {
+  readonly kind: ROLE_KIND[R];
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly variants: ReadonlyArray<Variants>;
+  readonly variants: ReadonlyArray<_VariantDefinitionNode<R>>;
 };
 
 export type VariantDefinition<F> = {
@@ -271,8 +270,14 @@ type VAR_DEF = {
   resolver: ResolverVariantDefinitionNode;
 };
 
+type TYPE_DEF = {
+  data: DataTypeDefinitionNode;
+  resolver: ResolverTypeDefinitionNode;
+};
+
 export type _FieldDefinitionNode<T extends Role> = FIELD_DEF[T];
 export type _VariantDefinitionNode<T extends Role> = VAR_DEF[T];
+export type _TypeDefinitionNode<T extends Role> = TYPE_DEF[T];
 
 export type VariantDefinitionNode = VariantDefinition<FieldDefinitionNode>;
 export type ResolverVariantDefinitionNode =

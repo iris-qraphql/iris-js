@@ -421,9 +421,10 @@ export class IrisResolverType<TSource = any, TContext = any> {
     this.description = config.description;
     this.astNode = config.astNode;
     this._isVariantType =
-      config.variants.length < 2 &&
-      config.variants[0]?.name === config.name &&
-      config.variants[0]?.fields !== undefined;
+      config.variants.length === 0 ||
+      ( config.variants.length === 1 &&
+        config.variants[0]?.name === config.name &&
+        config.variants[0]?.fields !== undefined);
 
     this.isTypeOf = config.isTypeOf;
     this._fields = () =>

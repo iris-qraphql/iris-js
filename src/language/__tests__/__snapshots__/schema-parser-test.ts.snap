@@ -220,6 +220,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [
@@ -290,6 +292,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 51,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -331,6 +337,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [
@@ -408,6 +416,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 58,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -449,6 +461,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [
@@ -526,6 +540,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 54,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -567,6 +585,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [
@@ -670,6 +690,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 66,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -711,6 +735,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [],
@@ -754,6 +780,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 37,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -795,6 +825,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [],
@@ -831,6 +863,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 36,
+            "start": 17,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -1045,6 +1081,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [],
@@ -1081,6 +1119,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 90,
+            "start": 71,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
@@ -1130,6 +1172,8 @@ Object {
       },
       "variants": Array [
         Object {
+          "description": undefined,
+          "directives": Array [],
           "fields": Array [
             Object {
               "arguments": Array [],
@@ -1166,6 +1210,10 @@ Object {
             },
           ],
           "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 50,
+            "start": 31,
+          },
           "name": Object {
             "kind": "Name",
             "loc": Object {
