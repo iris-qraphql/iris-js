@@ -1,5 +1,4 @@
-import { didYouMean } from '../../jsutils/didYouMean';
-import { suggestionList } from '../../jsutils/suggestionList';
+import { didYouMean, suggestionList } from '../../jsutils/suggestions';
 
 import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';

@@ -1,7 +1,6 @@
-import { didYouMean } from '../../jsutils/didYouMean';
 import { inspect } from '../../jsutils/inspect';
 import { keyMap } from '../../jsutils/ObjMap';
-import { suggestionList } from '../../jsutils/suggestionList';
+import { didYouMean, suggestionList } from '../../jsutils/suggestions';
 
 import type { ValueNode } from '../../language/ast';
 import { print } from '../../language/printer';

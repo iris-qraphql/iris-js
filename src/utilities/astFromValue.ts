@@ -1,7 +1,6 @@
 import { Kind } from 'graphql';
 
 import { inspect } from '../jsutils/inspect';
-import { invariant } from '../jsutils/invariant';
 import type { Maybe } from '../jsutils/Maybe';
 import { isIterableObject, isObjectLike } from '../jsutils/ObjMap';
 
@@ -11,8 +10,12 @@ import type {
   ValueNode,
 } from '../language/ast';
 
-import type { GraphQLInputType, IrisDataVariant } from '../type/definition';
-import { isDataType, isListType, isNonNullType } from '../type/definition';
+import type {
+  GraphQLInputType,
+  IrisDataType,
+  IrisDataVariant,
+} from '../type/definition';
+import { isListType, isNonNullType } from '../type/definition';
 import { GraphQLID } from '../type/scalars';
 
 /**
@@ -75,55 +78,7 @@ export function astFromValue(
     return astFromValue(value, itemType);
   }
 
-  if (isDataType(type)) {
-    if (!type.isPrimitive && isObjectLike(value)) {
-      const variantName = value.__typename as string | undefined;
-      const variant = type.variantBy(variantName);
-      return parseVariantValue(value, variant);
-    }
-
-    // Since value is an internally represented value, it must be serialized
-    // to an externally represented value before converting into an AST.
-    const serialized = type.serialize(value);
-    if (serialized == null) {
-      return null;
-    }
-
-    // Others serialize based on their corresponding JavaScript scalar types.
-    if (typeof serialized === 'boolean') {
-      return { kind: Kind.BOOLEAN, value: serialized };
-    }
-
-    // JavaScript numbers can be Int or Float values.
-    if (typeof serialized === 'number' && Number.isFinite(serialized)) {
-      const stringNum = String(serialized);
-      return integerStringRegExp.test(stringNum)
-        ? { kind: Kind.INT, value: stringNum }
-        : { kind: Kind.FLOAT, value: stringNum };
-    }
-
-    if (typeof serialized === 'string') {
-      // Enum types use Enum literals.
-      if (!type.isPrimitive) {
-        return { kind: Kind.ENUM, value: serialized };
-      }
-
-      // ID types can use Int literals.
-      if (type === GraphQLID && integerStringRegExp.test(serialized)) {
-        return { kind: Kind.INT, value: serialized };
-      }
-
-      return {
-        kind: Kind.STRING,
-        value: serialized,
-      };
-    }
-
-    throw new TypeError(`Cannot convert value to AST: ${inspect(serialized)}.`);
-  }
-  /* c8 ignore next 3 */
-  // Not reachable, all possible types have been considered.
-  invariant(false, 'Unexpected input type: ' + inspect(type));
+  return parseDataType(value, type);
 }
 
 /**
@@ -132,6 +87,56 @@ export function astFromValue(
  *   - NegativeSign? NonZeroDigit ( Digit+ )?
  */
 const integerStringRegExp = /^-?(?:0|[1-9][0-9]*)$/;
+
+const parseDataType = (
+  value: unknown,
+  type: IrisDataType,
+): Maybe<ValueNode> => {
+  if (!type.isPrimitive && isObjectLike(value)) {
+    const variantName = value.__typename as string | undefined;
+    const variant = type.variantBy(variantName);
+    return parseVariantValue(value, variant);
+  }
+
+  // Since value is an internally represented value, it must be serialized
+  // to an externally represented value before converting into an AST.
+  const serialized = type.serialize(value);
+  if (serialized == null) {
+    return null;
+  }
+
+  // Others serialize based on their corresponding JavaScript scalar types.
+  if (typeof serialized === 'boolean') {
+    return { kind: Kind.BOOLEAN, value: serialized };
+  }
+
+  // JavaScript numbers can be Int or Float values.
+  if (typeof serialized === 'number' && Number.isFinite(serialized)) {
+    const stringNum = String(serialized);
+    return integerStringRegExp.test(stringNum)
+      ? { kind: Kind.INT, value: stringNum }
+      : { kind: Kind.FLOAT, value: stringNum };
+  }
+
+  if (typeof serialized === 'string') {
+    // Enum types use Enum literals.
+    if (!type.isPrimitive) {
+      return { kind: Kind.ENUM, value: serialized };
+    }
+
+    // ID types can use Int literals.
+    if (type === GraphQLID && integerStringRegExp.test(serialized)) {
+      return { kind: Kind.INT, value: serialized };
+    }
+
+    return {
+      kind: Kind.STRING,
+      value: serialized,
+    };
+  }
+
+  throw new TypeError(`Cannot convert value to AST: ${inspect(serialized)}.`);
+};
 
 const parseVariantValue = (
   value: Record<string, unknown>,
