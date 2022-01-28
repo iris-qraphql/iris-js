@@ -1,5 +1,4 @@
-import { didYouMean } from '../../jsutils/didYouMean';
-import { suggestionList } from '../../jsutils/suggestionList';
+import { didYouMean, suggestionList } from '../../jsutils/suggestions';
 
 import type { ASTNode } from '../../language/ast';
 import {

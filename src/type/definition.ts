@@ -3,14 +3,13 @@ import { Kind, valueFromASTUntyped } from 'graphql';
 import { contains, identity, isNil, pluck } from 'ramda';
 
 import { devAssert } from '../jsutils/devAssert';
-import { didYouMean } from '../jsutils/didYouMean';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { mapValue } from '../jsutils/ObjMap';
 import type { PromiseOrValue } from '../jsutils/PromiseOrValue';
-import { suggestionList } from '../jsutils/suggestionList';
+import { didYouMean, suggestionList } from '../jsutils/suggestions';
 
 import type {
   ArgumentDefinitionNode,
