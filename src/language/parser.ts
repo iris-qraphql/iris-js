@@ -1,6 +1,7 @@
 import type { ParseOptions } from 'graphql';
-import { Kind, Location, TokenKind } from 'graphql';
+import { Kind, Location, Source, TokenKind } from 'graphql';
 
+import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
 
 import type { GraphQLError } from '../error';
@@ -41,7 +42,6 @@ import { parseDefinitions } from './definitions';
 import { DirectiveLocation } from './directiveLocation';
 import { IrisKind } from './kinds';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
-import { isSource, Source } from './source';
 
 /**
  * Given a GraphQL source, parses it into a Document.
@@ -110,6 +110,10 @@ export function parseType(
   const type = parser.parseTypeReference();
   parser.expectToken(TokenKind.EOF);
   return type;
+}
+
+export function isSource(source: unknown): source is Source {
+  return instanceOf(source, Source);
 }
 
 /**

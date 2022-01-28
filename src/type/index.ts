@@ -1,5 +1,3 @@
-export type { Path as ResponsePath } from '../jsutils/Path';
-
 export {
   // Predicate
   isSchema,
@@ -23,7 +21,6 @@ export {
   isResolverType,
   isWrappingType,
   isNullableType,
-  isNamedType,
   isRequiredArgument,
   assertResolverType,
   assertListType,
@@ -48,7 +45,6 @@ export type {
   GraphQLField,
   GraphQLFieldResolver,
   GraphQLIsTypeOfFn,
-  GraphQLTypeResolver,
 } from './definition';
 
 export {
@@ -61,12 +57,7 @@ export {
   // Built-in Directives defined by the Spec
   isSpecifiedDirective,
   specifiedDirectives,
-  GraphQLIncludeDirective,
-  GraphQLSkipDirective,
   GraphQLDeprecatedDirective,
-  GraphQLSpecifiedByDirective,
-  // Constant Deprecation Reason
-  DEFAULT_DEPRECATION_REASON,
 } from './directives';
 
 export type {

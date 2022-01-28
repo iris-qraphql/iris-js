@@ -1,6 +1,6 @@
-import { keyMap } from '../jsutils/keyMap';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
+import { keyMap } from '../jsutils/ObjMap';
 
 import type {
   ArgumentDefinitionNode,

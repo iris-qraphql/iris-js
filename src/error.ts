@@ -1,21 +1,41 @@
+/* eslint-disable @typescript-eslint/no-useless-constructor */
+import type { Source } from 'graphql';
+import { GraphQLError as GQLError } from 'graphql';
 import { locatedError as func } from 'graphql/error';
-import type { Source } from 'graphql/language/source';
+import type {
+  GraphQLErrorArgs,
+  GraphQLErrorExtensions,
+} from 'graphql/error/GraphQLError';
 
 import type { Maybe } from './jsutils/Maybe';
 
 import type { ASTNode } from './language/ast';
 
-import { GraphQLError } from './gql-error/GraphQLError';
+type IrisErrorArgs = GraphQLErrorArgs & {
+  node: ReadonlyArray<ASTNode> | ASTNode | null;
+};
 
-export {
-  GraphQLError,
-  printError,
-  formatError,
-} from './gql-error/GraphQLError';
-export type {
-  GraphQLFormattedError,
-  GraphQLErrorExtensions,
-} from './gql-error/GraphQLError';
+export class GraphQLError extends GQLError {
+  constructor(
+    message: string,
+    nodes?: ReadonlyArray<ASTNode> | ASTNode | null,
+    source?: Maybe<Source>,
+    positions?: Maybe<ReadonlyArray<number>>,
+    path?: Maybe<ReadonlyArray<string | number>>,
+    originalError?: Maybe<
+      Error & {
+        readonly extensions?: unknown;
+      }
+    >,
+    extensions?: Maybe<GraphQLErrorExtensions>,
+  ) {
+    // @ts-expect-error
+    super(message, nodes, source, positions, path, originalError, extensions);
+  }
+
+  // @ts-expect-error
+  constructor(message: string, args?: IrisErrorArgs);
+}
 
 export const locatedError = (
   rawOriginalError: unknown,

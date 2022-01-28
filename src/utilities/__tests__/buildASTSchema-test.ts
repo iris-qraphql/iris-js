@@ -3,12 +3,7 @@ import { dedent } from '../../__testUtils__/dedent';
 import { IrisKind } from '../../language/kinds';
 
 import { assertDataType, assertResolverType } from '../../type/definition';
-import {
-  GraphQLDeprecatedDirective,
-  GraphQLIncludeDirective,
-  GraphQLSkipDirective,
-  GraphQLSpecifiedByDirective,
-} from '../../type/directives';
+import { GraphQLDeprecatedDirective } from '../../type/directives';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -134,13 +129,8 @@ describe('Schema Builder', () => {
     `);
 
     expect(schema.getDirectives()).toHaveLength(4);
-    expect(schema.getDirective('skip')).not.toEqual(GraphQLSkipDirective);
-    expect(schema.getDirective('include')).not.toEqual(GraphQLIncludeDirective);
     expect(schema.getDirective('deprecated')).not.toEqual(
       GraphQLDeprecatedDirective,
-    );
-    expect(schema.getDirective('specifiedBy')).not.toEqual(
-      GraphQLSpecifiedByDirective,
     );
   });
 
@@ -411,7 +401,7 @@ describe('Schema Builder', () => {
     const oldValue = myEnum.getValue('OLD_VALUE');
     expect(oldValue).toEqual(
       expect.objectContaining({
-        deprecationReason: 'No longer supported',
+        deprecationReason: '',
       }),
     );
 
@@ -427,7 +417,7 @@ describe('Schema Builder', () => {
     ).getResolverFields();
     expect(rootFields.field1).toEqual(
       expect.objectContaining({
-        deprecationReason: 'No longer supported',
+        deprecationReason: '',
       }),
     );
     expect(rootFields.field2).toEqual(
@@ -439,7 +429,7 @@ describe('Schema Builder', () => {
     const field3OldArg = rootFields.field3.args[0];
     expect(field3OldArg).toEqual(
       expect.objectContaining({
-        deprecationReason: 'No longer supported',
+        deprecationReason: '',
       }),
     );
 

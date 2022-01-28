@@ -2,9 +2,8 @@ import { Kind } from 'graphql';
 
 import { inspect } from '../jsutils/inspect';
 import { invariant } from '../jsutils/invariant';
-import { isIterableObject } from '../jsutils/isIterableObject';
-import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
+import { isIterableObject, isObjectLike } from '../jsutils/ObjMap';
 
 import type {
   ObjectFieldNode,
@@ -140,15 +139,16 @@ const parseVariantValue = (
 ): ObjectValueNode => {
   const fieldNodes: Array<ObjectFieldNode> = [];
 
-  for (const field of Object.values(variant.fields ?? {})) {
-    const fieldValue = astFromValue(value[field.name], field.type);
+  Object.values(variant.fields ?? {}).forEach(({ name, type }) => {
+    const fieldValue = astFromValue(value[name], type);
     if (fieldValue) {
       fieldNodes.push({
         kind: Kind.OBJECT_FIELD,
-        name: { kind: Kind.NAME, value: field.name },
+        name: { kind: Kind.NAME, value: name },
         value: fieldValue,
       });
     }
-  }
+  });
+
   return { kind: Kind.OBJECT, fields: fieldNodes };
 };

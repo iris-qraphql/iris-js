@@ -17,7 +17,6 @@ import {
   isInputObjectType,
   isInputType,
   isListType,
-  isNamedType,
   isNonNullType,
   isNullableType,
   isObjectType,
@@ -33,8 +32,6 @@ import {
   assertDirective,
   GraphQLDeprecatedDirective,
   GraphQLDirective,
-  GraphQLIncludeDirective,
-  GraphQLSkipDirective,
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
@@ -333,17 +330,6 @@ describe('Type predicates', () => {
     });
   });
 
-  describe('isNamedType', () => {
-    it('returns true for unwrapped types', () => {
-      expect(isNamedType(ObjectType)).toEqual(true);
-    });
-
-    it('returns false for list and non-null types', () => {
-      expect(isNamedType(new GraphQLList(ObjectType))).toEqual(false);
-      expect(isNamedType(new GraphQLNonNull(ObjectType))).toEqual(false);
-    });
-  });
-
   describe('getNamedType', () => {
     it('returns undefined for no type', () => {
       expect(getNamedType(undefined)).toEqual(undefined);
@@ -456,11 +442,6 @@ describe('Type predicates', () => {
 
 describe('Directive predicates', () => {
   describe('isDirective', () => {
-    it('returns true for spec defined directive', () => {
-      expect(isDirective(GraphQLSkipDirective)).toEqual(true);
-      expect(() => assertDirective(GraphQLSkipDirective)).not.toThrow();
-    });
-
     it('returns true for custom directive', () => {
       expect(isDirective(Directive)).toEqual(true);
       expect(() => assertDirective(Directive)).not.toThrow();
@@ -485,8 +466,6 @@ describe('Directive predicates', () => {
   });
   describe('isSpecifiedDirective', () => {
     it('returns true for specified directives', () => {
-      expect(isSpecifiedDirective(GraphQLIncludeDirective)).toEqual(true);
-      expect(isSpecifiedDirective(GraphQLSkipDirective)).toEqual(true);
       expect(isSpecifiedDirective(GraphQLDeprecatedDirective)).toEqual(true);
     });
 

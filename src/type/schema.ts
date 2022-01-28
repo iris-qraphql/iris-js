@@ -1,9 +1,9 @@
 import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
-import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
+import { isObjectLike } from '../jsutils/ObjMap';
 
 import type { GraphQLError } from '../error';
 
@@ -122,9 +122,6 @@ export class GraphQLSchema {
   private _directives: ReadonlyArray<GraphQLDirective>;
   private _typeMap: TypeMap;
   private _subTypeMap: ObjMap<ObjMap<boolean>>;
-  private _implementationsMap: ObjMap<{
-    objects: Array<IrisResolverType>;
-  }>;
 
   constructor(config: Readonly<GraphQLSchemaConfig>) {
     // If this schema was built from a source known to be valid, then it may be
@@ -187,8 +184,6 @@ export class GraphQLSchema {
     // Storing the resulting map for reference by the schema.
     this._typeMap = Object.create(null);
     this._subTypeMap = Object.create(null);
-    // Keep track of all implementations by interface name.
-    this._implementationsMap = Object.create(null);
 
     for (const namedType of allReferencedTypes) {
       if (namedType == null) {

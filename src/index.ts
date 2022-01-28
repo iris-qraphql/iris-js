@@ -28,9 +28,6 @@
 
 // The GraphQL.js version info.
 export { version, versionInfo } from './version';
-
-// The primary entry point into fulfilling a GraphQL request.
-export type { GraphQLArgs } from './iris';
 export { graphql } from './iris';
 
 export {
@@ -47,11 +44,7 @@ export {
   GRAPHQL_MAX_INT,
   GRAPHQL_MIN_INT,
   specifiedDirectives,
-  GraphQLIncludeDirective,
-  GraphQLSkipDirective,
   GraphQLDeprecatedDirective,
-  GraphQLSpecifiedByDirective,
-  DEFAULT_DEPRECATION_REASON,
   isSchema,
   isDirective,
   isType,
@@ -66,7 +59,6 @@ export {
   isResolverType,
   isWrappingType,
   isNullableType,
-  isNamedType,
   isRequiredArgument,
   isSpecifiedScalarType,
   isSpecifiedDirective,
@@ -100,13 +92,9 @@ export type {
   GraphQLField,
   GraphQLFieldResolver,
   GraphQLIsTypeOfFn,
-  ResponsePath,
-  GraphQLTypeResolver,
 } from './type/index';
 
-// Parse and operate on GraphQL language source files.
 export {
-  Source,
   // Print source location.
   // Lex
   Lexer,
@@ -197,14 +185,7 @@ export {
   // Create a GraphQL language AST from a JavaScript value.
   astFromValue,
   // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.
-  TypeInfo,
-  visitWithTypeInfo,
-  // Strips characters that are not significant to the validity or execution of a GraphQL document.
-  stripIgnoredCharacters,
-  // Comparators for types
-  isEqualType,
-  isTypeSubTypeOf,
-  doTypesOverlap, // Asserts a string is a valid GraphQL name. // Determine if a string is a valid GraphQL name.
+  TypeInfo, // Comparators for types
 } from './utilities/index';
 
 export type { BuildSchemaOptions } from './utilities/index';

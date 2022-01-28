@@ -1,11 +1,10 @@
-import type { ParseOptions } from 'graphql';
+import type { ParseOptions, Source } from 'graphql';
 
 import { devAssert } from '../jsutils/devAssert';
 
 import type { DocumentNode } from '../language/ast';
 import { IrisKind } from '../language/kinds';
 import { parse } from '../language/parser';
-import type { Source } from '../language/source';
 
 import { specifiedDirectives } from '../type/directives';
 import type { GraphQLSchemaValidationOptions } from '../type/schema';

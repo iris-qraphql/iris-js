@@ -1,4 +1,4 @@
-import type { GraphQLType, IrisResolverType } from '../type/definition';
+import type { GraphQLType } from '../type/definition';
 import {
   isListType,
   isNonNullType,
@@ -6,29 +6,6 @@ import {
   isUnionType,
 } from '../type/definition';
 import type { GraphQLSchema } from '../type/schema';
-
-/**
- * Provided two types, return true if the types are equal (invariant).
- */
-export function isEqualType(typeA: GraphQLType, typeB: GraphQLType): boolean {
-  // Equivalent types are equal.
-  if (typeA === typeB) {
-    return true;
-  }
-
-  // If either type is non-null, the other must also be non-null.
-  if (isNonNullType(typeA) && isNonNullType(typeB)) {
-    return isEqualType(typeA.ofType, typeB.ofType);
-  }
-
-  // If either type is a list, the other must also be a list.
-  if (isListType(typeA) && isListType(typeB)) {
-    return isEqualType(typeA.ofType, typeB.ofType);
-  }
-
-  // Otherwise the types are not equal.
-  return false;
-}
 
 /**
  * Provided a type and a super type, return true if the first type is either
@@ -75,44 +52,4 @@ export function isTypeSubTypeOf(
     isObjectType(maybeSubType) &&
     schema.isSubType(superType, maybeSubType)
   );
-}
-
-/**
- * Provided two composite types, determine if they "overlap". Two composite
- * types overlap when the Sets of possible concrete types for each intersect.
- *
- * This is often used to determine if a fragment of a given type could possibly
- * be visited in a context of another type.
- *
- * This function is commutative.
- */
-export function doTypesOverlap(
-  schema: GraphQLSchema,
-  typeA: IrisResolverType,
-  typeB: IrisResolverType,
-): boolean {
-  // Equivalent types overlap
-  if (typeA === typeB) {
-    return true;
-  }
-
-  if (isUnionType(typeA)) {
-    if (isUnionType(typeB)) {
-      // If both types are abstract, then determine if there is any intersection
-      // between possible concrete types of each.
-      return schema
-        .getPossibleTypes(typeA)
-        .some((type) => schema.isSubType(typeB, type));
-    }
-    // Determine if the latter type is a possible concrete type of the former.
-    return schema.isSubType(typeA, typeB);
-  }
-
-  if (isUnionType(typeB)) {
-    // Determine if the former type is a possible concrete type of the latter.
-    return schema.isSubType(typeB, typeA);
-  }
-
-  // Otherwise the types do not overlap.
-  return false;
 }

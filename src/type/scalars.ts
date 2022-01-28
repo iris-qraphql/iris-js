@@ -1,7 +1,7 @@
 import { Kind } from 'graphql';
 
 import { inspect } from '../jsutils/inspect';
-import { isObjectLike } from '../jsutils/isObjectLike';
+import { isObjectLike } from '../jsutils/ObjMap';
 
 import { print } from '../language/printer';
 
