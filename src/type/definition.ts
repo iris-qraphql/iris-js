@@ -422,17 +422,16 @@ export class IrisResolverType<TSource = any, TContext = any> {
     this.astNode = config.astNode;
     this._isVariantType =
       config.variants.length === 0 ||
-      ( config.variants.length === 1 &&
+      (config.variants.length === 1 &&
         config.variants[0]?.name === config.name &&
         config.variants[0]?.fields !== undefined);
 
     this.isTypeOf = config.isTypeOf;
+    const configFields = config.variants[0]?.fields ?? {};
+
     this._fields = () =>
       this._isVariantType
-        ? mapValue(
-            resolveThunk(config.variants[0].fields ?? {}),
-            defineFieldFor(config.name),
-          )
+        ? mapValue(resolveThunk(configFields), defineFieldFor(config.name))
         : {};
 
     // UNION

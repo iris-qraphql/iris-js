@@ -59,19 +59,22 @@ export const parseVariantsDefinition = <R extends Role>(
   name: NameNode,
   parser: Parser,
 ): ReadonlyArray<_VariantDefinitionNode<R>> => {
-  const isEquals = parser.expectOptionalToken(TokenKind.EQUALS);
-
-  const afterEquals = parser.lookAhead().kind;
-  if (isEquals && ![TokenKind.BRACE_L, TokenKind.NAME].includes(afterEquals)) {
-    parser.throwExpected('Variant');
+  const equal = parser.expectOptionalToken(TokenKind.EQUALS);
+  if (!equal) {
+    return [];
   }
 
-  const isUnion = parser.lookAhead().kind !== TokenKind.BRACE_L;
-  return isEquals && isUnion
-    ? parser.delimitedMany(TokenKind.PIPE, () =>
+  switch (parser.lookAhead().kind) {
+    case TokenKind.NAME:
+      return parser.delimitedMany(TokenKind.PIPE, () =>
         parseVariantDefinition(role, parser),
-      )
-    : [parseVariantDefinition(role, parser, name)];
+      );
+    case TokenKind.BRACE_L:
+      return [parseVariantDefinition(role, parser, name)];
+    default:
+      parser.throwExpected('Variant');
+      return [];
+  }
 };
 
 const parseVariantDefinition = <R extends Role>(

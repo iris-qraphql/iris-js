@@ -38,7 +38,7 @@ describe('Validate: Known type names', () => {
           foo(arg: SomeInputObject): String
         }
 
-        data  SomeInputObject {
+        data  SomeInputObject = {
           someScalar: SomeScalar
         }
 
@@ -64,7 +64,7 @@ describe('Validate: Known type names', () => {
 
         resolver SomeUnion = F | G
 
-        data SomeInput {
+        data SomeInput = {
           j: J
         }
 

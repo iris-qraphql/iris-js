@@ -137,14 +137,14 @@ describe('Schema Parser', () => {
 
   it('Simple data object', () => {
     snapshot(`
-    data Hello {
+    data Hello = {
       world: String
     }`);
   });
 
   it('Simple data object with args should fail', () => {
     expectSyntaxError(`
-      data  Hello {
+      data  Hello = {
         world(foo: Int): String
       }
     `).toEqual({

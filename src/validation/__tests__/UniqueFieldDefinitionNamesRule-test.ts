@@ -60,7 +60,7 @@ describe('Validate: Unique field definition names', () => {
         foo: String
       }
 
-      data SomeInputObject {
+      data SomeInputObject = {
         foo: String
         bar: String
         foo: String

@@ -124,7 +124,7 @@ Object {
       "directives": Array [],
       "kind": "DataTypeDefinition",
       "loc": Object {
-        "end": 43,
+        "end": 45,
         "start": 5,
       },
       "name": Object {
@@ -146,28 +146,28 @@ Object {
               "directives": Array [],
               "kind": "FieldDefinition",
               "loc": Object {
-                "end": 37,
-                "start": 24,
+                "end": 39,
+                "start": 26,
               },
               "name": Object {
                 "kind": "Name",
                 "loc": Object {
-                  "end": 29,
-                  "start": 24,
+                  "end": 31,
+                  "start": 26,
                 },
                 "value": "world",
               },
               "type": Object {
                 "kind": "NamedType",
                 "loc": Object {
-                  "end": 37,
-                  "start": 31,
+                  "end": 39,
+                  "start": 33,
                 },
                 "name": Object {
                   "kind": "Name",
                   "loc": Object {
-                    "end": 37,
-                    "start": 31,
+                    "end": 39,
+                    "start": 33,
                   },
                   "value": "String",
                 },
@@ -176,8 +176,8 @@ Object {
           ],
           "kind": "VariantDefinition",
           "loc": Object {
-            "end": 43,
-            "start": 16,
+            "end": 45,
+            "start": 18,
           },
           "name": Object {
             "kind": "Name",
@@ -193,7 +193,7 @@ Object {
   ],
   "kind": "Document",
   "loc": Object {
-    "end": 43,
+    "end": 45,
     "start": 0,
   },
 }
