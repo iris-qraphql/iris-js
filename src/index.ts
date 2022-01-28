@@ -94,9 +94,7 @@ export type {
   GraphQLIsTypeOfFn,
 } from './type/index';
 
-// Parse and operate on GraphQL language source files.
 export {
-  Source,
   // Print source location.
   // Lex
   Lexer,

@@ -1,9 +1,9 @@
 import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
-import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
+import { isObjectLike } from '../jsutils/ObjMap';
 
 import type { GraphQLError } from '../error';
 

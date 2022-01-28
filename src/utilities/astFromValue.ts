@@ -2,9 +2,8 @@ import { Kind } from 'graphql';
 
 import { inspect } from '../jsutils/inspect';
 import { invariant } from '../jsutils/invariant';
-import { isIterableObject } from '../jsutils/isIterableObject';
-import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
+import { isIterableObject, isObjectLike } from '../jsutils/ObjMap';
 
 import type {
   ObjectFieldNode,

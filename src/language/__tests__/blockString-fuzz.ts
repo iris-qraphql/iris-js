@@ -1,3 +1,5 @@
+import { Source } from 'graphql';
+
 import { dedent } from '../../__testUtils__/dedent';
 import { genFuzzStrings } from '../../__testUtils__/genFuzzStrings';
 import { inspectStr } from '../../__testUtils__/inspectStr';
@@ -6,7 +8,6 @@ import { invariant } from '../../jsutils/invariant';
 
 import { isPrintableAsBlockString, printBlockString } from '../blockString';
 import { Lexer } from '../lexer';
-import { Source } from '../source';
 
 function lexValue(str: string): string {
   const lexer = new Lexer(new Source(str));

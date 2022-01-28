@@ -1,3 +1,4 @@
+import type { Source } from 'graphql';
 import type { ExecutionResult } from 'graphql/execution';
 import { execute } from 'graphql/execution';
 
@@ -6,7 +7,6 @@ import type { Maybe } from './jsutils/Maybe';
 import type { PromiseOrValue } from './jsutils/PromiseOrValue';
 
 import { parse } from './language/parser';
-import type { Source } from './language/source';
 
 import type {
   GraphQLFieldResolver,

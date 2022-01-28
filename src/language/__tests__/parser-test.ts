@@ -1,11 +1,10 @@
-import { Kind } from 'graphql';
+import { Kind, Source } from 'graphql';
 
 import { dedent } from '../../__testUtils__/dedent';
 
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
 import { parse, parseConstValue, parseType, parseValue } from '../parser';
-import { Source } from '../source';
 
 export function expectJSON(actual: unknown) {
   const actualJSON = toJSONDeep(actual);

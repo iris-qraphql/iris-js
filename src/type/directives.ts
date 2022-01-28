@@ -1,8 +1,8 @@
 import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
-import { isObjectLike } from '../jsutils/isObjectLike';
 import type { Maybe } from '../jsutils/Maybe';
+import { isObjectLike } from '../jsutils/ObjMap';
 
 import type { DirectiveDefinitionNode } from '../language/ast';
 import { DirectiveLocation } from '../language/directiveLocation';
