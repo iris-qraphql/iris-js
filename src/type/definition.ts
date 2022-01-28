@@ -1,3 +1,4 @@
+import type { ResponsePath } from 'graphql';
 import { Kind, valueFromASTUntyped } from 'graphql';
 import { contains, identity, isNil, pluck } from 'ramda';
 
@@ -8,7 +9,6 @@ import { instanceOf } from '../jsutils/instanceOf';
 import { mapValue } from '../jsutils/mapValue';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
-import type { Path } from '../jsutils/Path';
 import type { PromiseOrValue } from '../jsutils/PromiseOrValue';
 import { suggestionList } from '../jsutils/suggestionList';
 
@@ -348,7 +348,7 @@ export type GraphQLResolveInfo = {
   readonly fieldName: string;
   readonly returnType: GraphQLOutputType;
   readonly parentType: IrisResolverType;
-  readonly path: Path;
+  readonly path: ResponsePath;
   readonly schema: GraphQLSchema;
   readonly rootValue: unknown;
   readonly variableValues: Record<string, unknown>;

@@ -157,8 +157,6 @@ function validateDirectives(context: SchemaValidationContext): void {
     // Ensure they are named correctly.
     validateName(context, directive);
 
-    // TODO: Ensure proper locations.
-
     // Ensure the arguments are valid.
     for (const arg of directive.args) {
       // Ensure they are named correctly.

@@ -1,5 +1,3 @@
-export type { Path as ResponsePath } from '../jsutils/Path';
-
 export {
   // Predicate
   isSchema,
@@ -61,12 +59,7 @@ export {
   // Built-in Directives defined by the Spec
   isSpecifiedDirective,
   specifiedDirectives,
-  GraphQLIncludeDirective,
-  GraphQLSkipDirective,
   GraphQLDeprecatedDirective,
-  GraphQLSpecifiedByDirective,
-  // Constant Deprecation Reason
-  DEFAULT_DEPRECATION_REASON,
 } from './directives';
 
 export type {

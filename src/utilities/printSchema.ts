@@ -19,10 +19,7 @@ import type {
 } from '../type/definition';
 import { isDataType, isResolverType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
-import {
-  DEFAULT_DEPRECATION_REASON,
-  isSpecifiedDirective,
-} from '../type/directives';
+import { isSpecifiedDirective } from '../type/directives';
 import { isSpecifiedScalarType } from '../type/scalars';
 import type { GraphQLSchema } from '../type/schema';
 
@@ -203,7 +200,7 @@ function printDeprecated(reason: Maybe<string>): string {
   if (reason == null) {
     return '';
   }
-  if (reason !== DEFAULT_DEPRECATION_REASON) {
+  if (reason) {
     const astValue = print({ kind: Kind.STRING, value: reason });
     return ` @deprecated(reason: ${astValue})`;
   }
