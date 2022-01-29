@@ -353,7 +353,7 @@ describe('astFromValue', () => {
 
   it('does not converts non-object values as input objects', () => {
     expect(toJSONError(() => astFromValue(5, inputObj))).toEqual({
-      message: 'Data "MyInputObj" cannot represent value: 5',
+      message: 'Data "MyInputObj" cannot represent non-string value: 5.',
     });
   });
 });

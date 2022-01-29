@@ -5,8 +5,6 @@ import type {
   DataParser,
   DataSerializer,
   GraphQLFieldConfig,
-  GraphQLIsTypeOfFn,
-  GraphQLTypeResolver,
   IrisDataVariantField,
   IrisResolverVariantConfig,
   ThunkObjMap,
@@ -41,33 +39,29 @@ type GQLObject<S = any> = {
   name: string;
   description?: string;
   fields: ThunkObjMap<GraphQLFieldConfig<S, any>>;
-  isTypeOf?: GraphQLIsTypeOfFn<any, any>;
 };
 
-const gqlObject = <S>({ name, fields, isTypeOf, description }: GQLObject<S>) =>
+const gqlObject = <S>({ name, fields, description }: GQLObject<S>) =>
   new IrisResolverType({
     name,
     variants: [{ name, description, fields }],
-    isTypeOf,
     description,
   });
 
 type GQLUnion = {
   name: string;
   types: ReadonlyArray<IrisResolverType>;
-  resolveType?: GraphQLTypeResolver<any, any>;
 };
 
-const gqlUnion = ({ name, types, resolveType }: GQLUnion) =>
+const gqlUnion = ({ name, types }: GQLUnion) =>
   new IrisResolverType({
     name,
     variants: types.map(
-      (type): IrisResolverVariantConfig<any, any> => ({
+      (type): IrisResolverVariantConfig => ({
         name: type.name,
         type: () => type,
       }),
     ),
-    resolveType,
   });
 
 type GQLScalar<I = unknown, O = I> = {

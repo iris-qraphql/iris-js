@@ -3,19 +3,16 @@ import { OperationTypeNode } from 'graphql';
 import { inspect } from '../jsutils/inspect';
 import type { Maybe } from '../jsutils/Maybe';
 
-import type {
-  ASTNode,
-  DirectiveNode,
-  NameNode,
-  ResolverTypeDefinitionNode,
-} from '../language/ast';
+import type { ASTNode, DirectiveNode } from '../language/ast';
 
 import { GraphQLError } from '../error';
 
 import type {
+  GraphQLField,
   IrisDataType,
   IrisDataVariant,
   IrisResolverType,
+  IrisResolverVariant,
 } from './definition';
 import {
   isDataType,
@@ -23,7 +20,6 @@ import {
   isObjectType,
   isOutputType,
   isRequiredArgument,
-  isRequiredInputField,
   isResolverType,
 } from './definition';
 import { GraphQLDeprecatedDirective, isDirective } from './directives';
@@ -210,18 +206,22 @@ const validateResolverType = (
   context: SchemaValidationContext,
   type: IrisResolverType,
 ) => {
+  const variants = type.variants();
   if (type.isVariantType()) {
-    return validateFields(context, type);
+    return validateFields(
+      type.name,
+      context,
+      Object.values(variants[0]?.fields ?? {}),
+    );
   }
-  validateUnionMembers(context, type);
+  return validateUnionMembers(type.name, context, variants);
 };
 
 function validateFields(
+  typeName: string,
   context: SchemaValidationContext,
-  type: IrisResolverType,
+  fields: ReadonlyArray<GraphQLField>,
 ): void {
-  const fields = Object.values(type.getResolverFields());
-
   for (const field of fields) {
     // Ensure they are named correctly.
     validateName(context, field);
@@ -229,7 +229,7 @@ function validateFields(
     // Ensure the type is an output type
     if (!isOutputType(field.type)) {
       context.reportError(
-        `The type of ${type.name}.${field.name} must be Output Type ` +
+        `The type of ${typeName}.${field.name} must be Output Type ` +
           `but got: ${inspect(field.type)}.`,
         field.astNode?.type,
       );
@@ -245,7 +245,7 @@ function validateFields(
       // Ensure the type is an input type
       if (!isInputType(arg.type)) {
         context.reportError(
-          `The type of ${type.name}.${field.name}(${argName}:) must be Input ` +
+          `The type of ${typeName}.${field.name}(${argName}:) must be Input ` +
             `Type but got: ${inspect(arg.type)}.`,
           arg.astNode?.type,
         );
@@ -253,7 +253,7 @@ function validateFields(
 
       if (isRequiredArgument(arg) && arg.deprecationReason != null) {
         context.reportError(
-          `Required argument ${type.name}.${field.name}(${argName}:) cannot be deprecated.`,
+          `Required argument ${typeName}.${field.name}(${argName}:) cannot be deprecated.`,
           [getDeprecatedDirectiveNode(arg.astNode), arg.astNode?.type],
         );
       }
@@ -262,24 +262,26 @@ function validateFields(
 }
 
 function validateUnionMembers(
+  typeName: string,
   context: SchemaValidationContext,
-  adt: IrisResolverType,
+  variants: ReadonlyArray<IrisResolverVariant>,
 ): void {
   const listedMembers: Record<string, boolean> = {};
 
-  adt.getTypes().forEach((memberType) => {
-    if (listedMembers[memberType.name]) {
+  variants.forEach(({ name, astNode, type }) => {
+    if (listedMembers[name]) {
       return context.reportError(
-        `Union type ${adt.name} can only include type ${memberType.name} once.`,
-        getResolverVariantNames(adt, memberType.name),
+        `Union type ${typeName} can only include type ${name} once.`,
+        astNode?.name,
       );
     }
-    listedMembers[memberType.name] = true;
-    if (!isObjectType(memberType)) {
+
+    listedMembers[name] = true;
+    if (type && (!type?.isVariantType?.() || isDataType(type))) {
       context.reportError(
-        `Union type ${adt.name} can only include Object types, ` +
-          `it cannot include ${inspect(memberType)}.`,
-        getResolverVariantNames(adt, String(memberType)),
+        `Union type ${typeName} can only include Object types, ` +
+          `it cannot include ${inspect(type)}.`,
+        astNode?.name,
       );
     }
   });
@@ -289,7 +291,7 @@ const validateDataType = (
   context: SchemaValidationContext,
   type: IrisDataType,
 ): void => {
-  type.getVariants().forEach((variant) => {
+  type.variants().forEach((variant) => {
     validateName(context, variant);
     validateDataFields(context, variant);
   });
@@ -314,30 +316,7 @@ function validateDataFields(
         field.astNode?.type,
       );
     }
-
-    if (isRequiredInputField(field) && field.deprecationReason != null) {
-      context.reportError(
-        `Required input field ${variant.name}.${field.name} cannot be deprecated.`,
-        [getDeprecatedDirectiveNode(field.astNode), field.astNode?.type],
-      );
-    }
   }
-}
-
-function getResolverVariantNames(
-  union: IrisResolverType,
-  typeName: string,
-): Maybe<ReadonlyArray<NameNode>> {
-  const { astNode } = union;
-  const nodes: ReadonlyArray<ResolverTypeDefinitionNode> =
-    astNode != null ? [astNode] : [];
-
-  return nodes
-    .flatMap(
-      (unionNode) =>
-        /* c8 ignore next */ unionNode.variants?.map((x) => x.name) ?? [],
-    )
-    .filter((typeNode) => typeNode.value === typeName);
 }
 
 function getDeprecatedDirectiveNode(
