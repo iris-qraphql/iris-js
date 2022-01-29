@@ -13,7 +13,6 @@ import {
   isInputObjectType,
   isListType,
   isNonNullType,
-  isRequiredInputField,
 } from '../../type/definition';
 
 import { GraphQLError } from '../../error';
@@ -53,7 +52,7 @@ export function ValuesOfCorrectTypeRule(
       const variantName = lookupObjectTypename(nodeFields);
       Object.values(type.variantBy(variantName).fields ?? {}).forEach(
         (fieldDef) => {
-          if (!nodeFields[fieldDef.name] && isRequiredInputField(fieldDef)) {
+          if (!nodeFields[fieldDef.name] && isNonNullType(fieldDef.type)) {
             context.reportError(
               new GraphQLError(
                 `Field "${type.name}.${

@@ -1,5 +1,6 @@
 import { Kind } from 'graphql';
 import { isPrintableAsBlockString } from 'graphql/language/blockString';
+import { pluck } from 'ramda';
 
 import { inspect } from '../jsutils/inspect';
 import { invariant } from '../jsutils/invariant';
@@ -54,7 +55,7 @@ function printFilteredSchema(
 
 export function printType(type: GraphQLNamedType): string {
   if (isResolverType(type)) {
-    return type.isVariantType() ? printObject(type) : printUnion(type);
+    return printResolver(type);
   }
   if (isDataType(type)) {
     return printDATA(type);
@@ -64,24 +65,29 @@ export function printType(type: GraphQLNamedType): string {
   invariant(false, 'Unexpected type: ' + inspect(type));
 }
 
-function printObject(type: IrisResolverType): string {
-  const fields = Object.values(type.getResolverFields());
-  return (
-    printDescription(type) +
-    `resolver ${type.name}${Object.keys(fields).length > 0 ? ' =' : ''}${
-      fields.length === 0 ? '' : printFields(fields)
-    }`
-  );
-}
+function printResolver(type: IrisResolverType): string {
+  const variants = type.variants();
+  const start = printDescription(type) + `resolver ${type.name}`;
 
-function printUnion(type: IrisResolverType): string {
-  const types = type.getTypes();
-  const possibleTypes = types.length ? ' = ' + types.join(' | ') : '';
-  return printDescription(type) + 'resolver ' + type.name + possibleTypes;
+  if (variants.length === 0) {
+    return start;
+  }
+
+  if (type.isVariantType()) {
+    const variant = variants[0];
+    const fields = Object.values(variant.fields ?? {});
+    if (fields.length === 0 && variant.name === type.name) {
+      return start;
+    }
+
+    return start + ' =' + printFields(fields);
+  }
+
+  return start + ' = ' + pluck('name', variants).join(' | ');
 }
 
 function printDATA(type: IrisDataType): string {
-  const variants = type.getVariants();
+  const variants = type.variants();
   const start = printDescription(type) + `data ${type.name}`;
 
   if (variants.length === 0) {

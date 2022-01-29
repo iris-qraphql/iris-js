@@ -1,10 +1,6 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import type {
-  GraphQLArgument,
-  GraphQLInputType,
-  IrisDataVariantField,
-} from '../definition';
+import type { GraphQLArgument, GraphQLInputType } from '../definition';
 import {
   assertListType,
   assertNonNullType,
@@ -22,7 +18,6 @@ import {
   isObjectType,
   isOutputType,
   isRequiredArgument,
-  isRequiredInputField,
   isResolverType,
   isType,
   isUnionType,
@@ -398,44 +393,6 @@ describe('Type predicates', () => {
         defaultValue: 'default',
       });
       expect(isRequiredArgument(optArg4)).toEqual(false);
-    });
-  });
-
-  describe('isRequiredInputField', () => {
-    function buildInputField(config: {
-      type: GraphQLInputType;
-    }): IrisDataVariantField {
-      return {
-        name: 'someInputField',
-        type: config.type,
-        description: undefined,
-        deprecationReason: null,
-        astNode: undefined,
-      };
-    }
-
-    it('returns true for required data  field', () => {
-      const requiredField = buildInputField({
-        type: new GraphQLNonNull(GraphQLString),
-      });
-      expect(isRequiredInputField(requiredField)).toEqual(true);
-    });
-
-    it('returns false for optional data  field', () => {
-      const optField1 = buildInputField({
-        type: GraphQLString,
-      });
-      expect(isRequiredInputField(optField1)).toEqual(false);
-
-      const optField2 = buildInputField({
-        type: GraphQLString,
-      });
-      expect(isRequiredInputField(optField2)).toEqual(false);
-
-      const optField3 = buildInputField({
-        type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
-      });
-      expect(isRequiredInputField(optField3)).toEqual(false);
     });
   });
 });

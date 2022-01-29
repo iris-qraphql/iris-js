@@ -20,8 +20,6 @@ import {
   getNamedType,
   getNullableType,
   isDataType,
-  isEnumType,
-  isInputObjectType,
   isInputType,
   isListType,
   isOutputType,
@@ -176,14 +174,10 @@ export class TypeInfo {
         break;
       }
       case Kind.ENUM: {
-        const enumType: unknown = getNamedType(this.getInputType());
-        let enumValue;
-        if (isEnumType(enumType)) {
-          enumValue = enumType.getValue(node.value);
-        } else if (isInputObjectType(enumType)) {
-          enumValue = enumType.getVariants() as any as IrisDataVariant;
+        const enumType = getNamedType(this.getInputType());
+        if (isDataType(enumType)) {
+          this._enumValue = enumType.variantBy(node.value);
         }
-        this._enumValue = enumValue;
         break;
       }
       default:

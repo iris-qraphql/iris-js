@@ -393,28 +393,28 @@ describe('Schema Builder', () => {
 
     const myEnum = assertDataType(schema.getType('MyEnum'));
 
-    const value = myEnum.getValue('VALUE');
+    const value = myEnum.variantBy('VALUE');
     expect(value).toEqual(
       expect.objectContaining({ deprecationReason: undefined }),
     );
 
-    const oldValue = myEnum.getValue('OLD_VALUE');
+    const oldValue = myEnum.variantBy('OLD_VALUE');
     expect(oldValue).toEqual(
       expect.objectContaining({
         deprecationReason: '',
       }),
     );
 
-    const otherValue = myEnum.getValue('OTHER_VALUE');
+    const otherValue = myEnum.variantBy('OTHER_VALUE');
     expect(otherValue).toEqual(
       expect.objectContaining({
         deprecationReason: 'Terrible reasons',
       }),
     );
 
-    const rootFields = assertResolverType(
-      schema.getType('Query'),
-    ).getResolverFields();
+    const rootFields =
+      assertResolverType(schema.getType('Query')).variantBy().fields ?? {};
+
     expect(rootFields.field1).toEqual(
       expect.objectContaining({
         deprecationReason: '',

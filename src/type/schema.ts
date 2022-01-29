@@ -12,12 +12,7 @@ import type {
   GraphQLType,
   IrisResolverType,
 } from './definition';
-import {
-  getNamedType,
-  isDataType,
-  isResolverType,
-  isUnionType,
-} from './definition';
+import { getNamedType, isDataType, isResolverType } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective, specifiedDirectives } from './directives';
 
@@ -228,39 +223,6 @@ export class GraphQLSchema {
     return this.getTypeMap()[name];
   }
 
-  getPossibleTypes(
-    abstractType: IrisResolverType,
-  ): ReadonlyArray<IrisResolverType> {
-    return abstractType.getTypes();
-  }
-
-  isSubType(
-    abstractType: IrisResolverType,
-    maybeSubType: IrisResolverType,
-  ): boolean {
-    let map = this._subTypeMap[abstractType.name];
-    if (map === undefined) {
-      map = Object.create(null);
-
-      if (isUnionType(abstractType)) {
-        for (const type of abstractType.getTypes()) {
-          map[type.name] = true;
-        }
-      } else {
-        // const implementations = this.getImplementations(abstractType);
-        // for (const type of implementations.objects) {
-        //   map[type.name] = true;
-        // }
-        // for (const type of implementations.interfaces) {
-        //   map[type.name] = true;
-        // }
-      }
-
-      this._subTypeMap[abstractType.name] = map;
-    }
-    return map[maybeSubType.name] !== undefined;
-  }
-
   getDirectives(): ReadonlyArray<GraphQLDirective> {
     return this._directives;
   }
@@ -313,21 +275,25 @@ function collectReferencedTypes(
   if (!typeSet.has(namedType)) {
     typeSet.add(namedType);
     if (isResolverType(namedType)) {
+      const variants = namedType.variants();
       if (namedType.isVariantType()) {
-        for (const field of Object.values(namedType.getResolverFields())) {
+        const fields = Object.values(variants[0]?.fields ?? {});
+        for (const field of fields) {
           collectReferencedTypes(field.type, typeSet);
           for (const arg of field.args) {
             collectReferencedTypes(arg.type, typeSet);
           }
         }
       } else {
-        for (const memberType of namedType.getTypes()) {
-          collectReferencedTypes(memberType, typeSet);
+        for (const variant of variants) {
+          if (variant.type) {
+            collectReferencedTypes(variant.type, typeSet);
+          }
         }
       }
     } else if (isDataType(namedType)) {
       namedType
-        .getVariants()
+        .variants()
         .flatMap((x) => Object.values(x.fields ?? {}))
         .forEach((field) => collectReferencedTypes(field.type, typeSet));
     }
