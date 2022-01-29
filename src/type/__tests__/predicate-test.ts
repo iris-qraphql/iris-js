@@ -29,6 +29,7 @@ import {
   gqlObject,
   gqlScalar,
   gqlUnion,
+  irisMaybe,
 } from '../make';
 import {
   GraphQLBoolean,
@@ -229,13 +230,13 @@ describe('Type predicates', () => {
     });
 
     it('returns self for a nullable type', () => {
-      expect(getNullableType(ObjectType)).toEqual(ObjectType);
+      expect(irisMaybe(ObjectType)).toEqual(ObjectType);
       const listOfObj = gqlList(ObjectType);
-      expect(getNullableType(listOfObj)).toEqual(listOfObj);
+      expect(irisMaybe(listOfObj)).toEqual(listOfObj);
     });
 
     it('unwraps non-null type', () => {
-      expect(getNullableType(gqlNonNull(ObjectType))).toEqual(ObjectType);
+      expect(getNullableType(irisMaybe(ObjectType))).toEqual(ObjectType);
     });
   });
 

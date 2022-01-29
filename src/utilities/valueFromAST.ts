@@ -65,7 +65,7 @@ export function valueFromAST(
           // This is explicitly returning the value null.
           return null;
         }
-        break;
+        return valueFromAST(valueNode, type.ofType, variables);
       }
 
       case 'LIST': {

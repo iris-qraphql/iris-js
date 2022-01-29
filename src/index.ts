@@ -77,7 +77,6 @@ export type {
 export {
   // Print source location.
   // Lex
-  Lexer,
   // Parse
   parse,
   parseValue,
@@ -131,7 +130,6 @@ export type {
   TypeNode,
   NamedTypeNode,
   ListTypeNode,
-  NonNullTypeNode,
   TypeSystemDefinitionNode,
   TypeDefinitionNode,
   FieldDefinitionNode,

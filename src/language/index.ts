@@ -1,7 +1,4 @@
 export type { SourceLocation, Kind } from 'graphql';
-export { TokenKind, getLocation, Source } from 'graphql';
-
-export { Lexer } from './lexer';
 
 export { parse, parseValue, parseConstValue, parseType } from './parser';
 

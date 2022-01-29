@@ -756,25 +756,18 @@ Object {
                 "value": "world",
               },
               "type": Object {
-                "kind": "NonNullType",
+                "kind": "NamedType",
                 "loc": Object {
-                  "end": 35,
+                  "end": 34,
                   "start": 28,
                 },
-                "type": Object {
-                  "kind": "NamedType",
+                "name": Object {
+                  "kind": "Name",
                   "loc": Object {
                     "end": 34,
                     "start": 28,
                   },
-                  "name": Object {
-                    "kind": "Name",
-                    "loc": Object {
-                      "end": 34,
-                      "start": 28,
-                    },
-                    "value": "String",
-                  },
+                  "value": "String",
                 },
               },
             },

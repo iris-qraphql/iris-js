@@ -137,11 +137,11 @@ describe('Schema Builder', () => {
   it('Type modifiers', () => {
     const sdl = dedent`
       resolver Query = {
-        nonNullStr: String!
+        nonNullStr: String?
         listOfStrings: [String]
-        listOfNonNullStrings: [String!]
-        nonNullListOfStrings: [String]!
-        nonNullListOfNonNullStrings: [String!]!
+        listOfNonNullStrings: [String?]
+        nonNullListOfStrings: [String]?
+        nonNullListOfNonNullStrings: [String?]?
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
@@ -161,11 +161,11 @@ describe('Schema Builder', () => {
     const sdl = dedent`
       resolver TypeOne = {
         str: String
-        typeTwo: TypeTwo
+        typeTwo: TypeTwo?
       }
 
       resolver TypeTwo = {
-        str: String
+        str: String?
         typeOne: TypeOne
       }
     `;
@@ -175,10 +175,10 @@ describe('Schema Builder', () => {
   it('Single argument field', () => {
     const sdl = dedent`
       resolver Query = {
-        str(int: Int): String
+        str(int: Int?): String
         floatToStr(float: Float): String
-        idToStr(id: ID): String
-        booleanToStr(bool: Boolean): String
+        idToStr(id: ID?): String
+        booleanToStr(bool: Boolean?): String
         strToStr(bool: String): String
       }
     `;
@@ -373,7 +373,7 @@ describe('Schema Builder', () => {
       data MyEnum = VALUE {} | OLD_VALUE @deprecated {} | OTHER_VALUE @deprecated(reason: "Terrible reasons") {}
 
       data MyInput = {
-        oldInput: String @deprecated
+        oldInput: String? @deprecated
         otherInput: String @deprecated(reason: "Use newInput")
         newInput: String
       }

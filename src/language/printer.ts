@@ -48,7 +48,7 @@ const printDocASTReducer: ASTReducer<string> = {
 
   NamedType: { leave: ({ name }) => name },
   ListType: { leave: ({ type }) => '[' + type + ']' },
-  NonNullType: { leave: ({ type }) => type + '!' },
+  MaybeType: { leave: ({ type }) => type + '?' },
 
   // Type System Definitions
 

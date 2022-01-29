@@ -1,5 +1,5 @@
 import type { ParseOptions } from 'graphql';
-import { Kind, Location, Source, TokenKind } from 'graphql';
+import { Kind, Location, Source } from 'graphql';
 
 import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
@@ -42,6 +42,7 @@ import { parseDefinitions } from './definitions';
 import { DirectiveLocation } from './directiveLocation';
 import { IrisKind } from './kinds';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
+import { TokenKind } from './tokenKind';
 
 /**
  * Given a GraphQL source, parses it into a Document.
@@ -446,14 +447,18 @@ export class Parser {
       type = this.parseNamedType();
     }
 
+    if (this.expectOptionalToken(TokenKind.QUESTION_MARK)) {
+      return this.node<MaybeTypeNode>(start, {
+        kind: IrisKind.MAYBE_TYPE,
+        type,
+      });
+    }
+
     if (this.expectOptionalToken(TokenKind.BANG)) {
       return type;
     }
 
-    return this.node<MaybeTypeNode>(start, {
-      kind: IrisKind.MAYBE_TYPE,
-      type,
-    });
+    return type;
   }
 
   /**
