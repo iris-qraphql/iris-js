@@ -18,9 +18,9 @@ import {
   isDataType,
   isInputType,
   isObjectType,
-  isOutputType,
   isRequiredArgument,
   isResolverType,
+  isType,
 } from './definition';
 import { GraphQLDeprecatedDirective, isDirective } from './directives';
 import type { GraphQLSchema } from './schema';
@@ -227,7 +227,7 @@ function validateFields(
     validateName(context, field);
 
     // Ensure the type is an output type
-    if (!isOutputType(field.type)) {
+    if (!isType(field.type)) {
       context.reportError(
         `The type of ${typeName}.${field.name} must be Output Type ` +
           `but got: ${inspect(field.type)}.`,

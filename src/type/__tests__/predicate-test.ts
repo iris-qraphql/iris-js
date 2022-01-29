@@ -2,26 +2,17 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import type { GraphQLArgument, GraphQLInputType } from '../definition';
 import {
-  assertListType,
-  assertNonNullType,
   getNamedType,
   getNullableType,
-  GraphQLList,
-  GraphQLNonNull,
   isDataType,
-  isEnumType,
-  isInputObjectType,
   isInputType,
   isListType,
   isNonNullType,
-  isNullableType,
   isObjectType,
-  isOutputType,
   isRequiredArgument,
   isResolverType,
   isType,
-  isUnionType,
-  isWrappingType,
+  isTypeRef,
 } from '../definition';
 import {
   assertDirective,
@@ -30,7 +21,15 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlEnum, gqlInput, gqlObject, gqlScalar, gqlUnion } from '../make';
+import {
+  gqlEnum,
+  gqlInput,
+  gqlList,
+  gqlNonNull,
+  gqlObject,
+  gqlScalar,
+  gqlUnion,
+} from '../make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -61,7 +60,7 @@ describe('Type predicates', () => {
     });
 
     it('returns true for wrapped types', () => {
-      expect(isType(new GraphQLNonNull(GraphQLString))).toEqual(true);
+      expect(isType(gqlNonNull(GraphQLString))).toEqual(true);
     });
 
     it('returns false for random garbage', () => {
@@ -89,92 +88,35 @@ describe('Type predicates', () => {
     });
 
     it('returns false for wrapped object type', () => {
-      expect(isObjectType(new GraphQLList(ObjectType))).toEqual(false);
-    });
-  });
-
-  describe('isUnionType', () => {
-    it('returns true for union type', () => {
-      expect(isUnionType(UnionType)).toEqual(true);
-    });
-
-    it('returns false for non-union type', () => {
-      expect(isUnionType(new GraphQLList(UnionType))).toEqual(false);
-      expect(isUnionType(ObjectType)).toEqual(false);
-    });
-  });
-
-  describe('isEnumType', () => {
-    it('returns true for enum type', () => {
-      expect(isEnumType(EnumType)).toEqual(true);
-    });
-
-    it('returns false for wrapped enum type', () => {
-      expect(isEnumType(new GraphQLList(EnumType))).toEqual(false);
-    });
-
-    it('returns false for non-enum type', () => {
-      expect(isEnumType(ScalarType)).toEqual(false);
-    });
-  });
-
-  describe('isInputObjectType', () => {
-    it('returns true for data  object type', () => {
-      expect(isInputObjectType(InputObjectType)).toEqual(true);
-    });
-
-    it('returns false for wrapped data  object type', () => {
-      expect(isInputObjectType(new GraphQLList(InputObjectType))).toEqual(
-        false,
-      );
-    });
-
-    it('returns false for non-input-object type', () => {
-      expect(isInputObjectType(ObjectType)).toEqual(false);
+      expect(isObjectType(gqlList(ObjectType))).toEqual(false);
     });
   });
 
   describe('isListType', () => {
     it('returns true for a list wrapped type', () => {
-      expect(isListType(new GraphQLList(ObjectType))).toEqual(true);
-      expect(() => assertListType(new GraphQLList(ObjectType))).not.toThrow();
+      expect(isListType(gqlList(ObjectType))).toEqual(true);
     });
 
     it('returns false for an unwrapped type', () => {
       expect(isListType(ObjectType)).toEqual(false);
-      expect(() => assertListType(ObjectType)).toThrow();
     });
 
     it('returns false for a non-list wrapped type', () => {
-      expect(
-        isListType(new GraphQLNonNull(new GraphQLList(ObjectType))),
-      ).toEqual(false);
-      expect(() =>
-        assertListType(new GraphQLNonNull(new GraphQLList(ObjectType))),
-      ).toThrow();
+      expect(isListType(gqlNonNull(gqlList(ObjectType)))).toEqual(false);
     });
   });
 
   describe('isNonNullType', () => {
     it('returns true for a non-null wrapped type', () => {
-      expect(isNonNullType(new GraphQLNonNull(ObjectType))).toEqual(true);
-      expect(() =>
-        assertNonNullType(new GraphQLNonNull(ObjectType)),
-      ).not.toThrow();
+      expect(isNonNullType(gqlNonNull(ObjectType))).toEqual(true);
     });
 
     it('returns false for an unwrapped type', () => {
       expect(isNonNullType(ObjectType)).toEqual(false);
-      expect(() => assertNonNullType(ObjectType)).toThrow();
     });
 
     it('returns false for a not non-null wrapped type', () => {
-      expect(
-        isNonNullType(new GraphQLList(new GraphQLNonNull(ObjectType))),
-      ).toEqual(false);
-      expect(() =>
-        assertNonNullType(new GraphQLList(new GraphQLNonNull(ObjectType))),
-      ).toThrow();
+      expect(isNonNullType(gqlList(gqlNonNull(ObjectType)))).toEqual(false);
     });
   });
 
@@ -190,13 +132,13 @@ describe('Type predicates', () => {
     });
 
     it('returns true for a wrapped data  type', () => {
-      expectInputType(new GraphQLList(GraphQLString));
-      expectInputType(new GraphQLList(EnumType));
-      expectInputType(new GraphQLList(InputObjectType));
+      expectInputType(gqlList(GraphQLString));
+      expectInputType(gqlList(EnumType));
+      expectInputType(gqlList(InputObjectType));
 
-      expectInputType(new GraphQLNonNull(GraphQLString));
-      expectInputType(new GraphQLNonNull(EnumType));
-      expectInputType(new GraphQLNonNull(InputObjectType));
+      expectInputType(gqlNonNull(GraphQLString));
+      expectInputType(gqlNonNull(EnumType));
+      expectInputType(gqlNonNull(InputObjectType));
     });
 
     function expectNonInputType(type: unknown) {
@@ -209,35 +151,11 @@ describe('Type predicates', () => {
     });
 
     it('returns false for a wrapped output type', () => {
-      expectNonInputType(new GraphQLList(ObjectType));
-      expectNonInputType(new GraphQLList(UnionType));
+      expectNonInputType(gqlList(ObjectType));
+      expectNonInputType(gqlList(UnionType));
 
-      expectNonInputType(new GraphQLNonNull(ObjectType));
-      expectNonInputType(new GraphQLNonNull(UnionType));
-    });
-  });
-
-  describe('isOutputType', () => {
-    function expectOutputType(type: unknown) {
-      expect(isOutputType(type)).toEqual(true);
-    }
-
-    it('returns true for an output type', () => {
-      expectOutputType(GraphQLString);
-      expectOutputType(ObjectType);
-      expectOutputType(UnionType);
-      expectOutputType(EnumType);
-    });
-
-    it('returns true for a wrapped output type', () => {
-      expectOutputType(new GraphQLList(GraphQLString));
-      expectOutputType(new GraphQLList(ObjectType));
-      expectOutputType(new GraphQLList(UnionType));
-      expectOutputType(new GraphQLList(EnumType));
-      expectOutputType(new GraphQLNonNull(GraphQLString));
-      expectOutputType(new GraphQLNonNull(ObjectType));
-      expectOutputType(new GraphQLNonNull(UnionType));
-      expectOutputType(new GraphQLNonNull(EnumType));
+      expectNonInputType(gqlNonNull(ObjectType));
+      expectNonInputType(gqlNonNull(UnionType));
     });
   });
 
@@ -248,7 +166,7 @@ describe('Type predicates', () => {
     });
 
     it('returns false for wrapped leaf type', () => {
-      expect(isDataType(new GraphQLList(ScalarType))).toEqual(false);
+      expect(isDataType(gqlList(ScalarType))).toEqual(false);
     });
 
     it('returns false for non-leaf type', () => {
@@ -256,7 +174,7 @@ describe('Type predicates', () => {
     });
 
     it('returns false for wrapped non-leaf type', () => {
-      expect(isDataType(new GraphQLList(ObjectType))).toEqual(false);
+      expect(isDataType(gqlList(ObjectType))).toEqual(false);
     });
   });
 
@@ -267,7 +185,7 @@ describe('Type predicates', () => {
     });
 
     it('returns false for wrapped composite type', () => {
-      expect(isResolverType(new GraphQLList(ObjectType))).toEqual(false);
+      expect(isResolverType(gqlList(ObjectType))).toEqual(false);
     });
 
     it('returns false for non-composite type', () => {
@@ -275,34 +193,32 @@ describe('Type predicates', () => {
     });
 
     it('returns false for wrapped non-composite type', () => {
-      expect(isResolverType(new GraphQLList(InputObjectType))).toEqual(false);
+      expect(isResolverType(gqlList(InputObjectType))).toEqual(false);
     });
   });
 
   describe('isWrappingType', () => {
     it('returns true for list and non-null types', () => {
-      expect(isWrappingType(new GraphQLList(ObjectType))).toEqual(true);
-      expect(isWrappingType(new GraphQLNonNull(ObjectType))).toEqual(true);
+      expect(isTypeRef(gqlList(ObjectType))).toEqual(true);
+      expect(isTypeRef(gqlNonNull(ObjectType))).toEqual(true);
     });
 
     it('returns false for unwrapped types', () => {
-      expect(isWrappingType(ObjectType)).toEqual(false);
+      expect(isTypeRef(ObjectType)).toEqual(false);
     });
   });
 
   describe('isNullableType', () => {
     it('returns true for unwrapped types', () => {
-      expect(isNullableType(ObjectType)).toEqual(true);
+      expect(isNonNullType(ObjectType)).toEqual(false);
     });
 
     it('returns true for list of non-null types', () => {
-      expect(
-        isNullableType(new GraphQLList(new GraphQLNonNull(ObjectType))),
-      ).toEqual(true);
+      expect(isNonNullType(gqlList(gqlNonNull(ObjectType)))).toEqual(false);
     });
 
     it('returns false for non-null types', () => {
-      expect(isNullableType(new GraphQLNonNull(ObjectType))).toEqual(false);
+      expect(isNonNullType(gqlNonNull(ObjectType))).toEqual(true);
     });
   });
 
@@ -314,14 +230,12 @@ describe('Type predicates', () => {
 
     it('returns self for a nullable type', () => {
       expect(getNullableType(ObjectType)).toEqual(ObjectType);
-      const listOfObj = new GraphQLList(ObjectType);
+      const listOfObj = gqlList(ObjectType);
       expect(getNullableType(listOfObj)).toEqual(listOfObj);
     });
 
     it('unwraps non-null type', () => {
-      expect(getNullableType(new GraphQLNonNull(ObjectType))).toEqual(
-        ObjectType,
-      );
+      expect(getNullableType(gqlNonNull(ObjectType))).toEqual(ObjectType);
     });
   });
 
@@ -336,16 +250,14 @@ describe('Type predicates', () => {
     });
 
     it('unwraps wrapper types', () => {
-      expect(getNamedType(new GraphQLNonNull(ObjectType))).toEqual(ObjectType);
-      expect(getNamedType(new GraphQLList(ObjectType))).toEqual(ObjectType);
+      expect(getNamedType(gqlNonNull(ObjectType))).toEqual(ObjectType);
+      expect(getNamedType(gqlList(ObjectType))).toEqual(ObjectType);
     });
 
     it('unwraps deeply wrapper types', () => {
-      expect(
-        getNamedType(
-          new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ObjectType))),
-        ),
-      ).toEqual(ObjectType);
+      expect(getNamedType(gqlNonNull(gqlList(gqlNonNull(ObjectType))))).toEqual(
+        ObjectType,
+      );
     });
   });
 
@@ -366,7 +278,7 @@ describe('Type predicates', () => {
 
     it('returns true for required arguments', () => {
       const requiredArg = buildArg({
-        type: new GraphQLNonNull(GraphQLString),
+        type: gqlNonNull(GraphQLString),
       });
       expect(isRequiredArgument(requiredArg)).toEqual(true);
     });
@@ -384,12 +296,12 @@ describe('Type predicates', () => {
       expect(isRequiredArgument(optArg2)).toEqual(false);
 
       const optArg3 = buildArg({
-        type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
+        type: gqlList(gqlNonNull(GraphQLString)),
       });
       expect(isRequiredArgument(optArg3)).toEqual(false);
 
       const optArg4 = buildArg({
-        type: new GraphQLNonNull(GraphQLString),
+        type: gqlNonNull(GraphQLString),
         defaultValue: 'default',
       });
       expect(isRequiredArgument(optArg4)).toEqual(false);

@@ -33,8 +33,6 @@ export { graphql } from './iris';
 export {
   GraphQLSchema,
   GraphQLDirective,
-  GraphQLList,
-  GraphQLNonNull,
   specifiedScalarTypes,
   GraphQLInt,
   GraphQLFloat,
@@ -48,26 +46,14 @@ export {
   isSchema,
   isDirective,
   isType,
-  isObjectType,
-  isUnionType,
-  isInputObjectType,
-  isListType,
-  isNonNullType,
   isInputType,
-  isOutputType,
   isDataType,
   isResolverType,
-  isWrappingType,
-  isNullableType,
   isRequiredArgument,
   isSpecifiedScalarType,
   isSpecifiedDirective,
   assertSchema,
   assertDirective,
-  assertResolverType,
-  assertListType,
-  assertNonNullType,
-  getNullableType,
   getNamedType,
   validateSchema,
   assertValidSchema,
@@ -78,11 +64,7 @@ export {
 export type {
   GraphQLType,
   GraphQLInputType,
-  GraphQLOutputType,
-  GraphQLLeafType,
   IrisResolverType,
-  GraphQLWrappingType,
-  GraphQLNullableType,
   GraphQLNamedType,
   GraphQLSchemaConfig,
   GraphQLSchemaExtensions,
@@ -90,8 +72,6 @@ export type {
   GraphQLDirectiveExtensions,
   GraphQLArgument,
   GraphQLField,
-  GraphQLFieldResolver,
-  GraphQLIsTypeOfFn,
 } from './type/index';
 
 export {
@@ -176,12 +156,6 @@ export {
   printSchema,
   // Print a GraphQLType to GraphQL Schema language.
   printType,
-  // Prints the built-in introspection schema in the Schema Language format.
-  // Create a GraphQLType from a GraphQL language AST.
-  typeFromAST,
-  // Create a JavaScript value from a GraphQL language AST with a Type.
-  valueFromAST,
-  // Create a JavaScript value from a GraphQL language AST without a Type.
   // Create a GraphQL language AST from a JavaScript value.
   astFromValue,
   // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.

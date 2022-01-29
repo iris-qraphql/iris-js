@@ -1,17 +1,16 @@
-import type { Source } from 'graphql';
+import type {
+  GraphQLFieldResolver,
+  GraphQLTypeResolver,
+  Source,
+} from 'graphql';
 import type { ExecutionResult } from 'graphql/execution';
 import { execute } from 'graphql/execution';
 
 import { devAssert } from './jsutils/devAssert';
 import type { Maybe } from './jsutils/Maybe';
-import type { PromiseOrValue } from './jsutils/PromiseOrValue';
 
 import { parse } from './language/parser';
 
-import type {
-  GraphQLFieldResolver,
-  GraphQLTypeResolver,
-} from './type/definition';
 import type { GraphQLSchema } from './type/schema';
 import { validateSchema } from './type/validate';
 
@@ -32,6 +31,8 @@ export function graphql(args: GraphQLArgs): Promise<ExecutionResult> {
   // Always return a Promise for a consistent API.
   return new Promise((resolve) => resolve(graphqlImpl(args)));
 }
+
+type PromiseOrValue<T> = Promise<T> | T;
 
 function graphqlImpl(args: GraphQLArgs): PromiseOrValue<ExecutionResult> {
   // Temporary for v15 to v16 migration. Remove in v17
@@ -81,9 +82,7 @@ function graphqlImpl(args: GraphQLArgs): PromiseOrValue<ExecutionResult> {
     contextValue,
     variableValues,
     operationName,
-    // @ts-expect-error
     fieldResolver,
-    // @ts-expect-error
     typeResolver,
   });
 }

@@ -12,17 +12,13 @@ import type {
   GraphQLArgument,
   GraphQLFieldConfig,
   GraphQLInputType,
-  GraphQLNamedType,
   GraphQLOutputType,
+  IrisNamedType,
+  IrisTypeRef,
 } from '../definition';
-import {
-  assertDataType,
-  assertResolverType,
-  GraphQLList,
-  GraphQLNonNull,
-} from '../definition';
+import { assertDataType, assertResolverType } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
-import { gqlEnum, gqlObject, gqlUnion } from '../make';
+import { gqlEnum, gqlList, gqlNonNull, gqlObject, gqlUnion } from '../make';
 import { GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
@@ -51,15 +47,10 @@ const SomeInputObjectType = assertDataType(
 
 const SomeDirective = assertDirective(SomeSchema.getDirective('SomeDirective'));
 
-function withModifiers<T extends GraphQLNamedType>(
+function withModifiers<T extends IrisNamedType>(
   type: T,
-): Array<T | GraphQLList<T> | GraphQLNonNull<T | GraphQLList<T>>> {
-  return [
-    type,
-    new GraphQLList(type),
-    new GraphQLNonNull(type),
-    new GraphQLNonNull(new GraphQLList(type)),
-  ];
+): Array<T | IrisTypeRef<T | IrisTypeRef<T>>> {
+  return [type, gqlList(type), gqlNonNull(type), gqlNonNull(gqlList(type))];
 }
 
 const outputTypes: ReadonlyArray<GraphQLOutputType> = [
@@ -328,8 +319,8 @@ describe('Type System: Union types must be valid', () => {
 
     const badUnionMemberTypes = [
       GraphQLString,
-      new GraphQLNonNull(SomeObjectType),
-      new GraphQLList(SomeObjectType),
+      gqlNonNull(SomeObjectType),
+      gqlList(SomeObjectType),
       SomeUnionType,
       SomeEnumType,
       SomeInputObjectType,

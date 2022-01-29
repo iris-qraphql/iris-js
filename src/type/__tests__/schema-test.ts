@@ -5,9 +5,14 @@ import { printSchema } from '../../utilities/printSchema';
 import { dedent } from '../../utils/dedent';
 
 import type { IrisResolverType } from '../definition';
-import { GraphQLList } from '../definition';
 import { GraphQLDirective } from '../directives';
-import { emptyDataType, gqlInput, gqlObject, gqlScalar } from '../make';
+import {
+  emptyDataType,
+  gqlInput,
+  gqlList,
+  gqlObject,
+  gqlScalar,
+} from '../make';
 import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 
@@ -54,7 +59,7 @@ describe('Type System: Schema', () => {
           type: BlogArticle,
         },
         feed: {
-          type: new GraphQLList(BlogArticle),
+          type: gqlList(BlogArticle),
         },
       },
     });
@@ -156,7 +161,7 @@ describe('Type System: Schema', () => {
             type: emptyDataType('Foo'),
           },
           argList: {
-            type: new GraphQLList(emptyDataType('Bar')),
+            type: gqlList(emptyDataType('Bar')),
           },
         },
       });

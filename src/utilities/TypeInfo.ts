@@ -1,4 +1,4 @@
-import { Kind } from 'graphql';
+import { isType, Kind } from 'graphql';
 
 import type { Maybe } from '../jsutils/Maybe';
 
@@ -22,7 +22,6 @@ import {
   isDataType,
   isInputType,
   isListType,
-  isOutputType,
   isResolverType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
@@ -68,7 +67,7 @@ export class TypeInfo {
       if (isResolverType(initialType)) {
         this._parentTypeStack.push(initialType);
       }
-      if (isOutputType(initialType)) {
+      if (isType(initialType)) {
         this._typeStack.push(initialType);
       }
     }
@@ -154,10 +153,8 @@ export class TypeInfo {
         break;
       }
       case Kind.LIST: {
-        const listType: unknown = getNullableType(this.getInputType());
-        const itemType: unknown = isListType(listType)
-          ? listType.ofType
-          : listType;
+        const listType = getNullableType(this.getInputType());
+        const itemType = isListType(listType) ? listType.ofType : listType;
         // List positions never have a default value.
         this._defaultValueStack.push(undefined);
         this._inputTypeStack.push(isInputType(itemType) ? itemType : undefined);
