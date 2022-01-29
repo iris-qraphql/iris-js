@@ -1,10 +1,5 @@
 import type { GraphQLFieldResolver } from 'graphql';
-import {
-  GraphQLList,
-  GraphQLNonNull,
-  Kind,
-  valueFromASTUntyped,
-} from 'graphql';
+import { Kind, valueFromASTUntyped } from 'graphql';
 import { contains, identity, pluck } from 'ramda';
 
 import { inspect } from '../jsutils/inspect';
@@ -49,14 +44,8 @@ export type GraphQLType =
   | IrisDataType
   | IrisTypeRef<GraphQLType>;
 
-export function isType(type: unknown): type is GraphQLType {
-  return (
-    isResolverType(type) ||
-    isDataType(type) ||
-    isListType(type) ||
-    isNonNullType(type)
-  );
-}
+export const isType = (type: unknown): type is GraphQLType =>
+  isResolverType(type) || isDataType(type) || isTypeRef(type);
 
 export function isResolverType(type: unknown): type is IrisResolverType {
   return instanceOf(type, IrisResolverType);
@@ -117,9 +106,9 @@ export class IrisTypeRef<T extends GraphQLType> {
   readonly ofType: T;
   readonly kind: WrapperKind;
 
-  constructor(ofType: T, kind: WrapperKind) {
-    this.ofType = ofType;
+  constructor(kind: WrapperKind, ofType: T) {
     this.kind = kind;
+    this.ofType = ofType;
   }
 
   get [Symbol.toStringTag]() {
@@ -127,7 +116,14 @@ export class IrisTypeRef<T extends GraphQLType> {
   }
 
   toString(): string {
-    return '[' + String(this.ofType) + ']';
+    switch (this.kind) {
+      case 'LIST':
+        return '[' + String(this.ofType) + ']';
+      case 'REQUIRED':
+        return String(this.ofType) + '!';
+      default:
+        return String(this.ofType);
+    }
   }
 
   toJSON(): string {
@@ -137,12 +133,14 @@ export class IrisTypeRef<T extends GraphQLType> {
 
 export type GraphQLWrappingType = IrisTypeRef<GraphQLType>;
 
-export const isWrappingType = (type: unknown): type is GraphQLWrappingType =>
-  isListType(type) || isNonNullType(type);
+export const isTypeRef = (type: unknown): type is IrisTypeRef<GraphQLType> =>
+  instanceOf(type, IrisTypeRef);
+
+export const isWrappingType = isTypeRef;
 
 export type GraphQLNamedType = IrisResolverType | IrisDataType;
 
-type IrisNamedType = IrisDataType | IrisResolverType;
+export type IrisNamedType = IrisDataType | IrisResolverType;
 
 /**
  * These types can all accept null as a value.
@@ -153,9 +151,13 @@ export type GraphQLNullableType =
   | IrisTypeRef<GraphQLType>;
 
 export function isNonNullType(type: GraphQLInputType): type is IrisDataType;
-export function isNonNullType(type: unknown): type is IrisNamedType;
-export function isNonNullType(type: unknown): type is IrisNamedType {
-  return instanceOf(type, GraphQLNonNull);
+export function isNonNullType(
+  type: unknown,
+): type is IrisTypeRef<IrisNamedType>;
+export function isNonNullType(
+  type: unknown,
+): type is IrisTypeRef<IrisNamedType> {
+  return isTypeRef(type) && type.kind === 'REQUIRED';
 }
 
 export function isListType(
@@ -163,7 +165,7 @@ export function isListType(
 ): type is IrisTypeRef<GraphQLInputType>;
 export function isListType(type: unknown): type is IrisTypeRef<IrisNamedType>;
 export function isListType(type: unknown): type is IrisTypeRef<IrisNamedType> {
-  return instanceOf(type, GraphQLList);
+  return isTypeRef(type) && type.kind === 'LIST';
 }
 
 export function getNullableType(type: undefined | null): void;
@@ -171,7 +173,7 @@ export function getNullableType(
   type: Maybe<GraphQLType>,
 ): GraphQLType | undefined {
   if (type) {
-    return isNonNullType(type) ? type.ofType : type;
+    return isNonNullType(type) && type.kind === 'REQUIRED' ? type.ofType : type;
   }
 }
 

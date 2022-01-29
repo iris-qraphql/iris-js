@@ -27,10 +27,9 @@ import type {
   IrisResolverVariantConfig,
 } from '../type/definition';
 import {
-  GraphQLList,
-  GraphQLNonNull,
   IrisDataType,
   IrisResolverType,
+  IrisTypeRef,
 } from '../type/definition';
 import {
   GraphQLDeprecatedDirective,
@@ -155,10 +154,10 @@ export function extendSchemaImpl(
 
   function getWrappedType(node: TypeNode): GraphQLType {
     if (node.kind === IrisKind.LIST_TYPE) {
-      return new GraphQLList(getWrappedType(node.type));
+      return new IrisTypeRef('LIST', getWrappedType(node.type));
     }
     if (node.kind === IrisKind.NON_NULL_TYPE) {
-      return new GraphQLNonNull(getWrappedType(node.type));
+      return new IrisTypeRef('REQUIRED', getWrappedType(node.type));
     }
     return getNamedType(node);
   }

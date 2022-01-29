@@ -6,8 +6,7 @@ import type { ObjMap } from '../../jsutils/ObjMap';
 import { parseValue } from '../../language/parser';
 
 import type { GraphQLInputType } from '../../type/definition';
-import { GraphQLList, GraphQLNonNull } from '../../type/definition';
-import { gqlInput, gqlScalar } from '../../type/make';
+import { gqlInput, gqlList, gqlNonNull, gqlScalar } from '../../type/make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -89,15 +88,15 @@ describe('valueFromAST', () => {
   });
 
   // Boolean!
-  const nonNullBool = new GraphQLNonNull(GraphQLBoolean);
+  const nonNullBool = gqlNonNull(GraphQLBoolean);
   // [Boolean]
-  const listOfBool = new GraphQLList(GraphQLBoolean);
+  const listOfBool = gqlList(GraphQLBoolean);
   // [Boolean!]
-  const listOfNonNullBool = new GraphQLList(nonNullBool);
+  const listOfNonNullBool = gqlList(nonNullBool);
   // [Boolean]!
-  const nonNullListOfBool = new GraphQLNonNull(listOfBool);
+  const nonNullListOfBool = gqlNonNull(listOfBool);
   // [Boolean!]!
-  const nonNullListOfNonNullBool = new GraphQLNonNull(listOfNonNullBool);
+  const nonNullListOfNonNullBool = gqlNonNull(listOfNonNullBool);
 
   it('coerces to null unless non-null', () => {
     expectValueFrom('null', GraphQLBoolean).toEqual(null);

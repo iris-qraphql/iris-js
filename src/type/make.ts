@@ -5,11 +5,12 @@ import type {
   DataParser,
   DataSerializer,
   GraphQLFieldConfig,
+  GraphQLType,
   IrisDataVariantField,
   IrisResolverVariantConfig,
   ThunkObjMap,
 } from './definition';
-import { IrisDataType, IrisResolverType } from './definition';
+import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
 
 type InputC = {
   name: string;
@@ -74,5 +75,11 @@ type GQLScalar<I = unknown, O = I> = {
 
 const gqlScalar = <T>(x: GQLScalar<T>) =>
   new IrisDataType<T>({ ...x, isPrimitive: true });
+
+export const gqlNonNull = <T extends GraphQLType>(ofType: T) =>
+  new IrisTypeRef('REQUIRED', ofType);
+
+export const gqlList = <T extends GraphQLType>(ofType: T) =>
+  new IrisTypeRef('LIST', ofType);
 
 export { gqlInput, gqlEnum, gqlObject, gqlUnion, gqlScalar };

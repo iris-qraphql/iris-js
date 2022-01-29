@@ -1,5 +1,10 @@
-import { GraphQLList, GraphQLNonNull } from '../../type/definition';
-import { gqlEnum, gqlInput, gqlScalar } from '../../type/make';
+import {
+  gqlEnum,
+  gqlInput,
+  gqlList,
+  gqlNonNull,
+  gqlScalar,
+} from '../../type/make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -40,7 +45,7 @@ describe('astFromValue', () => {
       value: true,
     });
 
-    const NonNullBoolean = new GraphQLNonNull(GraphQLBoolean);
+    const NonNullBoolean = gqlNonNull(GraphQLBoolean);
     expect(astFromValue(0, NonNullBoolean)).toEqual({
       kind: 'BooleanValue',
       value: false,
@@ -230,7 +235,7 @@ describe('astFromValue', () => {
   });
 
   it('does not converts NonNull values to NullValue', () => {
-    const NonNullBoolean = new GraphQLNonNull(GraphQLBoolean);
+    const NonNullBoolean = gqlNonNull(GraphQLBoolean);
     expect(astFromValue(null, NonNullBoolean)).toEqual(null);
   });
 
@@ -254,9 +259,7 @@ describe('astFromValue', () => {
   });
 
   it('converts array values to List ASTs', () => {
-    expect(
-      astFromValue(['FOO', 'BAR'], new GraphQLList(GraphQLString)),
-    ).toEqual({
+    expect(astFromValue(['FOO', 'BAR'], gqlList(GraphQLString))).toEqual({
       kind: 'ListValue',
       values: [
         { kind: 'StringValue', value: 'FOO' },
@@ -264,15 +267,13 @@ describe('astFromValue', () => {
       ],
     });
 
-    expect(astFromValue(['HELLO', 'GOODBYE'], new GraphQLList(myEnum))).toEqual(
-      {
-        kind: 'ListValue',
-        values: [
-          { kind: 'EnumValue', value: 'HELLO' },
-          { kind: 'EnumValue', value: 'GOODBYE' },
-        ],
-      },
-    );
+    expect(astFromValue(['HELLO', 'GOODBYE'], gqlList(myEnum))).toEqual({
+      kind: 'ListValue',
+      values: [
+        { kind: 'EnumValue', value: 'HELLO' },
+        { kind: 'EnumValue', value: 'GOODBYE' },
+      ],
+    });
 
     function* listGenerator() {
       yield 1;
@@ -280,7 +281,7 @@ describe('astFromValue', () => {
       yield 3;
     }
 
-    expect(astFromValue(listGenerator(), new GraphQLList(GraphQLInt))).toEqual({
+    expect(astFromValue(listGenerator(), gqlList(GraphQLInt))).toEqual({
       kind: 'ListValue',
       values: [
         { kind: 'IntValue', value: '1' },
@@ -291,7 +292,7 @@ describe('astFromValue', () => {
   });
 
   it('converts list singletons', () => {
-    expect(astFromValue('FOO', new GraphQLList(GraphQLString))).toEqual({
+    expect(astFromValue('FOO', gqlList(GraphQLString))).toEqual({
       kind: 'StringValue',
       value: 'FOO',
     });
@@ -300,7 +301,7 @@ describe('astFromValue', () => {
   it('skip invalid list items', () => {
     const ast = astFromValue(
       ['FOO', null, 'BAR'],
-      new GraphQLList(new GraphQLNonNull(GraphQLString)),
+      gqlList(gqlNonNull(GraphQLString)),
     );
 
     expect(ast).toEqual({

@@ -1,13 +1,8 @@
-import type {
-  ListTypeNode,
-  NamedTypeNode,
-  NonNullTypeNode,
-  TypeNode,
-} from '../language/ast';
+import type { ListTypeNode, NamedTypeNode, TypeNode } from '../language/ast';
 import { IrisKind } from '../language/kinds';
 
 import type { GraphQLNamedType, GraphQLType } from '../type/definition';
-import { GraphQLList, GraphQLNonNull } from '../type/definition';
+import { IrisTypeRef } from '../type/definition';
 import type { GraphQLSchema } from '../type/schema';
 
 /**
@@ -24,11 +19,7 @@ export function typeFromAST(
 export function typeFromAST(
   schema: GraphQLSchema,
   typeNode: ListTypeNode,
-): GraphQLList<any> | undefined;
-export function typeFromAST(
-  schema: GraphQLSchema,
-  typeNode: NonNullTypeNode,
-): GraphQLNonNull<any> | undefined;
+): IrisTypeRef<any> | undefined;
 export function typeFromAST(
   schema: GraphQLSchema,
   typeNode: TypeNode,
@@ -40,11 +31,11 @@ export function typeFromAST(
   switch (typeNode.kind) {
     case IrisKind.LIST_TYPE: {
       const innerType = typeFromAST(schema, typeNode.type);
-      return innerType && new GraphQLList(innerType);
+      return innerType && new IrisTypeRef('LIST', innerType);
     }
     case IrisKind.NON_NULL_TYPE: {
       const innerType = typeFromAST(schema, typeNode.type);
-      return innerType && new GraphQLNonNull(innerType);
+      return innerType && new IrisTypeRef('REQUIRED', innerType);
     }
     case IrisKind.NAMED_TYPE:
       return schema.getType(typeNode.name.value);

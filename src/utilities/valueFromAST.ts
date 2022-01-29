@@ -9,7 +9,7 @@ import { keyMap } from '../jsutils/ObjMap';
 import type { ObjectValueNode, ValueNode } from '../language/ast';
 
 import type { GraphQLInputType, IrisDataVariant } from '../type/definition';
-import { isDataType, isListType, isNonNullType } from '../type/definition';
+import { isDataType, isNonNullType, isTypeRef } from '../type/definition';
 
 /**
  * Produces a JavaScript value given a GraphQL Value AST.
@@ -58,45 +58,52 @@ export function valueFromAST(
     return variableValue;
   }
 
-  if (isNonNullType(type)) {
-    if (valueNode.kind === Kind.NULL) {
-      return; // Invalid: intentionally return no value.
+  if (isTypeRef(type)) {
+    switch (type.kind) {
+      case 'REQUIRED':
+        return valueNode.kind === Kind.NULL
+          ? undefined
+          : valueFromAST(valueNode, type.ofType, variables);
+      case 'LIST': {
+        if (valueNode.kind === Kind.NULL) {
+          return null;
+        }
+        const itemType = type.ofType;
+        if (valueNode.kind === Kind.LIST) {
+          const coercedValues = [];
+          for (const itemNode of valueNode.values) {
+            if (isMissingVariable(itemNode, variables)) {
+              // If an array contains a missing variable, it is either coerced to
+              // null or if the item type is non-null, it considered invalid.
+              if (isNonNullType(itemType)) {
+                return; // Invalid: intentionally return no value.
+              }
+              coercedValues.push(null);
+            } else {
+              const itemValue = valueFromAST(itemNode, itemType, variables);
+              if (itemValue === undefined) {
+                return; // Invalid: intentionally return no value.
+              }
+              coercedValues.push(itemValue);
+            }
+          }
+          return coercedValues;
+        }
+        const coercedValue = valueFromAST(valueNode, itemType, variables);
+        if (coercedValue === undefined) {
+          return; // Invalid: intentionally return no value.
+        }
+
+        return [coercedValue];
+      }
+      default:
+        break;
     }
-    return valueFromAST(valueNode, type.ofType, variables);
   }
 
   if (valueNode.kind === Kind.NULL) {
     // This is explicitly returning the value null.
     return null;
-  }
-
-  if (isListType(type)) {
-    const itemType = type.ofType;
-    if (valueNode.kind === Kind.LIST) {
-      const coercedValues = [];
-      for (const itemNode of valueNode.values) {
-        if (isMissingVariable(itemNode, variables)) {
-          // If an array contains a missing variable, it is either coerced to
-          // null or if the item type is non-null, it considered invalid.
-          if (isNonNullType(itemType)) {
-            return; // Invalid: intentionally return no value.
-          }
-          coercedValues.push(null);
-        } else {
-          const itemValue = valueFromAST(itemNode, itemType, variables);
-          if (itemValue === undefined) {
-            return; // Invalid: intentionally return no value.
-          }
-          coercedValues.push(itemValue);
-        }
-      }
-      return coercedValues;
-    }
-    const coercedValue = valueFromAST(valueNode, itemType, variables);
-    if (coercedValue === undefined) {
-      return; // Invalid: intentionally return no value.
-    }
-    return [coercedValue];
   }
 
   if (isDataType(type)) {
