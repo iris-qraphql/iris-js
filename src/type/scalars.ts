@@ -7,7 +7,7 @@ import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
 
-import type { IrisDataType,IrisNamedType } from './definition';
+import type { IrisDataType, IrisNamedType } from './definition';
 import { gqlScalar } from './make';
 
 /**

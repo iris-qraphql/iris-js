@@ -156,11 +156,6 @@ export {
   printSchema,
   // Print a GraphQLType to GraphQL Schema language.
   printType,
-  // Prints the built-in introspection schema in the Schema Language format.
-  // Create a GraphQLType from a GraphQL language AST.
-  typeFromAST,
-  // Create a JavaScript value from a GraphQL language AST with a Type.
-  // Create a JavaScript value from a GraphQL language AST without a Type.
   // Create a GraphQL language AST from a JavaScript value.
   astFromValue,
   // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.

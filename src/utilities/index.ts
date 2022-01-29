@@ -7,9 +7,6 @@ export type { BuildSchemaOptions } from './buildASTSchema';
 // Print a GraphQLSchema to GraphQL Schema language.
 export { printSchema, printType } from './printSchema';
 
-// Create a GraphQLType from a GraphQL language AST.
-export { typeFromAST } from './typeFromAST';
-
 // Create a JavaScript value from a GraphQL language AST with a type.
 export { valueFromAST } from './valueFromAST';
 
