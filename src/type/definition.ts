@@ -54,10 +54,6 @@ export function isObjectType(type: unknown): type is IrisResolverType {
   return isResolverType(type) && type.isVariantType();
 }
 
-export function isUnionType(type: unknown): type is IrisResolverType {
-  return isResolverType(type) && !type.isVariantType();
-}
-
 export const isDataType = (type: unknown): type is IrisDataType =>
   instanceOf(type, IrisDataType);
 
@@ -72,16 +68,11 @@ export const assertBy =
     return type;
   };
 
-export const isNullableType = (type: unknown): type is GraphQLNullableType =>
-  isType(type) && !isNonNullType(type);
-
 export const assertResolverType = assertBy('Resolver', isResolverType);
 export const assertDataType = assertBy('Data', isDataType);
-export const assertNonNullType = assertBy('Non-Null', isNonNullType);
-export const assertListType = assertBy('List', isListType);
 
 export function isInputType(type: unknown): type is GraphQLInputType {
-  return isDataType(type) || (isWrappingType(type) && isInputType(type.ofType));
+  return isDataType(type) || (isTypeRef(type) && isInputType(type.ofType));
 }
 
 export type GraphQLInputType = IrisDataType | IrisTypeRef<GraphQLInputType>;
@@ -91,7 +82,7 @@ export function isOutputType(type: unknown): type is GraphQLOutputType {
   return (
     isResolverType(type) ||
     isDataType(type) ||
-    (isWrappingType(type) && isOutputType(type.ofType))
+    (isTypeRef(type) && isOutputType(type.ofType))
   );
 }
 
@@ -124,12 +115,9 @@ export class IrisTypeRef<T extends GraphQLType> {
   }
 }
 
-export type GraphQLWrappingType = IrisTypeRef<GraphQLType>;
-
-export const isTypeRef = (type: unknown): type is IrisTypeRef<GraphQLType> =>
-  instanceOf(type, IrisTypeRef);
-
-export const isWrappingType = isTypeRef;
+export const isTypeRef = <T extends GraphQLType>(
+  type: unknown,
+): type is IrisTypeRef<T> => instanceOf(type, IrisTypeRef);
 
 export type GraphQLNamedType = IrisResolverType | IrisDataType;
 
@@ -186,7 +174,7 @@ export function getNamedType(
 ): GraphQLNamedType | undefined {
   if (type) {
     let unwrappedType = type;
-    while (isWrappingType(unwrappedType)) {
+    while (isTypeRef(unwrappedType)) {
       unwrappedType = unwrappedType.ofType;
     }
     return unwrappedType;

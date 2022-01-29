@@ -2,22 +2,18 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import type { GraphQLArgument, GraphQLInputType } from '../definition';
 import {
-  assertListType,
-  assertNonNullType,
   getNamedType,
   getNullableType,
   isDataType,
   isInputType,
   isListType,
   isNonNullType,
-  isNullableType,
   isObjectType,
   isOutputType,
   isRequiredArgument,
   isResolverType,
   isType,
-  isUnionType,
-  isWrappingType,
+  isTypeRef,
 } from '../definition';
 import {
   assertDirective,
@@ -97,50 +93,31 @@ describe('Type predicates', () => {
     });
   });
 
-  describe('isUnionType', () => {
-    it('returns true for union type', () => {
-      expect(isUnionType(UnionType)).toEqual(true);
-    });
-
-    it('returns false for non-union type', () => {
-      expect(isUnionType(gqlList(UnionType))).toEqual(false);
-      expect(isUnionType(ObjectType)).toEqual(false);
-    });
-  });
-
   describe('isListType', () => {
     it('returns true for a list wrapped type', () => {
       expect(isListType(gqlList(ObjectType))).toEqual(true);
-      expect(() => assertListType(gqlList(ObjectType))).not.toThrow();
     });
 
     it('returns false for an unwrapped type', () => {
       expect(isListType(ObjectType)).toEqual(false);
-      expect(() => assertListType(ObjectType)).toThrow();
     });
 
     it('returns false for a non-list wrapped type', () => {
       expect(isListType(gqlNonNull(gqlList(ObjectType)))).toEqual(false);
-      expect(() => assertListType(gqlNonNull(gqlList(ObjectType)))).toThrow();
     });
   });
 
   describe('isNonNullType', () => {
     it('returns true for a non-null wrapped type', () => {
       expect(isNonNullType(gqlNonNull(ObjectType))).toEqual(true);
-      expect(() => assertNonNullType(gqlNonNull(ObjectType))).not.toThrow();
     });
 
     it('returns false for an unwrapped type', () => {
       expect(isNonNullType(ObjectType)).toEqual(false);
-      expect(() => assertNonNullType(ObjectType)).toThrow();
     });
 
     it('returns false for a not non-null wrapped type', () => {
       expect(isNonNullType(gqlList(gqlNonNull(ObjectType)))).toEqual(false);
-      expect(() =>
-        assertNonNullType(gqlList(gqlNonNull(ObjectType))),
-      ).toThrow();
     });
   });
 
@@ -247,26 +224,26 @@ describe('Type predicates', () => {
 
   describe('isWrappingType', () => {
     it('returns true for list and non-null types', () => {
-      expect(isWrappingType(gqlList(ObjectType))).toEqual(true);
-      expect(isWrappingType(gqlNonNull(ObjectType))).toEqual(true);
+      expect(isTypeRef(gqlList(ObjectType))).toEqual(true);
+      expect(isTypeRef(gqlNonNull(ObjectType))).toEqual(true);
     });
 
     it('returns false for unwrapped types', () => {
-      expect(isWrappingType(ObjectType)).toEqual(false);
+      expect(isTypeRef(ObjectType)).toEqual(false);
     });
   });
 
   describe('isNullableType', () => {
     it('returns true for unwrapped types', () => {
-      expect(isNullableType(ObjectType)).toEqual(true);
+      expect(isNonNullType(ObjectType)).toEqual(false);
     });
 
     it('returns true for list of non-null types', () => {
-      expect(isNullableType(gqlList(gqlNonNull(ObjectType)))).toEqual(true);
+      expect(isNonNullType(gqlList(gqlNonNull(ObjectType)))).toEqual(false);
     });
 
     it('returns false for non-null types', () => {
-      expect(isNullableType(gqlNonNull(ObjectType))).toEqual(false);
+      expect(isNonNullType(gqlNonNull(ObjectType))).toEqual(true);
     });
   });
 

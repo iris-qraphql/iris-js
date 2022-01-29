@@ -15,7 +15,7 @@ import type {
   IrisDataType,
   IrisDataVariant,
 } from '../type/definition';
-import { isListType, isNonNullType } from '../type/definition';
+import { isTypeRef } from '../type/definition';
 import { GraphQLID } from '../type/scalars';
 
 /**
@@ -43,12 +43,33 @@ export function astFromValue(
   value: unknown,
   type: GraphQLInputType,
 ): Maybe<ValueNode> {
-  if (isNonNullType(type)) {
-    const astValue = astFromValue(value, type.ofType);
-    if (astValue?.kind === Kind.NULL) {
-      return null;
+  if (isTypeRef(type)) {
+    const itemType = type.ofType;
+
+    switch (type.kind) {
+      case 'REQUIRED': {
+        const astValue = astFromValue(value, itemType);
+        if (astValue?.kind === Kind.NULL) {
+          return null;
+        }
+        return astValue;
+      }
+      case 'LIST': {
+        if (isIterableObject(value)) {
+          const valuesNodes = [];
+          for (const item of value) {
+            const itemNode = astFromValue(item, itemType);
+            if (itemNode != null) {
+              valuesNodes.push(itemNode);
+            }
+          }
+          return { kind: Kind.LIST, values: valuesNodes };
+        }
+        return astFromValue(value, itemType);
+      }
+      default:
+        break;
     }
-    return astValue;
   }
 
   // only explicit null, not undefined, NaN
@@ -61,23 +82,7 @@ export function astFromValue(
     return null;
   }
 
-  // Convert JavaScript array to GraphQL list. If the GraphQLType is a list, but
-  // the value is not an array, convert the value using the list's item type.
-  if (isListType(type)) {
-    const itemType = type.ofType;
-    if (isIterableObject(value)) {
-      const valuesNodes = [];
-      for (const item of value) {
-        const itemNode = astFromValue(item, itemType);
-        if (itemNode != null) {
-          valuesNodes.push(itemNode);
-        }
-      }
-      return { kind: Kind.LIST, values: valuesNodes };
-    }
-    return astFromValue(value, itemType);
-  }
-
+  // @ts-expect-error
   return parseDataType(value, type);
 }
 
