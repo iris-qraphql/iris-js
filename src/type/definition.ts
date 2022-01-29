@@ -1,4 +1,4 @@
-import type { ResponsePath } from 'graphql';
+import type { GraphQLResolveInfo } from 'graphql';
 import { Kind, valueFromASTUntyped } from 'graphql';
 import { contains, identity, pluck } from 'ramda';
 
@@ -8,7 +8,6 @@ import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { mapValue } from '../jsutils/ObjMap';
-import type { PromiseOrValue } from '../jsutils/PromiseOrValue';
 import { didYouMean, suggestionList } from '../jsutils/suggestions';
 
 import type {
@@ -27,7 +26,6 @@ import { GraphQLError } from '../error';
 import type { ConfigMap, ConfigMapValue, Override } from '../utils/type-level';
 
 import { assertName } from './assertName';
-import type { GraphQLSchema } from './schema';
 
 // UTILS
 
@@ -297,19 +295,6 @@ export const defineArguments = unfoldConfigMap<GraphQLArgument>(
 
 // FIELDS
 
-export type GraphQLTypeResolver<TSource, TContext> = (
-  value: TSource,
-  context: TContext,
-  info: GraphQLResolveInfo,
-  abstractType: IrisResolverType,
-) => PromiseOrValue<string | undefined>;
-
-export type GraphQLIsTypeOfFn<TSource, TContext> = (
-  source: TSource,
-  context: TContext,
-  info: GraphQLResolveInfo,
-) => PromiseOrValue<boolean>;
-
 export type GraphQLFieldResolver<
   TSource,
   TContext,
@@ -321,16 +306,6 @@ export type GraphQLFieldResolver<
   context: TContext,
   info: GraphQLResolveInfo,
 ) => TResult;
-
-export type GraphQLResolveInfo = {
-  readonly fieldName: string;
-  readonly returnType: GraphQLOutputType;
-  readonly parentType: IrisResolverType;
-  readonly path: ResponsePath;
-  readonly schema: GraphQLSchema;
-  readonly rootValue: unknown;
-  readonly variableValues: Record<string, unknown>;
-};
 
 export type GraphQLFieldConfig<TSource, TContext, TArgs = any> = {
   description?: Maybe<string>;

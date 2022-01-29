@@ -44,7 +44,6 @@ export type {
   IrisDataVariant,
   GraphQLField,
   GraphQLFieldResolver,
-  GraphQLIsTypeOfFn,
 } from './definition';
 
 export {

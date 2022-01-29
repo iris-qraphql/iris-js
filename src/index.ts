@@ -91,7 +91,6 @@ export type {
   GraphQLArgument,
   GraphQLField,
   GraphQLFieldResolver,
-  GraphQLIsTypeOfFn,
 } from './type/index';
 
 export {
