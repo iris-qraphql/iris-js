@@ -7,8 +7,6 @@ import {
   getNamedType,
   getNullableType,
   isDataType,
-  isEnumType,
-  isInputObjectType,
   isInputType,
   isListType,
   isNonNullType,
@@ -107,34 +105,6 @@ describe('Type predicates', () => {
     it('returns false for non-union type', () => {
       expect(isUnionType(gqlList(UnionType))).toEqual(false);
       expect(isUnionType(ObjectType)).toEqual(false);
-    });
-  });
-
-  describe('isEnumType', () => {
-    it('returns true for enum type', () => {
-      expect(isEnumType(EnumType)).toEqual(true);
-    });
-
-    it('returns false for wrapped enum type', () => {
-      expect(isEnumType(gqlList(EnumType))).toEqual(false);
-    });
-
-    it('returns false for non-enum type', () => {
-      expect(isEnumType(ScalarType)).toEqual(false);
-    });
-  });
-
-  describe('isInputObjectType', () => {
-    it('returns true for data  object type', () => {
-      expect(isInputObjectType(InputObjectType)).toEqual(true);
-    });
-
-    it('returns false for wrapped data  object type', () => {
-      expect(isInputObjectType(gqlList(InputObjectType))).toEqual(false);
-    });
-
-    it('returns false for non-input-object type', () => {
-      expect(isInputObjectType(ObjectType)).toEqual(false);
     });
   });
 

@@ -10,7 +10,6 @@ import {
   getNamedType,
   getNullableType,
   isDataType,
-  isInputObjectType,
   isListType,
   isNonNullType,
 } from '../../type/definition';
@@ -36,6 +35,7 @@ export function ValuesOfCorrectTypeRule(
       // Note: TypeInfo will traverse into a list's item type, so look to the
       // parent input type to check if it is a list.
       const type = getNullableType(context.getParentInputType());
+
       if (!isListType(type)) {
         isValidValueNode(context, node);
         return false; // Don't traverse further.
@@ -70,7 +70,7 @@ export function ValuesOfCorrectTypeRule(
     ObjectField(node) {
       const parentType = getNamedType(context.getParentInputType());
       const fieldType = context.getInputType();
-      if (!fieldType && isInputObjectType(parentType)) {
+      if (!fieldType && isDataType(parentType) && parentType.isVariantType()) {
         const suggestions = suggestionList(
           node.name.value,
           Object.keys(parentType.variantBy().fields ?? {}),

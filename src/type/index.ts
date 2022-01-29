@@ -12,7 +12,6 @@ export {
   isType,
   isObjectType,
   isUnionType,
-  isInputObjectType,
   isListType,
   isNonNullType,
   isInputType,

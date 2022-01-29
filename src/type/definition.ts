@@ -61,13 +61,6 @@ export function isUnionType(type: unknown): type is IrisResolverType {
 export const isDataType = (type: unknown): type is IrisDataType =>
   instanceOf(type, IrisDataType);
 
-export function isEnumType(type: unknown): type is IrisDataType {
-  return isDataType(type) && !type.isVariantType() && !type.isPrimitive;
-}
-
-export const isInputObjectType = (type: unknown): type is IrisDataType =>
-  isDataType(type) && type.isVariantType();
-
 export const assertBy =
   <T>(kind: string, f: (type: unknown) => type is T) =>
   (type: unknown): T => {
@@ -150,7 +143,9 @@ export type GraphQLNullableType =
   | IrisDataType
   | IrisTypeRef<GraphQLType>;
 
-export function isNonNullType(type: GraphQLInputType): type is IrisDataType;
+export function isNonNullType(
+  type: GraphQLInputType,
+): type is IrisTypeRef<IrisDataType>;
 export function isNonNullType(
   type: unknown,
 ): type is IrisTypeRef<IrisNamedType>;
@@ -168,7 +163,10 @@ export function isListType(type: unknown): type is IrisTypeRef<IrisNamedType> {
   return isTypeRef(type) && type.kind === 'LIST';
 }
 
-export function getNullableType(type: undefined | null): void;
+export function getNullableType(type: undefined | null): undefined;
+export function getNullableType(
+  type: Maybe<GraphQLType>,
+): GraphQLType | undefined;
 export function getNullableType(
   type: Maybe<GraphQLType>,
 ): GraphQLType | undefined {
