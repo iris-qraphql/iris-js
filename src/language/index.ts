@@ -42,7 +42,6 @@ export type {
   TypeNode,
   NamedTypeNode,
   ListTypeNode,
-  NonNullTypeNode,
   TypeSystemDefinitionNode,
   TypeDefinitionNode,
   FieldDefinitionNode,
@@ -55,7 +54,6 @@ export type {
 export {
   isValueNode,
   isConstValueNode,
-  isTypeNode,
   isTypeSystemDefinitionNode,
   isTypeDefinitionNode,
 } from './predicates';

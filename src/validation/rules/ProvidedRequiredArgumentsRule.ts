@@ -78,5 +78,5 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
 }
 
 function isRequiredArgumentNode(arg: ArgumentDefinitionNode): boolean {
-  return arg.type.kind !== IrisKind.MAYBE && arg.defaultValue == null;
+  return arg.type.kind !== IrisKind.MAYBE_TYPE && arg.defaultValue == null;
 }

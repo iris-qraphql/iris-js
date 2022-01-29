@@ -94,7 +94,6 @@ export {
   // Predicates
   isValueNode,
   isConstValueNode,
-  isTypeNode,
   isTypeSystemDefinitionNode,
   isTypeDefinitionNode,
 } from './language/index';

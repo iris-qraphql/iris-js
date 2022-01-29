@@ -60,14 +60,15 @@ export function valueFromAST(
 
   if (isTypeRef(type)) {
     switch (type.kind) {
-      case 'REQUIRED':
-        return valueNode.kind === Kind.NULL
-          ? undefined
-          : valueFromAST(valueNode, type.ofType, variables);
-      case 'LIST': {
+      case 'MAYBE': {
         if (valueNode.kind === Kind.NULL) {
+          // This is explicitly returning the value null.
           return null;
         }
+        break;
+      }
+
+      case 'LIST': {
         const itemType = type.ofType;
         if (valueNode.kind === Kind.LIST) {
           const coercedValues = [];
@@ -97,13 +98,10 @@ export function valueFromAST(
         return [coercedValue];
       }
       default:
-        break;
+        return valueNode.kind === Kind.NULL
+          ? undefined
+          : valueFromAST(valueNode, type.ofType, variables);
     }
-  }
-
-  if (valueNode.kind === Kind.NULL) {
-    // This is explicitly returning the value null.
-    return null;
   }
 
   if (isDataType(type)) {

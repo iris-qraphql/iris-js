@@ -47,12 +47,12 @@ export function astFromValue(
     const itemType = type.ofType;
 
     switch (type.kind) {
-      case 'REQUIRED': {
-        const astValue = astFromValue(value, itemType);
-        if (astValue?.kind === Kind.NULL) {
-          return null;
+      case 'MAYBE': {
+        // only explicit null, not undefined, NaN
+        if (value === null) {
+          return { kind: Kind.NULL };
         }
-        return astValue;
+        break;
       }
       case 'LIST': {
         if (isIterableObject(value)) {
@@ -72,13 +72,8 @@ export function astFromValue(
     }
   }
 
-  // only explicit null, not undefined, NaN
-  if (value === null) {
-    return { kind: Kind.NULL };
-  }
-
-  // undefined
-  if (value === undefined) {
+  // handles only required required
+  if (value === undefined || value === null) {
     return null;
   }
 

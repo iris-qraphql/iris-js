@@ -77,7 +77,10 @@ const gqlScalar = <T>(x: GQLScalar<T>) =>
   new IrisDataType<T>({ ...x, isPrimitive: true });
 
 export const gqlNonNull = <T extends GraphQLType>(ofType: T) =>
-  new IrisTypeRef('REQUIRED', ofType);
+  new IrisTypeRef('NAMED', ofType);
+
+export const irisMaybe = <T extends GraphQLType>(ofType: T) =>
+  new IrisTypeRef('NAMED', ofType);
 
 export const gqlList = <T extends GraphQLType>(ofType: T) =>
   new IrisTypeRef('LIST', ofType);

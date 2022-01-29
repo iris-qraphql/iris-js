@@ -2,8 +2,8 @@ import { Kind, Source } from 'graphql';
 
 import { dedent } from '../../utils/dedent';
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
-import { IrisKind } from '../kinds';
 
+import { IrisKind } from '../kinds';
 import { parse, parseConstValue, parseType, parseValue } from '../parser';
 
 export function expectJSON(actual: unknown) {
@@ -251,7 +251,7 @@ describe('Parser', () => {
     it('parses nested types', () => {
       const result = parseType('[MyType!]');
       expectJSON(result).toEqual({
-        kind: IrisKind.MAYBE,
+        kind: IrisKind.MAYBE_TYPE,
         loc: { start: 0, end: 9 },
         type: {
           kind: Kind.LIST_TYPE,

@@ -29,7 +29,6 @@ import type {
   MaybeTypeNode,
   NamedTypeNode,
   NameNode,
-  NonNullTypeNode,
   NullValueNode,
   ObjectFieldNode,
   ObjectValueNode,
@@ -452,7 +451,7 @@ export class Parser {
     }
 
     return this.node<MaybeTypeNode>(start, {
-      kind: IrisKind.MAYBE,
+      kind: IrisKind.MAYBE_TYPE,
       type,
     });
   }
