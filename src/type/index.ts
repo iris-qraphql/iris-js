@@ -10,20 +10,16 @@ export type { GraphQLSchemaConfig, GraphQLSchemaExtensions } from './schema';
 
 export {
   isType,
-  isNonNullType,
   isInputType,
-  isOutputType,
   isDataType,
   isResolverType,
   isRequiredArgument,
-  getNullableType,
   getNamedType,
 } from './definition';
 
 export type {
   GraphQLType,
   GraphQLInputType,
-  GraphQLOutputType,
   IrisResolverType,
   IrisNamedType as GraphQLNamedType,
   GraphQLArgument,

@@ -9,7 +9,6 @@ import {
   isListType,
   isNonNullType,
   isObjectType,
-  isOutputType,
   isRequiredArgument,
   isResolverType,
   isType,
@@ -157,30 +156,6 @@ describe('Type predicates', () => {
 
       expectNonInputType(gqlNonNull(ObjectType));
       expectNonInputType(gqlNonNull(UnionType));
-    });
-  });
-
-  describe('isOutputType', () => {
-    function expectOutputType(type: unknown) {
-      expect(isOutputType(type)).toEqual(true);
-    }
-
-    it('returns true for an output type', () => {
-      expectOutputType(GraphQLString);
-      expectOutputType(ObjectType);
-      expectOutputType(UnionType);
-      expectOutputType(EnumType);
-    });
-
-    it('returns true for a wrapped output type', () => {
-      expectOutputType(gqlList(GraphQLString));
-      expectOutputType(gqlList(ObjectType));
-      expectOutputType(gqlList(UnionType));
-      expectOutputType(gqlList(EnumType));
-      expectOutputType(gqlNonNull(GraphQLString));
-      expectOutputType(gqlNonNull(ObjectType));
-      expectOutputType(gqlNonNull(UnionType));
-      expectOutputType(gqlNonNull(EnumType));
     });
   });
 

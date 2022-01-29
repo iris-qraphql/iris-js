@@ -46,9 +46,7 @@ export {
   isSchema,
   isDirective,
   isType,
-  isNonNullType,
   isInputType,
-  isOutputType,
   isDataType,
   isResolverType,
   isRequiredArgument,
@@ -66,7 +64,6 @@ export {
 export type {
   GraphQLType,
   GraphQLInputType,
-  GraphQLOutputType,
   IrisResolverType,
   GraphQLNamedType,
   GraphQLSchemaConfig,

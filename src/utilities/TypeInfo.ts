@@ -1,4 +1,4 @@
-import { Kind } from 'graphql';
+import { isType, Kind } from 'graphql';
 
 import type { Maybe } from '../jsutils/Maybe';
 
@@ -22,7 +22,6 @@ import {
   isDataType,
   isInputType,
   isListType,
-  isOutputType,
   isResolverType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
@@ -68,7 +67,7 @@ export class TypeInfo {
       if (isResolverType(initialType)) {
         this._parentTypeStack.push(initialType);
       }
-      if (isOutputType(initialType)) {
+      if (isType(initialType)) {
         this._typeStack.push(initialType);
       }
     }
