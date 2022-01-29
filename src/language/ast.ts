@@ -176,6 +176,8 @@ export interface ConstDirectiveNode {
 
 /** Type Reference */
 
+export type WrapperKind = 'LIST' | 'Maybe' | 'TypeDef';
+
 export type TypeNode = NamedTypeNode | ListTypeNode | NonNullTypeNode;
 
 export interface NamedTypeNode {

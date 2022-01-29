@@ -1,8 +1,12 @@
 import type { GraphQLFieldResolver } from 'graphql';
-import { Kind, valueFromASTUntyped } from 'graphql';
+import {
+  GraphQLList,
+  GraphQLNonNull,
+  Kind,
+  valueFromASTUntyped,
+} from 'graphql';
 import { contains, identity, pluck } from 'ramda';
 
-import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
@@ -19,6 +23,7 @@ import type {
   ResolverTypeDefinitionNode,
   Role,
   ValueNode,
+  WrapperKind,
 } from '../language/ast';
 import { print } from '../language/printer';
 
@@ -42,8 +47,7 @@ export const unfoldConfigMap =
 export type GraphQLType =
   | IrisResolverType
   | IrisDataType
-  | GraphQLList<GraphQLType>
-  | GraphQLNonNull<IrisResolverType | IrisDataType | GraphQLList<GraphQLType>>;
+  | IrisTypeRef<GraphQLType>;
 
 export function isType(type: unknown): type is GraphQLType {
   return (
@@ -94,48 +98,12 @@ export const assertDataType = assertBy('Data', isDataType);
 export const assertNonNullType = assertBy('Non-Null', isNonNullType);
 export const assertListType = assertBy('List', isListType);
 
-export function isListType(
-  type: GraphQLInputType,
-): type is GraphQLList<GraphQLInputType>;
-export function isListType(
-  type: GraphQLOutputType,
-): type is GraphQLList<GraphQLOutputType>;
-export function isListType(type: unknown): type is GraphQLList<GraphQLType>;
-export function isListType(type: unknown): type is GraphQLList<GraphQLType> {
-  return instanceOf(type, GraphQLList);
-}
-
-export function isNonNullType(
-  type: GraphQLInputType,
-): type is GraphQLNonNull<GraphQLInputType>;
-export function isNonNullType(
-  type: GraphQLOutputType,
-): type is GraphQLNonNull<GraphQLOutputType>;
-export function isNonNullType(
-  type: unknown,
-): type is GraphQLNonNull<GraphQLType>;
-export function isNonNullType(
-  type: unknown,
-): type is GraphQLNonNull<GraphQLType> {
-  return instanceOf(type, GraphQLNonNull);
-}
-
-export type GraphQLInputType =
-  | IrisDataType
-  | GraphQLList<GraphQLInputType>
-  | GraphQLNonNull<IrisDataType | GraphQLList<GraphQLInputType>>;
-
 export function isInputType(type: unknown): type is GraphQLInputType {
   return isDataType(type) || (isWrappingType(type) && isInputType(type.ofType));
 }
 
-export type GraphQLOutputType =
-  | IrisResolverType
-  | IrisDataType
-  | GraphQLList<GraphQLOutputType>
-  | GraphQLNonNull<
-      IrisResolverType | IrisDataType | GraphQLList<GraphQLOutputType>
-    >;
+export type GraphQLInputType = IrisDataType | IrisTypeRef<GraphQLInputType>;
+export type GraphQLOutputType = IrisNamedType | IrisTypeRef<GraphQLOutputType>;
 
 export function isOutputType(type: unknown): type is GraphQLOutputType {
   return (
@@ -145,20 +113,17 @@ export function isOutputType(type: unknown): type is GraphQLOutputType {
   );
 }
 
-export class GraphQLList<T extends GraphQLType> {
+export class IrisTypeRef<T extends GraphQLType> {
   readonly ofType: T;
+  readonly kind: WrapperKind;
 
-  constructor(ofType: T) {
-    devAssert(
-      isType(ofType),
-      `Expected ${inspect(ofType)} to be a GraphQL type.`,
-    );
-
+  constructor(ofType: T, kind: WrapperKind) {
     this.ofType = ofType;
+    this.kind = kind;
   }
 
   get [Symbol.toStringTag]() {
-    return 'GraphQLList';
+    return 'IrisTypeRef';
   }
 
   toString(): string {
@@ -170,38 +135,14 @@ export class GraphQLList<T extends GraphQLType> {
   }
 }
 
-export class GraphQLNonNull<T extends GraphQLNullableType> {
-  readonly ofType: T;
+export type GraphQLWrappingType = IrisTypeRef<GraphQLType>;
 
-  constructor(ofType: T) {
-    devAssert(
-      isNullableType(ofType),
-      `Expected ${inspect(ofType)} to be a GraphQL nullable type.`,
-    );
+export const isWrappingType = (type: unknown): type is GraphQLWrappingType =>
+  isListType(type) || isNonNullType(type);
 
-    this.ofType = ofType;
-  }
+export type GraphQLNamedType = IrisResolverType | IrisDataType;
 
-  get [Symbol.toStringTag]() {
-    return 'GraphQLNonNull';
-  }
-
-  toString(): string {
-    return String(this.ofType) + '!';
-  }
-
-  toJSON(): string {
-    return this.toString();
-  }
-}
-
-export type GraphQLWrappingType =
-  | GraphQLList<GraphQLType>
-  | GraphQLNonNull<GraphQLType>;
-
-export function isWrappingType(type: unknown): type is GraphQLWrappingType {
-  return isListType(type) || isNonNullType(type);
-}
+type IrisNamedType = IrisDataType | IrisResolverType;
 
 /**
  * These types can all accept null as a value.
@@ -209,24 +150,30 @@ export function isWrappingType(type: unknown): type is GraphQLWrappingType {
 export type GraphQLNullableType =
   | IrisResolverType
   | IrisDataType
-  | GraphQLList<GraphQLType>;
+  | IrisTypeRef<GraphQLType>;
+
+export function isNonNullType(type: GraphQLInputType): type is IrisDataType;
+export function isNonNullType(type: unknown): type is IrisNamedType;
+export function isNonNullType(type: unknown): type is IrisNamedType {
+  return instanceOf(type, GraphQLNonNull);
+}
+
+export function isListType(
+  type: GraphQLInputType,
+): type is IrisTypeRef<GraphQLInputType>;
+export function isListType(type: unknown): type is IrisTypeRef<IrisNamedType>;
+export function isListType(type: unknown): type is IrisTypeRef<IrisNamedType> {
+  return instanceOf(type, GraphQLList);
+}
 
 export function getNullableType(type: undefined | null): void;
-export function getNullableType<T extends GraphQLNullableType>(
-  type: T | GraphQLNonNull<T>,
-): T;
 export function getNullableType(
   type: Maybe<GraphQLType>,
-): GraphQLNullableType | undefined;
-export function getNullableType(
-  type: Maybe<GraphQLType>,
-): GraphQLNullableType | undefined {
+): GraphQLType | undefined {
   if (type) {
     return isNonNullType(type) ? type.ofType : type;
   }
 }
-
-export type GraphQLNamedType = IrisResolverType | IrisDataType;
 
 export function getNamedType(type: undefined | null): void;
 export function getNamedType(type: GraphQLInputType): IrisDataType;

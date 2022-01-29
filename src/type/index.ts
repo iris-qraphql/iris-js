@@ -22,13 +22,10 @@ export {
   isWrappingType,
   isNullableType,
   isRequiredArgument,
-  assertResolverType,
   assertListType,
   assertNonNullType,
   getNullableType,
   getNamedType,
-  GraphQLList,
-  GraphQLNonNull,
 } from './definition';
 
 export type {
