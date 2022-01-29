@@ -79,7 +79,6 @@ export type {
   GraphQLType,
   GraphQLInputType,
   GraphQLOutputType,
-  GraphQLLeafType,
   IrisResolverType,
   GraphQLWrappingType,
   GraphQLNullableType,
@@ -90,7 +89,6 @@ export type {
   GraphQLDirectiveExtensions,
   GraphQLArgument,
   GraphQLField,
-  GraphQLFieldResolver,
 } from './type/index';
 
 export {

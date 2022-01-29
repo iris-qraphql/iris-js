@@ -1,4 +1,4 @@
-import type { GraphQLResolveInfo } from 'graphql';
+import type { GraphQLFieldResolver } from 'graphql';
 import { Kind, valueFromASTUntyped } from 'graphql';
 import { contains, identity, pluck } from 'ramda';
 
@@ -144,8 +144,6 @@ export function isOutputType(type: unknown): type is GraphQLOutputType {
     (isWrappingType(type) && isOutputType(type.ofType))
   );
 }
-
-export type GraphQLLeafType = IrisDataType;
 
 export class GraphQLList<T extends GraphQLType> {
   readonly ofType: T;
@@ -294,18 +292,6 @@ export const defineArguments = unfoldConfigMap<GraphQLArgument>(
 );
 
 // FIELDS
-
-export type GraphQLFieldResolver<
-  TSource,
-  TContext,
-  TArgs = any,
-  TResult = unknown,
-> = (
-  source: TSource,
-  args: TArgs,
-  context: TContext,
-  info: GraphQLResolveInfo,
-) => TResult;
 
 export type GraphQLFieldConfig<TSource, TContext, TArgs = any> = {
   description?: Maybe<string>;

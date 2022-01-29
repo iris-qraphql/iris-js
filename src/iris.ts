@@ -1,4 +1,8 @@
-import type { GraphQLTypeResolver, Source } from 'graphql';
+import type {
+  GraphQLFieldResolver,
+  GraphQLTypeResolver,
+  Source,
+} from 'graphql';
 import type { ExecutionResult } from 'graphql/execution';
 import { execute } from 'graphql/execution';
 
@@ -7,7 +11,6 @@ import type { Maybe } from './jsutils/Maybe';
 
 import { parse } from './language/parser';
 
-import type { GraphQLFieldResolver } from './type/definition';
 import type { GraphQLSchema } from './type/schema';
 import { validateSchema } from './type/validate';
 

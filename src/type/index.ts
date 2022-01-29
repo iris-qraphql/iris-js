@@ -35,7 +35,6 @@ export type {
   GraphQLType,
   GraphQLInputType,
   GraphQLOutputType,
-  GraphQLLeafType,
   IrisResolverType,
   GraphQLWrappingType,
   GraphQLNullableType,
@@ -43,7 +42,6 @@ export type {
   GraphQLArgument,
   IrisDataVariant,
   GraphQLField,
-  GraphQLFieldResolver,
 } from './definition';
 
 export {
