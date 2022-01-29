@@ -26,6 +26,7 @@ import type {
   IntValueNode,
   ListTypeNode,
   ListValueNode,
+  MaybeTypeNode,
   NamedTypeNode,
   NameNode,
   NonNullTypeNode,
@@ -447,13 +448,13 @@ export class Parser {
     }
 
     if (this.expectOptionalToken(TokenKind.BANG)) {
-      return this.node<NonNullTypeNode>(start, {
-        kind: IrisKind.NON_NULL_TYPE,
-        type,
-      });
+      return type;
     }
 
-    return type;
+    return this.node<MaybeTypeNode>(start, {
+      kind: IrisKind.MAYBE,
+      type,
+    });
   }
 
   /**

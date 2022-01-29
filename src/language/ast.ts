@@ -49,7 +49,8 @@ export type ASTNode =
   | ResolverTypeDefinitionNode
   | DataTypeDefinitionNode
   | DirectiveDefinitionNode
-  | VariantDefinitionNode;
+  | VariantDefinitionNode
+  | MaybeTypeNode;
 
 /**
  * @internal
@@ -70,12 +71,11 @@ export const QueryDocumentKeys: {
   ListValue: ['values'],
   ObjectValue: ['fields'],
   ObjectField: ['name', 'value'],
-
   Directive: ['name', 'arguments'],
-
   NamedType: ['name'],
   ListType: ['type'],
   NonNullType: ['type'],
+  Maybe: ['type'],
   FieldDefinition: ['description', 'name', 'arguments', 'type', 'directives'],
   InputValueDefinition: [
     'description',
@@ -178,7 +178,11 @@ export interface ConstDirectiveNode {
 
 export type WrapperKind = 'LIST' | 'MAYBE' | 'REQUIRED';
 
-export type TypeNode = NamedTypeNode | ListTypeNode | NonNullTypeNode;
+export type TypeNode =
+  | NamedTypeNode
+  | ListTypeNode
+  | NonNullTypeNode
+  | MaybeTypeNode;
 
 export interface NamedTypeNode {
   readonly kind: IrisKind.NAMED_TYPE;
@@ -190,6 +194,12 @@ export interface ListTypeNode {
   readonly kind: IrisKind.LIST_TYPE;
   readonly loc?: Location;
   readonly type: TypeNode;
+}
+
+export interface MaybeTypeNode {
+  readonly kind: IrisKind.MAYBE;
+  readonly loc?: Location;
+  readonly type: NamedTypeNode | ListTypeNode;
 }
 
 export interface NonNullTypeNode {

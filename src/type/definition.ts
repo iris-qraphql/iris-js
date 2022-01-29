@@ -85,9 +85,9 @@ export class IrisTypeRef<T extends GraphQLType> {
       case 'LIST':
         return '[' + String(this.ofType) + ']';
       case 'REQUIRED':
-        return String(this.ofType) + '!';
+        return this.ofType.toString();
       default:
-        return String(this.ofType);
+        return this.ofType.toString() + '?';
     }
   }
 

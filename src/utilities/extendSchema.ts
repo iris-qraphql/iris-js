@@ -157,7 +157,10 @@ export function extendSchemaImpl(
       return new IrisTypeRef('LIST', getWrappedType(node.type));
     }
     if (node.kind === IrisKind.NON_NULL_TYPE) {
-      return new IrisTypeRef('REQUIRED', getWrappedType(node.type));
+      return getWrappedType(node.type);
+    }
+    if (node.kind === IrisKind.MAYBE) {
+      return new IrisTypeRef('MAYBE', getWrappedType(node.type));
     }
     return getNamedType(node);
   }

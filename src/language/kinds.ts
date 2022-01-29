@@ -4,6 +4,7 @@ export enum IrisKind {
   ARGUMENT_DEFINITION = 'InputValueDefinition',
   NAMED_TYPE = 'NamedType',
   LIST_TYPE = 'ListType',
+  MAYBE = 'Maybe',
   NON_NULL_TYPE = 'NonNullType',
   FIELD_DEFINITION = 'FieldDefinition',
   RESOLVER_TYPE_DEFINITION = 'ResolverTypeDefinition',
