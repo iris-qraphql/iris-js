@@ -68,7 +68,6 @@ export type {
   GraphQLInputType,
   GraphQLOutputType,
   IrisResolverType,
-  GraphQLNullableType,
   GraphQLNamedType,
   GraphQLSchemaConfig,
   GraphQLSchemaExtensions,

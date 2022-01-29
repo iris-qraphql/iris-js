@@ -154,10 +154,8 @@ export class TypeInfo {
         break;
       }
       case Kind.LIST: {
-        const listType: unknown = getNullableType(this.getInputType());
-        const itemType: unknown = isListType(listType)
-          ? listType.ofType
-          : listType;
+        const listType = getNullableType(this.getInputType());
+        const itemType = isListType(listType) ? listType.ofType : listType;
         // List positions never have a default value.
         this._defaultValueStack.push(undefined);
         this._inputTypeStack.push(isInputType(itemType) ? itemType : undefined);

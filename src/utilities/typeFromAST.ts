@@ -1,7 +1,7 @@
 import type { ListTypeNode, NamedTypeNode, TypeNode } from '../language/ast';
 import { IrisKind } from '../language/kinds';
 
-import type { GraphQLNamedType, GraphQLType } from '../type/definition';
+import type { GraphQLType,IrisNamedType } from '../type/definition';
 import { IrisTypeRef } from '../type/definition';
 import type { GraphQLSchema } from '../type/schema';
 
@@ -15,7 +15,7 @@ import type { GraphQLSchema } from '../type/schema';
 export function typeFromAST(
   schema: GraphQLSchema,
   typeNode: NamedTypeNode,
-): GraphQLNamedType | undefined;
+): IrisNamedType | undefined;
 export function typeFromAST(
   schema: GraphQLSchema,
   typeNode: ListTypeNode,

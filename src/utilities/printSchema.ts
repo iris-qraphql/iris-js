@@ -11,10 +11,10 @@ import { print } from '../language/printer';
 import type {
   GraphQLArgument,
   GraphQLField,
-  GraphQLNamedType,
   IrisDataType,
   IrisDataVariant,
   IrisDataVariantField,
+  IrisNamedType,
   IrisResolverType,
 } from '../type/definition';
 import { isDataType, isResolverType } from '../type/definition';
@@ -33,14 +33,14 @@ export function printSchema(schema: GraphQLSchema): string {
   );
 }
 
-function isDefinedType(type: GraphQLNamedType): boolean {
+function isDefinedType(type: IrisNamedType): boolean {
   return !isSpecifiedScalarType(type);
 }
 
 function printFilteredSchema(
   schema: GraphQLSchema,
   directiveFilter: (type: GraphQLDirective) => boolean,
-  typeFilter: (type: GraphQLNamedType) => boolean,
+  typeFilter: (type: IrisNamedType) => boolean,
 ): string {
   const directives = schema.getDirectives().filter(directiveFilter);
   const types = Object.values(schema.getTypeMap()).filter(typeFilter);
@@ -53,7 +53,7 @@ function printFilteredSchema(
     .join('\n\n');
 }
 
-export function printType(type: GraphQLNamedType): string {
+export function printType(type: IrisNamedType): string {
   if (isResolverType(type)) {
     return printResolver(type);
   }

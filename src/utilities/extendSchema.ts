@@ -20,10 +20,10 @@ import { isTypeDefinitionNode } from '../language/predicates';
 import type {
   GraphQLArgument,
   GraphQLFieldConfig,
-  GraphQLNamedType,
   GraphQLType,
   IrisDataVariantConfig,
   IrisDataVariantField,
+  IrisNamedType,
   IrisResolverVariantConfig,
 } from '../type/definition';
 import {
@@ -135,14 +135,14 @@ export function extendSchemaImpl(
     assumeValid: options?.assumeValid ?? false,
   };
 
-  function replaceNamedType<T extends GraphQLNamedType>(type: T): T {
+  function replaceNamedType<T extends IrisNamedType>(type: T): T {
     // Note: While this could make early assertions to get the correctly
     // typed values, that would throw immediately while type system
     // validation with validateSchema() will produce more actionable results.
     return typeMap[type.name];
   }
 
-  function getNamedType(node: NamedTypeNode): GraphQLNamedType {
+  function getNamedType(node: NamedTypeNode): IrisNamedType {
     const name = node.name.value;
     const type = stdTypeMap[name] ?? typeMap[name];
 
@@ -262,7 +262,7 @@ export function extendSchemaImpl(
     };
   }
 
-  function buildType(astNode: TypeDefinitionNode): GraphQLNamedType {
+  function buildType(astNode: TypeDefinitionNode): IrisNamedType {
     const name = astNode.name.value;
 
     switch (astNode.kind) {

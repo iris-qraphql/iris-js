@@ -7,7 +7,7 @@ import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
 
-import type { GraphQLNamedType, IrisDataType } from './definition';
+import type { IrisDataType,IrisNamedType } from './definition';
 import { gqlScalar } from './make';
 
 /**
@@ -261,7 +261,7 @@ export const specifiedScalarTypes: ReadonlyArray<IrisDataType> = Object.freeze([
   GraphQLID,
 ]);
 
-export function isSpecifiedScalarType(type: GraphQLNamedType): boolean {
+export function isSpecifiedScalarType(type: IrisNamedType): boolean {
   return specifiedScalarTypes.some(({ name }) => type.name === name);
 }
 

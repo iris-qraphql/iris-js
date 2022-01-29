@@ -8,8 +8,8 @@ import { isObjectLike } from '../jsutils/ObjMap';
 import type { GraphQLError } from '../error';
 
 import type {
-  GraphQLNamedType,
   GraphQLType,
+  IrisNamedType,
   IrisResolverType,
 } from './definition';
 import { getNamedType, isDataType, isResolverType } from './definition';
@@ -146,7 +146,7 @@ export class GraphQLSchema {
 
     // To preserve order of user-provided types, we add first to add them to
     // the set of "collected" types, so `collectReferencedTypes` ignore them.
-    const allReferencedTypes: Set<GraphQLNamedType> = new Set(config.types);
+    const allReferencedTypes: Set<IrisNamedType> = new Set(config.types);
     if (config.types != null) {
       for (const type of config.types) {
         // When we ready to process this type, we remove it from "collected" types
@@ -219,7 +219,7 @@ export class GraphQLSchema {
     return this._typeMap;
   }
 
-  getType(name: string): GraphQLNamedType | undefined {
+  getType(name: string): IrisNamedType | undefined {
     return this.getTypeMap()[name];
   }
 
@@ -232,7 +232,7 @@ export class GraphQLSchema {
   }
 }
 
-type TypeMap = ObjMap<GraphQLNamedType>;
+type TypeMap = ObjMap<IrisNamedType>;
 
 export interface GraphQLSchemaValidationOptions {
   /**
@@ -250,7 +250,7 @@ export interface GraphQLSchemaConfig extends GraphQLSchemaValidationOptions {
   query?: Maybe<IrisResolverType>;
   mutation?: Maybe<IrisResolverType>;
   subscription?: Maybe<IrisResolverType>;
-  types?: Maybe<ReadonlyArray<GraphQLNamedType>>;
+  types?: Maybe<ReadonlyArray<IrisNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
   extensions?: Maybe<Readonly<GraphQLSchemaExtensions>>;
 }
@@ -260,7 +260,7 @@ export interface GraphQLSchemaConfig extends GraphQLSchemaValidationOptions {
  */
 export interface GraphQLSchemaNormalizedConfig extends GraphQLSchemaConfig {
   description: Maybe<string>;
-  types: ReadonlyArray<GraphQLNamedType>;
+  types: ReadonlyArray<IrisNamedType>;
   directives: ReadonlyArray<GraphQLDirective>;
   extensions: Readonly<GraphQLSchemaExtensions>;
   assumeValid: boolean;
@@ -268,8 +268,8 @@ export interface GraphQLSchemaNormalizedConfig extends GraphQLSchemaConfig {
 
 function collectReferencedTypes(
   type: GraphQLType,
-  typeSet: Set<GraphQLNamedType>,
-): Set<GraphQLNamedType> {
+  typeSet: Set<IrisNamedType>,
+): Set<IrisNamedType> {
   const namedType = getNamedType(type);
 
   if (!typeSet.has(namedType)) {
