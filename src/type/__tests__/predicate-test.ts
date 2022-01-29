@@ -235,7 +235,7 @@ describe('Type predicates', () => {
       expect(irisMaybe(listOfObj)).toEqual(listOfObj);
     });
 
-    it('unwraps non-null type', () => {
+    it('unwraps maybe type', () => {
       expect(getNullableType(irisMaybe(ObjectType))).toEqual(ObjectType);
     });
   });

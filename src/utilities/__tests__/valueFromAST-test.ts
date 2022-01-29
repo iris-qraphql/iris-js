@@ -6,7 +6,7 @@ import type { ObjMap } from '../../jsutils/ObjMap';
 import { parseValue } from '../../language/parser';
 
 import type { GraphQLInputType } from '../../type/definition';
-import { gqlInput, gqlList, gqlNonNull, gqlScalar } from '../../type/make';
+import { gqlInput, gqlList, gqlScalar, irisMaybe } from '../../type/make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -16,6 +16,24 @@ import {
 } from '../../type/scalars';
 
 import { valueFromAST } from '../valueFromAST';
+
+// Boolean?
+const maybeBool = irisMaybe(GraphQLBoolean);
+
+// Boolean
+const bool = GraphQLBoolean;
+
+// [Boolean?]?
+const maybeListOfMaybeBool = irisMaybe(gqlList(maybeBool));
+
+// [Boolean?]
+const ListOfMaybeBool = gqlList(maybeBool);
+
+// [Boolean]
+const listOfBool = gqlList(bool);
+
+// [Boolean]?
+const maybeListOfBool = irisMaybe(listOfBool);
 
 describe('valueFromAST', () => {
   function expectValueFrom(
@@ -29,12 +47,12 @@ describe('valueFromAST', () => {
   }
 
   it('rejects empty input', () => {
-    expect(valueFromAST(null, GraphQLBoolean)).toEqual(undefined);
+    expect(valueFromAST(null, maybeBool)).toEqual(undefined);
   });
 
   it('converts according to input coercion rules', () => {
-    expectValueFrom('true', GraphQLBoolean).toEqual(true);
-    expectValueFrom('false', GraphQLBoolean).toEqual(false);
+    expectValueFrom('true', maybeBool).toEqual(true);
+    expectValueFrom('false', maybeBool).toEqual(false);
     expectValueFrom('123', GraphQLInt).toEqual(123);
     expectValueFrom('123', GraphQLFloat).toEqual(123);
     expectValueFrom('123.456', GraphQLFloat).toEqual(123.456);
@@ -44,7 +62,7 @@ describe('valueFromAST', () => {
   });
 
   it('does not convert when input coercion rules reject a value', () => {
-    expectValueFrom('123', GraphQLBoolean).toEqual(undefined);
+    expectValueFrom('123', maybeBool).toEqual(undefined);
     expectValueFrom('123.456', GraphQLInt).toEqual(undefined);
     expectValueFrom('true', GraphQLInt).toEqual(undefined);
     expectValueFrom('"123"', GraphQLInt).toEqual(undefined);
@@ -87,70 +105,57 @@ describe('valueFromAST', () => {
     expectValueFrom('value', returnUndefinedScalar).toEqual(undefined);
   });
 
-  // Boolean!
-  const nonNullBool = gqlNonNull(GraphQLBoolean);
-  // [Boolean]
-  const listOfBool = gqlList(GraphQLBoolean);
-  // [Boolean!]
-  const listOfNonNullBool = gqlList(nonNullBool);
-  // [Boolean]!
-  const nonNullListOfBool = gqlNonNull(listOfBool);
-  // [Boolean!]!
-  const nonNullListOfNonNullBool = gqlNonNull(listOfNonNullBool);
-
   it('coerces to null unless non-null', () => {
-    expectValueFrom('null', GraphQLBoolean).toEqual(null);
-    expectValueFrom('null', nonNullBool).toEqual(undefined);
+    expectValueFrom('null', maybeBool).toEqual(null);
+    expectValueFrom('null', bool).toEqual(undefined);
   });
 
   it('coerces lists of values', () => {
-    expectValueFrom('true', listOfBool).toEqual([true]);
-    expectValueFrom('123', listOfBool).toEqual(undefined);
-    expectValueFrom('null', listOfBool).toEqual(null);
-    expectValueFrom('[true, false]', listOfBool).toEqual([true, false]);
-    expectValueFrom('[true, 123]', listOfBool).toEqual(undefined);
-    expectValueFrom('[true, null]', listOfBool).toEqual([true, null]);
-    expectValueFrom('{ true: true }', listOfBool).toEqual(undefined);
-  });
-
-  it('coerces non-null lists of values', () => {
-    expectValueFrom('true', nonNullListOfBool).toEqual([true]);
-    expectValueFrom('123', nonNullListOfBool).toEqual(undefined);
-    expectValueFrom('null', nonNullListOfBool).toEqual(undefined);
-    expectValueFrom('[true, false]', nonNullListOfBool).toEqual([true, false]);
-    expectValueFrom('[true, 123]', nonNullListOfBool).toEqual(undefined);
-    expectValueFrom('[true, null]', nonNullListOfBool).toEqual([true, null]);
-  });
-
-  it('coerces lists of non-null values', () => {
-    expectValueFrom('true', listOfNonNullBool).toEqual([true]);
-    expectValueFrom('123', listOfNonNullBool).toEqual(undefined);
-    expectValueFrom('null', listOfNonNullBool).toEqual(null);
-    expectValueFrom('[true, false]', listOfNonNullBool).toEqual([true, false]);
-    expectValueFrom('[true, 123]', listOfNonNullBool).toEqual(undefined);
-    expectValueFrom('[true, null]', listOfNonNullBool).toEqual(undefined);
-  });
-
-  it('coerces non-null lists of non-null values', () => {
-    expectValueFrom('true', nonNullListOfNonNullBool).toEqual([true]);
-    expectValueFrom('123', nonNullListOfNonNullBool).toEqual(undefined);
-    expectValueFrom('null', nonNullListOfNonNullBool).toEqual(undefined);
-    expectValueFrom('[true, false]', nonNullListOfNonNullBool).toEqual([
+    expectValueFrom('true', maybeListOfMaybeBool).toEqual([true]);
+    expectValueFrom('123', maybeListOfMaybeBool).toEqual(undefined);
+    expectValueFrom('null', maybeListOfMaybeBool).toEqual(null);
+    expectValueFrom('[true, false]', maybeListOfMaybeBool).toEqual([
       true,
       false,
     ]);
-    expectValueFrom('[true, 123]', nonNullListOfNonNullBool).toEqual(undefined);
-    expectValueFrom('[true, null]', nonNullListOfNonNullBool).toEqual(
-      undefined,
-    );
+    expectValueFrom('[true, 123]', maybeListOfMaybeBool).toEqual(undefined);
+    expectValueFrom('[true, null]', maybeListOfMaybeBool).toEqual([true, null]);
+    expectValueFrom('{ true: true }', maybeListOfMaybeBool).toEqual(undefined);
+  });
+
+  it('coerces non-null lists of values', () => {
+    expectValueFrom('true', ListOfMaybeBool).toEqual([true]);
+    expectValueFrom('123', ListOfMaybeBool).toEqual(undefined);
+    expectValueFrom('null', ListOfMaybeBool).toEqual(undefined);
+    expectValueFrom('[true, false]', ListOfMaybeBool).toEqual([true, false]);
+    expectValueFrom('[true, 123]', ListOfMaybeBool).toEqual(undefined);
+    expectValueFrom('[true, null]', ListOfMaybeBool).toEqual([true, null]);
+  });
+
+  it('coerces lists of non-null values', () => {
+    expectValueFrom('true', maybeListOfBool).toEqual([true]);
+    expectValueFrom('123', maybeListOfBool).toEqual(undefined);
+    expectValueFrom('null', maybeListOfBool).toEqual(null);
+    expectValueFrom('[true, false]', maybeListOfBool).toEqual([true, false]);
+    expectValueFrom('[true, 123]', maybeListOfBool).toEqual(undefined);
+    expectValueFrom('[true, null]', maybeListOfBool).toEqual(undefined);
+  });
+
+  it('coerces non-null lists of non-null values', () => {
+    expectValueFrom('true', listOfBool).toEqual([true]);
+    expectValueFrom('123', listOfBool).toEqual(undefined);
+    expectValueFrom('null', listOfBool).toEqual(undefined);
+    expectValueFrom('[true, false]', listOfBool).toEqual([true, false]);
+    expectValueFrom('[true, 123]', listOfBool).toEqual(undefined);
+    expectValueFrom('[true, null]', listOfBool).toEqual(undefined);
   });
 
   const testInputObj = gqlInput({
     name: 'TestInput',
     fields: {
       int: { type: GraphQLInt },
-      bool: { type: GraphQLBoolean },
-      requiredBool: { type: nonNullBool },
+      bool: { type: maybeBool },
+      requiredBool: { type: bool },
     },
   });
 
@@ -177,22 +182,22 @@ describe('valueFromAST', () => {
   });
 
   it('accepts variable values assuming already coerced', () => {
-    expectValueFrom('$var', GraphQLBoolean, {}).toEqual(undefined);
-    expectValueFrom('$var', GraphQLBoolean, { var: true }).toEqual(true);
-    expectValueFrom('$var', GraphQLBoolean, { var: null }).toEqual(null);
-    expectValueFrom('$var', nonNullBool, { var: null }).toEqual(undefined);
+    expectValueFrom('$var', maybeBool, {}).toEqual(undefined);
+    expectValueFrom('$var', maybeBool, { var: true }).toEqual(true);
+    expectValueFrom('$var', maybeBool, { var: null }).toEqual(null);
+    expectValueFrom('$var', bool, { var: null }).toEqual(undefined);
   });
 
   it('asserts variables are provided as items in lists', () => {
-    expectValueFrom('[ $foo ]', listOfBool, {}).toEqual([null]);
-    expectValueFrom('[ $foo ]', listOfNonNullBool, {}).toEqual(undefined);
-    expectValueFrom('[ $foo ]', listOfNonNullBool, {
+    expectValueFrom('[ $foo ]', maybeListOfMaybeBool, {}).toEqual([null]);
+    expectValueFrom('[ $foo ]', maybeListOfBool, {}).toEqual(undefined);
+    expectValueFrom('[ $foo ]', maybeListOfBool, {
       foo: true,
     }).toEqual([true]);
     // Note: variables are expected to have already been coerced, so we
     // do not expect the singleton wrapping behavior for variables.
-    expectValueFrom('$foo', listOfNonNullBool, { foo: true }).toEqual(true);
-    expectValueFrom('$foo', listOfNonNullBool, { foo: [true] }).toEqual([true]);
+    expectValueFrom('$foo', maybeListOfBool, { foo: true }).toEqual(true);
+    expectValueFrom('$foo', maybeListOfBool, { foo: [true] }).toEqual([true]);
   });
 
   it('omits input object fields for unprovided variables', () => {

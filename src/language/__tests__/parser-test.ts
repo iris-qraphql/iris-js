@@ -3,7 +3,6 @@ import { Kind, Source } from 'graphql';
 import { dedent } from '../../utils/dedent';
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
-import { IrisKind } from '../kinds';
 import { parse, parseConstValue, parseType, parseValue } from '../parser';
 
 export function expectJSON(actual: unknown) {
@@ -235,38 +234,14 @@ describe('Parser', () => {
       });
     });
 
-    it('parses non-null types', () => {
-      const result = parseType('MyType!');
-      expectJSON(result).toEqual({
-        kind: Kind.NAMED_TYPE,
-        loc: { start: 0, end: 6 },
-        name: {
-          kind: Kind.NAME,
-          loc: { start: 0, end: 6 },
-          value: 'MyType',
-        },
-      });
+    it('parses optional types', () => {
+      const result = parseType('MyType?');
+      expectJSON(result).toMatchSnapshot();
     });
 
     it('parses nested types', () => {
-      const result = parseType('[MyType!]');
-      expectJSON(result).toEqual({
-        kind: IrisKind.MAYBE_TYPE,
-        loc: { start: 0, end: 9 },
-        type: {
-          kind: Kind.LIST_TYPE,
-          loc: { start: 0, end: 9 },
-          type: {
-            kind: Kind.NAMED_TYPE,
-            loc: { start: 1, end: 7 },
-            name: {
-              kind: Kind.NAME,
-              loc: { start: 1, end: 7 },
-              value: 'MyType',
-            },
-          },
-        },
-      });
+      const result = parseType('[MyType?]');
+      expectJSON(result).toMatchSnapshot();
     });
   });
 });
