@@ -82,7 +82,10 @@ function schemaWithFieldType(type: GraphQLOutputType): GraphQLSchema {
   });
 }
 
-const expectedJSON = (schema: GraphQLSchema, value: unknown) =>
+const expectJSON = (schema: GraphQLSchema) =>
+  expect(toJSONDeep(validateSchema(schema)));
+
+const expectJSONEqual = (schema: GraphQLSchema, value: unknown) =>
   expect(toJSONDeep(validateSchema(schema))).toEqual(value);
 
 describe('Type System: A Schema must have Object root types', () => {
@@ -92,7 +95,7 @@ describe('Type System: A Schema must have Object root types', () => {
         test: String
       }
     `);
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message: 'Query root type must be Object type, it cannot be Query.',
         locations: [{ line: 2, column: 7 }],
@@ -110,7 +113,7 @@ describe('Type System: A Schema must have Object root types', () => {
         test: String
       }
     `);
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'Mutation root type must be Object type if provided, it cannot be Mutation.',
@@ -129,7 +132,7 @@ describe('Type System: A Schema must have Object root types', () => {
         test: String
       }
     `);
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'Subscription root type must be Object type if provided, it cannot be Subscription.',
@@ -144,7 +147,7 @@ describe('Type System: A Schema must have Object root types', () => {
       // @ts-expect-error
       types: [{ name: 'SomeType' }, SomeDirective],
     });
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message: 'Expected GraphQL named type but got: { name: "SomeType" }.',
       },
@@ -161,7 +164,7 @@ describe('Type System: A Schema must have Object root types', () => {
       // @ts-expect-error
       directives: [null, 'SomeDirective', SomeScalarType],
     });
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message: 'Expected directive but got: null.',
       },
@@ -187,7 +190,7 @@ describe('Type System: Objects must have fields', () => {
         field: String
       }
     `);
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 
   it('accept an resolver with empty fields', () => {
@@ -198,7 +201,7 @@ describe('Type System: Objects must have fields', () => {
 
       resolver IncompleteObject
     `);
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 
   it('rejects an Object type with incorrectly named fields', () => {
@@ -210,7 +213,7 @@ describe('Type System: Objects must have fields', () => {
         },
       }),
     );
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'Name "__badName" must not begin with "__", which is reserved by GraphQL introspection.',
@@ -234,7 +237,7 @@ describe('Type System: Fields args must be properly named', () => {
         },
       }),
     );
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 
   it('rejects field arg with invalid names', () => {
@@ -252,7 +255,7 @@ describe('Type System: Fields args must be properly named', () => {
       }),
     );
 
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'Name "__badName" must not begin with "__", which is reserved by GraphQL introspection.',
@@ -280,7 +283,7 @@ describe('Type System: Union types must be valid', () => {
         = TypeA
         | TypeB
     `);
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 
   it('rejects a Union type with non-Object members types', () => {
@@ -304,7 +307,7 @@ describe('Type System: Union types must be valid', () => {
         | Int
     `);
 
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'Union type BadUnion can only include Object types, it cannot include String.',
@@ -331,7 +334,7 @@ describe('Type System: Union types must be valid', () => {
         // @ts-expect-error
         types: [memberType],
       });
-      expectedJSON(schemaWithFieldType(badUnion), [
+      expectJSONEqual(schemaWithFieldType(badUnion), [
         {
           message:
             'Union type BadUnion can only include Object types, ' +
@@ -353,7 +356,7 @@ describe('Type System: Input Objects must have fields', () => {
         field: String
       }
     `);
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 
   it('accept empty data type', () => {
@@ -365,7 +368,7 @@ describe('Type System: Input Objects must have fields', () => {
       data SomeInputObject
     `);
 
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 
   it('accepts an Input Object with breakable circular reference', () => {
@@ -387,7 +390,7 @@ describe('Type System: Input Objects must have fields', () => {
       }
     `);
 
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 
   it('accept recursive data types', () => {
@@ -401,7 +404,7 @@ describe('Type System: Input Objects must have fields', () => {
       }
     `);
 
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 
   it('rejects an Input Object type with incorrectly typed fields', () => {
@@ -422,7 +425,7 @@ describe('Type System: Input Objects must have fields', () => {
         goodInputObject: SomeInputObject
       }
     `);
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'The type of SomeInputObject.badObject must be Input Type but got: SomeObject.',
@@ -441,7 +444,7 @@ describe('Type System: Enum types must be well defined', () => {
   it('rejects an Enum type with incorrectly named values', () => {
     const schema = schemaWithFieldType(gqlEnum('SomeEnum', ['__badName']));
 
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'Name "__badName" must not begin with "__", which is reserved by GraphQL introspection.',
@@ -476,14 +479,14 @@ describe('Type System: Object fields must have output types', () => {
     const typeName = inspect(type);
     it(`accepts an output type as an Object field type: ${typeName}`, () => {
       const schema = schemaWithObjectField({ type });
-      expectedJSON(schema, []);
+      expectJSONEqual(schema, []);
     });
   }
 
   it('rejects a non-type value as an Object field type', () => {
     // @ts-expect-error
     const schema = schemaWithObjectField({ type: Number });
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'The type of BadObject.badField must be Output Type but got: [function Number].',
@@ -504,7 +507,7 @@ describe('Type System: Object fields must have output types', () => {
         field: String
       }
     `);
-    expectedJSON(schema, []);
+    expectJSONEqual(schema, []);
   });
 });
 
@@ -547,7 +550,7 @@ describe('Type System: Arguments must have data  types', () => {
     const typeName = inspect(type);
     it(`accepts an data  type as a field arg type: ${typeName}`, () => {
       const schema = schemaWithArg({ type });
-      expectedJSON(schema, []);
+      expectJSONEqual(schema, []);
     });
   }
 
@@ -556,7 +559,7 @@ describe('Type System: Arguments must have data  types', () => {
     it(`rejects a non-input type as a field arg type: ${typeStr}`, () => {
       // @ts-expect-error
       const schema = schemaWithArg({ type });
-      expectedJSON(schema, [
+      expectJSONEqual(schema, [
         {
           message: `The type of @BadDirective(badArg:) must be Input Type but got: ${typeStr}.`,
         },
@@ -570,7 +573,7 @@ describe('Type System: Arguments must have data  types', () => {
   it('rejects a non-type value as a field arg type', () => {
     // @ts-expect-error
     const schema = schemaWithArg({ type: Number });
-    expectedJSON(schema, [
+    expectJSONEqual(schema, [
       {
         message:
           'The type of @BadDirective(badArg:) must be Input Type but got: [function Number].',
@@ -588,36 +591,20 @@ describe('Type System: Arguments must have data  types', () => {
   it('rejects an required argument that is deprecated', () => {
     const schema = buildSchema(`
       directive @BadDirective(
-        badArg: String! @deprecated
-        optionalArg: String @deprecated
-        anotherOptionalArg: String! = "" @deprecated
+        badArg: String @deprecated
+        optionalArg: String? @deprecated
+        anotherOptionalArg: String = "" @deprecated
       ) on FIELD
 
       resolver Query = {
         test(
-          badArg: String! @deprecated
-          optionalArg: String @deprecated
-          anotherOptionalArg: String! = "" @deprecated
+          badArg: String @deprecated
+          optionalArg: String? @deprecated
+          anotherOptionalArg: String = "" @deprecated
         ): String
       }
     `);
-    expectedJSON(schema, [
-      {
-        message:
-          'Required argument @BadDirective(badArg:) cannot be deprecated.',
-        locations: [
-          { line: 3, column: 25 },
-          { line: 3, column: 17 },
-        ],
-      },
-      {
-        message: 'Required argument Query.test(badArg:) cannot be deprecated.',
-        locations: [
-          { line: 10, column: 27 },
-          { line: 10, column: 19 },
-        ],
-      },
-    ]);
+    expectJSON(schema).toMatchSnapshot();
   });
 
   it('rejects a non-input type as a field arg with locations', () => {
@@ -630,13 +617,7 @@ describe('Type System: Arguments must have data  types', () => {
         foo: String
       }
     `);
-    expectedJSON(schema, [
-      {
-        message:
-          'The type of Query.test(arg:) must be Input Type but got: SomeObject.',
-        locations: [{ line: 3, column: 19 }],
-      },
-    ]);
+    expectJSON(schema).toMatchSnapshot();
   });
 });
 
