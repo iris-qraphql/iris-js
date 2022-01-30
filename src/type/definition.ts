@@ -1,5 +1,5 @@
 import type { GraphQLFieldResolver } from 'graphql';
-import { Kind, valueFromASTUntyped } from 'graphql';
+import { assertName, Kind, valueFromASTUntyped } from 'graphql';
 import { contains, identity, pluck } from 'ramda';
 
 import { inspect } from '../jsutils/inspect';
@@ -24,8 +24,6 @@ import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
 import type { ConfigMap, ConfigMapValue, Override } from '../utils/type-level';
-
-import { assertName } from './assertName';
 
 export const unfoldConfigMap =
   <T>(f: (k: string, v: ConfigMapValue<T>) => T) =>

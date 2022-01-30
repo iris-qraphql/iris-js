@@ -1,5 +1,3 @@
-import { invariant } from '../../jsutils/invariant';
-
 import { parseValue } from '../../language/parser';
 import { visit } from '../../language/visitor';
 
@@ -43,7 +41,6 @@ describe('visitWithTypeInfo', () => {
     `);
     const ast = parseValue('{ stringListField: ["foo"] }');
     const complexInputType = schema.getType('ComplexInput');
-    invariant(complexInputType != null);
 
     const typeInfo = new TypeInfo(schema, complexInputType);
 

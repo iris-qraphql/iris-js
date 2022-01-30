@@ -1,17 +1,15 @@
-import type { GraphQLArgs, GraphQLSchema } from 'graphql';
+import type { GraphQLArgs } from 'graphql';
 import { graphql } from 'graphql';
 import type { ExecutionResult } from 'graphql/execution';
 
 import type { IrisSchema } from './type/schema';
 import { validateSchema } from './type/validate';
 
+import { toGQLSchema } from './transpile/toGQLSchema';
+
 export type IrisArgs = Omit<GraphQLArgs, 'schema'> & {
   schema: IrisSchema;
 };
-
-const toGQLSchema = (schema: IrisSchema): GraphQLSchema =>
-  // @ts-expect-error
-  schema;
 
 export const iris = ({
   schema,

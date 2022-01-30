@@ -15,9 +15,6 @@ module.exports = function inlineInvariant(context) {
   const invariantTemplate = context.template(`
     (%%cond%%) || invariant(false, %%args%%)
   `);
-  const assertTemplate = context.template(`
-    (%%cond%%) || devAssert(false, %%args%%)
-  `);
 
   return {
     visitor: {
@@ -38,9 +35,6 @@ module.exports = function inlineInvariant(context) {
           const [cond, args] = node.arguments;
 
           path.replaceWith(invariantTemplate({ cond, args }));
-        } else if (calleeName === 'devAssert') {
-          const [cond, args] = node.arguments;
-          path.replaceWith(assertTemplate({ cond, args }));
         }
       },
     },

@@ -2,8 +2,6 @@ import { Kind } from 'graphql';
 import { isPrintableAsBlockString } from 'graphql/language/blockString';
 import { pluck } from 'ramda';
 
-import { inspect } from '../jsutils/inspect';
-import { invariant } from '../jsutils/invariant';
 import type { Maybe } from '../jsutils/Maybe';
 
 import { print } from '../language/printer';
@@ -17,7 +15,7 @@ import type {
   IrisNamedType,
   IrisResolverType,
 } from '../type/definition';
-import { isDataType, isResolverType } from '../type/definition';
+import { isResolverType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import { isSpecifiedDirective } from '../type/directives';
 import { isSpecifiedScalarType } from '../type/scalars';
@@ -57,12 +55,8 @@ export function printType(type: IrisNamedType): string {
   if (isResolverType(type)) {
     return printResolver(type);
   }
-  if (isDataType(type)) {
-    return printDATA(type);
-  }
-  /* c8 ignore next 3 */
-  // Not reachable, all possible types have been considered.
-  invariant(false, 'Unexpected type: ' + inspect(type));
+
+  return printDATA(type);
 }
 
 function printResolver(type: IrisResolverType): string {

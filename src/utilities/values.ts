@@ -16,7 +16,7 @@ import { GraphQLError } from '../error';
 
 import { valueFromAST } from './valueFromAST';
 
-export function getArgumentValues(
+function getArgumentValues(
   def: GraphQLField | GraphQLDirective,
   node: DirectiveNode,
   variableValues?: Maybe<ObjMap<unknown>>,

@@ -1,6 +1,5 @@
 import { uniqBy } from 'ramda';
 
-import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
@@ -88,10 +87,12 @@ export class IrisSchema {
       }
 
       const typeName = namedType.name;
-      devAssert(
-        typeName,
-        'One of the provided types for building the Schema is missing a name.',
-      );
+      if (!typeName) {
+        throw new Error(
+          'One of the provided types for building the Schema is missing a name.',
+        );
+      }
+
       if (this._typeMap[typeName] !== undefined) {
         throw new Error(
           `Schema must contain uniquely named types but contains multiple types named "${typeName}".`,
@@ -105,16 +106,16 @@ export class IrisSchema {
     return 'IrisSchema';
   }
 
-  getQueryType(): Maybe<IrisResolverType> {
-    return this._queryType;
+  getQueryType(): IrisResolverType | undefined {
+    return this._queryType ?? undefined;
   }
 
-  getMutationType(): Maybe<IrisResolverType> {
-    return this._mutationType;
+  getMutationType(): IrisResolverType | undefined {
+    return this._mutationType ?? undefined;
   }
 
-  getSubscriptionType(): Maybe<IrisResolverType> {
-    return this._subscriptionType;
+  getSubscriptionType(): IrisResolverType | undefined {
+    return this._subscriptionType ?? undefined;
   }
 
   getTypeMap(): TypeMap {
@@ -148,16 +149,6 @@ export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
   subscription?: Maybe<IrisResolverType>;
   types?: Maybe<ReadonlyArray<IrisNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
-}
-
-/**
- * @internal
- */
-export interface GraphQLSchemaNormalizedConfig extends GraphQLSchemaConfig {
-  description: Maybe<string>;
-  types: ReadonlyArray<IrisNamedType>;
-  directives: ReadonlyArray<GraphQLDirective>;
-  assumeValid: boolean;
 }
 
 function collectReferencedTypes(

@@ -1,8 +1,5 @@
 import { BREAK } from 'graphql';
 
-import { devAssert } from '../jsutils/devAssert';
-import { inspect } from '../jsutils/inspect';
-
 import type { ASTNode } from './ast';
 import { isNode, QueryDocumentKeys } from './ast';
 import type { KIND } from './kinds';
@@ -251,8 +248,6 @@ export function visit(
 
     let result;
     if (!Array.isArray(node)) {
-      devAssert(isNode(node), `Invalid AST Node: ${inspect(node)}.`);
-
       const visitFn = isLeaving
         ? enterLeaveMap.get(node.kind)?.leave
         : enterLeaveMap.get(node.kind)?.enter;
