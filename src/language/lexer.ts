@@ -91,7 +91,7 @@ export class Lexer {
  */
 export function isPunctuatorTokenKind(kind: TokenKind): boolean {
   return (
-    kind === TokenKind.BANG ||
+    kind === TokenKind.QUESTION_MARK ||
     kind === TokenKind.DOLLAR ||
     kind === TokenKind.AMP ||
     kind === TokenKind.PAREN_L ||
@@ -256,8 +256,6 @@ function readNextToken(lexer: Lexer, start: number): Token {
           position,
           position + 1,
         );
-      case 0x0021: // !
-        return createToken(lexer, TokenKind.BANG, position, position + 1);
       case 0x0024: // $
         return createToken(lexer, TokenKind.DOLLAR, position, position + 1);
       case 0x0026: // &

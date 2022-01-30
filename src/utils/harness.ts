@@ -58,7 +58,7 @@ export const testSchema: GraphQLSchema = buildSchema(`
     | UNKNOWN {}
 
   data ComplexInput = {
-    requiredField: Boolean!
+    requiredField: Boolean
     intField: Int
     stringField: String
     booleanField: Boolean
@@ -67,19 +67,19 @@ export const testSchema: GraphQLSchema = buildSchema(`
 
   resolver ComplicatedArgs = {
     intArgField(intArg: Int): String
-    nonNullIntArgField(nonNullIntArg: Int!): String
+    nonNullIntArgField(nonNullIntArg: Int): String
     stringArgField(stringArg: String): String
     booleanArgField(booleanArg: Boolean): String
     enumArgField(enumArg: FurColor): String
     floatArgField(floatArg: Float): String
     idArgField(idArg: ID): String
     stringListArgField(stringListArg: [String]): String
-    stringListNonNullArgField(stringListNonNullArg: [String!]): String
+    stringListNonNullArgField(stringListNonNullArg: [String]): String
     complexArgField(complexArg: ComplexInput): String
-    multipleReqs(req1: Int!, req2: Int!): String
-    nonNullFieldWithDefault(arg: Int! = 0): String
+    multipleReqs(req1: Int, req2: Int?): String
+    nonNullFieldWithDefault(arg: Int = 0): String
     multipleOpts(opt1: Int = 0, opt2: Int = 0): String
-    multipleOptAndReq(req1: Int!, req2: Int!, opt1: Int = 0, opt2: Int = 0): String
+    multipleOptAndReq(req1: Int, req2: Int, opt1: Int = 0, opt2: Int? = 0): String
   }
 
   resolver Query = {

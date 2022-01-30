@@ -12,7 +12,7 @@ describe('isPunctuatorTokenKind', () => {
     isPunctuatorTokenKind(lexOne(text).kind);
 
   it('returns true for punctuator tokens', () => {
-    expect(isPunctuatorToken('!')).toEqual(true);
+    expect(isPunctuatorToken('?')).toEqual(true);
     expect(isPunctuatorToken('$')).toEqual(true);
     expect(isPunctuatorToken('&')).toEqual(true);
     expect(isPunctuatorToken('(')).toEqual(true);

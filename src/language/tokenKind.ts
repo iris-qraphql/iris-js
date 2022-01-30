@@ -1,7 +1,6 @@
 export enum TokenKind {
   SOF = '<SOF>',
   EOF = '<EOF>',
-  BANG = '!',
   DOLLAR = '$',
   AMP = '&',
   PAREN_L = '(',
@@ -22,4 +21,5 @@ export enum TokenKind {
   BLOCK_STRING = 'BlockString',
   COMMENT = 'Comment',
   QUESTION_MARK = '?',
+  BANG = '!',
 }

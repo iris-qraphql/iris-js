@@ -454,10 +454,6 @@ export class Parser {
       });
     }
 
-    if (this.expectOptionalToken(TokenKind.BANG)) {
-      return type;
-    }
-
     return type;
   }
 

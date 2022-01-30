@@ -378,10 +378,10 @@ describe('Type System: Input Objects must have fields', () => {
       }
 
       data  SomeInputObject = {
-        self: SomeInputObject
-        arrayOfSelf: [SomeInputObject]
-        nonNullArrayOfSelf: [SomeInputObject]!
-        nonNullArrayOfNonNullSelf: [SomeInputObject!]!
+        self: SomeInputObject?
+        arrayOfSelf: [SomeInputObject?]?
+        nonNullArrayOfSelf: [SomeInputObject?]
+        nonNullArrayOfNonNullSelf: [SomeInputObject]
         intermediateSelf: AnotherInputObject
       }
 
@@ -400,7 +400,7 @@ describe('Type System: Input Objects must have fields', () => {
       }
 
       data SomeInputObject = {
-        nonNullSelf: SomeInputObject!
+        nonNullSelf: SomeInputObject
       }
     `);
 

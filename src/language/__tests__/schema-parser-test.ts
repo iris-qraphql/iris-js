@@ -50,7 +50,7 @@ describe('Schema Parser', () => {
   it('Simple non-null resolver', () => {
     snapshot(dedent`
       resolver Hello = {
-        world: String!
+        world: String
       }
     `);
   });
