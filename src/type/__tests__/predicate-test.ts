@@ -102,7 +102,7 @@ describe('Type predicates', () => {
     });
 
     it('returns false for a non-list wrapped type', () => {
-      expect(isListType(gqlNonNull(gqlList(ObjectType)))).toEqual(false);
+      expect(isListType(maybe(gqlList(ObjectType)))).toEqual(false);
     });
   });
 
