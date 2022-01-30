@@ -157,26 +157,6 @@ describe('Type System: A Schema must have Object root types', () => {
       },
     ]);
   });
-
-  it('rejects a Schema whose directives are incorrectly typed', () => {
-    const schema = new IrisSchema({
-      query: SomeObjectType,
-      // @ts-expect-error
-      directives: [null, 'SomeDirective', SomeScalarType],
-    });
-    expectJSONEqual(schema, [
-      {
-        message: 'Expected directive but got: null.',
-      },
-      {
-        message: 'Expected directive but got: "SomeDirective".',
-      },
-      {
-        message: 'Expected directive but got: SomeScalar.',
-        locations: [{ line: 2, column: 3 }],
-      },
-    ]);
-  });
 });
 
 describe('Type System: Objects must have fields', () => {
