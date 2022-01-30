@@ -2,11 +2,10 @@ export {
   // Predicate
   isSchema,
   // Assertion
-  assertSchema,
   // GraphQL Schema definition
-  GraphQLSchema,
+  IrisSchema,
 } from './schema';
-export type { GraphQLSchemaConfig, GraphQLSchemaExtensions } from './schema';
+export type { GraphQLSchemaConfig } from './schema';
 
 export {
   isType,
@@ -50,19 +49,13 @@ export {
   // Predicate
   isSpecifiedScalarType,
   // Standard GraphQL Scalars
-  specifiedScalarTypes,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLString,
-  GraphQLBoolean,
-  GraphQLID,
-  // Int boundaries constants
-  GRAPHQL_MAX_INT,
-  GRAPHQL_MIN_INT,
+  IrisFloat,
+  IrisString,
+  IrisBool,
 } from './scalars';
 
 // Validate GraphQL schema.
-export { validateSchema, assertValidSchema } from './validate';
+export { validateSchema } from './validate';
 
 // Upholds the spec rules about naming.
 export { assertName, assertEnumValueName } from './assertName';

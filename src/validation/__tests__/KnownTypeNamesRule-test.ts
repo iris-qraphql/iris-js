@@ -1,14 +1,14 @@
-import type { GraphQLSchema } from '../../type/schema';
+import type { IrisSchema } from '../../type/schema';
 
 import { getSDLValidationErrors } from '../../utils/harness';
 
 import { KnownTypeNamesRule } from '../rules/KnownTypeNamesRule';
 
-function getSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
+function getSDLErrors(sdlStr: string, schema?: IrisSchema) {
   return getSDLValidationErrors(schema, KnownTypeNamesRule, sdlStr);
 }
 
-function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {
+function expectValidSDL(sdlStr: string, schema?: IrisSchema) {
   expect(getSDLErrors(sdlStr, schema)).toEqual([]);
 }
 

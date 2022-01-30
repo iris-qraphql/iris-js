@@ -95,7 +95,7 @@ export function extendSchemaImpl(
   }
 
   // If this document contains no new types, extensions, or directives then
-  // return the same unmodified GraphQLSchema instance.
+  // return the same unmodified IrisSchema instance.
   if (
     Object.keys(typeExtensionsMap).length === 0 &&
     typeDefs.length === 0 &&
@@ -131,7 +131,6 @@ export function extendSchemaImpl(
       ...schemaConfig.directives,
       ...directiveDefs.map(buildDirective),
     ],
-    extensions: Object.create(null),
     assumeValid: options?.assumeValid ?? false,
   };
 

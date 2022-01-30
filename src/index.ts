@@ -28,19 +28,14 @@
 
 // The GraphQL.js version info.
 export { version, versionInfo } from './version';
-export { graphql } from './iris';
+export { iris } from './iris';
 
 export {
-  GraphQLSchema,
+  IrisSchema,
   GraphQLDirective,
-  specifiedScalarTypes,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLString,
-  GraphQLBoolean,
-  GraphQLID,
-  GRAPHQL_MAX_INT,
-  GRAPHQL_MIN_INT,
+  IrisFloat,
+  IrisString,
+  IrisBool,
   specifiedDirectives,
   GraphQLDeprecatedDirective,
   isSchema,
@@ -52,11 +47,9 @@ export {
   isRequiredArgument,
   isSpecifiedScalarType,
   isSpecifiedDirective,
-  assertSchema,
   assertDirective,
   getNamedType,
   validateSchema,
-  assertValidSchema,
   assertName,
   assertEnumValueName,
 } from './type/index';
@@ -67,11 +60,9 @@ export type {
   IrisResolverType,
   GraphQLNamedType,
   GraphQLSchemaConfig,
-  GraphQLSchemaExtensions,
   GraphQLDirectiveConfig,
   GraphQLDirectiveExtensions,
   GraphQLArgument,
-  GraphQLField,
 } from './type/index';
 
 export {
@@ -138,25 +129,13 @@ export type {
   DirectiveDefinitionNode,
 } from './language/index';
 
-// Create, format, and print GraphQL errors.
-
-// Utilities for operating on GraphQL type schema and parsed sources.
 export {
-  // Produce the GraphQL query recommended for a full schema introspection.
-  // Accepts optional IntrospectionOptions.
-  // Build a GraphQLSchema from an introspection result.
-  // Build a GraphQLSchema from a parsed GraphQL Schema language AST.
   buildASTSchema,
-  // Build a GraphQLSchema from a GraphQL schema language document.
   buildSchema,
-  // Print a GraphQLSchema to GraphQL Schema language.
   printSchema,
-  // Print a GraphQLType to GraphQL Schema language.
   printType,
-  // Create a GraphQL language AST from a JavaScript value.
   astFromValue,
-  // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.
-  TypeInfo, // Comparators for types
+  TypeInfo,
 } from './utilities/index';
 
 export type { BuildSchemaOptions } from './utilities/index';

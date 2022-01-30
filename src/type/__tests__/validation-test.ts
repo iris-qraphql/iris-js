@@ -4,7 +4,7 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { buildSchema } from '../../utilities/buildASTSchema';
 
-import { dedent } from '../../utils/dedent';
+import { GraphQLError } from '../../error';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { ConfigMapValue } from '../../utils/type-level';
 
@@ -19,9 +19,9 @@ import type {
 import { assertDataType, assertResolverType } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
 import { gqlEnum, gqlList, gqlObject, gqlUnion, maybe } from '../make';
-import { GraphQLString } from '../scalars';
-import { GraphQLSchema } from '../schema';
-import { assertValidSchema, validateSchema } from '../validate';
+import { IrisString } from '../scalars';
+import { IrisSchema } from '../schema';
+import { validateSchema } from '../validate';
 
 const SomeSchema = buildSchema(`
   data SomeScalar = Int
@@ -54,7 +54,7 @@ function withModifiers<T extends IrisNamedType>(
 }
 
 const outputTypes: ReadonlyArray<GraphQLOutputType> = [
-  ...withModifiers(GraphQLString),
+  ...withModifiers(IrisString),
   ...withModifiers(SomeScalarType),
   ...withModifiers(SomeEnumType),
   ...withModifiers(SomeObjectType),
@@ -62,7 +62,7 @@ const outputTypes: ReadonlyArray<GraphQLOutputType> = [
 ];
 
 const inputTypes: ReadonlyArray<GraphQLInputType> = [
-  ...withModifiers(GraphQLString),
+  ...withModifiers(IrisString),
   ...withModifiers(SomeScalarType),
   ...withModifiers(SomeEnumType),
   ...withModifiers(SomeInputObjectType),
@@ -73,8 +73,8 @@ const notInputTypes: ReadonlyArray<GraphQLOutputType> = [
   ...withModifiers(SomeUnionType),
 ];
 
-function schemaWithFieldType(type: GraphQLOutputType): GraphQLSchema {
-  return new GraphQLSchema({
+function schemaWithFieldType(type: GraphQLOutputType): IrisSchema {
+  return new IrisSchema({
     query: gqlObject({
       name: 'Query',
       fields: { f: { type } },
@@ -82,10 +82,10 @@ function schemaWithFieldType(type: GraphQLOutputType): GraphQLSchema {
   });
 }
 
-const expectJSON = (schema: GraphQLSchema) =>
+const expectJSON = (schema: IrisSchema) =>
   expect(toJSONDeep(validateSchema(schema)));
 
-const expectJSONEqual = (schema: GraphQLSchema, value: unknown) =>
+const expectJSONEqual = (schema: IrisSchema, value: unknown) =>
   expect(toJSONDeep(validateSchema(schema))).toEqual(value);
 
 describe('Type System: A Schema must have Object root types', () => {
@@ -142,7 +142,7 @@ describe('Type System: A Schema must have Object root types', () => {
   });
 
   it('rejects a Schema whose types are incorrectly typed', () => {
-    const schema = new GraphQLSchema({
+    const schema = new IrisSchema({
       query: SomeObjectType,
       // @ts-expect-error
       types: [{ name: 'SomeType' }, SomeDirective],
@@ -159,7 +159,7 @@ describe('Type System: A Schema must have Object root types', () => {
   });
 
   it('rejects a Schema whose directives are incorrectly typed', () => {
-    const schema = new GraphQLSchema({
+    const schema = new IrisSchema({
       query: SomeObjectType,
       // @ts-expect-error
       directives: [null, 'SomeDirective', SomeScalarType],
@@ -209,7 +209,7 @@ describe('Type System: Objects must have fields', () => {
       gqlObject({
         name: 'SomeObject',
         fields: {
-          __badName: { type: GraphQLString },
+          __badName: { type: IrisString },
         },
       }),
     );
@@ -229,9 +229,9 @@ describe('Type System: Fields args must be properly named', () => {
         name: 'SomeObject',
         fields: {
           goodField: {
-            type: GraphQLString,
+            type: IrisString,
             args: {
-              goodArg: { type: GraphQLString },
+              goodArg: { type: IrisString },
             },
           },
         },
@@ -246,9 +246,9 @@ describe('Type System: Fields args must be properly named', () => {
         name: 'SomeObject',
         fields: {
           badField: {
-            type: GraphQLString,
+            type: IrisString,
             args: {
-              __badName: { type: GraphQLString },
+              __badName: { type: IrisString },
             },
           },
         },
@@ -321,7 +321,7 @@ describe('Type System: Union types must be valid', () => {
     ]);
 
     const badUnionMemberTypes = [
-      GraphQLString,
+      IrisString,
       maybe(SomeObjectType),
       gqlList(SomeObjectType),
       SomeUnionType,
@@ -456,7 +456,7 @@ describe('Type System: Enum types must be well defined', () => {
 describe('Type System: Object fields must have output types', () => {
   function schemaWithObjectField(
     fieldConfig: GraphQLFieldConfig<unknown, unknown>,
-  ): GraphQLSchema {
+  ): IrisSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
@@ -464,7 +464,7 @@ describe('Type System: Object fields must have output types', () => {
       },
     });
 
-    return new GraphQLSchema({
+    return new IrisSchema({
       query: gqlObject({
         name: 'Query',
         fields: {
@@ -514,12 +514,12 @@ describe('Type System: Object fields must have output types', () => {
 describe('Type System: Arguments must have data  types', () => {
   function schemaWithArg(
     argConfig: ConfigMapValue<GraphQLArgument>,
-  ): GraphQLSchema {
+  ): IrisSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
         badField: {
-          type: GraphQLString,
+          type: IrisString,
           args: {
             badArg: argConfig,
           },
@@ -527,7 +527,7 @@ describe('Type System: Arguments must have data  types', () => {
       },
     });
 
-    return new GraphQLSchema({
+    return new IrisSchema({
       query: gqlObject({
         name: 'Query',
         fields: {
@@ -628,13 +628,13 @@ describe('assertValidSchema', () => {
         foo: String
       }
     `);
-    expect(() => assertValidSchema(schema)).not.toThrow();
+    expect(validateSchema(schema)).toEqual([]);
   });
 
   it('include multiple errors into a description', () => {
     const schema = buildSchema('resolver SomeType');
-    expect(() => assertValidSchema(schema)).toThrow(
-      dedent`Query root type must be provided.`,
-    );
+    expect(validateSchema(schema)).toEqual([
+      new GraphQLError('Query root type must be provided.'),
+    ]);
   });
 });

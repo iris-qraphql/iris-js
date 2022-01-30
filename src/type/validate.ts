@@ -24,7 +24,7 @@ import {
   isTypeRef,
 } from './definition';
 import { GraphQLDeprecatedDirective, isDirective } from './directives';
-import type { GraphQLSchema } from './schema';
+import type { IrisSchema } from './schema';
 import { assertSchema } from './schema';
 
 /**
@@ -35,9 +35,9 @@ import { assertSchema } from './schema';
  * an empty array if no errors were encountered and the Schema is valid.
  */
 export function validateSchema(
-  schema: GraphQLSchema,
+  schema: IrisSchema,
 ): ReadonlyArray<GraphQLError> {
-  // First check to ensure the provided value is in fact a GraphQLSchema.
+  // First check to ensure the provided value is in fact a IrisSchema.
   assertSchema(schema);
 
   // If this Schema has already been validated, return the previous results.
@@ -58,22 +58,11 @@ export function validateSchema(
   return errors;
 }
 
-/**
- * Utility function which asserts a schema is valid by throwing an error if
- * it is invalid.
- */
-export function assertValidSchema(schema: GraphQLSchema): void {
-  const errors = validateSchema(schema);
-  if (errors.length !== 0) {
-    throw new Error(errors.map((error) => error.message).join('\n\n'));
-  }
-}
-
 class SchemaValidationContext {
   readonly _errors: Array<GraphQLError>;
-  readonly schema: GraphQLSchema;
+  readonly schema: IrisSchema;
 
-  constructor(schema: GraphQLSchema) {
+  constructor(schema: IrisSchema) {
     this._errors = [];
     this.schema = schema;
   }
@@ -130,7 +119,7 @@ function validateRootTypes(context: SchemaValidationContext): void {
 }
 
 function getOperationTypeNode(
-  _schema: GraphQLSchema,
+  _schema: IrisSchema,
   _operation: OperationTypeNode,
 ): Maybe<ASTNode> {
   return undefined;

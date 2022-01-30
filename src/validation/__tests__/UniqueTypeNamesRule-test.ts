@@ -1,14 +1,14 @@
-import type { GraphQLSchema } from '../../type/schema';
+import type { IrisSchema } from '../../type/schema';
 
 import { getSDLValidationErrors } from '../../utils/harness';
 
 import { UniqueTypeNamesRule } from '../rules/UniqueTypeNamesRule';
 
-function expectSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
+function expectSDLErrors(sdlStr: string, schema?: IrisSchema) {
   return expect(getSDLValidationErrors(schema, UniqueTypeNamesRule, sdlStr));
 }
 
-function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {
+function expectValidSDL(sdlStr: string, schema?: IrisSchema) {
   expectSDLErrors(sdlStr, schema).toEqual([]);
 }
 

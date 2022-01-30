@@ -16,14 +16,14 @@ import type {
   IrisDataVariant,
 } from '../type/definition';
 import { isTypeRef } from '../type/definition';
-import { GraphQLID } from '../type/scalars';
+import { IrisID } from '../type/scalars';
 
 /**
  * Produces a GraphQL Value AST given a JavaScript object.
  * Function will match JavaScript/JSON values to GraphQL AST schema format
  * by using suggested GraphQLInputType. For example:
  *
- *     astFromValue("value", GraphQLString)
+ *     astFromValue("value", IrisString)
  *
  * A GraphQL type must be provided, which will be used to interpret different
  * JavaScript values.
@@ -122,7 +122,7 @@ const parseDataType = (
     }
 
     // ID types can use Int literals.
-    if (type === GraphQLID && integerStringRegExp.test(serialized)) {
+    if (type === IrisID && integerStringRegExp.test(serialized)) {
       return { kind: Kind.INT, value: serialized };
     }
 

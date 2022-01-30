@@ -26,14 +26,14 @@ serving queries against that type schema.
 First, build a Iris type schema which maps to your codebase.
 
 ```js
-import { graphql, IrisSchema, IrisResolverType, GraphQLString } from 'iris';
+import { iris, IrisSchema, IrisResolverType, IrisString } from 'iris';
 
 var schema = new IrisSchema({
   query: new IrisResolver({
     name: 'RootQueryType',
     fields: {
       hello: {
-        type: GraphQLString,
+        type: IrisString,
         resolve() {
           return 'world';
         },
@@ -52,7 +52,7 @@ Then, serve the result of a query against that type schema.
 ```js
 var source = '{ hello }';
 
-graphql({ schema, source }).then((result) => {
+iris({ schema, source }).then((result) => {
   // Prints
   // {
   //   data: { hello: "world" }
@@ -61,14 +61,14 @@ graphql({ schema, source }).then((result) => {
 });
 ```
 
-This runs a query fetching the one field defined. The `graphql` function will
+This runs a query fetching the one field defined. The `iris` function will
 first ensure the query is syntactically and semantically valid before executing
 it, reporting errors otherwise.
 
 ```js
 var source = '{ BoyHowdy }';
 
-graphql({ schema, source }).then((result) => {
+iris({ schema, source }).then((result) => {
   // Prints
   // {
   //   errors: [
