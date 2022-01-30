@@ -18,7 +18,7 @@ import type {
 } from '../definition';
 import { assertDataType, assertResolverType } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
-import { gqlEnum, gqlList, gqlNonNull, gqlObject, gqlUnion } from '../make';
+import { gqlEnum, gqlList, gqlObject, gqlUnion, maybe } from '../make';
 import { GraphQLString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
@@ -50,7 +50,7 @@ const SomeDirective = assertDirective(SomeSchema.getDirective('SomeDirective'));
 function withModifiers<T extends IrisNamedType>(
   type: T,
 ): Array<T | IrisTypeRef<T | IrisTypeRef<T>>> {
-  return [type, gqlList(type), gqlNonNull(type), gqlNonNull(gqlList(type))];
+  return [type, gqlList(type), maybe(type), maybe(gqlList(type))];
 }
 
 const outputTypes: ReadonlyArray<GraphQLOutputType> = [
@@ -322,7 +322,7 @@ describe('Type System: Union types must be valid', () => {
 
     const badUnionMemberTypes = [
       GraphQLString,
-      gqlNonNull(SomeObjectType),
+      maybe(SomeObjectType),
       gqlList(SomeObjectType),
       SomeUnionType,
       SomeEnumType,
