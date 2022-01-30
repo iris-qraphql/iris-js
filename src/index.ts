@@ -130,12 +130,9 @@ export type {
 } from './language/index';
 
 export {
-  buildASTSchema,
   buildSchema,
   printSchema,
   printType,
   astFromValue,
   TypeInfo,
 } from './utilities/index';
-
-export type { BuildSchemaOptions } from './utilities/index';

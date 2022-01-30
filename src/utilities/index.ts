@@ -2,7 +2,6 @@
 
 // Build a IrisSchema from GraphQL Schema language.
 export { buildASTSchema, buildSchema } from './buildASTSchema';
-export type { BuildSchemaOptions } from './buildASTSchema';
 
 // Print a IrisSchema to GraphQL Schema language.
 export { printSchema, printType } from './printSchema';

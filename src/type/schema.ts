@@ -1,3 +1,5 @@
+import { uniqBy } from 'ramda';
+
 import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
@@ -49,7 +51,10 @@ export class IrisSchema {
     this._queryType = config.query;
     this._mutationType = config.mutation;
     this._subscriptionType = config.subscription;
-    this._directives = config.directives ?? specifiedDirectives;
+    this._directives = uniqBy(
+      (x) => x.name,
+      [...(config.directives ?? []), ...specifiedDirectives],
+    );
 
     // To preserve order of user-provided types, we add first to add them to
     // the set of "collected" types, so `collectReferencedTypes` ignore them.
@@ -131,18 +136,12 @@ export class IrisSchema {
 
 type TypeMap = ObjMap<IrisNamedType>;
 
-export interface GraphQLSchemaValidationOptions {
-  /**
-   * When building a schema from a GraphQL service's introspection result, it
-   * might be safe to assume the schema is valid. Set to true to assume the
-   * produced schema is valid.
-   *
-   * Default: false
-   */
+export type IrisSchemaValidationOptions = {
   assumeValid?: boolean;
-}
+  assumeValidSDL?: boolean;
+};
 
-export interface GraphQLSchemaConfig extends GraphQLSchemaValidationOptions {
+export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
   description?: Maybe<string>;
   query?: Maybe<IrisResolverType>;
   mutation?: Maybe<IrisResolverType>;
