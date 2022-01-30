@@ -21,4 +21,5 @@ export enum TokenKind {
   BLOCK_STRING = 'BlockString',
   COMMENT = 'Comment',
   QUESTION_MARK = '?',
+  BANG = '!',
 }

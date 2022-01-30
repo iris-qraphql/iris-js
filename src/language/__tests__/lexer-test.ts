@@ -9,7 +9,6 @@ function lexOne(str: string) {
 
 describe('isPunctuatorTokenKind', () => {
   const isPunctuatorToken = (text: string) =>
-    // @ts-expect-error
     isPunctuatorTokenKind(lexOne(text).kind);
 
   it('returns true for punctuator tokens', () => {
