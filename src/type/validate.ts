@@ -12,7 +12,8 @@ import type {
   IrisDataType,
   IrisDataVariant,
   IrisResolverType,
-  IrisResolverVariant} from './definition';
+  IrisResolverVariant,
+} from './definition';
 import {
   isDataType,
   isInputType,
