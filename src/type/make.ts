@@ -78,7 +78,7 @@ const gqlScalar = <T>(x: GQLScalar<T>) =>
 
 export const gqlNonNull = <T extends GraphQLType>(ofType: T) => ofType;
 
-export const irisMaybe = <T extends GraphQLType>(ofType: T) =>
+export const maybe = <T extends GraphQLType>(ofType: T) =>
   new IrisTypeRef('MAYBE', ofType);
 
 export const gqlList = <T extends GraphQLType>(ofType: T) =>

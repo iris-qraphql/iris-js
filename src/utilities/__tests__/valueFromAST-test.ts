@@ -6,7 +6,7 @@ import type { ObjMap } from '../../jsutils/ObjMap';
 import { parseValue } from '../../language/parser';
 
 import type { GraphQLInputType } from '../../type/definition';
-import { gqlInput, gqlList, gqlScalar, irisMaybe } from '../../type/make';
+import { gqlInput, gqlList, gqlScalar, maybe } from '../../type/make';
 import {
   GraphQLBoolean,
   GraphQLFloat,
@@ -18,13 +18,13 @@ import {
 import { valueFromAST } from '../valueFromAST';
 
 // Boolean?
-const maybeBool = irisMaybe(GraphQLBoolean);
+const maybeBool = maybe(GraphQLBoolean);
 
 // Boolean
 const bool = GraphQLBoolean;
 
 // [Boolean?]?
-const maybeListOfMaybeBool = irisMaybe(gqlList(maybeBool));
+const maybeListOfMaybeBool = maybe(gqlList(maybeBool));
 
 // [Boolean?]
 const ListOfMaybeBool = gqlList(maybeBool);
@@ -33,7 +33,7 @@ const ListOfMaybeBool = gqlList(maybeBool);
 const listOfBool = gqlList(bool);
 
 // [Boolean]?
-const maybeListOfBool = irisMaybe(listOfBool);
+const maybeListOfBool = maybe(listOfBool);
 
 describe('valueFromAST', () => {
   function expectValueFrom(
