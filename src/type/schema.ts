@@ -105,16 +105,16 @@ export class IrisSchema {
     return 'IrisSchema';
   }
 
-  getQueryType(): Maybe<IrisResolverType> {
-    return this._queryType;
+  getQueryType(): IrisResolverType | undefined {
+    return this._queryType ?? undefined;
   }
 
-  getMutationType(): Maybe<IrisResolverType> {
-    return this._mutationType;
+  getMutationType(): IrisResolverType | undefined {
+    return this._mutationType ?? undefined;
   }
 
-  getSubscriptionType(): Maybe<IrisResolverType> {
-    return this._subscriptionType;
+  getSubscriptionType(): IrisResolverType | undefined {
+    return this._subscriptionType ?? undefined;
   }
 
   getTypeMap(): TypeMap {
@@ -148,16 +148,6 @@ export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
   subscription?: Maybe<IrisResolverType>;
   types?: Maybe<ReadonlyArray<IrisNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
-}
-
-/**
- * @internal
- */
-export interface GraphQLSchemaNormalizedConfig extends GraphQLSchemaConfig {
-  description: Maybe<string>;
-  types: ReadonlyArray<IrisNamedType>;
-  directives: ReadonlyArray<GraphQLDirective>;
-  assumeValid: boolean;
 }
 
 function collectReferencedTypes(
