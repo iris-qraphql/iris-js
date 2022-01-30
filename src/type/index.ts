@@ -55,7 +55,7 @@ export {
 } from './scalars';
 
 // Validate GraphQL schema.
-export { validateSchema, assertValidSchema } from './validate';
+export { validateSchema } from './validate';
 
 // Upholds the spec rules about naming.
 export { assertName, assertEnumValueName } from './assertName';

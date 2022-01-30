@@ -4,7 +4,7 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { buildSchema } from '../../utilities/buildASTSchema';
 
-import { dedent } from '../../utils/dedent';
+import { GraphQLError } from '../../error';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { ConfigMapValue } from '../../utils/type-level';
 
@@ -21,7 +21,7 @@ import { assertDirective, GraphQLDirective } from '../directives';
 import { gqlEnum, gqlList, gqlObject, gqlUnion, maybe } from '../make';
 import { IrisString } from '../scalars';
 import { IrisSchema } from '../schema';
-import { assertValidSchema, validateSchema } from '../validate';
+import { validateSchema } from '../validate';
 
 const SomeSchema = buildSchema(`
   data SomeScalar = Int
@@ -628,13 +628,13 @@ describe('assertValidSchema', () => {
         foo: String
       }
     `);
-    expect(() => assertValidSchema(schema)).not.toThrow();
+    expect(validateSchema(schema)).toEqual([]);
   });
 
   it('include multiple errors into a description', () => {
     const schema = buildSchema('resolver SomeType');
-    expect(() => assertValidSchema(schema)).toThrow(
-      dedent`Query root type must be provided.`,
-    );
+    expect(validateSchema(schema)).toEqual([
+      new GraphQLError('Query root type must be provided.'),
+    ]);
   });
 });

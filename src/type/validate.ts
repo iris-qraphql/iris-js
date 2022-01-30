@@ -58,17 +58,6 @@ export function validateSchema(
   return errors;
 }
 
-/**
- * Utility function which asserts a schema is valid by throwing an error if
- * it is invalid.
- */
-export function assertValidSchema(schema: IrisSchema): void {
-  const errors = validateSchema(schema);
-  if (errors.length !== 0) {
-    throw new Error(errors.map((error) => error.message).join('\n\n'));
-  }
-}
-
 class SchemaValidationContext {
   readonly _errors: Array<GraphQLError>;
   readonly schema: IrisSchema;

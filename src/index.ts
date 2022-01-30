@@ -28,7 +28,7 @@
 
 // The GraphQL.js version info.
 export { version, versionInfo } from './version';
-export { graphql } from './iris';
+export { iris } from './iris';
 
 export {
   IrisSchema,
@@ -50,7 +50,6 @@ export {
   assertDirective,
   getNamedType,
   validateSchema,
-  assertValidSchema,
   assertName,
   assertEnumValueName,
 } from './type/index';
