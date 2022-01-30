@@ -1,7 +1,5 @@
 import { Kind } from 'graphql';
 
-import { inspect } from '../jsutils/inspect';
-import { invariant } from '../jsutils/invariant';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { keyMap } from '../jsutils/ObjMap';
@@ -9,7 +7,7 @@ import { keyMap } from '../jsutils/ObjMap';
 import type { ObjectValueNode, ValueNode } from '../language/ast';
 
 import type { GraphQLInputType, IrisDataVariant } from '../type/definition';
-import { isDataType, isNonNullType, isTypeRef } from '../type/definition';
+import { isNonNullType, isTypeRef } from '../type/definition';
 
 /**
  * Produces a JavaScript value given a GraphQL Value AST.
@@ -69,6 +67,9 @@ export function valueFromAST(
       }
 
       case 'LIST': {
+        if (valueNode.kind === Kind.NULL) {
+          return;
+        }
         const itemType = type.ofType;
         if (valueNode.kind === Kind.LIST) {
           const coercedValues = [];
@@ -90,6 +91,7 @@ export function valueFromAST(
           }
           return coercedValues;
         }
+
         const coercedValue = valueFromAST(valueNode, itemType, variables);
         if (coercedValue === undefined) {
           return; // Invalid: intentionally return no value.
@@ -97,44 +99,39 @@ export function valueFromAST(
 
         return [coercedValue];
       }
-      default:
-        return valueNode.kind === Kind.NULL
-          ? undefined
-          : valueFromAST(valueNode, type.ofType, variables);
     }
   }
 
-  if (isDataType(type)) {
-    if (valueNode.kind === Kind.OBJECT && !type.isPrimitive) {
-      const variantName = valueNode.fields.find(
-        (x) => x.name.value === '__typename',
-      )?.value;
-
-      if (variantName && variantName.kind !== Kind.STRING) {
-        return undefined;
-      }
-
-      const variant = type.variantBy(variantName?.value);
-      return parseVariantValue(variant, valueNode, variables);
-    }
-
-    // Scalars and Enums fulfill parsing a literal value via parseLiteral().
-    // Invalid values represent a failure to parse correctly, in which case
-    // no value is returned.
-    let result;
-    try {
-      result = type.parseLiteral(valueNode);
-    } catch (_error) {
-      return; // Invalid: intentionally return no value.
-    }
-    if (result === undefined) {
-      return; // Invalid: intentionally return no value.
-    }
-    return result;
+  if (valueNode.kind === Kind.NULL) {
+    return;
   }
-  /* c8 ignore next 3 */
-  // Not reachable, all possible input types have been considered.
-  invariant(false, 'Unexpected input type: ' + inspect(type));
+
+  if (valueNode.kind === Kind.OBJECT && !type.isPrimitive) {
+    const variantName = valueNode.fields.find(
+      (x) => x.name.value === '__typename',
+    )?.value;
+
+    if (variantName && variantName.kind !== Kind.STRING) {
+      return undefined;
+    }
+
+    const variant = type.variantBy(variantName?.value);
+    return parseVariantValue(variant, valueNode, variables);
+  }
+
+  // Scalars and Enums fulfill parsing a literal value via parseLiteral().
+  // Invalid values represent a failure to parse correctly, in which case
+  // no value is returned.
+  let result;
+  try {
+    result = type.parseLiteral(valueNode);
+  } catch (_error) {
+    return; // Invalid: intentionally return no value.
+  }
+  if (result === undefined) {
+    return; // Invalid: intentionally return no value.
+  }
+  return result;
 }
 
 // Returns true if the provided valueNode is a variable which is not defined

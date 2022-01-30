@@ -153,14 +153,14 @@ describe('valueFromAST', () => {
   const testInputObj = gqlInput({
     name: 'TestInput',
     fields: {
-      int: { type: GraphQLInt },
+      int: { type: maybe(GraphQLInt) },
       bool: { type: maybeBool },
       requiredBool: { type: bool },
     },
   });
 
   it('coerces input objects according to input coercion rules', () => {
-    expectValueFrom('null', testInputObj).toEqual(null);
+    expectValueFrom('null', maybe(testInputObj)).toEqual(null);
     expectValueFrom('123', testInputObj).toEqual(undefined);
     expectValueFrom('[]', testInputObj).toEqual(undefined);
     expectValueFrom('{ int: 123, requiredBool: false }', testInputObj).toEqual({
