@@ -9,7 +9,7 @@ import {
   IrisInt,
   IrisString,
 } from '../../type/scalars';
-import { GraphQLSchema } from '../../type/schema';
+import { IrisSchema } from '../../type/schema';
 import { validateSchema } from '../../type/validate';
 
 import { dedent } from '../../utils/dedent';
@@ -20,7 +20,7 @@ import { printSchema } from '../printSchema';
 /**
  * This function does a full cycle of going from a string with the contents of
  * the SDL, parsed in a schema AST, materializing that schema AST into an
- * in-memory GraphQLSchema, and then finally printing that object into the SDL
+ * in-memory IrisSchema, and then finally printing that object into the SDL
  */
 function cycleSDL(sdl: string): string {
   return printSchema(buildSchema(sdl));
@@ -28,7 +28,7 @@ function cycleSDL(sdl: string): string {
 
 describe('Schema Builder', () => {
   it('Match order of default types and directives', () => {
-    const schema = new GraphQLSchema({});
+    const schema = new IrisSchema({});
     const sdlSchema = buildASTSchema({
       kind: IrisKind.DOCUMENT,
       definitions: [],

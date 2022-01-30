@@ -2,11 +2,10 @@ export {
   // Predicate
   isSchema,
   // Assertion
-  assertSchema,
   // GraphQL Schema definition
-  GraphQLSchema,
+  IrisSchema,
 } from './schema';
-export type { GraphQLSchemaConfig, GraphQLSchemaExtensions } from './schema';
+export type { GraphQLSchemaConfig } from './schema';
 
 export {
   isType,

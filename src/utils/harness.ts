@@ -2,7 +2,7 @@ import type { Maybe } from '../jsutils/Maybe';
 
 import { parse } from '../language/parser';
 
-import type { GraphQLSchema } from '../type/schema';
+import type { IrisSchema } from '../type/schema';
 
 import { validateSDL } from '../validation/validate';
 import type { SDLValidationRule } from '../validation/ValidationContext';
@@ -11,7 +11,7 @@ import { buildSchema } from '../utilities/buildASTSchema';
 
 import { toJSONDeep } from './toJSONDeep';
 
-export const testSchema: GraphQLSchema = buildSchema(`
+export const testSchema: IrisSchema = buildSchema(`
   resolver Pet = {
     name(surname: Boolean): String
   }
@@ -95,7 +95,7 @@ export const testSchema: GraphQLSchema = buildSchema(`
 `);
 
 export function getSDLValidationErrors(
-  schema: Maybe<GraphQLSchema>,
+  schema: Maybe<IrisSchema>,
   rule: SDLValidationRule,
   sdlStr: string,
 ): any {

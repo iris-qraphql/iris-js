@@ -8,7 +8,7 @@ import { parse } from '../language/parser';
 
 import { specifiedDirectives } from '../type/directives';
 import type { GraphQLSchemaValidationOptions } from '../type/schema';
-import { GraphQLSchema } from '../type/schema';
+import { IrisSchema } from '../type/schema';
 
 import { validateSDL } from '../validation/validate';
 
@@ -37,13 +37,13 @@ export function assertValidSDL(documentAST: DocumentNode): void {
  * If no schema definition is provided, then it will look for types named Query,
  * Mutation and Subscription.
  *
- * Given that AST it constructs a GraphQLSchema. The resulting schema
+ * Given that AST it constructs a IrisSchema. The resulting schema
  * has no resolve methods, so execution will use default resolvers.
  */
 export function buildASTSchema(
   documentAST: DocumentNode,
   options?: BuildSchemaOptions,
-): GraphQLSchema {
+): IrisSchema {
   devAssert(
     documentAST != null && documentAST.kind === IrisKind.DOCUMENT,
     'Must provide valid Document AST.',
@@ -93,17 +93,17 @@ export function buildASTSchema(
     ),
   ];
 
-  return new GraphQLSchema({ ...config, directives });
+  return new IrisSchema({ ...config, directives });
 }
 
 /**
- * A helper function to build a GraphQLSchema directly from a source
+ * A helper function to build a IrisSchema directly from a source
  * document.
  */
 export function buildSchema(
   source: string | Source,
   options?: BuildSchemaOptions & ParseOptions,
-): GraphQLSchema {
+): IrisSchema {
   const document = parse(source, {
     noLocation: options?.noLocation,
     allowLegacyFragmentVariables: options?.allowLegacyFragmentVariables,

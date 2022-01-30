@@ -25,7 +25,7 @@ import {
   isResolverType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
-import type { GraphQLSchema } from '../type/schema';
+import type { IrisSchema } from '../type/schema';
 
 /**
  * TypeInfo is a utility class which, given a GraphQL schema, can keep track
@@ -33,7 +33,7 @@ import type { GraphQLSchema } from '../type/schema';
  * AST during a recursive descent by calling `enter(node)` and `leave(node)`.
  */
 export class TypeInfo {
-  private _schema: GraphQLSchema;
+  private _schema: IrisSchema;
   private _typeStack: Array<Maybe<GraphQLOutputType>>;
   private _parentTypeStack: Array<Maybe<IrisResolverType>>;
   private _inputTypeStack: Array<Maybe<GraphQLInputType>>;
@@ -44,7 +44,7 @@ export class TypeInfo {
   private _enumValue: Maybe<IrisDataVariant>;
 
   constructor(
-    schema: GraphQLSchema,
+    schema: IrisSchema,
     /**
      * Initial type may be provided in rare cases to facilitate traversals
      *  beginning somewhere other than documents.

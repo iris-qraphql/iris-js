@@ -31,7 +31,7 @@ export { version, versionInfo } from './version';
 export { graphql } from './iris';
 
 export {
-  GraphQLSchema,
+  IrisSchema,
   GraphQLDirective,
   IrisFloat,
   IrisString,
@@ -47,7 +47,6 @@ export {
   isRequiredArgument,
   isSpecifiedScalarType,
   isSpecifiedDirective,
-  assertSchema,
   assertDirective,
   getNamedType,
   validateSchema,
@@ -62,7 +61,6 @@ export type {
   IrisResolverType,
   GraphQLNamedType,
   GraphQLSchemaConfig,
-  GraphQLSchemaExtensions,
   GraphQLDirectiveConfig,
   GraphQLDirectiveExtensions,
   GraphQLArgument,
@@ -132,25 +130,13 @@ export type {
   DirectiveDefinitionNode,
 } from './language/index';
 
-// Create, format, and print GraphQL errors.
-
-// Utilities for operating on GraphQL type schema and parsed sources.
 export {
-  // Produce the GraphQL query recommended for a full schema introspection.
-  // Accepts optional IntrospectionOptions.
-  // Build a GraphQLSchema from an introspection result.
-  // Build a GraphQLSchema from a parsed GraphQL Schema language AST.
   buildASTSchema,
-  // Build a GraphQLSchema from a GraphQL schema language document.
   buildSchema,
-  // Print a GraphQLSchema to GraphQL Schema language.
   printSchema,
-  // Print a GraphQLType to GraphQL Schema language.
   printType,
-  // Create a GraphQL language AST from a JavaScript value.
   astFromValue,
-  // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.
-  TypeInfo, // Comparators for types
+  TypeInfo,
 } from './utilities/index';
 
 export type { BuildSchemaOptions } from './utilities/index';

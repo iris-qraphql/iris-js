@@ -4,7 +4,7 @@ import type { Maybe } from '../jsutils/Maybe';
 import type { DocumentNode } from '../language/ast';
 import { visit, visitInParallel } from '../language/visitor';
 
-import type { GraphQLSchema } from '../type/schema';
+import type { IrisSchema } from '../type/schema';
 import { assertValidSchema } from '../type/validate';
 
 import { TypeInfo, visitWithTypeInfo } from '../utilities/TypeInfo';
@@ -16,7 +16,7 @@ import type { SDLValidationRule, ValidationRule } from './ValidationContext';
 import { SDLValidationContext, ValidationContext } from './ValidationContext';
 
 export function validate(
-  schema: GraphQLSchema,
+  schema: IrisSchema,
   documentAST: DocumentNode,
   rules: ReadonlyArray<ValidationRule> = [],
   options?: { maxErrors?: number },
@@ -70,7 +70,7 @@ export function validate(
  */
 export function validateSDL(
   documentAST: DocumentNode,
-  schemaToExtend?: Maybe<GraphQLSchema>,
+  schemaToExtend?: Maybe<IrisSchema>,
   rules: ReadonlyArray<SDLValidationRule> = specifiedSDLRules,
 ): ReadonlyArray<GraphQLError> {
   const errors: Array<GraphQLError> = [];

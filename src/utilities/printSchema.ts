@@ -21,11 +21,11 @@ import { isDataType, isResolverType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import { isSpecifiedDirective } from '../type/directives';
 import { isSpecifiedScalarType } from '../type/scalars';
-import type { GraphQLSchema } from '../type/schema';
+import type { IrisSchema } from '../type/schema';
 
 import { astFromValue } from './astFromValue';
 
-export function printSchema(schema: GraphQLSchema): string {
+export function printSchema(schema: IrisSchema): string {
   return printFilteredSchema(
     schema,
     (n) => !isSpecifiedDirective(n),
@@ -38,7 +38,7 @@ function isDefinedType(type: IrisNamedType): boolean {
 }
 
 function printFilteredSchema(
-  schema: GraphQLSchema,
+  schema: IrisSchema,
   directiveFilter: (type: GraphQLDirective) => boolean,
   typeFilter: (type: IrisNamedType) => boolean,
 ): string {

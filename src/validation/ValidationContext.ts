@@ -12,7 +12,7 @@ import type {
   IrisResolverType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
-import type { GraphQLSchema } from '../type/schema';
+import type { IrisSchema } from '../type/schema';
 
 import type { TypeInfo } from '../utilities/TypeInfo';
 
@@ -48,11 +48,11 @@ export class ASTValidationContext {
 export type ASTValidationRule = (context: ASTValidationContext) => ASTVisitor;
 
 export class SDLValidationContext extends ASTValidationContext {
-  private _schema: Maybe<GraphQLSchema>;
+  private _schema: Maybe<IrisSchema>;
 
   constructor(
     ast: DocumentNode,
-    schema: Maybe<GraphQLSchema>,
+    schema: Maybe<IrisSchema>,
     onError: (error: GraphQLError) => void,
   ) {
     super(ast, onError);
@@ -63,7 +63,7 @@ export class SDLValidationContext extends ASTValidationContext {
     return 'SDLValidationContext';
   }
 
-  getSchema(): Maybe<GraphQLSchema> {
+  getSchema(): Maybe<IrisSchema> {
     return this._schema;
   }
 }
@@ -71,11 +71,11 @@ export class SDLValidationContext extends ASTValidationContext {
 export type SDLValidationRule = (context: SDLValidationContext) => ASTVisitor;
 
 export class ValidationContext extends ASTValidationContext {
-  private _schema: GraphQLSchema;
+  private _schema: IrisSchema;
   private _typeInfo: TypeInfo;
 
   constructor(
-    schema: GraphQLSchema,
+    schema: IrisSchema,
     ast: DocumentNode,
     typeInfo: TypeInfo,
     onError: (error: GraphQLError) => void,
@@ -89,7 +89,7 @@ export class ValidationContext extends ASTValidationContext {
     return 'ValidationContext';
   }
 
-  getSchema(): GraphQLSchema {
+  getSchema(): IrisSchema {
     return this._schema;
   }
 

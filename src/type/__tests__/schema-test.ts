@@ -14,7 +14,7 @@ import {
   gqlScalar,
 } from '../make';
 import { IrisBool, IrisInt, IrisString } from '../scalars';
-import { GraphQLSchema } from '../schema';
+import { IrisSchema } from '../schema';
 
 describe('Type System: Schema', () => {
   it('Define sample schema', () => {
@@ -83,7 +83,7 @@ describe('Type System: Schema', () => {
       },
     });
 
-    const schema = new GraphQLSchema({
+    const schema = new IrisSchema({
       description: 'Sample schema',
       query: BlogQuery,
       mutation: BlogMutation,
@@ -136,7 +136,7 @@ describe('Type System: Schema', () => {
         fields: { nested: { type: NestedInputObject } },
       });
 
-      const schema = new GraphQLSchema({
+      const schema = new IrisSchema({
         query: gqlObject({
           name: 'Query',
           fields: {
@@ -165,7 +165,7 @@ describe('Type System: Schema', () => {
           },
         },
       });
-      const schema = new GraphQLSchema({ directives: [directive] });
+      const schema = new IrisSchema({ directives: [directive] });
 
       expect(Object.keys(schema.getTypeMap())).toEqual(
         expect.arrayContaining(['Foo', 'Bar']),
@@ -174,10 +174,10 @@ describe('Type System: Schema', () => {
   });
 
   it('can be Object.toStringified', () => {
-    const schema = new GraphQLSchema({});
+    const schema = new IrisSchema({});
 
     expect(Object.prototype.toString.call(schema)).toEqual(
-      '[object GraphQLSchema]',
+      '[object IrisSchema]',
     );
   });
 
@@ -185,19 +185,10 @@ describe('Type System: Schema', () => {
     describe('when not assumed valid', () => {
       it('configures the schema to still needing validation', () => {
         expect(
-          new GraphQLSchema({
+          new IrisSchema({
             assumeValid: false,
           }).__validationErrors,
         ).toEqual(undefined);
-      });
-
-      it('checks the configuration for mistakes', () => {
-        // @ts-expect-error
-        expect(() => new GraphQLSchema(JSON.parse)).toThrow();
-        // @ts-expect-error
-        expect(() => new GraphQLSchema({ types: {} })).toThrow();
-        // @ts-expect-error
-        expect(() => new GraphQLSchema({ directives: {} })).toThrow();
       });
     });
 
@@ -213,7 +204,7 @@ describe('Type System: Schema', () => {
           },
         });
 
-        expect(() => new GraphQLSchema({ query: QueryType })).toThrow(
+        expect(() => new IrisSchema({ query: QueryType })).toThrow(
           'Schema must contain uniquely named types but contains multiple types named "String".',
         );
       });
@@ -226,7 +217,7 @@ describe('Type System: Schema', () => {
         const types = [{}, query, {}];
 
         // @ts-expect-error
-        expect(() => new GraphQLSchema({ query, types })).toThrow(
+        expect(() => new IrisSchema({ query, types })).toThrow(
           'One of the provided types for building the Schema is missing a name.',
         );
       });
@@ -237,7 +228,7 @@ describe('Type System: Schema', () => {
           gqlObject({ name: 'SameName', fields: {} }),
         ];
 
-        expect(() => new GraphQLSchema({ types })).toThrow(
+        expect(() => new IrisSchema({ types })).toThrow(
           'Schema must contain uniquely named types but contains multiple types named "SameName".',
         );
       });
@@ -252,7 +243,7 @@ describe('Type System: Schema', () => {
           },
         });
 
-        expect(() => new GraphQLSchema({ query: QueryType })).toThrow(
+        expect(() => new IrisSchema({ query: QueryType })).toThrow(
           'Schema must contain uniquely named types but contains multiple types named "SameName".',
         );
       });
@@ -261,7 +252,7 @@ describe('Type System: Schema', () => {
     describe('when assumed valid', () => {
       it('configures the schema to have no errors', () => {
         expect(
-          new GraphQLSchema({
+          new IrisSchema({
             assumeValid: true,
           }).__validationErrors,
         ).toEqual([]);

@@ -11,13 +11,13 @@ import type { Maybe } from './jsutils/Maybe';
 
 import { parse } from './language/parser';
 
-import type { GraphQLSchema } from './type/schema';
+import type { IrisSchema } from './type/schema';
 import { validateSchema } from './type/validate';
 
 import { validate } from './validation/validate';
 
 export interface GraphQLArgs {
-  schema: GraphQLSchema;
+  schema: IrisSchema;
   source: string | Source;
   rootValue?: unknown;
   contextValue?: unknown;

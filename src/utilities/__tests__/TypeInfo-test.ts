@@ -3,13 +3,13 @@ import { invariant } from '../../jsutils/invariant';
 import { parseValue } from '../../language/parser';
 import { visit } from '../../language/visitor';
 
-import { GraphQLSchema } from '../../type/schema';
+import { IrisSchema } from '../../type/schema';
 
 import { buildSchema } from '../buildASTSchema';
 import { TypeInfo, visitWithTypeInfo } from '../TypeInfo';
 
 describe('TypeInfo', () => {
-  const schema = new GraphQLSchema({});
+  const schema = new IrisSchema({});
 
   it('can be Object.toStringified', () => {
     const typeInfo = new TypeInfo(schema);

@@ -20,7 +20,7 @@ import { assertDataType, assertResolverType } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
 import { gqlEnum, gqlList, gqlObject, gqlUnion, maybe } from '../make';
 import { IrisString } from '../scalars';
-import { GraphQLSchema } from '../schema';
+import { IrisSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
 
 const SomeSchema = buildSchema(`
@@ -73,8 +73,8 @@ const notInputTypes: ReadonlyArray<GraphQLOutputType> = [
   ...withModifiers(SomeUnionType),
 ];
 
-function schemaWithFieldType(type: GraphQLOutputType): GraphQLSchema {
-  return new GraphQLSchema({
+function schemaWithFieldType(type: GraphQLOutputType): IrisSchema {
+  return new IrisSchema({
     query: gqlObject({
       name: 'Query',
       fields: { f: { type } },
@@ -82,10 +82,10 @@ function schemaWithFieldType(type: GraphQLOutputType): GraphQLSchema {
   });
 }
 
-const expectJSON = (schema: GraphQLSchema) =>
+const expectJSON = (schema: IrisSchema) =>
   expect(toJSONDeep(validateSchema(schema)));
 
-const expectJSONEqual = (schema: GraphQLSchema, value: unknown) =>
+const expectJSONEqual = (schema: IrisSchema, value: unknown) =>
   expect(toJSONDeep(validateSchema(schema))).toEqual(value);
 
 describe('Type System: A Schema must have Object root types', () => {
@@ -142,7 +142,7 @@ describe('Type System: A Schema must have Object root types', () => {
   });
 
   it('rejects a Schema whose types are incorrectly typed', () => {
-    const schema = new GraphQLSchema({
+    const schema = new IrisSchema({
       query: SomeObjectType,
       // @ts-expect-error
       types: [{ name: 'SomeType' }, SomeDirective],
@@ -159,7 +159,7 @@ describe('Type System: A Schema must have Object root types', () => {
   });
 
   it('rejects a Schema whose directives are incorrectly typed', () => {
-    const schema = new GraphQLSchema({
+    const schema = new IrisSchema({
       query: SomeObjectType,
       // @ts-expect-error
       directives: [null, 'SomeDirective', SomeScalarType],
@@ -456,7 +456,7 @@ describe('Type System: Enum types must be well defined', () => {
 describe('Type System: Object fields must have output types', () => {
   function schemaWithObjectField(
     fieldConfig: GraphQLFieldConfig<unknown, unknown>,
-  ): GraphQLSchema {
+  ): IrisSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
@@ -464,7 +464,7 @@ describe('Type System: Object fields must have output types', () => {
       },
     });
 
-    return new GraphQLSchema({
+    return new IrisSchema({
       query: gqlObject({
         name: 'Query',
         fields: {
@@ -514,7 +514,7 @@ describe('Type System: Object fields must have output types', () => {
 describe('Type System: Arguments must have data  types', () => {
   function schemaWithArg(
     argConfig: ConfigMapValue<GraphQLArgument>,
-  ): GraphQLSchema {
+  ): IrisSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
@@ -527,7 +527,7 @@ describe('Type System: Arguments must have data  types', () => {
       },
     });
 
-    return new GraphQLSchema({
+    return new IrisSchema({
       query: gqlObject({
         name: 'Query',
         fields: {
