@@ -4,6 +4,7 @@ import {
   gqlList,
   gqlNonNull,
   gqlScalar,
+  maybe,
 } from '../../type/make';
 import {
   GraphQLBoolean,
@@ -17,21 +18,23 @@ import { toJSONError } from '../../utils/toJSONDeep';
 
 import { astFromValue } from '../astFromValue';
 
+const maybeBool = maybe(GraphQLBoolean);
+
 describe('astFromValue', () => {
   it('converts boolean values to ASTs', () => {
-    expect(astFromValue(true, GraphQLBoolean)).toEqual({
+    expect(astFromValue(true, maybeBool)).toEqual({
       kind: 'BooleanValue',
       value: true,
     });
 
-    expect(astFromValue(false, GraphQLBoolean)).toEqual({
+    expect(astFromValue(false, maybeBool)).toEqual({
       kind: 'BooleanValue',
       value: false,
     });
 
-    expect(astFromValue(undefined, GraphQLBoolean)).toEqual(null);
+    expect(astFromValue(undefined, maybeBool)).toEqual(null);
 
-    expect(astFromValue(null, GraphQLBoolean)).toEqual({
+    expect(astFromValue(null, maybeBool)).toEqual({
       kind: 'NullValue',
     });
 
@@ -137,7 +140,7 @@ describe('astFromValue', () => {
       value: 'false',
     });
 
-    expect(astFromValue(null, GraphQLString)).toEqual({
+    expect(astFromValue(null, maybe(GraphQLString))).toEqual({
       kind: 'NullValue',
     });
 
@@ -186,7 +189,7 @@ describe('astFromValue', () => {
       'ID cannot represent value: false',
     );
 
-    expect(astFromValue(null, GraphQLID)).toEqual({ kind: 'NullValue' });
+    expect(astFromValue(null, maybe(GraphQLID))).toEqual({ kind: 'NullValue' });
 
     expect(astFromValue(undefined, GraphQLID)).toEqual(null);
   });
@@ -316,8 +319,8 @@ describe('astFromValue', () => {
   const inputObj = gqlInput({
     name: 'MyInputObj',
     fields: {
-      foo: { type: GraphQLFloat },
-      bar: { type: myEnum },
+      foo: { type: maybe(GraphQLFloat) },
+      bar: { type: maybe(myEnum) },
     },
   });
 

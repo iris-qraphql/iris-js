@@ -47,13 +47,11 @@ export function astFromValue(
     const itemType = type.ofType;
 
     switch (type.kind) {
-      case 'REQUIRED': {
-        const astValue = astFromValue(value, itemType);
-        if (astValue?.kind === Kind.NULL) {
-          return null;
-        }
-        return astValue;
-      }
+      case 'MAYBE':
+        // only explicit null, not undefined, NaN
+        return value === null
+          ? { kind: Kind.NULL }
+          : astFromValue(value, itemType);
       case 'LIST': {
         if (isIterableObject(value)) {
           const valuesNodes = [];
@@ -68,21 +66,15 @@ export function astFromValue(
         return astFromValue(value, itemType);
       }
       default:
-        break;
+        return astFromValue(value, itemType);
     }
   }
 
-  // only explicit null, not undefined, NaN
-  if (value === null) {
-    return { kind: Kind.NULL };
-  }
-
-  // undefined
-  if (value === undefined) {
+  // handles only required required
+  if (value === undefined || value === null) {
     return null;
   }
 
-  // @ts-expect-error
   return parseDataType(value, type);
 }
 

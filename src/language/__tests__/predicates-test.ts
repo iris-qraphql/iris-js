@@ -46,7 +46,7 @@ describe('AST node predicates', () => {
     expect(filterNodes(isTypeNode)).toEqual([
       'NamedType',
       'ListType',
-      'NonNullType',
+      'MaybeType',
     ]);
   });
 

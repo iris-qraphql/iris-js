@@ -21,6 +21,7 @@ import {
   isRequiredArgument,
   isResolverType,
   isType,
+  isTypeRef,
 } from './definition';
 import { GraphQLDeprecatedDirective, isDirective } from './directives';
 import type { GraphQLSchema } from './schema';
@@ -276,8 +277,13 @@ function validateUnionMembers(
       );
     }
 
+    if (!type) {
+      // variants are valid records
+      return;
+    }
+
     listedMembers[name] = true;
-    if (type && (!type?.isVariantType?.() || isDataType(type))) {
+    if (!type?.isVariantType?.() || isDataType(type) || isTypeRef(type)) {
       context.reportError(
         `Union type ${typeName} can only include Object types, ` +
           `it cannot include ${inspect(type)}.`,

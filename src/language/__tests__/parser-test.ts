@@ -234,42 +234,14 @@ describe('Parser', () => {
       });
     });
 
-    it('parses non-null types', () => {
-      const result = parseType('MyType!');
-      expectJSON(result).toEqual({
-        kind: Kind.NON_NULL_TYPE,
-        loc: { start: 0, end: 7 },
-        type: {
-          kind: Kind.NAMED_TYPE,
-          loc: { start: 0, end: 6 },
-          name: {
-            kind: Kind.NAME,
-            loc: { start: 0, end: 6 },
-            value: 'MyType',
-          },
-        },
-      });
+    it('parses optional types', () => {
+      const result = parseType('MyType?');
+      expectJSON(result).toMatchSnapshot();
     });
 
     it('parses nested types', () => {
-      const result = parseType('[MyType!]');
-      expectJSON(result).toEqual({
-        kind: Kind.LIST_TYPE,
-        loc: { start: 0, end: 9 },
-        type: {
-          kind: Kind.NON_NULL_TYPE,
-          loc: { start: 1, end: 8 },
-          type: {
-            kind: Kind.NAMED_TYPE,
-            loc: { start: 1, end: 7 },
-            name: {
-              kind: Kind.NAME,
-              loc: { start: 1, end: 7 },
-              value: 'MyType',
-            },
-          },
-        },
-      });
+      const result = parseType('[MyType?]');
+      expectJSON(result).toMatchSnapshot();
     });
   });
 });

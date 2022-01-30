@@ -77,7 +77,6 @@ export type {
 export {
   // Print source location.
   // Lex
-  Lexer,
   // Parse
   parse,
   parseValue,
@@ -94,7 +93,6 @@ export {
   // Predicates
   isValueNode,
   isConstValueNode,
-  isTypeNode,
   isTypeSystemDefinitionNode,
   isTypeDefinitionNode,
 } from './language/index';
@@ -132,7 +130,6 @@ export type {
   TypeNode,
   NamedTypeNode,
   ListTypeNode,
-  NonNullTypeNode,
   TypeSystemDefinitionNode,
   TypeDefinitionNode,
   FieldDefinitionNode,

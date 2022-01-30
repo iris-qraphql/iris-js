@@ -1,7 +1,4 @@
 export type { SourceLocation, Kind } from 'graphql';
-export { TokenKind, getLocation, Source } from 'graphql';
-
-export { Lexer } from './lexer';
 
 export { parse, parseValue, parseConstValue, parseType } from './parser';
 
@@ -42,7 +39,6 @@ export type {
   TypeNode,
   NamedTypeNode,
   ListTypeNode,
-  NonNullTypeNode,
   TypeSystemDefinitionNode,
   TypeDefinitionNode,
   FieldDefinitionNode,
@@ -55,7 +51,6 @@ export type {
 export {
   isValueNode,
   isConstValueNode,
-  isTypeNode,
   isTypeSystemDefinitionNode,
   isTypeDefinitionNode,
 } from './predicates';

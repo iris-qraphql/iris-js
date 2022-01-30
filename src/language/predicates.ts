@@ -39,7 +39,7 @@ export function isTypeNode(node: ASTNode): node is TypeNode {
   return (
     node.kind === IrisKind.NAMED_TYPE ||
     node.kind === IrisKind.LIST_TYPE ||
-    node.kind === IrisKind.NON_NULL_TYPE
+    node.kind === IrisKind.MAYBE_TYPE
   );
 }
 

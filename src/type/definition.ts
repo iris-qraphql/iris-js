@@ -81,13 +81,14 @@ export class IrisTypeRef<T extends GraphQLType> {
   }
 
   toString(): string {
+    const name = this.ofType.toString();
     switch (this.kind) {
       case 'LIST':
-        return '[' + String(this.ofType) + ']';
-      case 'REQUIRED':
-        return String(this.ofType) + '!';
+        return '[' + name + ']';
+      case 'MAYBE':
+        return name + '?';
       default:
-        return String(this.ofType);
+        return name;
     }
   }
 
@@ -103,8 +104,12 @@ export const isTypeRef = <T extends GraphQLType>(
 
 export const isNonNullType = (
   type: unknown,
+): type is IrisTypeRef<IrisNamedType> => !isMaybeType(type);
+
+export const isMaybeType = (
+  type: unknown,
 ): type is IrisTypeRef<IrisNamedType> =>
-  isTypeRef(type) && type.kind === 'REQUIRED';
+  isTypeRef(type) && type.kind === 'MAYBE';
 
 export const isListType = (type: unknown): type is IrisTypeRef<GraphQLType> =>
   isTypeRef(type) && type.kind === 'LIST';
@@ -113,7 +118,7 @@ export const getNullableType = (
   type: Maybe<GraphQLType>,
 ): GraphQLType | undefined => {
   if (type) {
-    return isNonNullType(type) && type.kind === 'REQUIRED' ? type.ofType : type;
+    return isTypeRef(type) && type.kind === 'MAYBE' ? type.ofType : type;
   }
 };
 
