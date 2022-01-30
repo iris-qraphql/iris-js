@@ -50,8 +50,6 @@ export {
   assertDirective,
   getNamedType,
   validateSchema,
-  assertName,
-  assertEnumValueName,
 } from './type/index';
 
 export type {

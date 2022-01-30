@@ -56,6 +56,3 @@ export {
 
 // Validate GraphQL schema.
 export { validateSchema } from './validate';
-
-// Upholds the spec rules about naming.
-export { assertName, assertEnumValueName } from './assertName';

@@ -1,3 +1,5 @@
+import { assertName } from 'graphql';
+
 import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
@@ -9,7 +11,6 @@ import { DirectiveLocation } from '../language/directiveLocation';
 
 import type { ConfigMap } from '../utils/type-level';
 
-import { assertName } from './assertName';
 import type { GraphQLArgument } from './definition';
 import { defineArguments } from './definition';
 import { IrisString } from './scalars';
