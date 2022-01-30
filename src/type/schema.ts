@@ -1,6 +1,5 @@
 import { uniqBy } from 'ramda';
 
-import { devAssert } from '../jsutils/devAssert';
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
@@ -88,10 +87,12 @@ export class IrisSchema {
       }
 
       const typeName = namedType.name;
-      devAssert(
-        typeName,
-        'One of the provided types for building the Schema is missing a name.',
-      );
+      if (!typeName) {
+        throw new Error(
+          'One of the provided types for building the Schema is missing a name.',
+        );
+      }
+
       if (this._typeMap[typeName] !== undefined) {
         throw new Error(
           `Schema must contain uniquely named types but contains multiple types named "${typeName}".`,

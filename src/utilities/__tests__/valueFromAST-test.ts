@@ -1,6 +1,5 @@
 import { identity } from 'ramda';
 
-import { invariant } from '../../jsutils/invariant';
 import type { ObjMap } from '../../jsutils/ObjMap';
 
 import { parseValue } from '../../language/parser';
@@ -76,8 +75,9 @@ describe('valueFromAST', () => {
     const passthroughScalar = gqlScalar({
       name: 'PassthroughScalar',
       parseLiteral(node) {
-        invariant(node.kind === 'StringValue');
-        return node.value;
+        if (node.kind === 'StringValue') {
+          return node.value;
+        }
       },
       parseValue: identity,
     });
