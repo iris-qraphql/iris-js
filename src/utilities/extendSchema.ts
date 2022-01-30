@@ -1,3 +1,5 @@
+import type { GraphQLSchemaValidationOptions } from 'graphql/type/schema';
+
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { keyMap } from '../jsutils/ObjMap';
@@ -36,24 +38,12 @@ import {
   GraphQLDirective,
 } from '../type/directives';
 import { specifiedScalarTypes } from '../type/scalars';
-import type {
-  GraphQLSchemaNormalizedConfig,
-  GraphQLSchemaValidationOptions,
-} from '../type/schema';
+import type { GraphQLSchemaNormalizedConfig } from '../type/schema';
 
 import type { ConfigMap } from '../utils/type-level';
 
 import { valueFromAST } from './valueFromAST';
 import { getDirectiveValues } from './values';
-
-interface Options extends GraphQLSchemaValidationOptions {
-  /**
-   * Set to true to assume the SDL is valid.
-   *
-   * Default: false
-   */
-  assumeValidSDL?: boolean;
-}
 
 /**
  * Produces a new schema given an existing schema and a document which may
@@ -74,7 +64,7 @@ interface Options extends GraphQLSchemaValidationOptions {
 export function extendSchemaImpl(
   schemaConfig: GraphQLSchemaNormalizedConfig,
   documentAST: DocumentNode,
-  options?: Options,
+  options?: GraphQLSchemaValidationOptions,
 ): GraphQLSchemaNormalizedConfig {
   // Collect the type definitions and extensions found in the document.
   const typeDefs: Array<TypeDefinitionNode> = [];

@@ -131,18 +131,12 @@ export class IrisSchema {
 
 type TypeMap = ObjMap<IrisNamedType>;
 
-export interface GraphQLSchemaValidationOptions {
-  /**
-   * When building a schema from a GraphQL service's introspection result, it
-   * might be safe to assume the schema is valid. Set to true to assume the
-   * produced schema is valid.
-   *
-   * Default: false
-   */
+export type IrisSchemaValidationOptions = {
   assumeValid?: boolean;
-}
+  assumeValidSDL?: boolean;
+};
 
-export interface GraphQLSchemaConfig extends GraphQLSchemaValidationOptions {
+export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
   description?: Maybe<string>;
   query?: Maybe<IrisResolverType>;
   mutation?: Maybe<IrisResolverType>;
