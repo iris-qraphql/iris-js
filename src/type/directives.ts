@@ -12,7 +12,7 @@ import type { ConfigMap } from '../utils/type-level';
 import { assertName } from './assertName';
 import type { GraphQLArgument } from './definition';
 import { defineArguments } from './definition';
-import { GraphQLString } from './scalars';
+import { IrisString } from './scalars';
 
 /**
  * Test if the given value is a GraphQL directive.
@@ -111,7 +111,7 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     ],
     args: {
       reason: {
-        type: GraphQLString,
+        type: IrisString,
         description:
           'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
         defaultValue: '',

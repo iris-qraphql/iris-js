@@ -8,20 +8,20 @@ import { parseValue } from '../../language/parser';
 import type { GraphQLInputType } from '../../type/definition';
 import { gqlInput, gqlList, gqlScalar, maybe } from '../../type/make';
 import {
-  GraphQLBoolean,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLString,
+  IrisBool,
+  IrisFloat,
+  IrisID,
+  IrisInt,
+  IrisString,
 } from '../../type/scalars';
 
 import { valueFromAST } from '../valueFromAST';
 
 // Boolean?
-const maybeBool = maybe(GraphQLBoolean);
+const maybeBool = maybe(IrisBool);
 
 // Boolean
-const bool = GraphQLBoolean;
+const bool = IrisBool;
 
 // [Boolean?]?
 const maybeListOfMaybeBool = maybe(gqlList(maybeBool));
@@ -53,23 +53,23 @@ describe('valueFromAST', () => {
   it('converts according to input coercion rules', () => {
     expectValueFrom('true', maybeBool).toEqual(true);
     expectValueFrom('false', maybeBool).toEqual(false);
-    expectValueFrom('123', GraphQLInt).toEqual(123);
-    expectValueFrom('123', GraphQLFloat).toEqual(123);
-    expectValueFrom('123.456', GraphQLFloat).toEqual(123.456);
-    expectValueFrom('"abc123"', GraphQLString).toEqual('abc123');
-    expectValueFrom('123456', GraphQLID).toEqual('123456');
-    expectValueFrom('"123456"', GraphQLID).toEqual('123456');
+    expectValueFrom('123', IrisInt).toEqual(123);
+    expectValueFrom('123', IrisFloat).toEqual(123);
+    expectValueFrom('123.456', IrisFloat).toEqual(123.456);
+    expectValueFrom('"abc123"', IrisString).toEqual('abc123');
+    expectValueFrom('123456', IrisID).toEqual('123456');
+    expectValueFrom('"123456"', IrisID).toEqual('123456');
   });
 
   it('does not convert when input coercion rules reject a value', () => {
     expectValueFrom('123', maybeBool).toEqual(undefined);
-    expectValueFrom('123.456', GraphQLInt).toEqual(undefined);
-    expectValueFrom('true', GraphQLInt).toEqual(undefined);
-    expectValueFrom('"123"', GraphQLInt).toEqual(undefined);
-    expectValueFrom('"123"', GraphQLFloat).toEqual(undefined);
-    expectValueFrom('123', GraphQLString).toEqual(undefined);
-    expectValueFrom('true', GraphQLString).toEqual(undefined);
-    expectValueFrom('123.456', GraphQLString).toEqual(undefined);
+    expectValueFrom('123.456', IrisInt).toEqual(undefined);
+    expectValueFrom('true', IrisInt).toEqual(undefined);
+    expectValueFrom('"123"', IrisInt).toEqual(undefined);
+    expectValueFrom('"123"', IrisFloat).toEqual(undefined);
+    expectValueFrom('123', IrisString).toEqual(undefined);
+    expectValueFrom('true', IrisString).toEqual(undefined);
+    expectValueFrom('123.456', IrisString).toEqual(undefined);
   });
 
   it('convert using parseLiteral from a custom scalar type', () => {
@@ -153,7 +153,7 @@ describe('valueFromAST', () => {
   const testInputObj = gqlInput({
     name: 'TestInput',
     fields: {
-      int: { type: maybe(GraphQLInt) },
+      int: { type: maybe(IrisInt) },
       bool: { type: maybeBool },
       requiredBool: { type: bool },
     },

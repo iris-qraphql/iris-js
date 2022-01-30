@@ -13,7 +13,7 @@ import {
   gqlObject,
   gqlScalar,
 } from '../make';
-import { GraphQLBoolean, GraphQLInt, GraphQLString } from '../scalars';
+import { IrisBool, IrisInt, IrisString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 
 describe('Type System: Schema', () => {
@@ -21,19 +21,19 @@ describe('Type System: Schema', () => {
     const BlogImage = gqlObject({
       name: 'Image',
       fields: {
-        url: { type: GraphQLString },
-        width: { type: GraphQLInt },
-        height: { type: GraphQLInt },
+        url: { type: IrisString },
+        width: { type: IrisInt },
+        height: { type: IrisInt },
       },
     });
 
     const BlogAuthor: IrisResolverType = gqlObject({
       name: 'Author',
       fields: () => ({
-        id: { type: GraphQLString },
-        name: { type: GraphQLString },
+        id: { type: IrisString },
+        name: { type: IrisString },
         pic: {
-          args: { width: { type: GraphQLInt }, height: { type: GraphQLInt } },
+          args: { width: { type: IrisInt }, height: { type: IrisInt } },
           type: BlogImage,
         },
         recentArticle: { type: BlogArticle },
@@ -43,11 +43,11 @@ describe('Type System: Schema', () => {
     const BlogArticle: IrisResolverType = gqlObject({
       name: 'Article',
       fields: {
-        id: { type: GraphQLString },
-        isPublished: { type: GraphQLBoolean },
+        id: { type: IrisString },
+        isPublished: { type: IrisBool },
         author: { type: BlogAuthor },
-        title: { type: GraphQLString },
-        body: { type: GraphQLString },
+        title: { type: IrisString },
+        body: { type: IrisString },
       },
     });
 
@@ -55,7 +55,7 @@ describe('Type System: Schema', () => {
       name: 'Query',
       fields: {
         article: {
-          args: { id: { type: GraphQLString } },
+          args: { id: { type: IrisString } },
           type: BlogArticle,
         },
         feed: {
@@ -77,7 +77,7 @@ describe('Type System: Schema', () => {
       name: 'Subscription',
       fields: {
         articleSubscribe: {
-          args: { id: { type: GraphQLString } },
+          args: { id: { type: IrisString } },
           type: BlogArticle,
         },
       },
@@ -141,7 +141,7 @@ describe('Type System: Schema', () => {
           name: 'Query',
           fields: {
             something: {
-              type: GraphQLString,
+              type: IrisString,
               args: { input: { type: SomeInputObject } },
             },
           },
@@ -208,7 +208,7 @@ describe('Type System: Schema', () => {
         const QueryType = gqlObject({
           name: 'Query',
           fields: {
-            normal: { type: GraphQLString },
+            normal: { type: IrisString },
             fake: { type: FakeString },
           },
         });
@@ -221,7 +221,7 @@ describe('Type System: Schema', () => {
       it('rejects a Schema when a provided type has no name', () => {
         const query = gqlObject({
           name: 'Query',
-          fields: { foo: { type: GraphQLString } },
+          fields: { foo: { type: IrisString } },
         });
         const types = [{}, query, {}];
 

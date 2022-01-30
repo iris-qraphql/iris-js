@@ -1,7 +1,7 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { GraphQLDirective } from '../directives';
-import { GraphQLInt, GraphQLString } from '../scalars';
+import { IrisInt, IrisString } from '../scalars';
 
 describe('Type System: Directive', () => {
   it('defines a directive with no args', () => {
@@ -17,8 +17,8 @@ describe('Type System: Directive', () => {
     const directive = new GraphQLDirective({
       name: 'Foo',
       args: {
-        foo: { type: GraphQLString },
-        bar: { type: GraphQLInt },
+        foo: { type: IrisString },
+        bar: { type: IrisInt },
       },
       locations: [DirectiveLocation.QUERY],
     });
@@ -78,7 +78,7 @@ describe('Type System: Directive', () => {
           name: 'Foo',
           locations: [DirectiveLocation.QUERY],
           args: {
-            'bad-name': { type: GraphQLString },
+            'bad-name': { type: IrisString },
           },
         }),
     ).toThrow('Names must only contain [_a-zA-Z0-9] but "bad-name" does not.');

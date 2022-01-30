@@ -1,18 +1,12 @@
 import { parseValue as parseValueToAST } from '../../language/parser';
 
-import {
-  GraphQLBoolean,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLString,
-} from '../scalars';
+import { IrisBool, IrisFloat, IrisID, IrisInt, IrisString } from '../scalars';
 
 describe('Type System: Specified scalar types', () => {
-  describe('GraphQLInt', () => {
+  describe('IrisInt', () => {
     it('parseValue', () => {
       function parseValue(value: unknown) {
-        return GraphQLInt.parseValue(value);
+        return IrisInt.parseValue(value);
       }
 
       expect(parseValue(1)).toEqual(1);
@@ -63,7 +57,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('parseLiteral', () => {
       function parseLiteral(str: string) {
-        return GraphQLInt.parseLiteral(parseValueToAST(str));
+        return IrisInt.parseLiteral(parseValueToAST(str));
       }
 
       expect(parseLiteral('1')).toEqual(1);
@@ -108,7 +102,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('serialize', () => {
       function serialize(value: unknown) {
-        return GraphQLInt.serialize(value);
+        return IrisInt.serialize(value);
       }
 
       expect(serialize(1)).toEqual(1);
@@ -178,10 +172,10 @@ describe('Type System: Specified scalar types', () => {
     });
   });
 
-  describe('GraphQLFloat', () => {
+  describe('IrisFloat', () => {
     it('parseValue', () => {
       function parseValue(value: unknown) {
-        return GraphQLFloat.parseValue(value);
+        return IrisFloat.parseValue(value);
       }
 
       expect(parseValue(1)).toEqual(1);
@@ -228,7 +222,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('parseLiteral', () => {
       function parseLiteral(str: string) {
-        return GraphQLFloat.parseLiteral(parseValueToAST(str));
+        return IrisFloat.parseLiteral(parseValueToAST(str));
       }
 
       expect(parseLiteral('1')).toEqual(1);
@@ -268,7 +262,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('serialize', () => {
       function serialize(value: unknown) {
-        return GraphQLFloat.serialize(value);
+        return IrisFloat.serialize(value);
       }
 
       expect(serialize(1)).toEqual(1.0);
@@ -308,10 +302,10 @@ describe('Type System: Specified scalar types', () => {
     });
   });
 
-  describe('GraphQLString', () => {
+  describe('IrisString', () => {
     it('parseValue', () => {
       function parseValue(value: unknown) {
-        return GraphQLString.parseValue(value);
+        return IrisString.parseValue(value);
       }
 
       expect(parseValue('foo')).toEqual('foo');
@@ -341,7 +335,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('parseLiteral', () => {
       function parseLiteral(str: string) {
-        return GraphQLString.parseLiteral(parseValueToAST(str));
+        return IrisString.parseLiteral(parseValueToAST(str));
       }
 
       expect(parseLiteral('"foo"')).toEqual('foo');
@@ -375,7 +369,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('serialize', () => {
       function serialize(value: unknown) {
-        return GraphQLString.serialize(value);
+        return IrisString.serialize(value);
       }
 
       expect(serialize('string')).toEqual('string');
@@ -413,10 +407,10 @@ describe('Type System: Specified scalar types', () => {
     });
   });
 
-  describe('GraphQLBoolean', () => {
+  describe('IrisBool', () => {
     it('parseValue', () => {
       function parseValue(value: unknown) {
-        return GraphQLBoolean.parseValue(value);
+        return IrisBool.parseValue(value);
       }
 
       expect(parseValue(true)).toEqual(true);
@@ -453,7 +447,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('parseLiteral', () => {
       function parseLiteral(str: string) {
-        return GraphQLBoolean.parseLiteral(parseValueToAST(str));
+        return IrisBool.parseLiteral(parseValueToAST(str));
       }
 
       expect(parseLiteral('true')).toEqual(true);
@@ -493,7 +487,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('serialize', () => {
       function serialize(value: unknown) {
-        return GraphQLBoolean.serialize(value);
+        return IrisBool.serialize(value);
       }
 
       expect(serialize(1)).toEqual(true);
@@ -527,10 +521,10 @@ describe('Type System: Specified scalar types', () => {
     });
   });
 
-  describe('GraphQLID', () => {
+  describe('IrisID', () => {
     it('parseValue', () => {
       function parseValue(value: unknown) {
-        return GraphQLID.parseValue(value);
+        return IrisID.parseValue(value);
       }
 
       expect(parseValue('')).toEqual('');
@@ -556,17 +550,17 @@ describe('Type System: Specified scalar types', () => {
       expect(() => parseValue(false)).toThrow(
         'ID cannot represent value: false',
       );
-      expect(() => GraphQLID.parseValue(['1'])).toThrow(
+      expect(() => IrisID.parseValue(['1'])).toThrow(
         'ID cannot represent value: ["1"]',
       );
-      expect(() => GraphQLID.parseValue({ value: '1' })).toThrow(
+      expect(() => IrisID.parseValue({ value: '1' })).toThrow(
         'ID cannot represent value: { value: "1" }',
       );
     });
 
     it('parseLiteral', () => {
       function parseLiteral(str: string) {
-        return GraphQLID.parseLiteral(parseValueToAST(str));
+        return IrisID.parseLiteral(parseValueToAST(str));
       }
 
       expect(parseLiteral('""')).toEqual('');
@@ -606,7 +600,7 @@ describe('Type System: Specified scalar types', () => {
 
     it('serialize', () => {
       function serialize(value: unknown) {
-        return GraphQLID.serialize(value);
+        return IrisID.serialize(value);
       }
 
       expect(serialize('string')).toEqual('string');

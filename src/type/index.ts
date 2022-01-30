@@ -50,11 +50,9 @@ export {
   // Predicate
   isSpecifiedScalarType,
   // Standard GraphQL Scalars
-  specifiedScalarTypes,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLString,
-  GraphQLBoolean,
+  IrisFloat,
+  IrisString,
+  IrisBool,
 } from './scalars';
 
 // Validate GraphQL schema.

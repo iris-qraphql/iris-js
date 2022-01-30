@@ -33,11 +33,9 @@ export { graphql } from './iris';
 export {
   GraphQLSchema,
   GraphQLDirective,
-  specifiedScalarTypes,
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLString,
-  GraphQLBoolean,
+  IrisFloat,
+  IrisString,
+  IrisBool,
   specifiedDirectives,
   GraphQLDeprecatedDirective,
   isSchema,
@@ -68,7 +66,6 @@ export type {
   GraphQLDirectiveConfig,
   GraphQLDirectiveExtensions,
   GraphQLArgument,
-  GraphQLField,
 } from './type/index';
 
 export {

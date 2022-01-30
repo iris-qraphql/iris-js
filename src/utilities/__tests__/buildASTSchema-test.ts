@@ -3,11 +3,11 @@ import { IrisKind } from '../../language/kinds';
 import { assertDataType, assertResolverType } from '../../type/definition';
 import { GraphQLDeprecatedDirective } from '../../type/directives';
 import {
-  GraphQLBoolean,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLString,
+  IrisBool,
+  IrisFloat,
+  IrisID,
+  IrisInt,
+  IrisString,
 } from '../../type/scalars';
 import { GraphQLSchema } from '../../type/schema';
 import { validateSchema } from '../../type/validate';
@@ -63,11 +63,11 @@ describe('Schema Builder', () => {
 
     const schema = buildSchema(sdl);
     // Built-ins are used
-    expect(schema.getType('Int')).toEqual(GraphQLInt);
-    expect(schema.getType('Float')).toEqual(GraphQLFloat);
-    expect(schema.getType('String')).toEqual(GraphQLString);
-    expect(schema.getType('Boolean')).toEqual(GraphQLBoolean);
-    expect(schema.getType('ID')).toEqual(GraphQLID);
+    expect(schema.getType('Int')).toEqual(IrisInt);
+    expect(schema.getType('Float')).toEqual(IrisFloat);
+    expect(schema.getType('String')).toEqual(IrisString);
+    expect(schema.getType('Boolean')).toEqual(IrisBool);
+    expect(schema.getType('ID')).toEqual(IrisID);
   });
 
   it('include standard type only if it is used', () => {
@@ -456,7 +456,7 @@ describe('Schema Builder', () => {
       data ID = String
     `);
 
-    expect(schema.getType('ID')).toEqual(GraphQLID);
+    expect(schema.getType('ID')).toEqual(IrisID);
   });
 
   it('Rejects invalid SDL', () => {

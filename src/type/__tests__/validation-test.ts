@@ -19,7 +19,7 @@ import type {
 import { assertDataType, assertResolverType } from '../definition';
 import { assertDirective, GraphQLDirective } from '../directives';
 import { gqlEnum, gqlList, gqlObject, gqlUnion, maybe } from '../make';
-import { GraphQLString } from '../scalars';
+import { IrisString } from '../scalars';
 import { GraphQLSchema } from '../schema';
 import { assertValidSchema, validateSchema } from '../validate';
 
@@ -54,7 +54,7 @@ function withModifiers<T extends IrisNamedType>(
 }
 
 const outputTypes: ReadonlyArray<GraphQLOutputType> = [
-  ...withModifiers(GraphQLString),
+  ...withModifiers(IrisString),
   ...withModifiers(SomeScalarType),
   ...withModifiers(SomeEnumType),
   ...withModifiers(SomeObjectType),
@@ -62,7 +62,7 @@ const outputTypes: ReadonlyArray<GraphQLOutputType> = [
 ];
 
 const inputTypes: ReadonlyArray<GraphQLInputType> = [
-  ...withModifiers(GraphQLString),
+  ...withModifiers(IrisString),
   ...withModifiers(SomeScalarType),
   ...withModifiers(SomeEnumType),
   ...withModifiers(SomeInputObjectType),
@@ -209,7 +209,7 @@ describe('Type System: Objects must have fields', () => {
       gqlObject({
         name: 'SomeObject',
         fields: {
-          __badName: { type: GraphQLString },
+          __badName: { type: IrisString },
         },
       }),
     );
@@ -229,9 +229,9 @@ describe('Type System: Fields args must be properly named', () => {
         name: 'SomeObject',
         fields: {
           goodField: {
-            type: GraphQLString,
+            type: IrisString,
             args: {
-              goodArg: { type: GraphQLString },
+              goodArg: { type: IrisString },
             },
           },
         },
@@ -246,9 +246,9 @@ describe('Type System: Fields args must be properly named', () => {
         name: 'SomeObject',
         fields: {
           badField: {
-            type: GraphQLString,
+            type: IrisString,
             args: {
-              __badName: { type: GraphQLString },
+              __badName: { type: IrisString },
             },
           },
         },
@@ -321,7 +321,7 @@ describe('Type System: Union types must be valid', () => {
     ]);
 
     const badUnionMemberTypes = [
-      GraphQLString,
+      IrisString,
       maybe(SomeObjectType),
       gqlList(SomeObjectType),
       SomeUnionType,
@@ -519,7 +519,7 @@ describe('Type System: Arguments must have data  types', () => {
       name: 'BadObject',
       fields: {
         badField: {
-          type: GraphQLString,
+          type: IrisString,
           args: {
             badArg: argConfig,
           },

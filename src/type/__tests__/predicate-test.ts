@@ -24,18 +24,17 @@ import {
   gqlEnum,
   gqlInput,
   gqlList,
-  gqlNonNull,
   gqlObject,
   gqlScalar,
   gqlUnion,
   maybe,
 } from '../make';
 import {
-  GraphQLBoolean,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLString,
+  IrisBool,
+  IrisFloat,
+  IrisID,
+  IrisInt,
+  IrisString,
   isSpecifiedScalarType,
 } from '../scalars';
 
@@ -55,12 +54,12 @@ const Directive = new GraphQLDirective({
 describe('Type predicates', () => {
   describe('isType', () => {
     it('returns true for unwrapped types', () => {
-      expect(isType(GraphQLString)).toEqual(true);
+      expect(isType(IrisString)).toEqual(true);
       expect(isType(ObjectType)).toEqual(true);
     });
 
     it('returns true for wrapped types', () => {
-      expect(isType(GraphQLString)).toEqual(true);
+      expect(isType(IrisString)).toEqual(true);
     });
 
     it('returns false for random garbage', () => {
@@ -70,11 +69,11 @@ describe('Type predicates', () => {
 
   describe('isSpecifiedScalarType', () => {
     it('returns true for specified scalars', () => {
-      expect(isSpecifiedScalarType(GraphQLString)).toEqual(true);
-      expect(isSpecifiedScalarType(GraphQLInt)).toEqual(true);
-      expect(isSpecifiedScalarType(GraphQLFloat)).toEqual(true);
-      expect(isSpecifiedScalarType(GraphQLBoolean)).toEqual(true);
-      expect(isSpecifiedScalarType(GraphQLID)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisString)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisInt)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisFloat)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisBool)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisID)).toEqual(true);
     });
 
     it('returns false for custom scalar', () => {
@@ -112,19 +111,19 @@ describe('Type predicates', () => {
     }
 
     it('returns true for an data  type', () => {
-      expectInputType(GraphQLString);
+      expectInputType(IrisString);
       expectInputType(EnumType);
       expectInputType(InputObjectType);
     });
 
     it('returns true for a wrapped data  type', () => {
-      expectInputType(gqlList(GraphQLString));
+      expectInputType(gqlList(IrisString));
       expectInputType(gqlList(EnumType));
       expectInputType(gqlList(InputObjectType));
 
-      expectInputType(GraphQLString);
-      expectInputType(gqlNonNull(EnumType));
-      expectInputType(gqlNonNull(InputObjectType));
+      expectInputType(maybe(IrisString));
+      expectInputType(maybe(EnumType));
+      expectInputType(maybe(InputObjectType));
     });
 
     function expectNonInputType(type: unknown) {
@@ -140,8 +139,8 @@ describe('Type predicates', () => {
       expectNonInputType(gqlList(ObjectType));
       expectNonInputType(gqlList(UnionType));
 
-      expectNonInputType(ObjectType);
-      expectNonInputType(gqlNonNull(UnionType));
+      expectNonInputType(maybe(ObjectType));
+      expectNonInputType(maybe(UnionType));
     });
   });
 
@@ -244,13 +243,13 @@ describe('Type predicates', () => {
 
     it('returns true for required arguments', () => {
       const requiredArg = buildArg({
-        type: GraphQLString,
+        type: IrisString,
       });
       expect(isRequiredArgument(requiredArg)).toEqual(true);
     });
 
     it('returns false for optional arguments', () => {
-      const maybeString = maybe(GraphQLString);
+      const maybeString = maybe(IrisString);
       const optArg1 = buildArg({
         type: maybeString,
       });
@@ -268,7 +267,7 @@ describe('Type predicates', () => {
       expect(isRequiredArgument(optArg3)).toEqual(false);
 
       const optArg4 = buildArg({
-        type: GraphQLString,
+        type: IrisString,
         defaultValue: 'default',
       });
       expect(isRequiredArgument(optArg4)).toEqual(false);
