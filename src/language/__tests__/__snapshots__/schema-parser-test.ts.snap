@@ -722,7 +722,7 @@ Object {
       "directives": Array [],
       "kind": "ResolverTypeDefinition",
       "loc": Object {
-        "end": 37,
+        "end": 36,
         "start": 0,
       },
       "name": Object {
@@ -744,7 +744,7 @@ Object {
               "directives": Array [],
               "kind": "FieldDefinition",
               "loc": Object {
-                "end": 35,
+                "end": 34,
                 "start": 21,
               },
               "name": Object {
@@ -774,7 +774,7 @@ Object {
           ],
           "kind": "VariantDefinition",
           "loc": Object {
-            "end": 37,
+            "end": 36,
             "start": 17,
           },
           "name": Object {
@@ -791,7 +791,7 @@ Object {
   ],
   "kind": "Document",
   "loc": Object {
-    "end": 37,
+    "end": 36,
     "start": 0,
   },
 }
