@@ -1,4 +1,10 @@
-import { Kind } from 'graphql';
+import type { GraphQLScalarType } from 'graphql';
+import {
+  GraphQLFloat as GQLFloat,
+  GraphQLInt as GQLInt,
+  GraphQLString as GQLString,
+  Kind,
+} from 'graphql';
 
 import { inspect } from '../jsutils/inspect';
 import { isObjectLike } from '../jsutils/ObjMap';
@@ -7,172 +13,30 @@ import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
 
-import type { IrisDataType, IrisNamedType } from './definition';
+import type { IrisNamedType } from './definition';
+import { IrisDataType } from './definition';
 import { gqlScalar } from './make';
 
-/**
- * Maximum possible Int value as per GraphQL Spec (32-bit signed integer).
- * n.b. This differs from JavaScript's numbers that are IEEE 754 doubles safe up-to 2^53 - 1
- * */
-export const GRAPHQL_MAX_INT = 2147483647;
+const liftGQLScalar = <T>({
+  name,
+  parseValue,
+  parseLiteral,
+  serialize,
+}: GraphQLScalarType<T>) =>
+  new IrisDataType<T>({
+    name,
+    isPrimitive: true,
+    variants: [{ name }],
+    parseValue,
+    parseLiteral,
+    serialize,
+  });
 
-/**
- * Minimum possible Int value as per GraphQL Spec (32-bit signed integer).
- * n.b. This differs from JavaScript's numbers that are IEEE 754 doubles safe starting at -(2^53 - 1)
- * */
-export const GRAPHQL_MIN_INT = -2147483648;
+export const GraphQLInt = liftGQLScalar<number>(GQLInt);
 
-export const GraphQLInt = gqlScalar<number>({
-  name: 'Int',
-  description:
-    'The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.',
+export const GraphQLFloat = liftGQLScalar<number>(GQLFloat);
 
-  serialize(outputValue) {
-    const coercedValue = serializeObject(outputValue);
-
-    if (typeof coercedValue === 'boolean') {
-      return coercedValue ? 1 : 0;
-    }
-
-    let num = coercedValue;
-    if (typeof coercedValue === 'string' && coercedValue !== '') {
-      num = Number(coercedValue);
-    }
-
-    if (typeof num !== 'number' || !Number.isInteger(num)) {
-      throw new GraphQLError(
-        `Int cannot represent non-integer value: ${inspect(coercedValue)}`,
-      );
-    }
-    if (num > GRAPHQL_MAX_INT || num < GRAPHQL_MIN_INT) {
-      throw new GraphQLError(
-        'Int cannot represent non 32-bit signed integer value: ' +
-          inspect(coercedValue),
-      );
-    }
-    return num;
-  },
-
-  parseValue(inputValue) {
-    if (typeof inputValue !== 'number' || !Number.isInteger(inputValue)) {
-      throw new GraphQLError(
-        `Int cannot represent non-integer value: ${inspect(inputValue)}`,
-      );
-    }
-    if (inputValue > GRAPHQL_MAX_INT || inputValue < GRAPHQL_MIN_INT) {
-      throw new GraphQLError(
-        `Int cannot represent non 32-bit signed integer value: ${inputValue}`,
-      );
-    }
-    return inputValue;
-  },
-
-  parseLiteral(valueNode) {
-    if (valueNode.kind !== Kind.INT) {
-      throw new GraphQLError(
-        `Int cannot represent non-integer value: ${print(valueNode)}`,
-        valueNode,
-      );
-    }
-    const num = parseInt(valueNode.value, 10);
-    if (num > GRAPHQL_MAX_INT || num < GRAPHQL_MIN_INT) {
-      throw new GraphQLError(
-        `Int cannot represent non 32-bit signed integer value: ${valueNode.value}`,
-        valueNode,
-      );
-    }
-    return num;
-  },
-});
-
-export const GraphQLFloat = gqlScalar<number>({
-  name: 'Float',
-  description:
-    'The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](https://en.wikipedia.org/wiki/IEEE_floating_point).',
-
-  serialize(outputValue) {
-    const coercedValue = serializeObject(outputValue);
-
-    if (typeof coercedValue === 'boolean') {
-      return coercedValue ? 1 : 0;
-    }
-
-    let num = coercedValue;
-    if (typeof coercedValue === 'string' && coercedValue !== '') {
-      num = Number(coercedValue);
-    }
-
-    if (typeof num !== 'number' || !Number.isFinite(num)) {
-      throw new GraphQLError(
-        `Float cannot represent non numeric value: ${inspect(coercedValue)}`,
-      );
-    }
-    return num;
-  },
-
-  parseValue(inputValue) {
-    if (typeof inputValue !== 'number' || !Number.isFinite(inputValue)) {
-      throw new GraphQLError(
-        `Float cannot represent non numeric value: ${inspect(inputValue)}`,
-      );
-    }
-    return inputValue;
-  },
-
-  parseLiteral(valueNode) {
-    if (valueNode.kind !== Kind.FLOAT && valueNode.kind !== Kind.INT) {
-      throw new GraphQLError(
-        `Float cannot represent non numeric value: ${print(valueNode)}`,
-        valueNode,
-      );
-    }
-    return parseFloat(valueNode.value);
-  },
-});
-
-export const GraphQLString = gqlScalar<string>({
-  name: 'String',
-  description:
-    'The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.',
-
-  serialize(outputValue) {
-    const coercedValue = serializeObject(outputValue);
-
-    // Serialize string, boolean and number values to a string, but do not
-    // attempt to coerce object, function, symbol, or other types as strings.
-    if (typeof coercedValue === 'string') {
-      return coercedValue;
-    }
-    if (typeof coercedValue === 'boolean') {
-      return coercedValue ? 'true' : 'false';
-    }
-    if (typeof coercedValue === 'number' && Number.isFinite(coercedValue)) {
-      return coercedValue.toString();
-    }
-    throw new GraphQLError(
-      `String cannot represent value: ${inspect(outputValue)}`,
-    );
-  },
-
-  parseValue(inputValue) {
-    if (typeof inputValue !== 'string') {
-      throw new GraphQLError(
-        `String cannot represent a non string value: ${inspect(inputValue)}`,
-      );
-    }
-    return inputValue;
-  },
-
-  parseLiteral(valueNode) {
-    if (valueNode.kind !== Kind.STRING) {
-      throw new GraphQLError(
-        `String cannot represent a non string value: ${print(valueNode)}`,
-        valueNode,
-      );
-    }
-    return valueNode.value;
-  },
-});
+export const GraphQLString = liftGQLScalar<string>(GQLString);
 
 export const GraphQLBoolean = gqlScalar<boolean>({
   name: 'Boolean',
