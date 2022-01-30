@@ -104,8 +104,12 @@ export const isTypeRef = <T extends GraphQLType>(
 
 export const isNonNullType = (
   type: unknown,
+): type is IrisTypeRef<IrisNamedType> => !isMaybeType(type);
+
+export const isMaybeType = (
+  type: unknown,
 ): type is IrisTypeRef<IrisNamedType> =>
-  isTypeRef(type) && type.kind !== 'MAYBE';
+  isTypeRef(type) && type.kind === 'MAYBE';
 
 export const isListType = (type: unknown): type is IrisTypeRef<GraphQLType> =>
   isTypeRef(type) && type.kind === 'LIST';
@@ -114,7 +118,7 @@ export const getNullableType = (
   type: Maybe<GraphQLType>,
 ): GraphQLType | undefined => {
   if (type) {
-    return isNonNullType(type) && type.kind === 'MAYBE' ? type.ofType : type;
+    return isTypeRef(type) && type.kind === 'MAYBE' ? type.ofType : type;
   }
 };
 
