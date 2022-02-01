@@ -1,10 +1,12 @@
-import type { GraphQLNamedType, GraphQLSchemaConfig } from 'graphql';
+import type { GraphQLField, GraphQLFieldConfig, GraphQLNamedType, GraphQLSchemaConfig, ThunkObjMap } from 'graphql';
 import {
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
 } from 'graphql';
+import type { ObjMap } from 'graphql/jsutils/ObjMap';
+import { IrisString } from '../type';
 
 import type {
   IrisNamedType,
@@ -64,12 +66,11 @@ const transpileResolver = (
 const transpileVariant = (variant: IrisResolverVariant): GraphQLObjectType => {
   const { name, description } = variant;
 
-  const fields = variant.fields;
+  const fields:ThunkObjMap<GraphQLFieldConfig<any,any,any>> = variant.fields ?? { _: { type: IrisString } };
 
   return new GraphQLObjectType({
     name,
     description,
-    // @ts-expect-error
-    fields: () => fields ?? {},
+    fields,
   });
 };

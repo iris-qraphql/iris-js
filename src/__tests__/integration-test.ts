@@ -9,9 +9,6 @@ const schema = new IrisSchema({
         fields: {
           hello: {
             type: IrisString,
-            resolve() {
-              return 'world';
-            },
           },
         },
       },
