@@ -24,8 +24,8 @@ import type {
   IrisField,
   IrisNamedType,
   IrisResolverType,
-  IrisResolverVariant,
   IrisType,
+  IrisVariant,
 } from '../type/definition';
 import { isDataType, isTypeRef } from '../type/definition';
 import { isSpecifiedScalarType } from '../type/scalars';
@@ -84,7 +84,7 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   };
 
   const transpileVariant = (
-    variant: IrisResolverVariant,
+    variant: IrisVariant<'resolver'>,
   ): GraphQLObjectType => {
     const { name, description } = variant;
 

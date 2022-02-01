@@ -9,11 +9,11 @@ import { print } from '../language/printer';
 import type {
   IrisArgument,
   IrisDataType,
-  IrisDataVariant,
   IrisDataVariantField,
   IrisField,
   IrisNamedType,
   IrisResolverType,
+  IrisVariant,
 } from '../type/definition';
 import { isResolverType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
@@ -102,7 +102,7 @@ function printDATA(type: IrisDataType): string {
   return start + ' = ' + variants.map(printDataVariant).join(' | ');
 }
 
-const printDataVariant = (variant: IrisDataVariant): string =>
+const printDataVariant = (variant: IrisVariant<'data'>): string =>
   printDescription(variant) +
   variant.name +
   printDeprecated(variant.deprecationReason) +

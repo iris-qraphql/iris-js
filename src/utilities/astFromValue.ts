@@ -12,8 +12,8 @@ import type {
 
 import type {
   IrisDataType,
-  IrisDataVariant,
   IrisStrictType,
+  IrisVariant,
 } from '../type/definition';
 import { isTypeRef } from '../type/definition';
 import { IrisID } from '../type/scalars';
@@ -137,7 +137,7 @@ const parseDataType = (
 
 const parseVariantValue = (
   value: Record<string, unknown>,
-  variant: IrisDataVariant,
+  variant: IrisVariant<'data'>,
 ): ObjectValueNode => {
   const fieldNodes: Array<ObjectFieldNode> = [];
 

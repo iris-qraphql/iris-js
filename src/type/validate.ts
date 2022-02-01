@@ -9,10 +9,9 @@ import { GraphQLError } from '../error';
 
 import type {
   IrisDataType,
-  IrisDataVariant,
   IrisField,
   IrisResolverType,
-  IrisResolverVariant,
+  IrisVariant,
 } from './definition';
 import {
   isDataType,
@@ -254,7 +253,7 @@ function validateFields(
 function validateUnionMembers(
   typeName: string,
   context: SchemaValidationContext,
-  variants: ReadonlyArray<IrisResolverVariant>,
+  variants: ReadonlyArray<IrisVariant<'resolver'>>,
 ): void {
   const listedMembers: Record<string, boolean> = {};
 
@@ -294,7 +293,7 @@ const validateDataType = (
 
 function validateDataFields(
   context: SchemaValidationContext,
-  variant: IrisDataVariant,
+  variant: IrisVariant<'data'>,
 ): void {
   const fields = Object.values(variant.fields ?? {});
 

@@ -5,11 +5,11 @@ import type { ASTVisitor } from '../language/visitor';
 
 import type {
   IrisArgument,
-  IrisDataVariant,
   IrisField,
   IrisResolverType,
   IrisStrictType,
   IrisType,
+  IrisVariant,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
@@ -121,7 +121,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getArgument();
   }
 
-  getEnumValue(): Maybe<IrisDataVariant> {
+  getEnumValue(): Maybe<IrisVariant<'data'>> {
     return this._typeInfo.getEnumValue();
   }
 }

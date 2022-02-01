@@ -233,11 +233,8 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   type?: R extends 'resolver' ? IrisResolverType : never;
 };
 
-export type IrisDataVariant = IrisVariant<'data'>;
-export type IrisResolverVariant = IrisVariant<'resolver'>;
-
 export type IrisDataVariantConfig = Override<
-  IrisDataVariant,
+  IrisVariant<'data'>,
   { fields?: Thunk<ConfigMap<IrisDataVariantField>> }
 >;
 
@@ -273,14 +270,14 @@ const defineResolverField = <TSource, TContext>(
   astNode: fieldConfig.astNode,
 });
 
-const defineResolverVariant = ({
+const buildResolverVariant = ({
   name,
   description,
   deprecationReason,
   fields,
   astNode,
   type,
-}: IrisResolverVariantConfig): IrisResolverVariant => ({
+}: IrisResolverVariantConfig): IrisVariant<'resolver'> => ({
   name,
   description,
   deprecationReason,
@@ -292,8 +289,23 @@ const defineResolverVariant = ({
   toJSON: () => name,
 });
 
+const buildDataVariant = ({
+  name,
+  description,
+  deprecationReason,
+  fields,
+  astNode,
+}: IrisDataVariantConfig): IrisVariant<'data'> => ({
+  name,
+  description,
+  deprecationReason,
+  fields: fields ? mapValue(resolveThunk(fields), resolveField) : undefined,
+  astNode,
+  toJSON: () => name,
+});
+
 export class IrisResolverType<TSource = any, TContext = any>
-  implements IrisTypeDef<IrisResolverVariant>
+  implements IrisTypeDef<IrisVariant<'resolver'>>
 {
   name: string;
   description: Maybe<string>;
@@ -319,11 +331,11 @@ export class IrisResolverType<TSource = any, TContext = any>
 
   isVariantType = (): boolean => this.#isVariantType;
 
-  variants = (): ReadonlyArray<IrisResolverVariant> =>
-    this.#variants.map(defineResolverVariant);
+  variants = (): ReadonlyArray<IrisVariant<'resolver'>> =>
+    this.#variants.map(buildResolverVariant);
 
-  variantBy = (): IrisResolverVariant =>
-    defineResolverVariant(this.#variants[0]);
+  variantBy = (): IrisVariant<'resolver'> =>
+    buildResolverVariant(this.#variants[0]);
 
   toString = (): string => this.name;
 
@@ -352,21 +364,6 @@ const resolveField = (
   type,
   deprecationReason,
   astNode,
-});
-
-const resolveVariant = ({
-  name,
-  description,
-  deprecationReason,
-  fields,
-  astNode,
-}: IrisDataVariantConfig): IrisDataVariant => ({
-  name,
-  description,
-  deprecationReason,
-  fields: fields ? mapValue(resolveThunk(fields), resolveField) : undefined,
-  astNode,
-  toJSON: () => name,
 });
 
 const lookupVariant = <V extends { name: string }>(
@@ -440,11 +437,11 @@ export class IrisDataType<I = unknown, O = I> {
   isVariantType = () =>
     this.#variants[0]?.name === this.name && this.#variants.length === 1;
 
-  variants = (): ReadonlyArray<IrisDataVariant> =>
-    this.#variants.map(resolveVariant);
+  variants = (): ReadonlyArray<IrisVariant<'data'>> =>
+    this.#variants.map(buildDataVariant);
 
-  variantBy = (name?: string): IrisDataVariant =>
-    resolveVariant(lookupVariant(this.name, this.#variants, name));
+  variantBy = (name?: string): IrisVariant<'data'> =>
+    buildDataVariant(lookupVariant(this.name, this.#variants, name));
 
   serialize = (value: unknown): Maybe<any> =>
     this.#scalar

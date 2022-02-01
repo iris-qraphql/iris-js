@@ -6,7 +6,7 @@ import { keyMap } from '../jsutils/ObjMap';
 
 import type { ObjectValueNode, ValueNode } from '../language/ast';
 
-import type { IrisDataVariant, IrisStrictType } from '../type/definition';
+import type { IrisStrictType, IrisVariant } from '../type/definition';
 import { isNonNullType, isTypeRef } from '../type/definition';
 
 /**
@@ -147,7 +147,7 @@ function isMissingVariable(
 }
 
 const parseVariantValue = (
-  variant: IrisDataVariant,
+  variant: IrisVariant<'data'>,
   valueNode: ObjectValueNode,
   variables: Maybe<ObjMap<unknown>>,
 ): Maybe<ObjectValueNode> => {

@@ -9,11 +9,11 @@ import { getEnterLeaveForKind } from '../language/visitor';
 
 import type {
   IrisArgument,
-  IrisDataVariant,
   IrisField,
   IrisResolverType,
   IrisStrictType,
   IrisType,
+  IrisVariant,
 } from '../type/definition';
 import {
   getNamedType,
@@ -40,7 +40,7 @@ export class TypeInfo {
   private _defaultValueStack: Array<Maybe<unknown>>;
   private _directive: Maybe<GraphQLDirective>;
   private _argument: Maybe<IrisArgument>;
-  private _enumValue: Maybe<IrisDataVariant>;
+  private _enumValue: Maybe<IrisVariant<'data'>>;
 
   constructor(
     schema: IrisSchema,
@@ -120,7 +120,7 @@ export class TypeInfo {
     return this._argument;
   }
 
-  getEnumValue(): Maybe<IrisDataVariant> {
+  getEnumValue(): Maybe<IrisVariant<'data'>> {
     return this._enumValue;
   }
 
