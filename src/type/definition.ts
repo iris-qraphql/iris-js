@@ -162,15 +162,6 @@ const isThunk = <T>(thunk: Thunk<T>): thunk is () => T =>
 const resolveThunk = <T>(thunk: Thunk<T>): T =>
   isThunk(thunk) ? thunk() : thunk;
 
-export type DataSerializer<O> = (output: unknown) => O;
-export type DataParser<I> = (input: unknown) => I;
-export type DataLiteralParser<I> = (
-  value: ValueNode,
-  variables?: ObjMap<unknown>,
-) => I;
-
-// ARGUMENTS
-
 export type IrisArgument = IrisEntity & {
   type: IrisStrictType;
   defaultValue?: unknown;
@@ -201,35 +192,27 @@ export type IrisFieldConfig<TSource, TContext, TArgs = any> = {
   args?: ConfigMap<IrisArgument>;
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
-  astNode?: Maybe<FieldDefinitionNode>;
+  astNode?: FieldDefinitionNode;
 };
 
-export type IrisField<
-  TSource = unknown,
-  TContext = unknown,
-  TArgs = any,
-> = IrisEntity & {
-  type: IrisType;
-  args: ReadonlyArray<IrisArgument>;
-  resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
-  subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
-  astNode: Maybe<FieldDefinitionNode>;
-};
+export type IrisVariantField<R extends Role> = IrisEntity & {
+  type: R extends 'data' ? IrisStrictType : IrisType;
+  astNode?: R extends 'data' ? DataFieldDefinitionNode : FieldDefinitionNode;
+} & (R extends 'resolver'
+    ? {
+        args: ReadonlyArray<IrisArgument>;
+        resolve?: GraphQLFieldResolver<any, any>;
+        subscribe?: GraphQLFieldResolver<any, any>;
+      }
+    : {});
 
-export type IrisDataVariantField = IrisEntity & {
-  type: IrisStrictType;
-  astNode?: Maybe<DataFieldDefinitionNode>;
-};
-
-type IRIS_FIELD = {
-  data: IrisDataVariantField;
-  resolver: IrisField;
-};
+export type IrisDataVariantField = IrisVariantField<'data'>;
+export type IrisResolverVariantField = IrisVariantField<'resolver'>;
 
 export type IrisVariant<R extends Role> = IrisEntity & {
   astNode?: _VariantDefinitionNode<R>;
   toJSON?: () => string;
-  fields?: ObjMap<IRIS_FIELD[R]>;
+  fields?: ObjMap<IrisVariantField<R>>;
   type?: R extends 'resolver' ? IrisResolverType : never;
 };
 
@@ -259,7 +242,7 @@ type IrisTypeDef<T> = {
 const defineResolverField = <TSource, TContext>(
   fieldConfig: IrisFieldConfig<TSource, TContext>,
   fieldName: string,
-): IrisField<TSource, TContext> => ({
+): IrisResolverVariantField => ({
   name: assertName(fieldName),
   description: fieldConfig.description,
   type: fieldConfig.type,

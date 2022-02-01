@@ -7,20 +7,19 @@ const schema = new IrisSchema({
     variants: [
       {
         name: 'Query',
-        fields: {
-          hello: {
-            type: IrisString,
-            resolve: () => 'world',
-          },
-        },
+        fields: { hello: { type: IrisString } },
       },
     ],
   }),
 });
 
+const rootValue = {
+  hello: () => 'world',
+};
+
 describe('Integration', () => {
   it('hello world App', async () => {
-    const result = await iris({ schema, source: '{ hello }' });
+    const result = await iris({ schema, rootValue, source: '{ hello }' });
 
     expect(toJSONDeep(result)).toEqual({
       data: {

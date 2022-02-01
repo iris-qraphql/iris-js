@@ -5,8 +5,8 @@ import type { ASTVisitor } from '../language/visitor';
 
 import type {
   IrisArgument,
-  IrisField,
   IrisResolverType,
+  IrisResolverVariantField,
   IrisStrictType,
   IrisType,
   IrisVariant,
@@ -109,7 +109,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getParentInputType();
   }
 
-  getFieldDef(): Maybe<IrisField> {
+  getFieldDef(): Maybe<IrisResolverVariantField> {
     return this._typeInfo.getFieldDef();
   }
 

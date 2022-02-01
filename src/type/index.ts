@@ -22,7 +22,6 @@ export type {
   IrisStrictType,
   IrisNamedType,
   IrisArgument,
-  IrisField,
 } from './definition';
 
 export {

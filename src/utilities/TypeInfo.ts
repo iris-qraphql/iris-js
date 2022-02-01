@@ -9,8 +9,8 @@ import { getEnterLeaveForKind } from '../language/visitor';
 
 import type {
   IrisArgument,
-  IrisField,
   IrisResolverType,
+  IrisResolverVariantField,
   IrisStrictType,
   IrisType,
   IrisVariant,
@@ -36,7 +36,7 @@ export class TypeInfo {
   private _typeStack: Array<Maybe<IrisType>>;
   private _parentTypeStack: Array<Maybe<IrisResolverType>>;
   private _inputTypeStack: Array<Maybe<IrisStrictType>>;
-  private _fieldDefStack: Array<Maybe<IrisField>>;
+  private _fieldDefStack: Array<Maybe<IrisResolverVariantField>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
   private _directive: Maybe<GraphQLDirective>;
   private _argument: Maybe<IrisArgument>;
@@ -100,7 +100,7 @@ export class TypeInfo {
     }
   }
 
-  getFieldDef(): Maybe<IrisField> {
+  getFieldDef(): Maybe<IrisResolverVariantField> {
     if (this._fieldDefStack.length > 0) {
       return this._fieldDefStack[this._fieldDefStack.length - 1];
     }

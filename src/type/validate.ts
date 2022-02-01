@@ -9,8 +9,8 @@ import { GraphQLError } from '../error';
 
 import type {
   IrisDataType,
-  IrisField,
   IrisResolverType,
+  IrisResolverVariantField,
   IrisVariant,
 } from './definition';
 import {
@@ -209,7 +209,7 @@ const validateResolverType = (
 function validateFields(
   typeName: string,
   context: SchemaValidationContext,
-  fields: ReadonlyArray<IrisField>,
+  fields: ReadonlyArray<IrisResolverVariantField>,
 ): void {
   for (const field of fields) {
     // Ensure they are named correctly.

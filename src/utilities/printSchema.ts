@@ -10,9 +10,9 @@ import type {
   IrisArgument,
   IrisDataType,
   IrisDataVariantField,
-  IrisField,
   IrisNamedType,
   IrisResolverType,
+  IrisResolverVariantField,
   IrisVariant,
 } from '../type/definition';
 import { isResolverType } from '../type/definition';
@@ -121,7 +121,7 @@ const printDataFields = (fields: ReadonlyArray<IrisDataVariantField>): string =>
     ),
   );
 
-const printFields = (fs: ReadonlyArray<IrisField<any, any>>): string => {
+const printFields = (fs: ReadonlyArray<IrisResolverVariantField>): string => {
   const fields = fs.map(
     (f, i) =>
       printDescription(f, '  ', !i) +
