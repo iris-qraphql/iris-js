@@ -12,9 +12,9 @@ import type {
   GraphQLField,
   GraphQLInputType,
   GraphQLOutputType,
-  GraphQLType,
   IrisDataVariant,
   IrisResolverType,
+  IrisType,
 } from '../type/definition';
 import {
   getNamedType,
@@ -49,7 +49,7 @@ export class TypeInfo {
      * Initial type may be provided in rare cases to facilitate traversals
      *  beginning somewhere other than documents.
      */
-    initialType?: Maybe<GraphQLType>,
+    initialType?: Maybe<IrisType>,
   ) {
     this._schema = schema;
     this._typeStack = [];

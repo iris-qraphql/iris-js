@@ -23,11 +23,11 @@ import { isTypeDefinitionNode } from '../language/predicates';
 import type {
   GraphQLArgument,
   GraphQLFieldConfig,
-  GraphQLType,
   IrisDataVariantConfig,
   IrisDataVariantField,
   IrisNamedType,
   IrisResolverVariantConfig,
+  IrisType,
 } from '../type/definition';
 import {
   IrisDataType,
@@ -101,7 +101,7 @@ export function buildASTSchema(
     return type;
   }
 
-  function getWrappedType(node: TypeNode): GraphQLType {
+  function getWrappedType(node: TypeNode): IrisType {
     if (node.kind === IrisKind.LIST_TYPE) {
       return new IrisTypeRef('LIST', getWrappedType(node.type));
     }

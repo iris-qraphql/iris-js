@@ -5,9 +5,9 @@ import type {
   DataParser,
   DataSerializer,
   GraphQLFieldConfig,
-  GraphQLType,
   IrisDataVariantField,
   IrisResolverVariantConfig,
+  IrisType,
   ThunkObjMap,
 } from './definition';
 import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
@@ -76,10 +76,10 @@ type GQLScalar<I = unknown, O = I> = {
 const gqlScalar = <T>(x: GQLScalar<T>) =>
   new IrisDataType<T>({ ...x, isPrimitive: true });
 
-export const maybe = <T extends GraphQLType>(ofType: T) =>
+export const maybe = <T extends IrisType>(ofType: T) =>
   new IrisTypeRef('MAYBE', ofType);
 
-export const gqlList = <T extends GraphQLType>(ofType: T) =>
+export const gqlList = <T extends IrisType>(ofType: T) =>
   new IrisTypeRef('LIST', ofType);
 
 export { gqlInput, gqlEnum, gqlObject, gqlUnion, gqlScalar };

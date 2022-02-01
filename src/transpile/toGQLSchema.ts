@@ -1,4 +1,10 @@
-import type { GraphQLField, GraphQLFieldConfig, GraphQLNamedType, GraphQLSchemaConfig, ThunkObjMap } from 'graphql';
+import {
+  GraphQLBoolean,
+  GraphQLFieldConfig,
+  GraphQLNamedType,
+  GraphQLSchemaConfig,
+  ThunkObjMap,
+} from 'graphql';
 import {
   GraphQLObjectType,
   GraphQLScalarType,
@@ -6,12 +12,14 @@ import {
   GraphQLUnionType,
 } from 'graphql';
 import type { ObjMap } from 'graphql/jsutils/ObjMap';
-import { IrisString } from '../type';
+import { map } from 'ramda';
+import { mapValue } from '../jsutils/ObjMap';
 
 import type {
   IrisNamedType,
   IrisResolverType,
   IrisResolverVariant,
+  GraphQLField,
 } from '../type/definition';
 import { isDataType } from '../type/definition';
 import type { IrisSchema } from '../type/schema';
@@ -66,11 +74,28 @@ const transpileResolver = (
 const transpileVariant = (variant: IrisResolverVariant): GraphQLObjectType => {
   const { name, description } = variant;
 
-  const fields:ThunkObjMap<GraphQLFieldConfig<any,any,any>> = variant.fields ?? { _: { type: IrisString } };
+  const empty: ObjMap<GraphQLFieldConfig<any, any, any>> = {
+    _: { type: GraphQLBoolean },
+  };
+
+  const fields: ObjMap<GraphQLFieldConfig<any, any, any>> = variant.fields
+    ? mapValue(variant.fields, transpileField)
+    : empty;
 
   return new GraphQLObjectType({
     name,
     description,
     fields,
   });
+};
+
+const transpileField = (
+  field: GraphQLField<unknown, unknown, any>,
+): GraphQLFieldConfig<any, any, any> => {
+  const { description, type } = field;
+
+  return {
+    description,
+    type: type,
+  };
 };

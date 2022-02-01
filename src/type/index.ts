@@ -18,7 +18,7 @@ export {
 } from './definition';
 
 export type {
-  GraphQLType,
+  IrisType,
   GraphQLInputType,
 
   IrisNamedType ,
