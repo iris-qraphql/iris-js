@@ -16,12 +16,12 @@ const body = `
 // automatically updated by "npm version" command.
 
 /**
- * A string containing the version of the GraphQL.js library
+ * A string containing the version of the Iris.js library
  */
 export const version = '${version}' as string;
 
 /**
- * An object containing the components of the GraphQL.js version string
+ * An object containing the components of the Iris.js version string
  */
 export const versionInfo = Object.freeze({
   major: ${major} as number,

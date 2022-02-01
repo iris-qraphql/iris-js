@@ -8,11 +8,10 @@ import type { ASTNode, DirectiveNode } from '../language/ast';
 import { GraphQLError } from '../error';
 
 import type {
-  GraphQLField,
   IrisDataType,
-  IrisDataVariant,
   IrisResolverType,
-  IrisResolverVariant,
+  IrisResolverVariantField,
+  IrisVariant,
 } from './definition';
 import {
   isDataType,
@@ -210,7 +209,7 @@ const validateResolverType = (
 function validateFields(
   typeName: string,
   context: SchemaValidationContext,
-  fields: ReadonlyArray<GraphQLField>,
+  fields: ReadonlyArray<IrisResolverVariantField>,
 ): void {
   for (const field of fields) {
     // Ensure they are named correctly.
@@ -254,7 +253,7 @@ function validateFields(
 function validateUnionMembers(
   typeName: string,
   context: SchemaValidationContext,
-  variants: ReadonlyArray<IrisResolverVariant>,
+  variants: ReadonlyArray<IrisVariant<'resolver'>>,
 ): void {
   const listedMembers: Record<string, boolean> = {};
 
@@ -294,7 +293,7 @@ const validateDataType = (
 
 function validateDataFields(
   context: SchemaValidationContext,
-  variant: IrisDataVariant,
+  variant: IrisVariant<'data'>,
 ): void {
   const fields = Object.values(variant.fields ?? {});
 

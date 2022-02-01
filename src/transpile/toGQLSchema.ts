@@ -20,12 +20,12 @@ import type { ObjMap } from 'graphql/jsutils/ObjMap';
 import { keyMap, mapValue } from '../jsutils/ObjMap';
 
 import type {
-  GraphQLField,
   IrisDataType,
   IrisNamedType,
   IrisResolverType,
-  IrisResolverVariant,
+  IrisResolverVariantField,
   IrisType,
+  IrisVariant,
 } from '../type/definition';
 import { isDataType, isTypeRef } from '../type/definition';
 import { isSpecifiedScalarType } from '../type/scalars';
@@ -84,7 +84,7 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   };
 
   const transpileVariant = (
-    variant: IrisResolverVariant,
+    variant: IrisVariant<'resolver'>,
   ): GraphQLObjectType => {
     const { name, description } = variant;
 
@@ -108,11 +108,9 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   const transpileField = ({
     description,
     type,
-    resolve,
-  }: GraphQLField): GraphQLFieldConfig<any, any> => ({
+  }: IrisResolverVariantField): GraphQLFieldConfig<any, any> => ({
     description,
     type: transpileType(type),
-    resolve,
   });
 
   const transpileType = (

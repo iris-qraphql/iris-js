@@ -9,7 +9,7 @@ import { DirectiveLocation } from '../language/directiveLocation';
 
 import type { ConfigMap } from '../utils/type-level';
 
-import type { GraphQLArgument } from './definition';
+import type { IrisArgument } from './definition';
 import { defineArguments } from './definition';
 import { IrisString } from './scalars';
 
@@ -48,7 +48,7 @@ export class GraphQLDirective {
   name: string;
   description: Maybe<string>;
   locations: ReadonlyArray<DirectiveLocation>;
-  args: ReadonlyArray<GraphQLArgument>;
+  args: ReadonlyArray<IrisArgument>;
   isRepeatable: boolean;
   astNode: Maybe<DirectiveDefinitionNode>;
 
@@ -78,7 +78,7 @@ export interface GraphQLDirectiveConfig {
   name: string;
   description?: Maybe<string>;
   locations: ReadonlyArray<DirectiveLocation>;
-  args?: ConfigMap<GraphQLArgument>;
+  args?: ConfigMap<IrisArgument>;
   isRepeatable?: Maybe<boolean>;
   astNode?: Maybe<DirectiveDefinitionNode>;
 }

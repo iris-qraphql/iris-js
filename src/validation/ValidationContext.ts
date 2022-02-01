@@ -4,12 +4,12 @@ import type { DocumentNode } from '../language/ast';
 import type { ASTVisitor } from '../language/visitor';
 
 import type {
-  GraphQLArgument,
-  GraphQLField,
-  IrisDataVariant,
+  IrisArgument,
   IrisResolverType,
+  IrisResolverVariantField,
   IrisStrictType,
   IrisType,
+  IrisVariant,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
@@ -109,7 +109,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getParentInputType();
   }
 
-  getFieldDef(): Maybe<GraphQLField> {
+  getFieldDef(): Maybe<IrisResolverVariantField> {
     return this._typeInfo.getFieldDef();
   }
 
@@ -117,11 +117,11 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getDirective();
   }
 
-  getArgument(): Maybe<GraphQLArgument> {
+  getArgument(): Maybe<IrisArgument> {
     return this._typeInfo.getArgument();
   }
 
-  getEnumValue(): Maybe<IrisDataVariant> {
+  getEnumValue(): Maybe<IrisVariant<'data'>> {
     return this._typeInfo.getEnumValue();
   }
 }

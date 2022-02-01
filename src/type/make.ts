@@ -1,11 +1,11 @@
+import type { GraphQLScalarTypeConfig } from 'graphql';
+import { GraphQLScalarType } from 'graphql';
+
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
-  DataLiteralParser,
-  DataParser,
-  DataSerializer,
-  GraphQLFieldConfig,
   IrisDataVariantField,
+  IrisFieldConfig,
   IrisResolverVariantConfig,
   IrisType,
   ThunkObjMap,
@@ -36,13 +36,13 @@ const gqlEnum = (name: string, values: Array<string>) =>
     variants: values.map((v) => ({ name: v })),
   });
 
-type GQLObject<S = any> = {
+type GQLObject = {
   name: string;
   description?: string;
-  fields: ThunkObjMap<GraphQLFieldConfig<S, any>>;
+  fields: ThunkObjMap<IrisFieldConfig>;
 };
 
-const gqlObject = <S>({ name, fields, description }: GQLObject<S>) =>
+const gqlObject = ({ name, fields, description }: GQLObject) =>
   new IrisResolverType({
     name,
     variants: [{ name, description, fields }],
@@ -65,16 +65,12 @@ const gqlUnion = ({ name, types }: GQLUnion) =>
     ),
   });
 
-type GQLScalar<I = unknown, O = I> = {
-  name: string;
-  description?: string;
-  serialize?: DataSerializer<O>;
-  parseValue?: DataParser<I>;
-  parseLiteral?: DataLiteralParser<I>;
-};
-
-const gqlScalar = <T>(x: GQLScalar<T>) =>
-  new IrisDataType<T>({ ...x, isPrimitive: true });
+const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>
+  new IrisDataType<I, O>({
+    name: config.name,
+    description: config.description,
+    scalar: new GraphQLScalarType(config),
+  });
 
 export const maybe = <T extends IrisType>(ofType: T) =>
   new IrisTypeRef('MAYBE', ofType);

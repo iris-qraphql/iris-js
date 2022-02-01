@@ -7,7 +7,7 @@ import { IrisKind } from '../../language/kinds';
 import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
 
-import type { GraphQLArgument } from '../../type/definition';
+import type { IrisArgument } from '../../type/definition';
 import { isRequiredArgument, isType } from '../../type/definition';
 import { specifiedDirectives } from '../../type/directives';
 
@@ -24,9 +24,8 @@ import type {
 export function ProvidedRequiredArgumentsOnDirectivesRule(
   context: ValidationContext | SDLValidationContext,
 ): ASTVisitor {
-  const requiredArgsMap: ObjMap<
-    ObjMap<GraphQLArgument | ArgumentDefinitionNode>
-  > = Object.create(null);
+  const requiredArgsMap: ObjMap<ObjMap<IrisArgument | ArgumentDefinitionNode>> =
+    Object.create(null);
 
   const schema = context.getSchema();
   const definedDirectives = schema?.getDirectives() ?? specifiedDirectives;

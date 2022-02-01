@@ -7,13 +7,13 @@ import type { Maybe } from '../jsutils/Maybe';
 import { print } from '../language/printer';
 
 import type {
-  GraphQLArgument,
-  GraphQLField,
+  IrisArgument,
   IrisDataType,
-  IrisDataVariant,
   IrisDataVariantField,
   IrisNamedType,
   IrisResolverType,
+  IrisResolverVariantField,
+  IrisVariant,
 } from '../type/definition';
 import { isResolverType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
@@ -102,7 +102,7 @@ function printDATA(type: IrisDataType): string {
   return start + ' = ' + variants.map(printDataVariant).join(' | ');
 }
 
-const printDataVariant = (variant: IrisDataVariant): string =>
+const printDataVariant = (variant: IrisVariant<'data'>): string =>
   printDescription(variant) +
   variant.name +
   printDeprecated(variant.deprecationReason) +
@@ -121,7 +121,7 @@ const printDataFields = (fields: ReadonlyArray<IrisDataVariantField>): string =>
     ),
   );
 
-const printFields = (fs: ReadonlyArray<GraphQLField<any, any>>): string => {
+const printFields = (fs: ReadonlyArray<IrisResolverVariantField>): string => {
   const fields = fs.map(
     (f, i) =>
       printDescription(f, '  ', !i) +
@@ -139,7 +139,7 @@ const printBlock = (items: ReadonlyArray<string>): string =>
   items.length !== 0 ? ' {\n' + items.join('\n') + '\n}' : '{}';
 
 function printArgs(
-  args: ReadonlyArray<GraphQLArgument>,
+  args: ReadonlyArray<IrisArgument>,
   indentation: string = '',
 ): string {
   if (args.length === 0) {
@@ -173,7 +173,7 @@ const printArgument = ({
   type,
   defaultValue,
   deprecationReason,
-}: GraphQLArgument): string => {
+}: IrisArgument): string => {
   const value = astFromValue(defaultValue, type);
   const printedDefaultValue = value ? ` = ${print(value)}` : '';
 

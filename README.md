@@ -1,12 +1,12 @@
-# GraphQL.js
+# Iris.js
 
 The JavaScript implementation for Iris
 
 ## Getting Started
 
-### Using GraphQL.js
+### Using Iris.js
 
-Install GraphQL.js from npm
+Install Iris.js from npm
 
 With npm:
 

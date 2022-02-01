@@ -10,19 +10,12 @@ import {
 import type { IrisNamedType } from './definition';
 import { IrisDataType } from './definition';
 
-const liftScalar = <T>({
-  name,
-  parseValue,
-  parseLiteral,
-  serialize,
-}: GraphQLScalarType<T>) =>
-  new IrisDataType<T>({
-    name,
-    isPrimitive: true,
-    variants: [{ name }],
-    parseValue,
-    parseLiteral,
-    serialize,
+const liftScalar = <I, O = I>(scalar: GraphQLScalarType<I, O>) =>
+  new IrisDataType<I, O>({
+    name: scalar.name,
+    description: scalar.description,
+    variants: [{ name: scalar.name }],
+    scalar,
   });
 
 export const IrisInt = liftScalar<number>(GraphQLInt);

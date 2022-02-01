@@ -8,12 +8,12 @@ import type { ASTVisitor } from '../language/visitor';
 import { getEnterLeaveForKind } from '../language/visitor';
 
 import type {
-  GraphQLArgument,
-  GraphQLField,
-  IrisDataVariant,
+  IrisArgument,
   IrisResolverType,
+  IrisResolverVariantField,
   IrisStrictType,
   IrisType,
+  IrisVariant,
 } from '../type/definition';
 import {
   getNamedType,
@@ -36,11 +36,11 @@ export class TypeInfo {
   private _typeStack: Array<Maybe<IrisType>>;
   private _parentTypeStack: Array<Maybe<IrisResolverType>>;
   private _inputTypeStack: Array<Maybe<IrisStrictType>>;
-  private _fieldDefStack: Array<Maybe<GraphQLField>>;
+  private _fieldDefStack: Array<Maybe<IrisResolverVariantField>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
   private _directive: Maybe<GraphQLDirective>;
-  private _argument: Maybe<GraphQLArgument>;
-  private _enumValue: Maybe<IrisDataVariant>;
+  private _argument: Maybe<IrisArgument>;
+  private _enumValue: Maybe<IrisVariant<'data'>>;
 
   constructor(
     schema: IrisSchema,
@@ -100,7 +100,7 @@ export class TypeInfo {
     }
   }
 
-  getFieldDef(): Maybe<GraphQLField> {
+  getFieldDef(): Maybe<IrisResolverVariantField> {
     if (this._fieldDefStack.length > 0) {
       return this._fieldDefStack[this._fieldDefStack.length - 1];
     }
@@ -116,11 +116,11 @@ export class TypeInfo {
     return this._directive;
   }
 
-  getArgument(): Maybe<GraphQLArgument> {
+  getArgument(): Maybe<IrisArgument> {
     return this._argument;
   }
 
-  getEnumValue(): Maybe<IrisDataVariant> {
+  getEnumValue(): Maybe<IrisVariant<'data'>> {
     return this._enumValue;
   }
 
