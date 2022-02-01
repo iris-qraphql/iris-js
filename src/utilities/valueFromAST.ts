@@ -6,7 +6,7 @@ import { keyMap } from '../jsutils/ObjMap';
 
 import type { ObjectValueNode, ValueNode } from '../language/ast';
 
-import type { IrisStrictType, IrisDataVariant } from '../type/definition';
+import type { IrisDataVariant,IrisStrictType } from '../type/definition';
 import { isNonNullType, isTypeRef } from '../type/definition';
 
 /**

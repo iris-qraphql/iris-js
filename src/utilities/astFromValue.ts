@@ -11,9 +11,9 @@ import type {
 } from '../language/ast';
 
 import type {
-  IrisStrictType,
   IrisDataType,
   IrisDataVariant,
+  IrisStrictType,
 } from '../type/definition';
 import { isTypeRef } from '../type/definition';
 import { IrisID } from '../type/scalars';

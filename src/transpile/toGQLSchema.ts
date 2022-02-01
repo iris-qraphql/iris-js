@@ -1,32 +1,30 @@
-import {
-  GraphQLBoolean,
+import type {
   GraphQLFieldConfig,
   GraphQLNamedType,
-  GraphQLSchemaConfig,
-  ThunkObjMap,
   GraphQLOutputType,
-} from 'graphql';
+  GraphQLSchemaConfig} from 'graphql';
 import {
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
 } from 'graphql';
 import type { ObjMap } from 'graphql/jsutils/ObjMap';
-import { map } from 'ramda';
+
 import { mapValue } from '../jsutils/ObjMap';
 
-import {
+import type {
+  GraphQLField,
+  IrisDataType,
   IrisNamedType,
   IrisResolverType,
   IrisResolverVariant,
-  GraphQLField,
   IrisType,
-  isTypeRef,
-  isResolverType,
-  IrisDataType,
 } from '../type/definition';
-import { isDataType } from '../type/definition';
+import { isDataType, isTypeRef } from '../type/definition';
 import type { IrisSchema } from '../type/schema';
 
 export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
@@ -50,17 +48,14 @@ const transpileRootTypeDefinition = (
   type ? (transpileResolverDefinition(type) as GraphQLObjectType) : undefined;
 
 const transpileTypeDefinition = (type: IrisNamedType): GraphQLNamedType => {
-
   if (isDataType(type)) {
-    return transpileDataDefinition(type)
+    return transpileDataDefinition(type);
   }
 
   return transpileResolverDefinition(type);
 };
 
-const transpileDataDefinition = (
-  type: IrisDataType,
-): GraphQLScalarType => {
+const transpileDataDefinition = (type: IrisDataType): GraphQLScalarType => {
   const { name } = type;
   return new GraphQLScalarType({ name });
 };
@@ -85,11 +80,11 @@ const transpileResolverDefinition = (
 const transpileVariant = (variant: IrisResolverVariant): GraphQLObjectType => {
   const { name, description } = variant;
 
-  const empty: ObjMap<GraphQLFieldConfig<any, any, any>> = {
+  const empty: ObjMap<GraphQLFieldConfig<any, any>> = {
     _: { type: GraphQLBoolean },
   };
 
-  const fields: ObjMap<GraphQLFieldConfig<any, any, any>> = variant.fields
+  const fields: ObjMap<GraphQLFieldConfig<any, any>> = variant.fields
     ? mapValue(variant.fields, transpileField)
     : empty;
 
@@ -100,9 +95,7 @@ const transpileVariant = (variant: IrisResolverVariant): GraphQLObjectType => {
   });
 };
 
-const transpileField = (
-  field: GraphQLField<unknown, unknown, any>,
-): GraphQLFieldConfig<any, any, any> => {
+const transpileField = (field: GraphQLField): GraphQLFieldConfig<any, any> => {
   const { description, type } = field;
 
   return {
@@ -111,14 +104,21 @@ const transpileField = (
   };
 };
 
-const transpileType = (type: IrisType): GraphQLOutputType => {
+const transpileType = (type: IrisType, isMaybe?: boolean): GraphQLOutputType => {
+  const withMaybe = (t: GraphQLOutputType) => (isMaybe ? t : new GraphQLNonNull(t));
+
   if (isTypeRef(type)) {
-    return { ofType: type.ofType };
+    switch (type.kind) {
+      case 'MAYBE':
+        return transpileType(type.ofType, true);
+      case 'LIST':
+        return withMaybe(new GraphQLList(transpileType(type.ofType)));
+    }
   }
 
   if (isDataType(type)) {
-    return transpileDataDefinition(type)
+    return withMaybe(transpileDataDefinition(type));
   }
 
-  return transpileResolverDefinition(type);
+  return withMaybe(transpileResolverDefinition(type));
 };
