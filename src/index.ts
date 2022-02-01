@@ -1,32 +1,10 @@
 /**
- * GraphQL.js provides a reference implementation for the GraphQL specification
- * but is also a useful utility for operating on GraphQL files and building
- * sophisticated tools.
- *
- * This primary module exports a general purpose function for fulfilling all
- * steps of the GraphQL specification in a single operation, but also includes
- * utilities for every part of the GraphQL specification:
- *
- *   - Parsing the GraphQL language.
- *   - Building a GraphQL type schema.
- *   - Validating a GraphQL request against a type schema.
- *   - Executing a GraphQL request against a type schema.
- *
- * This also includes utility functions for operating on GraphQL types and
- * GraphQL documents to facilitate building tools.
- *
- * You may also import from each sub-directory directly. For example, the
- * following two import statements are equivalent:
- *
- * ```ts
- * import { parse } from 'iris';
- * import { parse } from 'iris/language';
- * ```
+ * Iris.js provides a reference implementation for the Iris.
  *
  * @packageDocumentation
  */
 
-// The GraphQL.js version info.
+// The Iris.js version info.
 export { version, versionInfo } from './version';
 export { iris } from './iris';
 
@@ -54,12 +32,10 @@ export {
 } from './type/index';
 
 export type {
-  GraphQLInputType,
   IrisNamedType,
   GraphQLSchemaConfig,
   GraphQLDirectiveConfig,
   GraphQLDirectiveExtensions,
-  GraphQLArgument,
 } from './type/index';
 
 export {

@@ -8,9 +8,9 @@ import type { ASTVisitor } from '../language/visitor';
 import { getEnterLeaveForKind } from '../language/visitor';
 
 import type {
-  GraphQLArgument,
-  GraphQLField,
+  IrisArgument,
   IrisDataVariant,
+  IrisField,
   IrisResolverType,
   IrisStrictType,
   IrisType,
@@ -36,10 +36,10 @@ export class TypeInfo {
   private _typeStack: Array<Maybe<IrisType>>;
   private _parentTypeStack: Array<Maybe<IrisResolverType>>;
   private _inputTypeStack: Array<Maybe<IrisStrictType>>;
-  private _fieldDefStack: Array<Maybe<GraphQLField>>;
+  private _fieldDefStack: Array<Maybe<IrisField>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
   private _directive: Maybe<GraphQLDirective>;
-  private _argument: Maybe<GraphQLArgument>;
+  private _argument: Maybe<IrisArgument>;
   private _enumValue: Maybe<IrisDataVariant>;
 
   constructor(
@@ -100,7 +100,7 @@ export class TypeInfo {
     }
   }
 
-  getFieldDef(): Maybe<GraphQLField> {
+  getFieldDef(): Maybe<IrisField> {
     if (this._fieldDefStack.length > 0) {
       return this._fieldDefStack[this._fieldDefStack.length - 1];
     }
@@ -116,7 +116,7 @@ export class TypeInfo {
     return this._directive;
   }
 
-  getArgument(): Maybe<GraphQLArgument> {
+  getArgument(): Maybe<IrisArgument> {
     return this._argument;
   }
 

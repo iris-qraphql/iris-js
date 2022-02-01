@@ -9,8 +9,8 @@ import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { ConfigMapValue } from '../../utils/type-level';
 
 import type {
-  GraphQLArgument,
-  GraphQLFieldConfig,
+  IrisArgument,
+  IrisFieldConfig,
   IrisNamedType,
   IrisStrictType,
   IrisType,
@@ -435,7 +435,7 @@ describe('Type System: Enum types must be well defined', () => {
 
 describe('Type System: Object fields must have output types', () => {
   function schemaWithObjectField(
-    fieldConfig: GraphQLFieldConfig<unknown, unknown>,
+    fieldConfig: IrisFieldConfig<unknown, unknown>,
   ): IrisSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
@@ -492,9 +492,7 @@ describe('Type System: Object fields must have output types', () => {
 });
 
 describe('Type System: Arguments must have data  types', () => {
-  function schemaWithArg(
-    argConfig: ConfigMapValue<GraphQLArgument>,
-  ): IrisSchema {
+  function schemaWithArg(argConfig: ConfigMapValue<IrisArgument>): IrisSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {

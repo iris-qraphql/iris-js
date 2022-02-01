@@ -1,6 +1,6 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import type { GraphQLArgument, IrisStrictType } from '../definition';
+import type { IrisArgument, IrisStrictType } from '../definition';
 import {
   getNamedType,
   getNullableType,
@@ -230,7 +230,7 @@ describe('Type predicates', () => {
     function buildArg(config: {
       type: IrisStrictType;
       defaultValue?: unknown;
-    }): GraphQLArgument {
+    }): IrisArgument {
       return {
         name: 'someArg',
         type: config.type,

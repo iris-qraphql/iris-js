@@ -54,9 +54,7 @@ export const assertBy =
   <T>(kind: string, f: (type: unknown) => type is T) =>
   (type: unknown): T => {
     if (!f(type)) {
-      throw new Error(
-        `Expected ${inspect(type)} to be a GraphQL ${kind} type.`,
-      );
+      throw new Error(`Expected ${inspect(type)} to be a Iris ${kind} type.`);
     }
     return type;
   };
@@ -157,17 +155,17 @@ export type DataLiteralParser<I> = (
 
 // ARGUMENTS
 
-export type GraphQLArgument = IrisEntity & {
+export type IrisArgument = IrisEntity & {
   type: IrisStrictType;
   defaultValue?: unknown;
   astNode?: Maybe<ArgumentDefinitionNode>;
 };
 
-export function isRequiredArgument(arg: GraphQLArgument): boolean {
+export function isRequiredArgument(arg: IrisArgument): boolean {
   return isNonNullType(arg.type) && arg.defaultValue === undefined;
 }
 
-export const defineArguments = unfoldConfigMap<GraphQLArgument>(
+export const defineArguments = unfoldConfigMap<IrisArgument>(
   (name, { description, type, defaultValue, deprecationReason, astNode }) => ({
     name,
     description,
@@ -180,23 +178,23 @@ export const defineArguments = unfoldConfigMap<GraphQLArgument>(
 
 // FIELDS
 
-export type GraphQLFieldConfig<TSource, TContext, TArgs = any> = {
+export type IrisFieldConfig<TSource, TContext, TArgs = any> = {
   description?: Maybe<string>;
   deprecationReason?: Maybe<string>;
   type: IrisType;
-  args?: ConfigMap<GraphQLArgument>;
+  args?: ConfigMap<IrisArgument>;
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   astNode?: Maybe<FieldDefinitionNode>;
 };
 
-export type GraphQLField<
+export type IrisField<
   TSource = unknown,
   TContext = unknown,
   TArgs = any,
 > = IrisEntity & {
   type: IrisType;
-  args: ReadonlyArray<GraphQLArgument>;
+  args: ReadonlyArray<IrisArgument>;
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   astNode: Maybe<FieldDefinitionNode>;
@@ -207,32 +205,28 @@ export type IrisDataVariantField = IrisEntity & {
   astNode?: Maybe<DataFieldDefinitionNode>;
 };
 
-export type GraphQLFieldMap<TSource, TContext> = ObjMap<
-  GraphQLField<TSource, TContext>
->;
+type IRIS_FIELD = {
+  data: IrisDataVariantField;
+  resolver: IrisField;
+};
 
 export type IrisVariant<R extends Role> = IrisEntity & {
   astNode?: _VariantDefinitionNode<R>;
-
   toJSON?: () => string;
+  fields?: ObjMap<IRIS_FIELD[R]>;
+  type?: R extends 'resolver' ? IrisResolverType : never;
 };
 
-export type IrisDataVariant = IrisVariant<'data'> & {
-  fields?: ObjMap<IrisDataVariantField>;
-};
+export type IrisDataVariant = IrisVariant<'data'>;
+export type IrisResolverVariant = IrisVariant<'resolver'>;
 
 export type IrisDataVariantConfig = Override<
   IrisDataVariant,
   { fields?: Thunk<ConfigMap<IrisDataVariantField>> }
 >;
 
-export type IrisResolverVariant = IrisVariant<'resolver'> & {
-  fields?: ObjMap<GraphQLField>;
-  type?: IrisResolverType;
-};
-
 export type IrisResolverVariantConfig<S = any, C = any> = IrisEntity & {
-  fields?: ThunkObjMap<GraphQLFieldConfig<S, C>>;
+  fields?: ThunkObjMap<IrisFieldConfig<S, C>>;
   type?: () => IrisResolverType;
   astNode?: _VariantDefinitionNode<'resolver'>;
 };
@@ -244,18 +238,15 @@ export type IrisResolverTypeConfig<TSource, TContext> = {
   astNode?: Maybe<ResolverTypeDefinitionNode>;
 };
 
-// Type
-
 type IrisTypeDef<T> = {
   isVariantType: () => boolean;
   variants: () => ReadonlyArray<T>;
-  // variantBy: (name?: string) => T;
 };
 
 const defineResolverField = <TSource, TContext>(
-  fieldConfig: GraphQLFieldConfig<TSource, TContext>,
+  fieldConfig: IrisFieldConfig<TSource, TContext>,
   fieldName: string,
-): GraphQLField<TSource, TContext> => ({
+): IrisField<TSource, TContext> => ({
   name: assertName(fieldName),
   description: fieldConfig.description,
   type: fieldConfig.type,
@@ -312,21 +303,15 @@ export class IrisResolverType<TSource = any, TContext = any>
 
   isVariantType = (): boolean => this.#isVariantType;
 
-  variants(): ReadonlyArray<IrisResolverVariant> {
-    return this.#variants.map(defineResolverVariant);
-  }
+  variants = (): ReadonlyArray<IrisResolverVariant> =>
+    this.#variants.map(defineResolverVariant);
 
-  variantBy(): IrisResolverVariant {
-    return defineResolverVariant(this.#variants[0]);
-  }
+  variantBy = (): IrisResolverVariant =>
+    defineResolverVariant(this.#variants[0]);
 
-  toString(): string {
-    return this.name;
-  }
+  toString = (): string => this.name;
 
-  toJSON(): string {
-    return this.toString();
-  }
+  toJSON = (): string => this.toString();
 }
 
 type IrisDataTypeConfig<I, O> = Readonly<{
@@ -335,11 +320,8 @@ type IrisDataTypeConfig<I, O> = Readonly<{
   astNode?: Maybe<DataTypeDefinitionNode>;
   variants?: ReadonlyArray<IrisDataVariantConfig>;
   isPrimitive?: boolean;
-  /** Serializes an internal value to include in a response. */
   serialize?: DataSerializer<O>;
-  /** Parses an externally provided value to use as an input. */
   parseValue?: DataParser<I>;
-  /** Parses an externally provided literal value to use as an input. */
   parseLiteral?: DataLiteralParser<I>;
 }>;
 
@@ -449,26 +431,20 @@ export class IrisDataType<I = unknown, O = I> {
     return 'IrisDataType';
   }
 
-  toString(): string {
-    return this.name;
-  }
+  toString = (): string => this.name;
 
-  toJSON(): string {
-    return this.toString();
-  }
+  toJSON = (): string => this.toString();
 
   isVariantType = () => {
     const [variant, ...xs] = this.#variants;
     return variant?.name === this.name && xs.length === 0;
   };
 
-  variants(): ReadonlyArray<IrisDataVariant> {
-    return this.#variants.map(resolveVariant);
-  }
+  variants = (): ReadonlyArray<IrisDataVariant> =>
+    this.#variants.map(resolveVariant);
 
-  variantBy(name?: string): IrisDataVariant {
-    return resolveVariant(lookupVariant(this.name, this.#variants, name));
-  }
+  variantBy = (name?: string): IrisDataVariant =>
+    resolveVariant(lookupVariant(this.name, this.#variants, name));
 
   serialize(value: unknown): Maybe<any> {
     if (this.isPrimitive) {
@@ -478,7 +454,7 @@ export class IrisDataType<I = unknown, O = I> {
     return this.variantBy(assertString(this.name, value))?.name;
   }
 
-  parseValue(value: unknown): Maybe<any> /* T */ {
+  parseValue(value: unknown): Maybe<any> {
     if (this.isPrimitive) {
       return this.#parseValue(value);
     }
@@ -486,7 +462,7 @@ export class IrisDataType<I = unknown, O = I> {
     return this.variantBy(assertString(this.name, value))?.name;
   }
 
-  parseLiteral(valueNode: ValueNode): Maybe<any> /* T */ {
+  parseLiteral(valueNode: ValueNode): Maybe<any> {
     if (this.isPrimitive) {
       return this.#parseLiteral(valueNode);
     }

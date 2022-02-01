@@ -8,7 +8,7 @@ import { keyMap } from '../jsutils/ObjMap';
 import type { DirectiveNode } from '../language/ast';
 import { print } from '../language/printer';
 
-import type { GraphQLField } from '../type/definition';
+import type { IrisField } from '../type/definition';
 import { isNonNullType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 
@@ -17,7 +17,7 @@ import { GraphQLError } from '../error';
 import { valueFromAST } from './valueFromAST';
 
 function getArgumentValues(
-  def: GraphQLField | GraphQLDirective,
+  def: IrisField | GraphQLDirective,
   node: DirectiveNode,
   variableValues?: Maybe<ObjMap<unknown>>,
 ): Record<string, unknown> {

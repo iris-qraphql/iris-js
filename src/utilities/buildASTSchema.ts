@@ -21,10 +21,10 @@ import { parse } from '../language/parser';
 import { isTypeDefinitionNode } from '../language/predicates';
 
 import type {
-  GraphQLArgument,
-  GraphQLFieldConfig,
+  IrisArgument,
   IrisDataVariantConfig,
   IrisDataVariantField,
+  IrisFieldConfig,
   IrisNamedType,
   IrisResolverVariantConfig,
   IrisType,
@@ -125,7 +125,7 @@ export function buildASTSchema(
 
   function buildArgumentMap(
     args: Maybe<ReadonlyArray<ArgumentDefinitionNode>>,
-  ): ConfigMap<GraphQLArgument> {
+  ): ConfigMap<IrisArgument> {
     const argsNodes = /* c8 ignore next */ args ?? [];
 
     const argConfigMap = Object.create(null);
@@ -148,13 +148,13 @@ export function buildASTSchema(
 
   function buildFieldMap(
     node: ReadonlyArray<FieldDefinitionNode>,
-  ): ObjMap<GraphQLFieldConfig<unknown, unknown>>;
+  ): ObjMap<IrisFieldConfig<unknown, unknown>>;
   function buildFieldMap(
     fields: ReadonlyArray<DataFieldDefinitionNode>,
   ): ObjMap<IrisDataVariantField>;
   function buildFieldMap(
     fields: ReadonlyArray<FieldDefinitionNode>,
-  ): ObjMap<GraphQLFieldConfig<unknown, unknown>> {
+  ): ObjMap<IrisFieldConfig<unknown, unknown>> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
       return [

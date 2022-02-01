@@ -8,9 +8,9 @@ import type { ASTNode, DirectiveNode } from '../language/ast';
 import { GraphQLError } from '../error';
 
 import type {
-  GraphQLField,
   IrisDataType,
   IrisDataVariant,
+  IrisField,
   IrisResolverType,
   IrisResolverVariant,
 } from './definition';
@@ -210,7 +210,7 @@ const validateResolverType = (
 function validateFields(
   typeName: string,
   context: SchemaValidationContext,
-  fields: ReadonlyArray<GraphQLField>,
+  fields: ReadonlyArray<IrisField>,
 ): void {
   for (const field of fields) {
     // Ensure they are named correctly.

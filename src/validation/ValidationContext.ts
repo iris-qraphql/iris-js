@@ -4,9 +4,9 @@ import type { DocumentNode } from '../language/ast';
 import type { ASTVisitor } from '../language/visitor';
 
 import type {
-  GraphQLArgument,
-  GraphQLField,
+  IrisArgument,
   IrisDataVariant,
+  IrisField,
   IrisResolverType,
   IrisStrictType,
   IrisType,
@@ -109,7 +109,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getParentInputType();
   }
 
-  getFieldDef(): Maybe<GraphQLField> {
+  getFieldDef(): Maybe<IrisField> {
     return this._typeInfo.getFieldDef();
   }
 
@@ -117,7 +117,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getDirective();
   }
 
-  getArgument(): Maybe<GraphQLArgument> {
+  getArgument(): Maybe<IrisArgument> {
     return this._typeInfo.getArgument();
   }
 

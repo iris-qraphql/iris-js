@@ -20,8 +20,8 @@ import type { ObjMap } from 'graphql/jsutils/ObjMap';
 import { keyMap, mapValue } from '../jsutils/ObjMap';
 
 import type {
-  GraphQLField,
   IrisDataType,
+  IrisField,
   IrisNamedType,
   IrisResolverType,
   IrisResolverVariant,
@@ -109,7 +109,7 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     description,
     type,
     resolve,
-  }: GraphQLField): GraphQLFieldConfig<any, any> => ({
+  }: IrisField): GraphQLFieldConfig<any, any> => ({
     description,
     type: transpileType(type),
     resolve,

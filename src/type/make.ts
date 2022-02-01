@@ -4,8 +4,8 @@ import type {
   DataLiteralParser,
   DataParser,
   DataSerializer,
-  GraphQLFieldConfig,
   IrisDataVariantField,
+  IrisFieldConfig,
   IrisResolverVariantConfig,
   IrisType,
   ThunkObjMap,
@@ -39,7 +39,7 @@ const gqlEnum = (name: string, values: Array<string>) =>
 type GQLObject<S = any> = {
   name: string;
   description?: string;
-  fields: ThunkObjMap<GraphQLFieldConfig<S, any>>;
+  fields: ThunkObjMap<IrisFieldConfig<S, any>>;
 };
 
 const gqlObject = <S>({ name, fields, description }: GQLObject<S>) =>
