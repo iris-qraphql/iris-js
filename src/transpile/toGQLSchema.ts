@@ -108,11 +108,9 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   const transpileField = ({
     description,
     type,
-    resolve,
   }: IrisResolverVariantField): GraphQLFieldConfig<any, any> => ({
     description,
     type: transpileType(type),
-    resolve,
   });
 
   const transpileType = (

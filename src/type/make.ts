@@ -36,13 +36,13 @@ const gqlEnum = (name: string, values: Array<string>) =>
     variants: values.map((v) => ({ name: v })),
   });
 
-type GQLObject<S = any> = {
+type GQLObject = {
   name: string;
   description?: string;
-  fields: ThunkObjMap<IrisFieldConfig<S, any>>;
+  fields: ThunkObjMap<IrisFieldConfig>;
 };
 
-const gqlObject = <S>({ name, fields, description }: GQLObject<S>) =>
+const gqlObject = ({ name, fields, description }: GQLObject) =>
   new IrisResolverType({
     name,
     variants: [{ name, description, fields }],

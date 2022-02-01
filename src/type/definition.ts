@@ -1,4 +1,4 @@
-import type { GraphQLFieldResolver, GraphQLScalarType } from 'graphql';
+import type { GraphQLScalarType } from 'graphql';
 import {
   assertName,
   GraphQLBoolean,
@@ -185,13 +185,11 @@ export const defineArguments = unfoldConfigMap<IrisArgument>(
 
 // FIELDS
 
-export type IrisFieldConfig<TSource, TContext, TArgs = any> = {
+export type IrisFieldConfig = {
   description?: Maybe<string>;
   deprecationReason?: Maybe<string>;
   type: IrisType;
   args?: ConfigMap<IrisArgument>;
-  resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
-  subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   astNode?: FieldDefinitionNode;
 };
 
@@ -201,8 +199,6 @@ export type IrisVariantField<R extends Role> = IrisEntity & {
 } & (R extends 'resolver'
     ? {
         args: ReadonlyArray<IrisArgument>;
-        resolve?: GraphQLFieldResolver<any, any>;
-        subscribe?: GraphQLFieldResolver<any, any>;
       }
     : {});
 
@@ -221,16 +217,16 @@ export type IrisDataVariantConfig = Override<
   { fields?: Thunk<ConfigMap<IrisDataVariantField>> }
 >;
 
-export type IrisResolverVariantConfig<S = any, C = any> = IrisEntity & {
-  fields?: ThunkObjMap<IrisFieldConfig<S, C>>;
+export type IrisResolverVariantConfig = IrisEntity & {
+  fields?: ThunkObjMap<IrisFieldConfig>;
   type?: () => IrisResolverType;
   astNode?: _VariantDefinitionNode<'resolver'>;
 };
 
-export type IrisResolverTypeConfig<TSource, TContext> = {
+export type IrisResolverTypeConfig = {
   name: string;
   description?: Maybe<string>;
-  variants: ReadonlyArray<IrisResolverVariantConfig<TSource, TContext>>;
+  variants: ReadonlyArray<IrisResolverVariantConfig>;
   astNode?: Maybe<ResolverTypeDefinitionNode>;
 };
 
@@ -239,16 +235,14 @@ type IrisTypeDef<T> = {
   variants: () => ReadonlyArray<T>;
 };
 
-const defineResolverField = <TSource, TContext>(
-  fieldConfig: IrisFieldConfig<TSource, TContext>,
+const defineResolverField = (
+  fieldConfig: IrisFieldConfig,
   fieldName: string,
 ): IrisResolverVariantField => ({
   name: assertName(fieldName),
   description: fieldConfig.description,
   type: fieldConfig.type,
   args: defineArguments(fieldConfig.args ?? {}),
-  resolve: fieldConfig.resolve,
-  subscribe: fieldConfig.subscribe,
   deprecationReason: fieldConfig.deprecationReason,
   astNode: fieldConfig.astNode,
 });
@@ -287,16 +281,14 @@ const buildDataVariant = ({
   toJSON: () => name,
 });
 
-export class IrisResolverType<TSource = any, TContext = any>
-  implements IrisTypeDef<IrisVariant<'resolver'>>
-{
+export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
   name: string;
   description: Maybe<string>;
   astNode: Maybe<ResolverTypeDefinitionNode>;
-  #variants: ReadonlyArray<IrisResolverVariantConfig<TSource, TContext>>;
+  #variants: ReadonlyArray<IrisResolverVariantConfig>;
   #isVariantType: boolean;
 
-  constructor(config: Readonly<IrisResolverTypeConfig<any, any>>) {
+  constructor(config: Readonly<IrisResolverTypeConfig>) {
     this.name = assertName(config.name);
     this.description = config.description;
     this.astNode = config.astNode;

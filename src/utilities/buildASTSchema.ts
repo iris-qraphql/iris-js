@@ -148,13 +148,13 @@ export function buildASTSchema(
 
   function buildFieldMap(
     node: ReadonlyArray<FieldDefinitionNode>,
-  ): ObjMap<IrisFieldConfig<unknown, unknown>>;
+  ): ObjMap<IrisFieldConfig>;
   function buildFieldMap(
     fields: ReadonlyArray<DataFieldDefinitionNode>,
   ): ObjMap<IrisDataVariantField>;
   function buildFieldMap(
     fields: ReadonlyArray<FieldDefinitionNode>,
-  ): ObjMap<IrisFieldConfig<unknown, unknown>> {
+  ): ObjMap<IrisFieldConfig> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
       return [
