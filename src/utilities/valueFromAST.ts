@@ -6,7 +6,7 @@ import { keyMap } from '../jsutils/ObjMap';
 
 import type { ObjectValueNode, ValueNode } from '../language/ast';
 
-import type { GraphQLInputType, IrisDataVariant } from '../type/definition';
+import type { IrisDataVariant, IrisStrictType } from '../type/definition';
 import { isNonNullType, isTypeRef } from '../type/definition';
 
 /**
@@ -31,7 +31,7 @@ import { isNonNullType, isTypeRef } from '../type/definition';
  */
 export function valueFromAST(
   valueNode: Maybe<ValueNode>,
-  type: GraphQLInputType,
+  type: IrisStrictType,
   variables?: Maybe<ObjMap<unknown>>,
 ): unknown {
   if (!valueNode) {

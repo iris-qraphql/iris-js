@@ -6,10 +6,10 @@ import type { ASTVisitor } from '../language/visitor';
 import type {
   GraphQLArgument,
   GraphQLField,
-  GraphQLInputType,
-  GraphQLOutputType,
   IrisDataVariant,
   IrisResolverType,
+  IrisStrictType,
+  IrisType,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
@@ -93,7 +93,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._schema;
   }
 
-  getType(): Maybe<GraphQLOutputType> {
+  getType(): Maybe<IrisType> {
     return this._typeInfo.getType();
   }
 
@@ -101,11 +101,11 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getParentType();
   }
 
-  getInputType(): Maybe<GraphQLInputType> {
+  getInputType(): Maybe<IrisStrictType> {
     return this._typeInfo.getInputType();
   }
 
-  getParentInputType(): Maybe<GraphQLInputType> {
+  getParentInputType(): Maybe<IrisStrictType> {
     return this._typeInfo.getParentInputType();
   }
 

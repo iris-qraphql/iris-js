@@ -12,15 +12,15 @@ export {
   isInputType,
   isDataType,
   isResolverType,
+  IrisResolverType,
   isRequiredArgument,
   getNamedType,
 } from './definition';
 
 export type {
-  GraphQLType,
-  GraphQLInputType,
-  IrisResolverType,
-  IrisNamedType as GraphQLNamedType,
+  IrisType,
+  IrisStrictType as GraphQLInputType,
+  IrisNamedType,
   GraphQLArgument,
   IrisDataVariant,
   GraphQLField,

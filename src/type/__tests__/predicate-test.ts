@@ -1,6 +1,6 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import type { GraphQLArgument, GraphQLInputType } from '../definition';
+import type { GraphQLArgument, IrisStrictType } from '../definition';
 import {
   getNamedType,
   getNullableType,
@@ -228,7 +228,7 @@ describe('Type predicates', () => {
 
   describe('isRequiredArgument', () => {
     function buildArg(config: {
-      type: GraphQLInputType;
+      type: IrisStrictType;
       defaultValue?: unknown;
     }): GraphQLArgument {
       return {

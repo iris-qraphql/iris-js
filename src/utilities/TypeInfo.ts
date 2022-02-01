@@ -10,11 +10,10 @@ import { getEnterLeaveForKind } from '../language/visitor';
 import type {
   GraphQLArgument,
   GraphQLField,
-  GraphQLInputType,
-  GraphQLOutputType,
-  GraphQLType,
   IrisDataVariant,
   IrisResolverType,
+  IrisStrictType,
+  IrisType,
 } from '../type/definition';
 import {
   getNamedType,
@@ -34,9 +33,9 @@ import type { IrisSchema } from '../type/schema';
  */
 export class TypeInfo {
   private _schema: IrisSchema;
-  private _typeStack: Array<Maybe<GraphQLOutputType>>;
+  private _typeStack: Array<Maybe<IrisType>>;
   private _parentTypeStack: Array<Maybe<IrisResolverType>>;
-  private _inputTypeStack: Array<Maybe<GraphQLInputType>>;
+  private _inputTypeStack: Array<Maybe<IrisStrictType>>;
   private _fieldDefStack: Array<Maybe<GraphQLField>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
   private _directive: Maybe<GraphQLDirective>;
@@ -49,7 +48,7 @@ export class TypeInfo {
      * Initial type may be provided in rare cases to facilitate traversals
      *  beginning somewhere other than documents.
      */
-    initialType?: Maybe<GraphQLType>,
+    initialType?: Maybe<IrisType>,
   ) {
     this._schema = schema;
     this._typeStack = [];
@@ -77,7 +76,7 @@ export class TypeInfo {
     return 'TypeInfo';
   }
 
-  getType(): Maybe<GraphQLOutputType> {
+  getType(): Maybe<IrisType> {
     if (this._typeStack.length > 0) {
       return this._typeStack[this._typeStack.length - 1];
     }
@@ -89,13 +88,13 @@ export class TypeInfo {
     }
   }
 
-  getInputType(): Maybe<GraphQLInputType> {
+  getInputType(): Maybe<IrisStrictType> {
     if (this._inputTypeStack.length > 0) {
       return this._inputTypeStack[this._inputTypeStack.length - 1];
     }
   }
 
-  getParentInputType(): Maybe<GraphQLInputType> {
+  getParentInputType(): Maybe<IrisStrictType> {
     if (this._inputTypeStack.length > 1) {
       return this._inputTypeStack[this._inputTypeStack.length - 2];
     }

@@ -32,14 +32,13 @@ export const unfoldConfigMap =
 
 // Predicates & Assertions
 
-export type GraphQLType = IrisNamedType | IrisTypeRef<GraphQLType>;
-export type GraphQLInputType = IrisDataType | IrisTypeRef<GraphQLInputType>;
-export type GraphQLOutputType = GraphQLType;
+export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
+export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
 
-export const isInputType = (type: unknown): type is GraphQLInputType =>
+export const isInputType = (type: unknown): type is IrisStrictType =>
   isDataType(type) || (isTypeRef(type) && isInputType(type.ofType));
 
-export const isType = (type: unknown): type is GraphQLType =>
+export const isType = (type: unknown): type is IrisType =>
   isResolverType(type) || isDataType(type) || isTypeRef(type);
 
 export const isResolverType = (type: unknown): type is IrisResolverType =>
@@ -65,7 +64,7 @@ export const assertBy =
 export const assertResolverType = assertBy('Resolver', isResolverType);
 export const assertDataType = assertBy('Data', isDataType);
 
-export class IrisTypeRef<T extends GraphQLType> {
+export class IrisTypeRef<T extends IrisType> {
   readonly ofType: T;
   readonly kind: WrapperKind;
 
@@ -96,7 +95,7 @@ export class IrisTypeRef<T extends GraphQLType> {
 }
 export type IrisNamedType = IrisResolverType | IrisDataType;
 
-export const isTypeRef = <T extends GraphQLType>(
+export const isTypeRef = <T extends IrisType>(
   type: unknown,
 ): type is IrisTypeRef<T> => instanceOf(type, IrisTypeRef);
 
@@ -109,26 +108,22 @@ export const isMaybeType = (
 ): type is IrisTypeRef<IrisNamedType> =>
   isTypeRef(type) && type.kind === 'MAYBE';
 
-export const isListType = (type: unknown): type is IrisTypeRef<GraphQLType> =>
+export const isListType = (type: unknown): type is IrisTypeRef<IrisType> =>
   isTypeRef(type) && type.kind === 'LIST';
 
 export const getNullableType = (
-  type: Maybe<GraphQLType>,
-): GraphQLType | undefined => {
+  type: Maybe<IrisType>,
+): IrisType | undefined => {
   if (type) {
     return isTypeRef(type) && type.kind === 'MAYBE' ? type.ofType : type;
   }
 };
 
 export function getNamedType(type: undefined | null): void;
-export function getNamedType(type: GraphQLInputType): IrisDataType;
-export function getNamedType(type: GraphQLType): IrisNamedType;
-export function getNamedType(
-  type: Maybe<GraphQLType>,
-): IrisNamedType | undefined;
-export function getNamedType(
-  type: Maybe<GraphQLType>,
-): IrisNamedType | undefined {
+export function getNamedType(type: IrisStrictType): IrisDataType;
+export function getNamedType(type: IrisType): IrisNamedType;
+export function getNamedType(type: Maybe<IrisType>): IrisNamedType | undefined;
+export function getNamedType(type: Maybe<IrisType>): IrisNamedType | undefined {
   if (type) {
     let unwrappedType = type;
     while (isTypeRef(unwrappedType)) {
@@ -163,7 +158,7 @@ export type DataLiteralParser<I> = (
 // ARGUMENTS
 
 export type GraphQLArgument = IrisEntity & {
-  type: GraphQLInputType;
+  type: IrisStrictType;
   defaultValue?: unknown;
   astNode?: Maybe<ArgumentDefinitionNode>;
 };
@@ -188,7 +183,7 @@ export const defineArguments = unfoldConfigMap<GraphQLArgument>(
 export type GraphQLFieldConfig<TSource, TContext, TArgs = any> = {
   description?: Maybe<string>;
   deprecationReason?: Maybe<string>;
-  type: GraphQLOutputType;
+  type: IrisType;
   args?: ConfigMap<GraphQLArgument>;
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
@@ -200,7 +195,7 @@ export type GraphQLField<
   TContext = unknown,
   TArgs = any,
 > = IrisEntity & {
-  type: GraphQLOutputType;
+  type: IrisType;
   args: ReadonlyArray<GraphQLArgument>;
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
@@ -208,7 +203,7 @@ export type GraphQLField<
 };
 
 export type IrisDataVariantField = IrisEntity & {
-  type: GraphQLInputType;
+  type: IrisStrictType;
   astNode?: Maybe<DataFieldDefinitionNode>;
 };
 
@@ -251,7 +246,7 @@ export type IrisResolverTypeConfig<TSource, TContext> = {
 
 // Type
 
-export type IrisType<T> = {
+type IrisTypeDef<T> = {
   isVariantType: () => boolean;
   variants: () => ReadonlyArray<T>;
   // variantBy: (name?: string) => T;
@@ -291,7 +286,7 @@ const defineResolverVariant = ({
 });
 
 export class IrisResolverType<TSource = any, TContext = any>
-  implements IrisType<IrisResolverVariant>
+  implements IrisTypeDef<IrisResolverVariant>
 {
   name: string;
   description: Maybe<string>;

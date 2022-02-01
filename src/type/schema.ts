@@ -7,11 +7,7 @@ import type { ObjMap } from '../jsutils/ObjMap';
 
 import type { GraphQLError } from '../error';
 
-import type {
-  GraphQLType,
-  IrisNamedType,
-  IrisResolverType,
-} from './definition';
+import type { IrisNamedType, IrisResolverType, IrisType } from './definition';
 import { getNamedType, isDataType, isResolverType } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective, specifiedDirectives } from './directives';
@@ -152,7 +148,7 @@ export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
 }
 
 function collectReferencedTypes(
-  type: GraphQLType,
+  type: IrisType,
   typeSet: Set<IrisNamedType>,
 ): Set<IrisNamedType> {
   const namedType = getNamedType(type);

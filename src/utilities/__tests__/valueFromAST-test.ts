@@ -4,7 +4,7 @@ import type { ObjMap } from '../../jsutils/ObjMap';
 
 import { parseValue } from '../../language/parser';
 
-import type { GraphQLInputType } from '../../type/definition';
+import type { IrisStrictType } from '../../type/definition';
 import { gqlInput, gqlList, gqlScalar, maybe } from '../../type/make';
 import {
   IrisBool,
@@ -37,7 +37,7 @@ const maybeListOfBool = maybe(listOfBool);
 describe('valueFromAST', () => {
   function expectValueFrom(
     valueText: string,
-    type: GraphQLInputType,
+    type: IrisStrictType,
     variables?: ObjMap<unknown>,
   ) {
     const ast = parseValue(valueText);
