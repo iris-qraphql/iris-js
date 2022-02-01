@@ -6,7 +6,6 @@ import type {
   ThunkObjMap,
 } from 'graphql';
 import {
-  specifiedScalarTypes,
   GraphQLBoolean,
   GraphQLList,
   GraphQLNonNull,
@@ -14,6 +13,7 @@ import {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
+  specifiedScalarTypes,
 } from 'graphql';
 import type { ObjMap } from 'graphql/jsutils/ObjMap';
 
