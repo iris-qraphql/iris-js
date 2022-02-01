@@ -50,13 +50,13 @@ export {
   assertDirective,
   getNamedType,
   validateSchema,
+  IrisResolverType,
 } from './type/index';
 
 export type {
   GraphQLType,
   GraphQLInputType,
-  IrisResolverType,
-  GraphQLNamedType,
+  IrisNamedType,
   GraphQLSchemaConfig,
   GraphQLDirectiveConfig,
   GraphQLDirectiveExtensions,
