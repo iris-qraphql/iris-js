@@ -1,6 +1,14 @@
-import type { GraphQLFieldResolver } from 'graphql';
-import { assertName, Kind, valueFromASTUntyped } from 'graphql';
-import { contains, identity, pluck } from 'ramda';
+import type { GraphQLFieldResolver, GraphQLScalarType } from 'graphql';
+import {
+  assertName,
+  GraphQLBoolean,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLString,
+  Kind,
+} from 'graphql';
+import { pluck } from 'ramda';
 
 import { inspect } from '../jsutils/inspect';
 import { instanceOf } from '../jsutils/instanceOf';
@@ -24,6 +32,14 @@ import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
 import type { ConfigMap, ConfigMapValue, Override } from '../utils/type-level';
+
+export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({
+  String: GraphQLString,
+  Int: GraphQLInt,
+  Float: GraphQLFloat,
+  Bool: GraphQLBoolean,
+  ID: GraphQLID,
+});
 
 export const unfoldConfigMap =
   <T>(f: (k: string, v: ConfigMapValue<T>) => T) =>
@@ -317,12 +333,9 @@ export class IrisResolverType<TSource = any, TContext = any>
 type IrisDataTypeConfig<I, O> = Readonly<{
   name: string;
   description?: Maybe<string>;
-  astNode?: Maybe<DataTypeDefinitionNode>;
   variants?: ReadonlyArray<IrisDataVariantConfig>;
-  isPrimitive?: boolean;
-  serialize?: DataSerializer<O>;
-  parseValue?: DataParser<I>;
-  parseLiteral?: DataLiteralParser<I>;
+  scalar?: GraphQLScalarType<I, O>;
+  astNode?: Maybe<DataTypeDefinitionNode>;
 }>;
 
 const resolveField = (
@@ -355,8 +368,6 @@ const resolveVariant = ({
   astNode,
   toJSON: () => name,
 });
-
-const PRIMITIVES = ['Int', 'Boolean', 'String', 'Float'];
 
 const lookupVariant = <V extends { name: string }>(
   typeName: string,
@@ -402,29 +413,20 @@ const assertString = (type: string, value: unknown): string => {
 export class IrisDataType<I = unknown, O = I> {
   name: string;
   description: Maybe<string>;
-  astNode: Maybe<DataTypeDefinitionNode>;
-  isPrimitive: boolean;
-
-  #serialize: DataSerializer<O>;
-  #parseValue: DataParser<I>;
-  #parseLiteral: DataLiteralParser<I>;
   #variants: ReadonlyArray<IrisDataVariantConfig>;
+  #scalar?: GraphQLScalarType;
+  astNode: Maybe<DataTypeDefinitionNode>;
 
   constructor(config: IrisDataTypeConfig<I, O>) {
     this.astNode = config.astNode;
     this.name = assertName(config.name);
     this.description = config.description;
     this.#variants = config.variants ?? [];
-    this.isPrimitive =
-      Boolean(config.isPrimitive) ||
-      contains(this.#variants[0]?.name, PRIMITIVES);
+    this.#scalar = config.scalar ?? stdScalars[this.#variants[0]?.name];
+  }
 
-    const parseValue = config.parseValue ?? (identity as DataParser<I>);
-    this.#serialize = config.serialize ?? (identity as DataParser<O>);
-    this.#parseValue = parseValue;
-    this.#parseLiteral =
-      config.parseLiteral ??
-      ((node, variables) => parseValue(valueFromASTUntyped(node, variables)));
+  get isPrimitive() {
+    return Boolean(this.#scalar);
   }
 
   get [Symbol.toStringTag]() {
@@ -435,10 +437,8 @@ export class IrisDataType<I = unknown, O = I> {
 
   toJSON = (): string => this.toString();
 
-  isVariantType = () => {
-    const [variant, ...xs] = this.#variants;
-    return variant?.name === this.name && xs.length === 0;
-  };
+  isVariantType = () =>
+    this.#variants[0]?.name === this.name && this.#variants.length === 1;
 
   variants = (): ReadonlyArray<IrisDataVariant> =>
     this.#variants.map(resolveVariant);
@@ -446,25 +446,19 @@ export class IrisDataType<I = unknown, O = I> {
   variantBy = (name?: string): IrisDataVariant =>
     resolveVariant(lookupVariant(this.name, this.#variants, name));
 
-  serialize(value: unknown): Maybe<any> {
-    if (this.isPrimitive) {
-      return this.#serialize(value);
-    }
+  serialize = (value: unknown): Maybe<any> =>
+    this.#scalar
+      ? this.#scalar.serialize(value)
+      : this.variantBy(assertString(this.name, value))?.name;
 
-    return this.variantBy(assertString(this.name, value))?.name;
-  }
-
-  parseValue(value: unknown): Maybe<any> {
-    if (this.isPrimitive) {
-      return this.#parseValue(value);
-    }
-
-    return this.variantBy(assertString(this.name, value))?.name;
-  }
+  parseValue = (value: unknown): Maybe<any> =>
+    this.#scalar
+      ? this.#scalar.parseValue(value)
+      : this.variantBy(assertString(this.name, value))?.name;
 
   parseLiteral(valueNode: ValueNode): Maybe<any> {
-    if (this.isPrimitive) {
-      return this.#parseLiteral(valueNode);
+    if (this.#scalar) {
+      return this.#scalar.parseLiteral(valueNode);
     }
 
     // Note: variables will be resolved to a value before calling this function.

@@ -1,9 +1,9 @@
+import type { GraphQLScalarTypeConfig } from 'graphql';
+import { GraphQLScalarType } from 'graphql';
+
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
-  DataLiteralParser,
-  DataParser,
-  DataSerializer,
   IrisDataVariantField,
   IrisFieldConfig,
   IrisResolverVariantConfig,
@@ -65,16 +65,12 @@ const gqlUnion = ({ name, types }: GQLUnion) =>
     ),
   });
 
-type GQLScalar<I = unknown, O = I> = {
-  name: string;
-  description?: string;
-  serialize?: DataSerializer<O>;
-  parseValue?: DataParser<I>;
-  parseLiteral?: DataLiteralParser<I>;
-};
-
-const gqlScalar = <T>(x: GQLScalar<T>) =>
-  new IrisDataType<T>({ ...x, isPrimitive: true });
+const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>
+  new IrisDataType<I, O>({
+    name: config.name,
+    description: config.description,
+    scalar: new GraphQLScalarType(config),
+  });
 
 export const maybe = <T extends IrisType>(ofType: T) =>
   new IrisTypeRef('MAYBE', ofType);
