@@ -20,8 +20,7 @@ export {
 export type {
   IrisType,
   IrisStrictType as GraphQLInputType,
-
-  IrisNamedType ,
+  IrisNamedType,
   GraphQLArgument,
   IrisDataVariant,
   GraphQLField,

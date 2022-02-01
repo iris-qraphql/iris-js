@@ -122,12 +122,8 @@ export const getNullableType = (
 export function getNamedType(type: undefined | null): void;
 export function getNamedType(type: IrisStrictType): IrisDataType;
 export function getNamedType(type: IrisType): IrisNamedType;
-export function getNamedType(
-  type: Maybe<IrisType>,
-): IrisNamedType | undefined;
-export function getNamedType(
-  type: Maybe<IrisType>,
-): IrisNamedType | undefined {
+export function getNamedType(type: Maybe<IrisType>): IrisNamedType | undefined;
+export function getNamedType(type: Maybe<IrisType>): IrisNamedType | undefined {
   if (type) {
     let unwrappedType = type;
     while (isTypeRef(unwrappedType)) {

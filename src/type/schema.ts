@@ -7,11 +7,7 @@ import type { ObjMap } from '../jsutils/ObjMap';
 
 import type { GraphQLError } from '../error';
 
-import type {
-  IrisNamedType,
-  IrisResolverType,
-  IrisType,
-} from './definition';
+import type { IrisNamedType, IrisResolverType, IrisType } from './definition';
 import { getNamedType, isDataType, isResolverType } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective, specifiedDirectives } from './directives';
