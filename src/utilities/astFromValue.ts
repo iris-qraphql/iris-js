@@ -11,7 +11,7 @@ import type {
 } from '../language/ast';
 
 import type {
-  GraphQLInputType,
+  IrisStrictType,
   IrisDataType,
   IrisDataVariant,
 } from '../type/definition';
@@ -41,7 +41,7 @@ import { IrisID } from '../type/scalars';
  */
 export function astFromValue(
   value: unknown,
-  type: GraphQLInputType,
+  type: IrisStrictType,
 ): Maybe<ValueNode> {
   if (isTypeRef(type)) {
     const itemType = type.ofType;

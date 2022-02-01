@@ -11,9 +11,9 @@ import type { ConfigMapValue } from '../../utils/type-level';
 import type {
   GraphQLArgument,
   GraphQLFieldConfig,
-  GraphQLInputType,
-  GraphQLOutputType,
   IrisNamedType,
+  IrisStrictType,
+  IrisType,
   IrisTypeRef,
 } from '../definition';
 import { assertDataType, assertResolverType } from '../definition';
@@ -53,7 +53,7 @@ function withModifiers<T extends IrisNamedType>(
   return [type, gqlList(type), maybe(type), maybe(gqlList(type))];
 }
 
-const outputTypes: ReadonlyArray<GraphQLOutputType> = [
+const outputTypes: ReadonlyArray<IrisType> = [
   ...withModifiers(IrisString),
   ...withModifiers(SomeScalarType),
   ...withModifiers(SomeEnumType),
@@ -61,19 +61,19 @@ const outputTypes: ReadonlyArray<GraphQLOutputType> = [
   ...withModifiers(SomeUnionType),
 ];
 
-const inputTypes: ReadonlyArray<GraphQLInputType> = [
+const inputTypes: ReadonlyArray<IrisStrictType> = [
   ...withModifiers(IrisString),
   ...withModifiers(SomeScalarType),
   ...withModifiers(SomeEnumType),
   ...withModifiers(SomeInputObjectType),
 ];
 
-const notInputTypes: ReadonlyArray<GraphQLOutputType> = [
+const notInputTypes: ReadonlyArray<IrisType> = [
   ...withModifiers(SomeObjectType),
   ...withModifiers(SomeUnionType),
 ];
 
-function schemaWithFieldType(type: GraphQLOutputType): IrisSchema {
+function schemaWithFieldType(type: IrisType): IrisSchema {
   return new IrisSchema({
     query: gqlObject({
       name: 'Query',

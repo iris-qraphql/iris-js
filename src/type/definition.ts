@@ -33,10 +33,9 @@ export const unfoldConfigMap =
 // Predicates & Assertions
 
 export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
-export type GraphQLInputType = IrisDataType | IrisTypeRef<GraphQLInputType>;
-export type GraphQLOutputType = IrisType;
+export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
 
-export const isInputType = (type: unknown): type is GraphQLInputType =>
+export const isInputType = (type: unknown): type is IrisStrictType =>
   isDataType(type) || (isTypeRef(type) && isInputType(type.ofType));
 
 export const isType = (type: unknown): type is IrisType =>
@@ -121,7 +120,7 @@ export const getNullableType = (
 };
 
 export function getNamedType(type: undefined | null): void;
-export function getNamedType(type: GraphQLInputType): IrisDataType;
+export function getNamedType(type: IrisStrictType): IrisDataType;
 export function getNamedType(type: IrisType): IrisNamedType;
 export function getNamedType(
   type: Maybe<IrisType>,
@@ -163,7 +162,7 @@ export type DataLiteralParser<I> = (
 // ARGUMENTS
 
 export type GraphQLArgument = IrisEntity & {
-  type: GraphQLInputType;
+  type: IrisStrictType;
   defaultValue?: unknown;
   astNode?: Maybe<ArgumentDefinitionNode>;
 };
@@ -188,7 +187,7 @@ export const defineArguments = unfoldConfigMap<GraphQLArgument>(
 export type GraphQLFieldConfig<TSource, TContext, TArgs = any> = {
   description?: Maybe<string>;
   deprecationReason?: Maybe<string>;
-  type: GraphQLOutputType;
+  type: IrisType;
   args?: ConfigMap<GraphQLArgument>;
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
@@ -200,7 +199,7 @@ export type GraphQLField<
   TContext = unknown,
   TArgs = any,
 > = IrisEntity & {
-  type: GraphQLOutputType;
+  type: IrisType;
   args: ReadonlyArray<GraphQLArgument>;
   resolve?: GraphQLFieldResolver<TSource, TContext, TArgs>;
   subscribe?: GraphQLFieldResolver<TSource, TContext, TArgs>;
@@ -208,7 +207,7 @@ export type GraphQLField<
 };
 
 export type IrisDataVariantField = IrisEntity & {
-  type: GraphQLInputType;
+  type: IrisStrictType;
   astNode?: Maybe<DataFieldDefinitionNode>;
 };
 

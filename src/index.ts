@@ -54,7 +54,6 @@ export {
 } from './type/index';
 
 export type {
-  GraphQLType,
   GraphQLInputType,
   IrisNamedType,
   GraphQLSchemaConfig,

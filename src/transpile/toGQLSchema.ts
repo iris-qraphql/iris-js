@@ -4,6 +4,7 @@ import {
   GraphQLNamedType,
   GraphQLSchemaConfig,
   ThunkObjMap,
+  GraphQLOutputType,
 } from 'graphql';
 import {
   GraphQLObjectType,
@@ -15,23 +16,27 @@ import type { ObjMap } from 'graphql/jsutils/ObjMap';
 import { map } from 'ramda';
 import { mapValue } from '../jsutils/ObjMap';
 
-import type {
+import {
   IrisNamedType,
   IrisResolverType,
   IrisResolverVariant,
   GraphQLField,
+  IrisType,
+  isTypeRef,
+  isResolverType,
+  IrisDataType,
 } from '../type/definition';
 import { isDataType } from '../type/definition';
 import type { IrisSchema } from '../type/schema';
 
 export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
-  const types = Object.values(schema.getTypeMap()).map(transpileType);
+  const types = Object.values(schema.getTypeMap()).map(transpileTypeDefinition);
 
   const config: GraphQLSchemaConfig = {
     description: schema.description,
-    query: transpileRootType(schema.getQueryType()),
-    mutation: transpileRootType(schema.getMutationType()),
-    subscription: transpileRootType(schema.getSubscriptionType()),
+    query: transpileRootTypeDefinition(schema.getQueryType()),
+    mutation: transpileRootTypeDefinition(schema.getMutationType()),
+    subscription: transpileRootTypeDefinition(schema.getSubscriptionType()),
     types,
     directives: [],
   };
@@ -39,22 +44,28 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   return new GraphQLSchema(config);
 };
 
-const transpileRootType = (
+const transpileRootTypeDefinition = (
   type?: IrisResolverType,
 ): GraphQLObjectType | undefined =>
-  type ? (transpileResolver(type) as GraphQLObjectType) : undefined;
+  type ? (transpileResolverDefinition(type) as GraphQLObjectType) : undefined;
 
-const transpileType = (type: IrisNamedType): GraphQLNamedType => {
-  const { name } = type;
+const transpileTypeDefinition = (type: IrisNamedType): GraphQLNamedType => {
 
   if (isDataType(type)) {
-    return new GraphQLScalarType({ name });
+    return transpileDataDefinition(type)
   }
 
-  return transpileResolver(type);
+  return transpileResolverDefinition(type);
 };
 
-const transpileResolver = (
+const transpileDataDefinition = (
+  type: IrisDataType,
+): GraphQLScalarType => {
+  const { name } = type;
+  return new GraphQLScalarType({ name });
+};
+
+const transpileResolverDefinition = (
   type: IrisResolverType,
 ): GraphQLObjectType | GraphQLUnionType => {
   const { name, description } = type;
@@ -96,6 +107,18 @@ const transpileField = (
 
   return {
     description,
-    type: type,
+    type: transpileType(type),
   };
+};
+
+const transpileType = (type: IrisType): GraphQLOutputType => {
+  if (isTypeRef(type)) {
+    return { ofType: type.ofType };
+  }
+
+  if (isDataType(type)) {
+    return transpileDataDefinition(type)
+  }
+
+  return transpileResolverDefinition(type);
 };
