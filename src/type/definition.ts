@@ -164,9 +164,8 @@ export type IrisArgument = IrisEntity & {
   astNode?: Maybe<ArgumentDefinitionNode>;
 };
 
-export function isRequiredArgument(arg: IrisArgument): boolean {
-  return !isMaybeType(arg.type) && arg.defaultValue === undefined;
-}
+export const isRequiredArgument = (arg: IrisArgument): boolean =>
+  !isMaybeType(arg.type) && arg.defaultValue === undefined;
 
 export const defineArguments = unfoldConfigMap<IrisArgument>(
   (name, { description, type, defaultValue, deprecationReason, astNode }) => ({
@@ -178,8 +177,6 @@ export const defineArguments = unfoldConfigMap<IrisArgument>(
     astNode,
   }),
 );
-
-// FIELDS
 
 export type IrisFieldConfig = {
   description?: Maybe<string>;
@@ -205,9 +202,9 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   type?: R extends 'resolver' ? IrisResolverType : never;
 };
 
-export type IrisDataVariantConfig = Override<
-  IrisVariant<'data'>,
-  { fields?: Thunk<ConfigMap<IrisField<'data'>>> }
+export type IrisVariantConfig<R extends Role> = Override<
+  IrisVariant<R>,
+  { fields?: Thunk<ConfigMap<IrisField<R>>> }
 >;
 
 export type IrisResolverVariantConfig = IrisEntity & {
@@ -265,7 +262,7 @@ const buildDataVariant = ({
   deprecationReason,
   fields,
   astNode,
-}: IrisDataVariantConfig): IrisVariant<'data'> => ({
+}: IrisVariantConfig<'data'>): IrisVariant<'data'> => ({
   name,
   description,
   deprecationReason,
@@ -313,7 +310,7 @@ export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
 type IrisDataTypeConfig<I, O> = Readonly<{
   name: string;
   description?: Maybe<string>;
-  variants?: ReadonlyArray<IrisDataVariantConfig>;
+  variants?: ReadonlyArray<IrisVariantConfig<'data'>>;
   scalar?: GraphQLScalarType<I, O>;
   astNode?: Maybe<DataTypeDefinitionNode>;
 }>;
@@ -378,7 +375,7 @@ const assertString = (type: string, value: unknown): string => {
 export class IrisDataType<I = unknown, O = I> {
   name: string;
   description: Maybe<string>;
-  #variants: ReadonlyArray<IrisDataVariantConfig>;
+  #variants: ReadonlyArray<IrisVariantConfig<'data'>>;
   #scalar?: GraphQLScalarType;
   astNode: Maybe<DataTypeDefinitionNode>;
 

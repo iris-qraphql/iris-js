@@ -22,12 +22,12 @@ import { isTypeDefinitionNode } from '../language/predicates';
 
 import type {
   IrisArgument,
-  IrisDataVariantConfig,
   IrisField,
   IrisFieldConfig,
   IrisNamedType,
   IrisResolverVariantConfig,
   IrisType,
+  IrisVariantConfig,
 } from '../type/definition';
 import {
   IrisDataType,
@@ -174,7 +174,7 @@ export function buildASTSchema(
 
   function resolveDataVariant(
     value: VariantDefinitionNode,
-  ): IrisDataVariantConfig {
+  ): IrisVariantConfig<'data'> {
     return {
       name: value.name.value,
       description: value.description?.value,

@@ -6,8 +6,8 @@ import { keyMap } from '../jsutils/ObjMap';
 
 import type { ObjectValueNode, ValueNode } from '../language/ast';
 
-import type { IrisStrictType, IrisVariant} from '../type/definition';
-import { isMaybeType , isTypeRef } from '../type/definition';
+import type { IrisStrictType, IrisVariant } from '../type/definition';
+import { isMaybeType, isTypeRef } from '../type/definition';
 
 /**
  * Produces a JavaScript value given a GraphQL Value AST.
