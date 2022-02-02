@@ -155,7 +155,7 @@ export type Thunk<T> = (() => T) | T;
 const isThunk = <T>(thunk: Thunk<T>): thunk is () => T =>
   typeof thunk === 'function';
 
-const resolveThunk = <T>(thunk: Thunk<T>): T =>
+export const resolveThunk = <T>(thunk: Thunk<T>): T =>
   isThunk(thunk) ? thunk() : thunk;
 
 export type IrisArgument = IrisEntity & {
@@ -204,19 +204,19 @@ export type IrisVariant<R extends Role> = IrisEntity & {
 
 export type IrisVariantConfig<R extends Role> = Override<
   IrisVariant<R>,
-  { fields?: Thunk<ConfigMap<IrisField<R>>> }
+  { fields?: ConfigMap<IrisField<R>> }
 >;
 
 export type IrisResolverVariantConfig = IrisEntity & {
-  fields?: ThunkObjMap<IrisFieldConfig>;
-  type?: () => IrisResolverType;
+  fields?: ConfigMap<IrisFieldConfig>;
+  type?: IrisResolverType;
   astNode?: _VariantDefinitionNode<'resolver'>;
 };
 
 export type IrisResolverTypeConfig = {
   name: string;
   description?: Maybe<string>;
-  variants: ReadonlyArray<IrisResolverVariantConfig>;
+  variants: Thunk<ReadonlyArray<IrisResolverVariantConfig>>;
   astNode?: Maybe<ResolverTypeDefinitionNode>;
 };
 
@@ -248,10 +248,8 @@ const buildResolverVariant = ({
   name,
   description,
   deprecationReason,
-  fields: fields
-    ? mapValue(resolveThunk(fields), defineResolverField)
-    : undefined,
-  type: type?.(),
+  fields: fields ? mapValue(fields, defineResolverField) : undefined,
+  type,
   astNode,
   toJSON: () => name,
 });
@@ -262,11 +260,13 @@ const buildDataVariant = ({
   deprecationReason,
   fields,
   astNode,
+  type,
 }: IrisVariantConfig<'data'>): IrisVariant<'data'> => ({
   name,
   description,
   deprecationReason,
   fields: fields ? mapValue(resolveThunk(fields), resolveField) : undefined,
+  type,
   astNode,
   toJSON: () => name,
 });
@@ -275,32 +275,40 @@ export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
   name: string;
   description: Maybe<string>;
   astNode: Maybe<ResolverTypeDefinitionNode>;
-  #variants: ReadonlyArray<IrisResolverVariantConfig>;
-  #isVariantType: boolean;
+  #thunkVariants: () => ReadonlyArray<IrisResolverVariantConfig>;
+  #resolverdVariants?: ReadonlyArray<IrisVariant<'resolver'>>;
 
   constructor(config: Readonly<IrisResolverTypeConfig>) {
     this.name = assertName(config.name);
     this.description = config.description;
     this.astNode = config.astNode;
-    this.#isVariantType =
-      config.variants.length === 0 ||
-      (config.variants.length === 1 &&
-        config.variants[0]?.name === config.name &&
-        config.variants[0]?.fields !== undefined);
-    this.#variants = config.variants;
+    this.#thunkVariants = () => resolveThunk(config.variants);
   }
 
   get [Symbol.toStringTag]() {
     return 'IrisResolverType';
   }
 
-  isVariantType = (): boolean => this.#isVariantType;
+  isVariantType = (): boolean => {
+    const variants = this.variants();
+    return (
+      variants.length === 0 ||
+      (variants.length === 1 &&
+        variants[0]?.name === this.name &&
+        variants[0]?.fields !== undefined)
+    );
+  };
 
-  variants = (): ReadonlyArray<IrisVariant<'resolver'>> =>
-    this.#variants.map(buildResolverVariant);
+  variants = (): ReadonlyArray<IrisVariant<'resolver'>> => {
+    if (this.#resolverdVariants) {
+      return this.#resolverdVariants;
+    }
+    this.#resolverdVariants = this.#thunkVariants().map(buildResolverVariant);
 
-  variantBy = (): IrisVariant<'resolver'> =>
-    buildResolverVariant(this.#variants[0]);
+    return this.#resolverdVariants;
+  };
+
+  variantBy = (): IrisVariant<'resolver'> => this.variants()[0];
 
   toString = (): string => this.name;
 

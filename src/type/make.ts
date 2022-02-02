@@ -8,9 +8,14 @@ import type {
   IrisFieldConfig,
   IrisResolverVariantConfig,
   IrisType,
-  ThunkObjMap,
+  Thunk,
 } from './definition';
-import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
+import {
+  IrisDataType,
+  IrisResolverType,
+  IrisTypeRef,
+  resolveThunk,
+} from './definition';
 
 type InputC = {
   name: string;
@@ -39,13 +44,13 @@ const gqlEnum = (name: string, values: Array<string>) =>
 type GQLObject = {
   name: string;
   description?: string;
-  fields: ThunkObjMap<IrisFieldConfig>;
+  fields: Thunk<ObjMap<IrisFieldConfig>>;
 };
 
 const gqlObject = ({ name, fields, description }: GQLObject) =>
   new IrisResolverType({
     name,
-    variants: [{ name, description, fields }],
+    variants: () => [{ name, description, fields: resolveThunk(fields) }],
     description,
   });
 
@@ -57,12 +62,13 @@ type GQLUnion = {
 const gqlUnion = ({ name, types }: GQLUnion) =>
   new IrisResolverType({
     name,
-    variants: types.map(
-      (type): IrisResolverVariantConfig => ({
-        name: type.name,
-        type: () => type,
-      }),
-    ),
+    variants: () =>
+      types.map(
+        (type): IrisResolverVariantConfig => ({
+          name: type.name,
+          type,
+        }),
+      ),
   });
 
 const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>
