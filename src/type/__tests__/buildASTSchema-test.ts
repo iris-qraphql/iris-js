@@ -1,16 +1,16 @@
 import { IrisKind } from '../../language/kinds';
 
-import { assertDataType, assertResolverType } from '../../type/definition';
-import { GraphQLDeprecatedDirective } from '../../type/directives';
+import { assertDataType, assertResolverType } from '../definition';
+import { GraphQLDeprecatedDirective } from '../directives';
 import {
   IrisBool,
   IrisFloat,
   IrisID,
   IrisInt,
   IrisString,
-} from '../../type/scalars';
-import { IrisSchema } from '../../type/schema';
-import { validateSchema } from '../../type/validate';
+} from '../scalars';
+import { IrisSchema } from '../schema';
+import { validateSchema } from '../validate';
 
 import { dedent } from '../../utils/dedent';
 

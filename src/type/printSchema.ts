@@ -13,12 +13,12 @@ import type {
   IrisNamedType,
   IrisResolverType,
   IrisVariant,
-} from '../type/definition';
-import { isResolverType } from '../type/definition';
-import type { GraphQLDirective } from '../type/directives';
-import { isSpecifiedDirective } from '../type/directives';
-import { isSpecifiedScalarType } from '../type/scalars';
-import type { IrisSchema } from '../type/schema';
+} from './definition';
+import { isResolverType } from './definition';
+import type { GraphQLDirective } from './directives';
+import { isSpecifiedDirective } from './directives';
+import { isSpecifiedScalarType } from './scalars';
+import type { IrisSchema } from './schema';
 
 import { astFromValue } from '../conversion/astFromValue';
 

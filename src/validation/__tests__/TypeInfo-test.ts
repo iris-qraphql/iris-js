@@ -3,7 +3,7 @@ import { visit } from '../../language/visitor';
 
 import { IrisSchema } from '../../type/schema';
 
-import { buildSchema } from '../../utilities/buildASTSchema';
+import { buildSchema } from '../../type/buildASTSchema';
 
 import { TypeInfo, visitWithTypeInfo } from '../TypeInfo';
 

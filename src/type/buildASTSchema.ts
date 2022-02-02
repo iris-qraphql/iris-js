@@ -27,26 +27,25 @@ import type {
   IrisResolverVariantConfig,
   IrisType,
   IrisVariant,
-} from '../type/definition';
+} from './definition';
 import {
   IrisDataType,
   IrisResolverType,
   IrisTypeRef,
-} from '../type/definition';
+} from './definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,
-} from '../type/directives';
-import { specifiedScalarTypes } from '../type/scalars';
-import type { IrisSchemaValidationOptions } from '../type/schema';
-import { IrisSchema } from '../type/schema';
+} from './directives';
+import { specifiedScalarTypes } from './scalars';
+import type { IrisSchemaValidationOptions } from './schema';
+import { IrisSchema } from './schema';
 
 import { validateSDL } from '../validation/validate';
 
 import { valueFromAST } from '../conversion/valueFromAST';
+import { getDirectiveValues } from '../conversion/values';
 import type { ConfigMap } from '../utils/type-level';
-
-import { getDirectiveValues } from './values';
 
 export function buildSchema(
   source: string | Source,

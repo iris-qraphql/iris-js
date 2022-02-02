@@ -1,6 +1,6 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import { printSchema } from '../../utilities/printSchema';
+import { printSchema } from '../printSchema';
 
 import { dedent } from '../../utils/dedent';
 

@@ -12,8 +12,9 @@ import type { IrisField } from '../type/definition';
 import { isMaybeType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 
-import { valueFromAST } from '../conversion/valueFromAST';
 import { GraphQLError } from '../error';
+
+import { valueFromAST } from './valueFromAST';
 
 function getArgumentValues(
   def: IrisField<'resolver'> | GraphQLDirective,

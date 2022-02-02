@@ -2,7 +2,7 @@ import { inspect } from '../../jsutils/inspect';
 
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import { buildSchema } from '../../utilities/buildASTSchema';
+import { buildSchema } from '../buildASTSchema';
 
 import { GraphQLError } from '../../error';
 import { toJSONDeep } from '../../utils/toJSONDeep';

@@ -1,10 +1,10 @@
 // Gets the Type for the target Operation AST.
 
 // Build a IrisSchema from GraphQL Schema language.
-export { buildASTSchema, buildSchema } from './buildASTSchema';
+export { buildASTSchema, buildSchema } from '../type/buildASTSchema';
 
 // Print a IrisSchema to GraphQL Schema language.
-export { printSchema, printType } from './printSchema';
+export { printSchema, printType } from '../type/printSchema';
 
 // Create a JavaScript value from a GraphQL language AST with a type.
 export { valueFromAST } from '../conversion/valueFromAST';

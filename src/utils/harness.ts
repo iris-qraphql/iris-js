@@ -7,7 +7,7 @@ import type { IrisSchema } from '../type/schema';
 import { validateSDL } from '../validation/validate';
 import type { SDLValidationRule } from '../validation/ValidationContext';
 
-import { buildSchema } from '../utilities/buildASTSchema';
+import { buildSchema } from '../type/buildASTSchema';
 
 import { toJSONDeep } from './toJSONDeep';
 
