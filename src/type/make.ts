@@ -4,7 +4,7 @@ import { GraphQLScalarType } from 'graphql';
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
-  IrisDataVariantField,
+  IrisField,
   IrisFieldConfig,
   IrisResolverVariantConfig,
   IrisType,
@@ -14,7 +14,7 @@ import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
 
 type InputC = {
   name: string;
-  fields: ObjMap<Omit<IrisDataVariantField, 'name'>>;
+  fields: ObjMap<Omit<IrisField<'data'>, 'name'>>;
 };
 
 export const emptyDataType = (name: string) => new IrisDataType({ name });

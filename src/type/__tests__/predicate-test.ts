@@ -3,7 +3,7 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 import type { IrisArgument, IrisStrictType } from '../definition';
 import {
   getNamedType,
-  getNullableType,
+  getRequiredType,
   isDataType,
   isInputType,
   isListType,
@@ -193,16 +193,16 @@ describe('Type predicates', () => {
     });
   });
 
-  describe('getNullableType', () => {
+  describe('getRequiredType', () => {
     it('returns undefined for no type', () => {
-      expect(getNullableType(undefined)).toEqual(undefined);
-      expect(getNullableType(null)).toEqual(undefined);
+      expect(getRequiredType(undefined)).toEqual(undefined);
+      expect(getRequiredType(null)).toEqual(undefined);
     });
 
     it('unwraps maybe type', () => {
-      expect(getNullableType(maybe(ObjectType))).toEqual(ObjectType);
+      expect(getRequiredType(maybe(ObjectType))).toEqual(ObjectType);
       const listOfObj = gqlList(ObjectType);
-      expect(getNullableType(maybe(listOfObj))).toEqual(listOfObj);
+      expect(getRequiredType(maybe(listOfObj))).toEqual(listOfObj);
     });
   });
 

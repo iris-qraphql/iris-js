@@ -113,10 +113,6 @@ export const isTypeRef = <T extends IrisType>(
   type: unknown,
 ): type is IrisTypeRef<T> => instanceOf(type, IrisTypeRef);
 
-export const isNonNullType = (
-  type: unknown,
-): type is IrisTypeRef<IrisNamedType> => !isMaybeType(type);
-
 export const isMaybeType = (
   type: unknown,
 ): type is IrisTypeRef<IrisNamedType> =>
@@ -125,7 +121,7 @@ export const isMaybeType = (
 export const isListType = (type: unknown): type is IrisTypeRef<IrisType> =>
   isTypeRef(type) && type.kind === 'LIST';
 
-export const getNullableType = (
+export const getRequiredType = (
   type: Maybe<IrisType>,
 ): IrisType | undefined => {
   if (type) {
@@ -193,7 +189,7 @@ export type IrisFieldConfig = {
   astNode?: FieldDefinitionNode;
 };
 
-export type IrisVariantField<R extends Role> = IrisEntity & {
+export type IrisField<R extends Role> = IrisEntity & {
   type: R extends 'data' ? IrisStrictType : IrisType;
   astNode?: R extends 'data' ? DataFieldDefinitionNode : FieldDefinitionNode;
 } & (R extends 'resolver'
@@ -202,19 +198,16 @@ export type IrisVariantField<R extends Role> = IrisEntity & {
       }
     : {});
 
-export type IrisDataVariantField = IrisVariantField<'data'>;
-export type IrisResolverVariantField = IrisVariantField<'resolver'>;
-
 export type IrisVariant<R extends Role> = IrisEntity & {
   astNode?: _VariantDefinitionNode<R>;
   toJSON?: () => string;
-  fields?: ObjMap<IrisVariantField<R>>;
+  fields?: ObjMap<IrisField<R>>;
   type?: R extends 'resolver' ? IrisResolverType : never;
 };
 
 export type IrisDataVariantConfig = Override<
   IrisVariant<'data'>,
-  { fields?: Thunk<ConfigMap<IrisDataVariantField>> }
+  { fields?: Thunk<ConfigMap<IrisField<'data'>>> }
 >;
 
 export type IrisResolverVariantConfig = IrisEntity & {
@@ -238,7 +231,7 @@ type IrisTypeDef<T> = {
 const defineResolverField = (
   fieldConfig: IrisFieldConfig,
   fieldName: string,
-): IrisResolverVariantField => ({
+): IrisField<'resolver'> => ({
   name: assertName(fieldName),
   description: fieldConfig.description,
   type: fieldConfig.type,
@@ -331,7 +324,7 @@ const resolveField = (
     type,
     deprecationReason,
     astNode,
-  }: ConfigMapValue<IrisDataVariantField>,
+  }: ConfigMapValue<IrisField<'data'>>,
   fieldName: string,
 ) => ({
   name: assertName(fieldName),

@@ -23,7 +23,7 @@ import { isTypeDefinitionNode } from '../language/predicates';
 import type {
   IrisArgument,
   IrisDataVariantConfig,
-  IrisDataVariantField,
+  IrisField,
   IrisFieldConfig,
   IrisNamedType,
   IrisResolverVariantConfig,
@@ -151,7 +151,7 @@ export function buildASTSchema(
   ): ObjMap<IrisFieldConfig>;
   function buildFieldMap(
     fields: ReadonlyArray<DataFieldDefinitionNode>,
-  ): ObjMap<IrisDataVariantField>;
+  ): ObjMap<IrisField<'data'>>;
   function buildFieldMap(
     fields: ReadonlyArray<FieldDefinitionNode>,
   ): ObjMap<IrisFieldConfig> {

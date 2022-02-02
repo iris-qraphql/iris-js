@@ -9,10 +9,9 @@ import { print } from '../language/printer';
 import type {
   IrisArgument,
   IrisDataType,
-  IrisDataVariantField,
+  IrisField,
   IrisNamedType,
   IrisResolverType,
-  IrisResolverVariantField,
   IrisVariant,
 } from '../type/definition';
 import { isResolverType } from '../type/definition';
@@ -108,7 +107,7 @@ const printDataVariant = (variant: IrisVariant<'data'>): string =>
   printDeprecated(variant.deprecationReason) +
   (variant.fields ? ' ' + printDataFields(Object.values(variant.fields)) : '');
 
-const printDataFields = (fields: ReadonlyArray<IrisDataVariantField>): string =>
+const printDataFields = (fields: ReadonlyArray<IrisField<'data'>>): string =>
   printBlock(
     fields.map(
       (f, i) =>
@@ -121,7 +120,7 @@ const printDataFields = (fields: ReadonlyArray<IrisDataVariantField>): string =>
     ),
   );
 
-const printFields = (fs: ReadonlyArray<IrisResolverVariantField>): string => {
+const printFields = (fs: ReadonlyArray<IrisField<'resolver'>>): string => {
   const fields = fs.map(
     (f, i) =>
       printDescription(f, '  ', !i) +

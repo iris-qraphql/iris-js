@@ -8,8 +8,8 @@ import { keyMap } from '../jsutils/ObjMap';
 import type { DirectiveNode } from '../language/ast';
 import { print } from '../language/printer';
 
-import type { IrisResolverVariantField } from '../type/definition';
-import { isNonNullType } from '../type/definition';
+import type { IrisField } from '../type/definition';
+import { isMaybeType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 
 import { GraphQLError } from '../error';
@@ -17,7 +17,7 @@ import { GraphQLError } from '../error';
 import { valueFromAST } from './valueFromAST';
 
 function getArgumentValues(
-  def: IrisResolverVariantField | GraphQLDirective,
+  def: IrisField<'resolver'> | GraphQLDirective,
   node: DirectiveNode,
   variableValues?: Maybe<ObjMap<unknown>>,
 ): Record<string, unknown> {
@@ -35,7 +35,7 @@ function getArgumentValues(
     if (!argumentNode) {
       if (argDef.defaultValue !== undefined) {
         coercedValues[name] = argDef.defaultValue;
-      } else if (isNonNullType(argType)) {
+      } else if (!isMaybeType(argType)) {
         throw new GraphQLError(
           `Argument "${name}" of required type "${inspect(argType)}" ` +
             'was not provided.',
@@ -56,7 +56,7 @@ function getArgumentValues(
       ) {
         if (argDef.defaultValue !== undefined) {
           coercedValues[name] = argDef.defaultValue;
-        } else if (isNonNullType(argType)) {
+        } else if (!isMaybeType(argType)) {
           throw new GraphQLError(
             `Argument "${name}" of required type "${inspect(argType)}" ` +
               `was provided the variable "$${variableName}" which was not provided a runtime value.`,
@@ -68,7 +68,7 @@ function getArgumentValues(
       isNull = variableValues[variableName] == null;
     }
 
-    if (isNull && isNonNullType(argType)) {
+    if (isNull && !isMaybeType(argType)) {
       throw new GraphQLError(
         `Argument "${name}" of non-null type "${inspect(argType)}" ` +
           'must not be null.',
