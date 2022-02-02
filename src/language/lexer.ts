@@ -38,8 +38,7 @@ export class Lexer {
   lineStart: number;
 
   constructor(source: Source) {
-    // @ts-expect-error
-    const startOfFileToken = new Token(TokenKind.SOF, 0, 0, 0, 0);
+    const startOfFileToken = new Token(TokenKind.SOF as any, 0, 0, 0, 0);
 
     this.source = source;
     this.lastToken = startOfFileToken;
@@ -179,8 +178,7 @@ function createToken(
 ): Token {
   const line = lexer.line;
   const col = 1 + start - lexer.lineStart;
-  // @ts-expect-error
-  return new Token(kind, start, end, line, col, value);
+  return new Token(kind as any, start, end, line, col, value);
 }
 
 /**

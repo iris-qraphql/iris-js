@@ -109,8 +109,7 @@ export function buildASTSchema(
     return new GraphQLDirective({
       name: node.name.value,
       description: node.description?.value,
-      // @ts-expect-error
-      locations: node.locations.map(({ value }) => value),
+      locations: node.locations.map(({ value }) => value as any),
       isRepeatable: node.repeatable,
       args: buildArgumentMap(node.arguments),
       astNode: node,
