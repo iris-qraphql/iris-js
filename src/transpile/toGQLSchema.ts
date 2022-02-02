@@ -1,5 +1,6 @@
 import type {
   GraphQLFieldConfig,
+  GraphQLNamedOutputType,
   GraphQLNamedType,
   GraphQLOutputType,
   GraphQLSchemaConfig,
@@ -13,6 +14,7 @@ import {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
+  isOutputType,
   specifiedScalarTypes,
 } from 'graphql';
 import type { ObjMap } from 'graphql/jsutils/ObjMap';
@@ -34,15 +36,23 @@ import type { IrisSchema } from '../type/schema';
 const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
 
 export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
-  const typeMap: ObjMap<GraphQLNamedType> = stdTypeMap;
+  const typeMap: ObjMap<GraphQLNamedOutputType> = stdTypeMap;
 
-  const register = <T extends GraphQLScalarType | GraphQLOutputType>(
+  const register = <T extends GraphQLNamedOutputType>(
     name: string,
     type: T,
   ): T => {
-    // @ts-expect-error
     typeMap[name] = type;
     return type;
+  };
+
+  const lookup = (name: string): GraphQLNamedOutputType => {
+    const namedType = typeMap[name];
+    if (!namedType) {
+      throw new Error(`Unknown type ${name}`);
+    }
+
+    return namedType;
   };
 
   const transpileRootTypeDefinition = (
@@ -129,12 +139,7 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
       }
     }
 
-    const t = typeMap[type.name];
-    if (!t) {
-      throw new Error(`Unknown type ${type.name}`);
-    }
-    // @ts-expect-error
-    return t ? withMaybe(t) : undefined;
+    return withMaybe(lookup(type.name));
   };
 
   const types = Object.values(schema.getTypeMap())
