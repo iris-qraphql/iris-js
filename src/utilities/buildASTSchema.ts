@@ -12,6 +12,7 @@ import type {
   FieldDefinitionNode,
   NamedTypeNode,
   ResolverVariantDefinitionNode,
+  Role,
   TypeDefinitionNode,
   TypeNode,
   VariantDefinitionNode,
@@ -27,7 +28,6 @@ import type {
   IrisNamedType,
   IrisResolverVariantConfig,
   IrisType,
-  IrisVariant,
 } from '../type/definition';
 import {
   IrisDataType,
@@ -176,41 +176,43 @@ export function buildASTSchema(
     return Object.fromEntries(entries);
   }
 
-  function resolveDataVariant(
-    value: VariantDefinitionNode,
-  ): IrisVariant<'data'> {
-    return {
-      name: value.name.value,
-      description: value.description?.value,
-      deprecationReason: getDeprecationReason(value),
-      astNode: value,
-      // @ts-expect-error
-      fields: value.fields
-        ? () => buildFieldMap(value?.fields ?? [])
-        : undefined,
-    };
-  }
-
-  function buildResolverVariant(
-    variantNode: ResolverVariantDefinitionNode,
+  function buildVariant<R extends Role>(
+    role: R,
+    astNode: ResolverVariantDefinitionNode,
   ): IrisResolverVariantConfig {
-    const name = variantNode.name.value;
-    const description = variantNode.description?.value;
+    const name = astNode.name.value;
+    const description = astNode.description?.value;
+    const deprecationReason = getDeprecationReason(astNode);
 
-    if (variantNode.fields) {
+    if (!astNode.fields) {
       return {
         name,
         description,
-        fields: buildFieldMap(variantNode.fields ?? []),
-        astNode: variantNode,
+        deprecationReason,
+        astNode,
+        type: getNamedType(astNode),
+      };
+    }
+
+    if (role === 'data') {
+      return {
+        name,
+        description,
+        deprecationReason,
+        // @ts-expect-error
+        fields: astNode.fields
+          ? () => buildFieldMap(astNode?.fields ?? [])
+          : undefined,
+        astNode,
       };
     }
 
     return {
       name,
       description,
-      astNode: variantNode,
-      type: getNamedType(variantNode),
+      deprecationReason,
+      fields: buildFieldMap(astNode.fields ?? []),
+      astNode,
     };
   }
 
@@ -222,7 +224,8 @@ export function buildASTSchema(
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
-          variants: () => astNode.variants.map(buildResolverVariant),
+          variants: () =>
+            astNode.variants.map((v) => buildVariant('resolver', v)),
           astNode,
         });
       }
@@ -230,7 +233,7 @@ export function buildASTSchema(
         return new IrisDataType({
           name,
           description: astNode.description?.value,
-          variants: astNode.variants.map(resolveDataVariant),
+          variants: astNode.variants.map((v) => buildVariant('data', v)) as any,
           astNode,
         });
       }

@@ -1,11 +1,11 @@
 import type { ParseOptions } from 'graphql';
 import { Kind, Location, Source } from 'graphql';
 
-import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
 
 import type { GraphQLError } from '../error';
 import { syntaxError } from '../error';
+import { instanceOf } from '../utils/legacy';
 
 import type {
   ArgumentDefinitionNode,

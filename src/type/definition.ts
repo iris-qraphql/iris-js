@@ -11,7 +11,6 @@ import {
 import { pluck } from 'ramda';
 
 import { inspect } from '../jsutils/inspect';
-import { instanceOf } from '../jsutils/instanceOf';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { mapValue } from '../jsutils/ObjMap';
@@ -31,6 +30,7 @@ import type {
 import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
+import { instanceOf } from '../utils/legacy';
 import type { ConfigMap } from '../utils/type-level';
 
 export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({
@@ -53,7 +53,6 @@ export const fromConfig = <T extends {}>(
     ),
   );
 
-// Predicates & Assertions
 export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
 export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
 

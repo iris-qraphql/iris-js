@@ -14,7 +14,6 @@ import {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
-  isOutputType,
   specifiedScalarTypes,
 } from 'graphql';
 import type { ObjMap } from 'graphql/jsutils/ObjMap';
