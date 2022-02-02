@@ -434,7 +434,9 @@ describe('Type System: Enum types must be well defined', () => {
 });
 
 describe('Type System: Object fields must have output types', () => {
-  function schemaWithObjectField(fieldConfig: IrisFieldConfig): IrisSchema {
+  function schemaWithObjectField(
+    fieldConfig: IrisFieldConfig<'resolver'>,
+  ): IrisSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {

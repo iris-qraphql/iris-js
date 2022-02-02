@@ -6,7 +6,6 @@ import { keyMap } from '../jsutils/ObjMap';
 
 import type {
   ArgumentDefinitionNode,
-  DataFieldDefinitionNode,
   DirectiveDefinitionNode,
   DocumentNode,
   FieldDefinitionNode,
@@ -23,11 +22,11 @@ import { isTypeDefinitionNode } from '../language/predicates';
 
 import type {
   IrisArgument,
-  IrisField,
   IrisFieldConfig,
   IrisNamedType,
   IrisResolverVariantConfig,
   IrisType,
+  IrisVariant,
 } from '../type/definition';
 import {
   IrisDataType,
@@ -150,15 +149,9 @@ export function buildASTSchema(
     return argConfigMap;
   }
 
-  function buildFieldMap(
-    node: ReadonlyArray<FieldDefinitionNode>,
-  ): ObjMap<IrisFieldConfig>;
-  function buildFieldMap(
-    fields: ReadonlyArray<DataFieldDefinitionNode>,
-  ): ObjMap<IrisField<'data'>>;
-  function buildFieldMap(
+  function buildFieldMap<R extends Role>(
     fields: ReadonlyArray<FieldDefinitionNode>,
-  ): ObjMap<IrisFieldConfig> {
+  ): ObjMap<IrisFieldConfig<R>> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
       return [
@@ -179,7 +172,7 @@ export function buildASTSchema(
   function buildVariant<R extends Role>(
     role: R,
     astNode: ResolverVariantDefinitionNode,
-  ): IrisResolverVariantConfig {
+  ): IrisResolverVariantConfig | IrisVariant<'data'> {
     const name = astNode.name.value;
     const description = astNode.description?.value;
     const deprecationReason = getDeprecationReason(astNode);
@@ -199,19 +192,18 @@ export function buildASTSchema(
         name,
         description,
         deprecationReason,
-        // @ts-expect-error
         fields: astNode.fields
-          ? () => buildFieldMap(astNode?.fields ?? [])
+          ? () => buildFieldMap<'data'>(astNode?.fields ?? [])
           : undefined,
         astNode,
-      };
+      } as IrisVariant<'data'>;
     }
 
     return {
       name,
       description,
       deprecationReason,
-      fields: buildFieldMap(astNode.fields ?? []),
+      fields: buildFieldMap<'resolver'>(astNode.fields ?? []),
       astNode,
     };
   }

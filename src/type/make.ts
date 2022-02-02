@@ -45,7 +45,7 @@ const gqlEnum = (name: string, values: Array<string>) =>
 type GQLObject = {
   name: string;
   description?: string;
-  fields: Thunk<ObjMap<IrisFieldConfig>>;
+  fields: Thunk<ObjMap<IrisFieldConfig<'resolver'>>>;
 };
 
 const gqlObject = ({ name, fields, description }: GQLObject) =>

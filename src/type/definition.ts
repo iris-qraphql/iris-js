@@ -170,14 +170,6 @@ export type IrisArgument = IrisEntity & {
 export const isRequiredArgument = (arg: IrisArgument): boolean =>
   !isMaybeType(arg.type) && arg.defaultValue === undefined;
 
-export type IrisFieldConfig = {
-  description?: Maybe<string>;
-  deprecationReason?: Maybe<string>;
-  type: IrisType;
-  args?: ConfigMap<IrisArgument>;
-  astNode?: FieldDefinitionNode;
-};
-
 export type IrisField<R extends Role> = IrisEntity & {
   type: R extends 'data' ? IrisStrictType : IrisType;
   astNode?: R extends 'data' ? DataFieldDefinitionNode : FieldDefinitionNode;
@@ -187,6 +179,13 @@ export type IrisField<R extends Role> = IrisEntity & {
       }
     : {});
 
+export type IrisFieldConfig<R extends Role> = Omit<
+  IrisField<R>,
+  'args' | 'name'
+> & {
+  args?: R extends 'resolver' ? ConfigMap<IrisArgument> : never;
+};
+
 export type IrisVariant<R extends Role> = IrisEntity & {
   astNode?: _VariantDefinitionNode<R>;
   toJSON?: () => string;
@@ -195,7 +194,7 @@ export type IrisVariant<R extends Role> = IrisEntity & {
 };
 
 export type IrisResolverVariantConfig = IrisEntity & {
-  fields?: ConfigMap<IrisFieldConfig>;
+  fields?: ConfigMap<IrisFieldConfig<'resolver'>>;
   type?: IrisResolverType;
   astNode?: _VariantDefinitionNode<'resolver'>;
 };
@@ -216,21 +215,17 @@ export const buildArguments = (
   args: ConfigMap<IrisArgument>,
 ): Array<IrisArgument> => Object.values(fromConfig(args));
 
-function buildField(c: IrisField<'data'>, n: string): IrisField<'data'>;
-function buildField(c: IrisFieldConfig, n: string): IrisField<'resolver'>;
-function buildField(
-  { description, args, type, deprecationReason, astNode }: IrisFieldConfig,
+const buildField = <R extends Role>(
+  { description, args, type, deprecationReason, astNode }: IrisFieldConfig<R>,
   fieldName: string,
-): IrisField<Role> {
-  return {
-    name: assertName(fieldName),
-    description,
-    type,
-    args: buildArguments(args ?? {}),
-    deprecationReason,
-    astNode,
-  };
-}
+): IrisField<R> => ({
+  name: assertName(fieldName),
+  description,
+  type,
+  args: buildArguments(args ?? {}),
+  deprecationReason,
+  astNode,
+});
 
 function buildVariant(v: IrisVariant<'data'>): IrisVariant<'data'>;
 function buildVariant(v: IrisResolverVariantConfig): IrisVariant<'resolver'>;
