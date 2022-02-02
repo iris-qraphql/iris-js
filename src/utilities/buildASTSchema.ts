@@ -43,9 +43,9 @@ import { IrisSchema } from '../type/schema';
 
 import { validateSDL } from '../validation/validate';
 
+import { valueFromAST } from '../conversion/valueFromAST';
 import type { ConfigMap } from '../utils/type-level';
 
-import { valueFromAST } from './valueFromAST';
 import { getDirectiveValues } from './values';
 
 export function buildSchema(

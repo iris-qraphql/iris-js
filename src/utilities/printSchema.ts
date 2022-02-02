@@ -20,7 +20,7 @@ import { isSpecifiedDirective } from '../type/directives';
 import { isSpecifiedScalarType } from '../type/scalars';
 import type { IrisSchema } from '../type/schema';
 
-import { astFromValue } from './astFromValue';
+import { astFromValue } from '../conversion/astFromValue';
 
 export function printSchema(schema: IrisSchema): string {
   return printFilteredSchema(
