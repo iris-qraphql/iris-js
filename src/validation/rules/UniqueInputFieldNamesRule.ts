@@ -1,10 +1,10 @@
-import { invariant } from '../../jsutils/invariant';
 import type { ObjMap } from '../../jsutils/ObjMap';
 
 import type { NameNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { GraphQLError } from '../../error';
+import { invariant } from '../../utils/legacy';
 
 import type { ASTValidationContext } from '../ValidationContext';
 

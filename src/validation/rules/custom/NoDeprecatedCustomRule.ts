@@ -1,10 +1,9 @@
-import { invariant } from '../../../jsutils/invariant';
-
 import type { ASTVisitor } from '../../../language/visitor';
 
 import { getNamedType, isDataType } from '../../../type/definition';
 
 import { GraphQLError } from '../../../error';
+import { invariant } from '../../../utils/legacy';
 
 import type { ValidationContext } from '../../ValidationContext';
 
