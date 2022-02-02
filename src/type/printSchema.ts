@@ -2,11 +2,10 @@ import { Kind } from 'graphql';
 import { isPrintableAsBlockString } from 'graphql/language/blockString';
 import { pluck } from 'ramda';
 
-import type { Maybe } from '../jsutils/Maybe';
-
 import { print } from '../language/printer';
 
 import { astFromValue } from '../conversion/astFromValue';
+import type { Maybe } from '../utils/type-level';
 
 import type {
   IrisArgument,

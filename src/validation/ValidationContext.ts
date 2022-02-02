@@ -1,5 +1,3 @@
-import type { Maybe } from '../jsutils/Maybe';
-
 import type { DocumentNode } from '../language/ast';
 import type { ASTVisitor } from '../language/visitor';
 
@@ -15,6 +13,7 @@ import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
 
 import type { GraphQLError } from '../error';
+import type { Maybe } from '../utils/type-level';
 
 import type { TypeInfo } from './TypeInfo';
 

@@ -1,7 +1,5 @@
 import { isType, Kind } from 'graphql';
 
-import type { Maybe } from '../jsutils/Maybe';
-
 import type { ASTNode } from '../language/ast';
 import { isNode } from '../language/ast';
 import type { ASTVisitor } from '../language/visitor';
@@ -25,6 +23,8 @@ import {
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
+
+import type { Maybe } from '../utils/type-level';
 
 /**
  * TypeInfo is a utility class which, given a GraphQL schema, can keep track

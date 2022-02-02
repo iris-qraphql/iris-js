@@ -1,6 +1,5 @@
 import { Kind } from 'graphql';
 
-import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { keyMap } from '../jsutils/ObjMap';
 
@@ -8,6 +7,8 @@ import type { ObjectValueNode, ValueNode } from '../language/ast';
 
 import type { IrisStrictType, IrisVariant } from '../type/definition';
 import { isMaybeType, isTypeRef } from '../type/definition';
+
+import type { Maybe } from '../utils/type-level';
 
 /**
  * Produces a JavaScript value given a GraphQL Value AST.

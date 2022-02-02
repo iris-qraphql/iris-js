@@ -1,7 +1,7 @@
 import { printBlockString } from 'graphql/language/blockString';
 import { printString } from 'graphql/language/printString';
 
-import type { Maybe } from '../jsutils/Maybe';
+import type { Maybe } from '../utils/type-level';
 
 import type { ASTNode } from './ast';
 import type { ASTReducer } from './visitor';

@@ -1,12 +1,10 @@
 import { assertName } from 'graphql';
 
-import type { Maybe } from '../jsutils/Maybe';
-
 import type { DirectiveDefinitionNode } from '../language/ast';
 import { DirectiveLocation } from '../language/directiveLocation';
 
 import { inspect, instanceOf } from '../utils/legacy';
-import type { ConfigMap } from '../utils/type-level';
+import type { ConfigMap, Maybe } from '../utils/type-level';
 
 import type { IrisArgument } from './definition';
 import { buildArguments } from './definition';

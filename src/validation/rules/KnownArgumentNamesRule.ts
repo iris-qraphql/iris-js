@@ -1,11 +1,10 @@
-import { didYouMean, suggestionList } from '../../jsutils/suggestions';
-
 import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
 
 import { GraphQLError } from '../../error';
+import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type {
   SDLValidationContext,

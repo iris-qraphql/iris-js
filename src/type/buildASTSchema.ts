@@ -1,6 +1,5 @@
 import type { ParseOptions, Source } from 'graphql';
 
-import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { keyMap } from '../jsutils/ObjMap';
 
@@ -24,7 +23,7 @@ import { validateSDL } from '../validation/validate';
 
 import { valueFromAST } from '../conversion/valueFromAST';
 import { getDirectiveValues } from '../conversion/values';
-import type { ConfigMap } from '../utils/type-level';
+import type { ConfigMap, Maybe } from '../utils/type-level';
 
 import type {
   IrisArgument,

@@ -1,6 +1,5 @@
 import { Kind } from 'graphql';
 
-import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { keyMap } from '../jsutils/ObjMap';
 
@@ -13,6 +12,7 @@ import type { GraphQLDirective } from '../type/directives';
 
 import { GraphQLError } from '../error';
 import { inspect } from '../utils/legacy';
+import type { Maybe } from '../utils/type-level';
 
 import { valueFromAST } from './valueFromAST';
 

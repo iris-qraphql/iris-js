@@ -8,7 +8,7 @@ import type { ASTVisitor } from '../../language/visitor';
 import { specifiedDirectives } from '../../type/directives';
 
 import { GraphQLError } from '../../error';
-import { inspect ,invariant } from '../../utils/legacy';
+import { inspect, invariant } from '../../utils/legacy';
 
 import type {
   SDLValidationContext,

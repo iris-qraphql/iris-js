@@ -1,6 +1,5 @@
 import { Kind } from 'graphql';
 
-import type { Maybe } from '../jsutils/Maybe';
 import { isIterableObject, isObjectLike } from '../jsutils/ObjMap';
 
 import type {
@@ -18,6 +17,7 @@ import { isTypeRef } from '../type/definition';
 import { IrisID } from '../type/scalars';
 
 import { inspect } from '../utils/legacy';
+import type { Maybe } from '../utils/type-level';
 
 /**
  * Produces a GraphQL Value AST given a JavaScript object.
