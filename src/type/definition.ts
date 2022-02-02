@@ -213,8 +213,9 @@ type IrisTypeDef<T> = {
   variants: () => ReadonlyArray<T>;
 };
 
-export const buildArguments = (args: ConfigMap<IrisArgument>): Array<IrisArgument> =>
-  Object.values(uncinfig(args));
+export const buildArguments = (
+  args: ConfigMap<IrisArgument>,
+): Array<IrisArgument> => Object.values(uncinfig(args));
 
 function buildField(c: IrisField<'data'>, n: string): IrisField<'data'>;
 function buildField(c: IrisFieldConfig, n: string): IrisField<'resolver'>;
