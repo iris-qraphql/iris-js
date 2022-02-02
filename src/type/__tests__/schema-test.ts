@@ -208,19 +208,6 @@ describe('Type System: Schema', () => {
         );
       });
 
-      it('rejects a Schema when a provided type has no name', () => {
-        const query = gqlObject({
-          name: 'Query',
-          fields: { foo: { type: IrisString } },
-        });
-        const types = [{}, query, {}];
-
-        // @ts-expect-error
-        expect(() => new IrisSchema({ query, types })).toThrow(
-          'One of the provided types for building the Schema is missing a name.',
-        );
-      });
-
       it('rejects a Schema which defines an object type twice', () => {
         const types = [
           gqlObject({ name: 'SameName', fields: {} }),
