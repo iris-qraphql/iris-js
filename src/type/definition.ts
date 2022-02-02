@@ -121,9 +121,7 @@ export const isMaybeType = (
 export const isListType = (type: unknown): type is IrisTypeRef<IrisType> =>
   isTypeRef(type) && type.kind === 'LIST';
 
-export const getRequiredType = (
-  type: Maybe<IrisType>,
-): IrisType | undefined => {
+export const unpackMaybe = (type: Maybe<IrisType>): IrisType | undefined => {
   if (type) {
     return isTypeRef(type) && type.kind === 'MAYBE' ? type.ofType : type;
   }
@@ -166,17 +164,6 @@ export type IrisArgument = IrisEntity & {
 
 export const isRequiredArgument = (arg: IrisArgument): boolean =>
   !isMaybeType(arg.type) && arg.defaultValue === undefined;
-
-export const defineArguments = unfoldConfigMap<IrisArgument>(
-  (name, { description, type, defaultValue, deprecationReason, astNode }) => ({
-    name,
-    description,
-    type,
-    defaultValue,
-    deprecationReason,
-    astNode,
-  }),
-);
 
 export type IrisFieldConfig = {
   description?: Maybe<string>;
@@ -225,58 +212,63 @@ type IrisTypeDef<T> = {
   variants: () => ReadonlyArray<T>;
 };
 
-const defineResolverField = (
-  fieldConfig: IrisFieldConfig,
+export const buildArguments = unfoldConfigMap<IrisArgument>(
+  (name, { description, type, defaultValue, deprecationReason, astNode }) => ({
+    name,
+    description,
+    type,
+    defaultValue,
+    deprecationReason,
+    astNode,
+  }),
+);
+
+function buildField(
+  c: ConfigMapValue<IrisField<'data'>>,
+  n: string,
+): IrisField<'data'>;
+function buildField(c: IrisFieldConfig, n: string): IrisField<'resolver'>;
+function buildField(
+  { description, args, type, deprecationReason, astNode }: IrisFieldConfig,
   fieldName: string,
-): IrisField<'resolver'> => ({
-  name: assertName(fieldName),
-  description: fieldConfig.description,
-  type: fieldConfig.type,
-  args: defineArguments(fieldConfig.args ?? {}),
-  deprecationReason: fieldConfig.deprecationReason,
-  astNode: fieldConfig.astNode,
-});
+): IrisField<Role> {
+  return {
+    name: assertName(fieldName),
+    description,
+    type,
+    args: buildArguments(args ?? {}),
+    deprecationReason,
+    astNode,
+  };
+}
 
-const buildResolverVariant = ({
+function buildVariant(v: IrisVariantConfig<'data'>): IrisVariant<'data'>;
+function buildVariant(v: IrisResolverVariantConfig): IrisVariant<'resolver'>;
+function buildVariant({
   name,
   description,
   deprecationReason,
   fields,
   astNode,
   type,
-}: IrisResolverVariantConfig): IrisVariant<'resolver'> => ({
-  name,
-  description,
-  deprecationReason,
-  fields: fields ? mapValue(fields, defineResolverField) : undefined,
-  type,
-  astNode,
-  toJSON: () => name,
-});
-
-const buildDataVariant = ({
-  name,
-  description,
-  deprecationReason,
-  fields,
-  astNode,
-  type,
-}: IrisVariantConfig<'data'>): IrisVariant<'data'> => ({
-  name,
-  description,
-  deprecationReason,
-  fields: fields ? mapValue(resolveThunk(fields), resolveField) : undefined,
-  type,
-  astNode,
-  toJSON: () => name,
-});
+}: IrisResolverVariantConfig | IrisVariantConfig<'data'>): IrisVariant<Role> {
+  return {
+    name,
+    description,
+    deprecationReason,
+    fields: fields ? mapValue(resolveThunk(fields), buildField) : undefined,
+    type,
+    astNode,
+    toJSON: () => name,
+  };
+}
 
 export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
   name: string;
   description: Maybe<string>;
   astNode: Maybe<ResolverTypeDefinitionNode>;
   #thunkVariants: () => ReadonlyArray<IrisResolverVariantConfig>;
-  #resolverdVariants?: ReadonlyArray<IrisVariant<'resolver'>>;
+  #resolvedVariants?: ReadonlyArray<IrisVariant<'resolver'>>;
 
   constructor(config: Readonly<IrisResolverTypeConfig>) {
     this.name = assertName(config.name);
@@ -300,12 +292,12 @@ export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
   };
 
   variants = (): ReadonlyArray<IrisVariant<'resolver'>> => {
-    if (this.#resolverdVariants) {
-      return this.#resolverdVariants;
+    if (this.#resolvedVariants) {
+      return this.#resolvedVariants;
     }
-    this.#resolverdVariants = this.#thunkVariants().map(buildResolverVariant);
+    this.#resolvedVariants = this.#thunkVariants().map(buildVariant);
 
-    return this.#resolverdVariants;
+    return this.#resolvedVariants;
   };
 
   variantBy = (): IrisVariant<'resolver'> => this.variants()[0];
@@ -322,22 +314,6 @@ type IrisDataTypeConfig<I, O> = Readonly<{
   scalar?: GraphQLScalarType<I, O>;
   astNode?: Maybe<DataTypeDefinitionNode>;
 }>;
-
-const resolveField = (
-  {
-    description,
-    type,
-    deprecationReason,
-    astNode,
-  }: ConfigMapValue<IrisField<'data'>>,
-  fieldName: string,
-) => ({
-  name: assertName(fieldName),
-  description,
-  type,
-  deprecationReason,
-  astNode,
-});
 
 const lookupVariant = <V extends { name: string }>(
   typeName: string,
@@ -411,10 +387,10 @@ export class IrisDataType<I = unknown, O = I> {
     this.#variants[0]?.name === this.name && this.#variants.length === 1;
 
   variants = (): ReadonlyArray<IrisVariant<'data'>> =>
-    this.#variants.map(buildDataVariant);
+    this.#variants.map((v) => buildVariant(v));
 
   variantBy = (name?: string): IrisVariant<'data'> =>
-    buildDataVariant(lookupVariant(this.name, this.#variants, name));
+    buildVariant(lookupVariant(this.name, this.#variants, name));
 
   serialize = (value: unknown): Maybe<any> =>
     this.#scalar

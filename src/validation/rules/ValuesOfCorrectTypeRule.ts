@@ -8,10 +8,10 @@ import type { ASTVisitor } from '../../language/visitor';
 
 import {
   getNamedType,
-  getRequiredType,
   isDataType,
   isListType,
   isMaybeType,
+  unpackMaybe,
 } from '../../type/definition';
 
 import { GraphQLError } from '../../error';
@@ -25,7 +25,7 @@ export const ValuesOfCorrectTypeRule = (
   ListValue(node) {
     // Note: TypeInfo will traverse into a list's item type, so look to the
     // parent input type to check if it is a list.
-    const type = getRequiredType(context.getParentInputType());
+    const type = unpackMaybe(context.getParentInputType());
 
     if (!isListType(type)) {
       isValidValueNode(context, node);

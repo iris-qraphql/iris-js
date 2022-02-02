@@ -17,11 +17,11 @@ import type {
 } from '../type/definition';
 import {
   getNamedType,
-  getRequiredType,
   isDataType,
   isInputType,
   isListType,
   isResolverType,
+  unpackMaybe,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
@@ -152,7 +152,7 @@ export class TypeInfo {
         break;
       }
       case Kind.LIST: {
-        const listType = getRequiredType(this.getInputType());
+        const listType = unpackMaybe(this.getInputType());
         const itemType = isListType(listType) ? listType.ofType : listType;
         // List positions never have a default value.
         this._defaultValueStack.push(undefined);

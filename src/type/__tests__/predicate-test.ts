@@ -3,7 +3,6 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 import type { IrisArgument, IrisStrictType } from '../definition';
 import {
   getNamedType,
-  getRequiredType,
   isDataType,
   isInputType,
   isListType,
@@ -12,6 +11,7 @@ import {
   isResolverType,
   isType,
   isTypeRef,
+  unpackMaybe,
 } from '../definition';
 import {
   assertDirective,
@@ -193,16 +193,16 @@ describe('Type predicates', () => {
     });
   });
 
-  describe('getRequiredType', () => {
+  describe('unpackMaybe', () => {
     it('returns undefined for no type', () => {
-      expect(getRequiredType(undefined)).toEqual(undefined);
-      expect(getRequiredType(null)).toEqual(undefined);
+      expect(unpackMaybe(undefined)).toEqual(undefined);
+      expect(unpackMaybe(null)).toEqual(undefined);
     });
 
     it('unwraps maybe type', () => {
-      expect(getRequiredType(maybe(ObjectType))).toEqual(ObjectType);
+      expect(unpackMaybe(maybe(ObjectType))).toEqual(ObjectType);
       const listOfObj = gqlList(ObjectType);
-      expect(getRequiredType(maybe(listOfObj))).toEqual(listOfObj);
+      expect(unpackMaybe(maybe(listOfObj))).toEqual(listOfObj);
     });
   });
 
