@@ -9,19 +9,19 @@ import { getEnterLeaveForKind } from '../language/visitor';
 
 import type {
   IrisArgument,
+  IrisField,
   IrisResolverType,
-  IrisResolverVariantField,
   IrisStrictType,
   IrisType,
   IrisVariant,
 } from '../type/definition';
 import {
   getNamedType,
-  getNullableType,
   isDataType,
   isInputType,
   isListType,
   isResolverType,
+  unpackMaybe,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
@@ -36,7 +36,7 @@ export class TypeInfo {
   private _typeStack: Array<Maybe<IrisType>>;
   private _parentTypeStack: Array<Maybe<IrisResolverType>>;
   private _inputTypeStack: Array<Maybe<IrisStrictType>>;
-  private _fieldDefStack: Array<Maybe<IrisResolverVariantField>>;
+  private _fieldDefStack: Array<Maybe<IrisField<'resolver'>>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
   private _directive: Maybe<GraphQLDirective>;
   private _argument: Maybe<IrisArgument>;
@@ -100,7 +100,7 @@ export class TypeInfo {
     }
   }
 
-  getFieldDef(): Maybe<IrisResolverVariantField> {
+  getFieldDef(): Maybe<IrisField<'resolver'>> {
     if (this._fieldDefStack.length > 0) {
       return this._fieldDefStack[this._fieldDefStack.length - 1];
     }
@@ -152,7 +152,7 @@ export class TypeInfo {
         break;
       }
       case Kind.LIST: {
-        const listType = getNullableType(this.getInputType());
+        const listType = unpackMaybe(this.getInputType());
         const itemType = isListType(listType) ? listType.ofType : listType;
         // List positions never have a default value.
         this._defaultValueStack.push(undefined);

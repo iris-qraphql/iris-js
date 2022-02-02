@@ -10,7 +10,7 @@ import { DirectiveLocation } from '../language/directiveLocation';
 import type { ConfigMap } from '../utils/type-level';
 
 import type { IrisArgument } from './definition';
-import { defineArguments } from './definition';
+import { buildArguments } from './definition';
 import { IrisString } from './scalars';
 
 /**
@@ -58,7 +58,7 @@ export class GraphQLDirective {
     this.locations = config.locations;
     this.isRepeatable = config.isRepeatable ?? false;
     this.astNode = config.astNode;
-    this.args = defineArguments(config.args ?? {});
+    this.args = buildArguments(config.args ?? {});
   }
 
   get [Symbol.toStringTag]() {

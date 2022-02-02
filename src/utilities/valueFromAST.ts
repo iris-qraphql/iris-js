@@ -7,7 +7,7 @@ import { keyMap } from '../jsutils/ObjMap';
 import type { ObjectValueNode, ValueNode } from '../language/ast';
 
 import type { IrisStrictType, IrisVariant } from '../type/definition';
-import { isNonNullType, isTypeRef } from '../type/definition';
+import { isMaybeType, isTypeRef } from '../type/definition';
 
 /**
  * Produces a JavaScript value given a GraphQL Value AST.
@@ -47,7 +47,7 @@ export function valueFromAST(
       return;
     }
     const variableValue = variables[variableName];
-    if (variableValue === null && isNonNullType(type)) {
+    if (variableValue === null && !isMaybeType(type)) {
       return; // Invalid: intentionally return no value.
     }
     // Note: This does no further checking that this variable is correct.
@@ -77,7 +77,7 @@ export function valueFromAST(
             if (isMissingVariable(itemNode, variables)) {
               // If an array contains a missing variable, it is either coerced to
               // null or if the item type is non-null, it considered invalid.
-              if (isNonNullType(itemType)) {
+              if (!isMaybeType(itemType)) {
                 return; // Invalid: intentionally return no value.
               }
               coercedValues.push(null);
@@ -156,7 +156,7 @@ const parseVariantValue = (
   for (const field of Object.values(variant.fields ?? {})) {
     const fieldNode = fieldNodes[field.name];
     if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
-      if (isNonNullType(field.type)) {
+      if (!isMaybeType(field.type)) {
         return; // Invalid: intentionally return no value.
       }
       continue;

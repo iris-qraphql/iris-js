@@ -22,12 +22,12 @@ import { isTypeDefinitionNode } from '../language/predicates';
 
 import type {
   IrisArgument,
-  IrisDataVariantConfig,
-  IrisDataVariantField,
+  IrisField,
   IrisFieldConfig,
   IrisNamedType,
   IrisResolverVariantConfig,
   IrisType,
+  IrisVariant,
 } from '../type/definition';
 import {
   IrisDataType,
@@ -91,7 +91,11 @@ export function buildASTSchema(
     assumeValid: options?.assumeValid ?? false,
   });
 
-  function getNamedType(node: NamedTypeNode): IrisNamedType {
+  function getNamedType(node: ResolverVariantDefinitionNode): IrisResolverType;
+  function getNamedType(node: NamedTypeNode): IrisNamedType;
+  function getNamedType(
+    node: NamedTypeNode | ResolverVariantDefinitionNode,
+  ): IrisNamedType {
     const name = node.name.value;
     const type = stdTypeMap[name] ?? typeMap[name];
 
@@ -151,7 +155,7 @@ export function buildASTSchema(
   ): ObjMap<IrisFieldConfig>;
   function buildFieldMap(
     fields: ReadonlyArray<DataFieldDefinitionNode>,
-  ): ObjMap<IrisDataVariantField>;
+  ): ObjMap<IrisField<'data'>>;
   function buildFieldMap(
     fields: ReadonlyArray<FieldDefinitionNode>,
   ): ObjMap<IrisFieldConfig> {
@@ -174,7 +178,7 @@ export function buildASTSchema(
 
   function resolveDataVariant(
     value: VariantDefinitionNode,
-  ): IrisDataVariantConfig {
+  ): IrisVariant<'data'> {
     return {
       name: value.name.value,
       description: value.description?.value,
@@ -197,7 +201,7 @@ export function buildASTSchema(
       return {
         name,
         description,
-        fields: () => buildFieldMap(variantNode.fields ?? []),
+        fields: buildFieldMap(variantNode.fields ?? []),
         astNode: variantNode,
       };
     }
@@ -206,8 +210,7 @@ export function buildASTSchema(
       name,
       description,
       astNode: variantNode,
-      // @ts-expect-error
-      type: () => getNamedType(variantNode),
+      type: getNamedType(variantNode),
     };
   }
 
@@ -219,7 +222,7 @@ export function buildASTSchema(
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
-          variants: astNode.variants.map(buildResolverVariant),
+          variants: () => astNode.variants.map(buildResolverVariant),
           astNode,
         });
       }

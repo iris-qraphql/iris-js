@@ -4,17 +4,23 @@ import { GraphQLScalarType } from 'graphql';
 import type { ObjMap } from '../jsutils/ObjMap';
 
 import type {
-  IrisDataVariantField,
+  IrisField,
   IrisFieldConfig,
   IrisResolverVariantConfig,
   IrisType,
-  ThunkObjMap,
+  Thunk,
 } from './definition';
-import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
+import {
+  fromConfig,
+  IrisDataType,
+  IrisResolverType,
+  IrisTypeRef,
+  resolveThunk,
+} from './definition';
 
 type InputC = {
   name: string;
-  fields: ObjMap<Omit<IrisDataVariantField, 'name'>>;
+  fields: ObjMap<Omit<IrisField<'data'>, 'name'>>;
 };
 
 export const emptyDataType = (name: string) => new IrisDataType({ name });
@@ -25,7 +31,7 @@ const gqlInput = ({ name, fields }: InputC) =>
     variants: [
       {
         name,
-        fields,
+        fields: fromConfig(fields),
       },
     ],
   });
@@ -39,13 +45,13 @@ const gqlEnum = (name: string, values: Array<string>) =>
 type GQLObject = {
   name: string;
   description?: string;
-  fields: ThunkObjMap<IrisFieldConfig>;
+  fields: Thunk<ObjMap<IrisFieldConfig>>;
 };
 
 const gqlObject = ({ name, fields, description }: GQLObject) =>
   new IrisResolverType({
     name,
-    variants: [{ name, description, fields }],
+    variants: () => [{ name, description, fields: resolveThunk(fields) }],
     description,
   });
 
@@ -57,12 +63,13 @@ type GQLUnion = {
 const gqlUnion = ({ name, types }: GQLUnion) =>
   new IrisResolverType({
     name,
-    variants: types.map(
-      (type): IrisResolverVariantConfig => ({
-        name: type.name,
-        type: () => type,
-      }),
-    ),
+    variants: () =>
+      types.map(
+        (type): IrisResolverVariantConfig => ({
+          name: type.name,
+          type,
+        }),
+      ),
   });
 
 const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>

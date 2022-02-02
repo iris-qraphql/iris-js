@@ -8,10 +8,10 @@ import type { ASTVisitor } from '../../language/visitor';
 
 import {
   getNamedType,
-  getNullableType,
   isDataType,
   isListType,
-  isNonNullType,
+  isMaybeType,
+  unpackMaybe,
 } from '../../type/definition';
 
 import { GraphQLError } from '../../error';
@@ -25,7 +25,7 @@ export const ValuesOfCorrectTypeRule = (
   ListValue(node) {
     // Note: TypeInfo will traverse into a list's item type, so look to the
     // parent input type to check if it is a list.
-    const type = getNullableType(context.getParentInputType());
+    const type = unpackMaybe(context.getParentInputType());
 
     if (!isListType(type)) {
       isValidValueNode(context, node);
@@ -43,7 +43,7 @@ export const ValuesOfCorrectTypeRule = (
     const variantName = lookupObjectTypename(nodeFields);
     Object.values(type.variantBy(variantName).fields ?? {}).forEach(
       (fieldDef) => {
-        if (!nodeFields[fieldDef.name] && isNonNullType(fieldDef.type)) {
+        if (!nodeFields[fieldDef.name] && !isMaybeType(fieldDef.type)) {
           context.reportError(
             new GraphQLError(
               `Field "${type.name}.${
@@ -77,7 +77,7 @@ export const ValuesOfCorrectTypeRule = (
   },
   NullValue(node) {
     const type = context.getInputType();
-    if (isNonNullType(type)) {
+    if (!isMaybeType(type)) {
       context.reportError(
         new GraphQLError(
           `Expected value of type "${inspect(type)}", found ${print(node)}.`,
