@@ -31,7 +31,7 @@ import type {
 import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
-import type { ConfigMap, ConfigMapValue, Override } from '../utils/type-level';
+import type { ConfigMap } from '../utils/type-level';
 
 export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({
   String: GraphQLString,
@@ -41,13 +41,19 @@ export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({
   ID: GraphQLID,
 });
 
-export const unfoldConfigMap =
-  <T>(f: (k: string, v: ConfigMapValue<T>) => T) =>
-  (config: ConfigMap<T>): ReadonlyArray<T> =>
-    Object.entries(config).map(([name, value]) => f(assertName(name), value));
+export const uncinfig = <T extends {}>(
+  obj: Record<string, T>,
+): Record<string, T & { name: string }> =>
+  Object.fromEntries(
+    Object.entries(obj).map(
+      ([name, field]: [string, T]): [string, T & { name: string }] => [
+        name,
+        { ...field, name: assertName(name) },
+      ],
+    ),
+  );
 
 // Predicates & Assertions
-
 export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
 export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
 
@@ -189,11 +195,6 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   type?: R extends 'resolver' ? IrisResolverType : never;
 };
 
-export type IrisVariantConfig<R extends Role> = Override<
-  IrisVariant<R>,
-  { fields?: ConfigMap<IrisField<R>> }
->;
-
 export type IrisResolverVariantConfig = IrisEntity & {
   fields?: ConfigMap<IrisFieldConfig>;
   type?: IrisResolverType;
@@ -212,21 +213,10 @@ type IrisTypeDef<T> = {
   variants: () => ReadonlyArray<T>;
 };
 
-export const buildArguments = unfoldConfigMap<IrisArgument>(
-  (name, { description, type, defaultValue, deprecationReason, astNode }) => ({
-    name,
-    description,
-    type,
-    defaultValue,
-    deprecationReason,
-    astNode,
-  }),
-);
+export const buildArguments = (args: ConfigMap<IrisArgument>): Array<IrisArgument> =>
+  Object.values(uncinfig(args));
 
-function buildField(
-  c: ConfigMapValue<IrisField<'data'>>,
-  n: string,
-): IrisField<'data'>;
+function buildField(c: IrisField<'data'>, n: string): IrisField<'data'>;
 function buildField(c: IrisFieldConfig, n: string): IrisField<'resolver'>;
 function buildField(
   { description, args, type, deprecationReason, astNode }: IrisFieldConfig,
@@ -236,13 +226,13 @@ function buildField(
     name: assertName(fieldName),
     description,
     type,
-    args: buildArguments(args ?? {}),
+    args: buildArguments(uncinfig(args ?? {})),
     deprecationReason,
     astNode,
   };
 }
 
-function buildVariant(v: IrisVariantConfig<'data'>): IrisVariant<'data'>;
+function buildVariant(v: IrisVariant<'data'>): IrisVariant<'data'>;
 function buildVariant(v: IrisResolverVariantConfig): IrisVariant<'resolver'>;
 function buildVariant({
   name,
@@ -251,7 +241,7 @@ function buildVariant({
   fields,
   astNode,
   type,
-}: IrisResolverVariantConfig | IrisVariantConfig<'data'>): IrisVariant<Role> {
+}: IrisResolverVariantConfig | IrisVariant<'data'>): IrisVariant<Role> {
   return {
     name,
     description,
@@ -310,7 +300,7 @@ export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
 type IrisDataTypeConfig<I, O> = Readonly<{
   name: string;
   description?: Maybe<string>;
-  variants?: ReadonlyArray<IrisVariantConfig<'data'>>;
+  variants?: ReadonlyArray<IrisVariant<'data'>>;
   scalar?: GraphQLScalarType<I, O>;
   astNode?: Maybe<DataTypeDefinitionNode>;
 }>;
@@ -359,7 +349,7 @@ const assertString = (type: string, value: unknown): string => {
 export class IrisDataType<I = unknown, O = I> {
   name: string;
   description: Maybe<string>;
-  #variants: ReadonlyArray<IrisVariantConfig<'data'>>;
+  #variants: ReadonlyArray<IrisVariant<'data'>>;
   #scalar?: GraphQLScalarType;
   astNode: Maybe<DataTypeDefinitionNode>;
 

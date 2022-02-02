@@ -27,7 +27,7 @@ import type {
   IrisNamedType,
   IrisResolverVariantConfig,
   IrisType,
-  IrisVariantConfig,
+  IrisVariant,
 } from '../type/definition';
 import {
   IrisDataType,
@@ -178,7 +178,7 @@ export function buildASTSchema(
 
   function resolveDataVariant(
     value: VariantDefinitionNode,
-  ): IrisVariantConfig<'data'> {
+  ): IrisVariant<'data'> {
     return {
       name: value.name.value,
       description: value.description?.value,
