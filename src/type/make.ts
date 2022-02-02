@@ -11,11 +11,11 @@ import type {
   Thunk,
 } from './definition';
 import {
+  fromConfig,
   IrisDataType,
   IrisResolverType,
   IrisTypeRef,
   resolveThunk,
-  uncinfig,
 } from './definition';
 
 type InputC = {
@@ -31,7 +31,7 @@ const gqlInput = ({ name, fields }: InputC) =>
     variants: [
       {
         name,
-        fields: uncinfig(fields),
+        fields: fromConfig(fields),
       },
     ],
   });

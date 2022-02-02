@@ -41,7 +41,7 @@ export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({
   ID: GraphQLID,
 });
 
-export const uncinfig = <T extends {}>(
+export const fromConfig = <T extends {}>(
   obj: Record<string, T>,
 ): Record<string, T & { name: string }> =>
   Object.fromEntries(
@@ -215,7 +215,7 @@ type IrisTypeDef<T> = {
 
 export const buildArguments = (
   args: ConfigMap<IrisArgument>,
-): Array<IrisArgument> => Object.values(uncinfig(args));
+): Array<IrisArgument> => Object.values(fromConfig(args));
 
 function buildField(c: IrisField<'data'>, n: string): IrisField<'data'>;
 function buildField(c: IrisFieldConfig, n: string): IrisField<'resolver'>;
@@ -227,7 +227,7 @@ function buildField(
     name: assertName(fieldName),
     description,
     type,
-    args: buildArguments(uncinfig(args ?? {})),
+    args: buildArguments(args ?? {}),
     deprecationReason,
     astNode,
   };
