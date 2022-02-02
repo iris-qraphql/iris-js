@@ -15,7 +15,7 @@ import type {
   IrisTypeRef,
 } from '../definition';
 import { assertDataType, assertResolverType } from '../definition';
-import { assertDirective, GraphQLDirective } from '../directives';
+import { GraphQLDirective } from '../directives';
 import { gqlEnum, gqlList, gqlObject, gqlUnion, maybe } from '../make';
 import { IrisString } from '../scalars';
 import { IrisSchema } from '../schema';
@@ -42,8 +42,6 @@ const SomeEnumType = assertDataType(SomeSchema.getType('SomeEnum'));
 const SomeInputObjectType = assertDataType(
   SomeSchema.getType('SomeInputObject'),
 );
-
-const SomeDirective = assertDirective(SomeSchema.getDirective('SomeDirective'));
 
 function withModifiers<T extends IrisNamedType>(
   type: T,
@@ -135,23 +133,6 @@ describe('Type System: A Schema must have Object root types', () => {
         message:
           'Subscription root type must be Object type if provided, it cannot be Subscription.',
         locations: [{ line: 6, column: 7 }],
-      },
-    ]);
-  });
-
-  it('rejects a Schema whose types are incorrectly typed', () => {
-    const schema = new IrisSchema({
-      query: SomeObjectType,
-      // @ts-expect-error
-      types: [{ name: 'SomeType' }, SomeDirective],
-    });
-    expectJSONEqual(schema, [
-      {
-        message: 'Expected GraphQL named type but got: { name: "SomeType" }.',
-      },
-      {
-        message: 'Expected GraphQL named type but got: @SomeDirective.',
-        locations: [{ line: 12, column: 3 }],
       },
     ]);
   });
