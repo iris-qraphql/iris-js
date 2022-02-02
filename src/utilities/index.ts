@@ -13,4 +13,4 @@ export { valueFromAST } from './valueFromAST';
 export { astFromValue } from './astFromValue';
 
 // A helper to use within recursive-descent visitors which need to be aware of the GraphQL type system.
-export { TypeInfo } from './TypeInfo';
+export { TypeInfo } from '../validation/TypeInfo';

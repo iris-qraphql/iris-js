@@ -107,5 +107,4 @@ export {
   printSchema,
   printType,
   astFromValue,
-  TypeInfo,
 } from './utilities/index';

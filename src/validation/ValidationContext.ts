@@ -14,9 +14,9 @@ import type {
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
 
-import type { TypeInfo } from '../utilities/TypeInfo';
-
 import type { GraphQLError } from '../error';
+
+import type { TypeInfo } from './TypeInfo';
 
 /**
  * An instance of this class is passed as the "this" context to all validators,

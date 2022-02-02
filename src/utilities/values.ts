@@ -91,17 +91,6 @@ function getArgumentValues(
   return coercedValues;
 }
 
-/**
- * Prepares an object map of argument values given a directive definition
- * and a AST node which may contain directives. Optionally also accepts a map
- * of variable values.
- *
- * If the directive does not exist on the node, returns undefined.
- *
- * Note: The returned value is a plain Object with a prototype, since it is
- * exposed to user code. Care should be taken to not pull values from the
- * Object prototype.
- */
 export function getDirectiveValues(
   directiveDef: GraphQLDirective,
   node: { readonly directives?: ReadonlyArray<DirectiveNode> },
