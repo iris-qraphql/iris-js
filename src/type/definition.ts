@@ -169,7 +169,7 @@ export type IrisArgument = IrisEntity & {
 };
 
 export function isRequiredArgument(arg: IrisArgument): boolean {
-  return isNonNullType(arg.type) && arg.defaultValue === undefined;
+  return !isMaybeType(arg.type) && arg.defaultValue === undefined;
 }
 
 export const defineArguments = unfoldConfigMap<IrisArgument>(
