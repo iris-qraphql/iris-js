@@ -1,11 +1,9 @@
 import { uniqBy } from 'ramda';
 
-import { inspect } from '../jsutils/inspect';
-import { instanceOf } from '../jsutils/instanceOf';
-import type { Maybe } from '../jsutils/Maybe';
-import type { ObjMap } from '../jsutils/ObjMap';
-
 import type { GraphQLError } from '../error';
+import { inspect, instanceOf } from '../utils/legacy';
+import type { ObjMap } from '../utils/ObjMap';
+import type { Maybe } from '../utils/type-level';
 
 import type { IrisNamedType, IrisResolverType, IrisType } from './definition';
 import { getNamedType, isDataType, isResolverType } from './definition';

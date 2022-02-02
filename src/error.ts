@@ -7,9 +7,9 @@ import type {
   GraphQLErrorExtensions,
 } from 'graphql/error/GraphQLError';
 
-import type { Maybe } from './jsutils/Maybe';
-
 import type { ASTNode } from './language/ast';
+
+import type { Maybe } from './utils/type-level';
 
 type IrisErrorArgs = GraphQLErrorArgs & {
   node: ReadonlyArray<ASTNode> | ASTNode | null;

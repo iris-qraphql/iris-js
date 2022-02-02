@@ -1,4 +1,4 @@
-import { isObjectLike, mapValue } from '../jsutils/ObjMap';
+import { isObjectLike, mapValue } from './ObjMap';
 
 export function toJSONDeep(value: unknown): unknown {
   if (!isObjectLike(value)) {

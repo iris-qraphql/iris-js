@@ -1,5 +1,3 @@
-import { didYouMean, suggestionList } from '../../jsutils/suggestions';
-
 import type { ASTNode } from '../../language/ast';
 import {
   isTypeDefinitionNode,
@@ -10,6 +8,7 @@ import type { ASTVisitor } from '../../language/visitor';
 import { specifiedScalarTypes } from '../../type/scalars';
 
 import { GraphQLError } from '../../error';
+import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type {
   SDLValidationContext,

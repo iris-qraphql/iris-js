@@ -48,7 +48,7 @@ export type ASTNode =
   | ResolverTypeDefinitionNode
   | DataTypeDefinitionNode
   | DirectiveDefinitionNode
-  | VariantDefinitionNode
+  | DataVariantDefinitionNode
   | MaybeTypeNode;
 
 /**
@@ -238,13 +238,13 @@ export type TypeDefinition<R extends Role> = {
   readonly variants: ReadonlyArray<_VariantDefinitionNode<R>>;
 };
 
-export type VariantDefinition<F> = {
+export type VariantDefinition<R extends Role> = {
   readonly kind: IrisKind.VARIANT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly name: NameNode;
-  readonly fields?: ReadonlyArray<F>;
+  readonly fields?: ReadonlyArray<_FieldDefinitionNode<R>>;
 };
 
 export type DataFieldDefinitionNode = {
@@ -265,23 +265,17 @@ type FIELD_DEF = {
   resolver: FieldDefinitionNode;
 };
 
-type VAR_DEF = {
-  data: VariantDefinitionNode;
-  resolver: ResolverVariantDefinitionNode;
-};
-
 type TYPE_DEF = {
   data: DataTypeDefinitionNode;
   resolver: ResolverTypeDefinitionNode;
 };
 
 export type _FieldDefinitionNode<T extends Role> = FIELD_DEF[T];
-export type _VariantDefinitionNode<T extends Role> = VAR_DEF[T];
+export type _VariantDefinitionNode<R extends Role> = VariantDefinition<R>;
 export type _TypeDefinitionNode<T extends Role> = TYPE_DEF[T];
 
-export type VariantDefinitionNode = VariantDefinition<FieldDefinitionNode>;
-export type ResolverVariantDefinitionNode =
-  VariantDefinition<FieldDefinitionNode>;
+export type DataVariantDefinitionNode = VariantDefinition<'data'>;
+export type ResolverVariantDefinitionNode = VariantDefinition<'resolver'>;
 
 /** Directive Definitions */
 

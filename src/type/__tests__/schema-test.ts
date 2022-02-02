@@ -1,7 +1,5 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import { printSchema } from '../../utilities/printSchema';
-
 import { dedent } from '../../utils/dedent';
 
 import type { IrisResolverType } from '../definition';
@@ -13,6 +11,7 @@ import {
   gqlObject,
   gqlScalar,
 } from '../make';
+import { printSchema } from '../printSchema';
 import { IrisBool, IrisInt, IrisString } from '../scalars';
 import { IrisSchema } from '../schema';
 
@@ -206,19 +205,6 @@ describe('Type System: Schema', () => {
 
         expect(() => new IrisSchema({ query: QueryType })).toThrow(
           'Schema must contain uniquely named types but contains multiple types named "String".',
-        );
-      });
-
-      it('rejects a Schema when a provided type has no name', () => {
-        const query = gqlObject({
-          name: 'Query',
-          fields: { foo: { type: IrisString } },
-        });
-        const types = [{}, query, {}];
-
-        // @ts-expect-error
-        expect(() => new IrisSchema({ query, types })).toThrow(
-          'One of the provided types for building the Schema is missing a name.',
         );
       });
 

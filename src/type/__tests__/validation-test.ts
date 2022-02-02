@@ -1,13 +1,11 @@
-import { inspect } from '../../jsutils/inspect';
-
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import { buildSchema } from '../../utilities/buildASTSchema';
-
 import { GraphQLError } from '../../error';
+import { inspect } from '../../utils/legacy';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { ConfigMapValue } from '../../utils/type-level';
 
+import { buildSchema } from '../buildASTSchema';
 import type {
   IrisArgument,
   IrisFieldConfig,
@@ -17,8 +15,8 @@ import type {
   IrisTypeRef,
 } from '../definition';
 import { assertDataType, assertResolverType } from '../definition';
-import { assertDirective, GraphQLDirective } from '../directives';
-import { gqlEnum, gqlList, gqlObject, gqlUnion, maybe } from '../make';
+import { GraphQLDirective } from '../directives';
+import { gqlEnum, gqlList, gqlObject, maybe } from '../make';
 import { IrisString } from '../scalars';
 import { IrisSchema } from '../schema';
 import { validateSchema } from '../validate';
@@ -45,8 +43,6 @@ const SomeInputObjectType = assertDataType(
   SomeSchema.getType('SomeInputObject'),
 );
 
-const SomeDirective = assertDirective(SomeSchema.getDirective('SomeDirective'));
-
 function withModifiers<T extends IrisNamedType>(
   type: T,
 ): Array<T | IrisTypeRef<T | IrisTypeRef<T>>> {
@@ -66,11 +62,6 @@ const inputTypes: ReadonlyArray<IrisStrictType> = [
   ...withModifiers(SomeScalarType),
   ...withModifiers(SomeEnumType),
   ...withModifiers(SomeInputObjectType),
-];
-
-const notInputTypes: ReadonlyArray<IrisType> = [
-  ...withModifiers(SomeObjectType),
-  ...withModifiers(SomeUnionType),
 ];
 
 function schemaWithFieldType(type: IrisType): IrisSchema {
@@ -137,23 +128,6 @@ describe('Type System: A Schema must have Object root types', () => {
         message:
           'Subscription root type must be Object type if provided, it cannot be Subscription.',
         locations: [{ line: 6, column: 7 }],
-      },
-    ]);
-  });
-
-  it('rejects a Schema whose types are incorrectly typed', () => {
-    const schema = new IrisSchema({
-      query: SomeObjectType,
-      // @ts-expect-error
-      types: [{ name: 'SomeType' }, SomeDirective],
-    });
-    expectJSONEqual(schema, [
-      {
-        message: 'Expected GraphQL named type but got: { name: "SomeType" }.',
-      },
-      {
-        message: 'Expected GraphQL named type but got: @SomeDirective.',
-        locations: [{ line: 12, column: 3 }],
       },
     ]);
   });
@@ -299,29 +273,6 @@ describe('Type System: Union types must be valid', () => {
         locations: [{ line: 18, column: 11 }],
       },
     ]);
-
-    const badUnionMemberTypes = [
-      IrisString,
-      maybe(SomeObjectType),
-      gqlList(SomeObjectType),
-      SomeUnionType,
-      SomeEnumType,
-      SomeInputObjectType,
-    ];
-    for (const memberType of badUnionMemberTypes) {
-      const badUnion = gqlUnion({
-        name: 'BadUnion',
-        // @ts-expect-error
-        types: [memberType],
-      });
-      expectJSONEqual(schemaWithFieldType(badUnion), [
-        {
-          message:
-            'Union type BadUnion can only include Object types, ' +
-            `it cannot include ${inspect(memberType)}.`,
-        },
-      ]);
-    }
   });
 });
 
@@ -434,7 +385,9 @@ describe('Type System: Enum types must be well defined', () => {
 });
 
 describe('Type System: Object fields must have output types', () => {
-  function schemaWithObjectField(fieldConfig: IrisFieldConfig): IrisSchema {
+  function schemaWithObjectField(
+    fieldConfig: IrisFieldConfig<'resolver'>,
+  ): IrisSchema {
     const BadObjectType = gqlObject({
       name: 'BadObject',
       fields: {
@@ -460,20 +413,6 @@ describe('Type System: Object fields must have output types', () => {
       expectJSONEqual(schema, []);
     });
   }
-
-  it('rejects a non-type value as an Object field type', () => {
-    // @ts-expect-error
-    const schema = schemaWithObjectField({ type: Number });
-    expectJSONEqual(schema, [
-      {
-        message:
-          'The type of BadObject.badField must be Output Type but got: [function Number].',
-      },
-      {
-        message: 'Expected GraphQL named type but got: [function Number].',
-      },
-    ]);
-  });
 
   it('accept data as resolver field type', () => {
     const schema = buildSchema(`
@@ -529,40 +468,6 @@ describe('Type System: Arguments must have data  types', () => {
       expectJSONEqual(schema, []);
     });
   }
-
-  for (const type of notInputTypes) {
-    const typeStr = inspect(type);
-    it(`rejects a non-input type as a field arg type: ${typeStr}`, () => {
-      // @ts-expect-error
-      const schema = schemaWithArg({ type });
-      expectJSONEqual(schema, [
-        {
-          message: `The type of @BadDirective(badArg:) must be Input Type but got: ${typeStr}.`,
-        },
-        {
-          message: `The type of BadObject.badField(badArg:) must be Input Type but got: ${typeStr}.`,
-        },
-      ]);
-    });
-  }
-
-  it('rejects a non-type value as a field arg type', () => {
-    // @ts-expect-error
-    const schema = schemaWithArg({ type: Number });
-    expectJSONEqual(schema, [
-      {
-        message:
-          'The type of @BadDirective(badArg:) must be Input Type but got: [function Number].',
-      },
-      {
-        message:
-          'The type of BadObject.badField(badArg:) must be Input Type but got: [function Number].',
-      },
-      {
-        message: 'Expected GraphQL named type but got: [function Number].',
-      },
-    ]);
-  });
 
   it('rejects an required argument that is deprecated', () => {
     const schema = buildSchema(`

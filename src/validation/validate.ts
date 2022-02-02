@@ -1,11 +1,10 @@
-import type { Maybe } from '../jsutils/Maybe';
-
 import type { DocumentNode } from '../language/ast';
 import { visit, visitInParallel } from '../language/visitor';
 
 import type { IrisSchema } from '../type/schema';
 
 import type { GraphQLError } from '../error';
+import type { Maybe } from '../utils/type-level';
 
 import { specifiedSDLRules } from './specifiedRules';
 import type { SDLValidationRule } from './ValidationContext';

@@ -1,15 +1,13 @@
-import type { Maybe } from '../jsutils/Maybe';
-
 import { parse } from '../language/parser';
 
+import { buildSchema } from '../type/buildASTSchema';
 import type { IrisSchema } from '../type/schema';
 
 import { validateSDL } from '../validation/validate';
 import type { SDLValidationRule } from '../validation/ValidationContext';
 
-import { buildSchema } from '../utilities/buildASTSchema';
-
 import { toJSONDeep } from './toJSONDeep';
+import type { Maybe } from './type-level';
 
 export const testSchema: IrisSchema = buildSchema(`
   resolver Pet = {

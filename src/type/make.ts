@@ -1,7 +1,7 @@
 import type { GraphQLScalarTypeConfig } from 'graphql';
 import { GraphQLScalarType } from 'graphql';
 
-import type { ObjMap } from '../jsutils/ObjMap';
+import type { ObjMap } from '../utils/ObjMap';
 
 import type {
   IrisField,
@@ -45,7 +45,7 @@ const gqlEnum = (name: string, values: Array<string>) =>
 type GQLObject = {
   name: string;
   description?: string;
-  fields: Thunk<ObjMap<IrisFieldConfig>>;
+  fields: Thunk<ObjMap<IrisFieldConfig<'resolver'>>>;
 };
 
 const gqlObject = ({ name, fields, description }: GQLObject) =>

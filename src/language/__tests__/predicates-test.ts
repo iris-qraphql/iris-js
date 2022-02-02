@@ -10,10 +10,7 @@ import {
 } from '../predicates';
 
 function filterNodes(predicate: (node: ASTNode) => boolean): Array<string> {
-  return KINDS.filter(
-    // @ts-expect-error create node only with kind
-    (kind) => predicate({ kind }),
-  );
+  return KINDS.filter((kind) => predicate({ kind: kind as any }));
 }
 
 describe('AST node predicates', () => {

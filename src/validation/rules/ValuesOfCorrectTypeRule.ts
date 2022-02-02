@@ -1,7 +1,3 @@
-import { inspect } from '../../jsutils/inspect';
-import { keyMap } from '../../jsutils/ObjMap';
-import { didYouMean, suggestionList } from '../../jsutils/suggestions';
-
 import type { ValueNode } from '../../language/ast';
 import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
@@ -15,6 +11,8 @@ import {
 } from '../../type/definition';
 
 import { GraphQLError } from '../../error';
+import { didYouMean, inspect, suggestionList } from '../../utils/legacy';
+import { keyMap } from '../../utils/ObjMap';
 import { lookupObjectTypename } from '../../utils/type-level';
 
 import type { ValidationContext } from '../ValidationContext';

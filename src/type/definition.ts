@@ -10,13 +10,6 @@ import {
 } from 'graphql';
 import { pluck } from 'ramda';
 
-import { inspect } from '../jsutils/inspect';
-import { instanceOf } from '../jsutils/instanceOf';
-import type { Maybe } from '../jsutils/Maybe';
-import type { ObjMap } from '../jsutils/ObjMap';
-import { mapValue } from '../jsutils/ObjMap';
-import { didYouMean, suggestionList } from '../jsutils/suggestions';
-
 import type {
   _VariantDefinitionNode,
   ArgumentDefinitionNode,
@@ -31,7 +24,15 @@ import type {
 import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
-import type { ConfigMap } from '../utils/type-level';
+import {
+  didYouMean,
+  inspect,
+  instanceOf,
+  suggestionList,
+} from '../utils/legacy';
+import type { ObjMap } from '../utils/ObjMap';
+import { mapValue } from '../utils/ObjMap';
+import type { ConfigMap, Maybe } from '../utils/type-level';
 
 export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({
   String: GraphQLString,
@@ -53,7 +54,6 @@ export const fromConfig = <T extends {}>(
     ),
   );
 
-// Predicates & Assertions
 export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
 export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
 
@@ -171,14 +171,6 @@ export type IrisArgument = IrisEntity & {
 export const isRequiredArgument = (arg: IrisArgument): boolean =>
   !isMaybeType(arg.type) && arg.defaultValue === undefined;
 
-export type IrisFieldConfig = {
-  description?: Maybe<string>;
-  deprecationReason?: Maybe<string>;
-  type: IrisType;
-  args?: ConfigMap<IrisArgument>;
-  astNode?: FieldDefinitionNode;
-};
-
 export type IrisField<R extends Role> = IrisEntity & {
   type: R extends 'data' ? IrisStrictType : IrisType;
   astNode?: R extends 'data' ? DataFieldDefinitionNode : FieldDefinitionNode;
@@ -188,6 +180,13 @@ export type IrisField<R extends Role> = IrisEntity & {
       }
     : {});
 
+export type IrisFieldConfig<R extends Role> = Omit<
+  IrisField<R>,
+  'args' | 'name'
+> & {
+  args?: R extends 'resolver' ? ConfigMap<IrisArgument> : never;
+};
+
 export type IrisVariant<R extends Role> = IrisEntity & {
   astNode?: _VariantDefinitionNode<R>;
   toJSON?: () => string;
@@ -196,10 +195,25 @@ export type IrisVariant<R extends Role> = IrisEntity & {
 };
 
 export type IrisResolverVariantConfig = IrisEntity & {
-  fields?: ConfigMap<IrisFieldConfig>;
+  fields?: ConfigMap<IrisFieldConfig<'resolver'>>;
   type?: IrisResolverType;
   astNode?: _VariantDefinitionNode<'resolver'>;
 };
+
+export type VARIANT_CONFIG = {
+  resolver: IrisResolverVariantConfig;
+  data: IrisVariant<'data'>;
+};
+
+export type IrisVariantConfig<R extends Role> = VARIANT_CONFIG[R];
+
+type IrisDataTypeConfig<I, O> = Readonly<{
+  name: string;
+  description?: Maybe<string>;
+  variants?: ReadonlyArray<IrisVariant<'data'>>;
+  scalar?: GraphQLScalarType<I, O>;
+  astNode?: Maybe<DataTypeDefinitionNode>;
+}>;
 
 export type IrisResolverTypeConfig = {
   name: string;
@@ -217,21 +231,17 @@ export const buildArguments = (
   args: ConfigMap<IrisArgument>,
 ): Array<IrisArgument> => Object.values(fromConfig(args));
 
-function buildField(c: IrisField<'data'>, n: string): IrisField<'data'>;
-function buildField(c: IrisFieldConfig, n: string): IrisField<'resolver'>;
-function buildField(
-  { description, args, type, deprecationReason, astNode }: IrisFieldConfig,
+const buildField = <R extends Role>(
+  { description, args, type, deprecationReason, astNode }: IrisFieldConfig<R>,
   fieldName: string,
-): IrisField<Role> {
-  return {
-    name: assertName(fieldName),
-    description,
-    type,
-    args: buildArguments(args ?? {}),
-    deprecationReason,
-    astNode,
-  };
-}
+): IrisField<R> => ({
+  name: assertName(fieldName),
+  description,
+  type,
+  args: buildArguments(args ?? {}),
+  deprecationReason,
+  astNode,
+});
 
 function buildVariant(v: IrisVariant<'data'>): IrisVariant<'data'>;
 function buildVariant(v: IrisResolverVariantConfig): IrisVariant<'resolver'>;
@@ -297,14 +307,6 @@ export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
 
   toJSON = (): string => this.toString();
 }
-
-type IrisDataTypeConfig<I, O> = Readonly<{
-  name: string;
-  description?: Maybe<string>;
-  variants?: ReadonlyArray<IrisVariant<'data'>>;
-  scalar?: GraphQLScalarType<I, O>;
-  astNode?: Maybe<DataTypeDefinitionNode>;
-}>;
 
 const lookupVariant = <V extends { name: string }>(
   typeName: string,

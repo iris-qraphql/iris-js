@@ -1,5 +1,3 @@
-import type { Maybe } from '../jsutils/Maybe';
-
 import type { DocumentNode } from '../language/ast';
 import type { ASTVisitor } from '../language/visitor';
 
@@ -14,9 +12,10 @@ import type {
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
 
-import type { TypeInfo } from '../utilities/TypeInfo';
-
 import type { GraphQLError } from '../error';
+import type { Maybe } from '../utils/type-level';
+
+import type { TypeInfo } from './TypeInfo';
 
 /**
  * An instance of this class is passed as the "this" context to all validators,

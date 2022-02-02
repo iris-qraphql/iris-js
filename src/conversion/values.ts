@@ -1,10 +1,5 @@
 import { Kind } from 'graphql';
 
-import { inspect } from '../jsutils/inspect';
-import type { Maybe } from '../jsutils/Maybe';
-import type { ObjMap } from '../jsutils/ObjMap';
-import { keyMap } from '../jsutils/ObjMap';
-
 import type { DirectiveNode } from '../language/ast';
 import { print } from '../language/printer';
 
@@ -13,6 +8,10 @@ import { isMaybeType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 
 import { GraphQLError } from '../error';
+import { inspect } from '../utils/legacy';
+import type { ObjMap } from '../utils/ObjMap';
+import { keyMap } from '../utils/ObjMap';
+import type { Maybe } from '../utils/type-level';
 
 import { valueFromAST } from './valueFromAST';
 
@@ -91,17 +90,6 @@ function getArgumentValues(
   return coercedValues;
 }
 
-/**
- * Prepares an object map of argument values given a directive definition
- * and a AST node which may contain directives. Optionally also accepts a map
- * of variable values.
- *
- * If the directive does not exist on the node, returns undefined.
- *
- * Note: The returned value is a plain Object with a prototype, since it is
- * exposed to user code. Care should be taken to not pull values from the
- * Object prototype.
- */
 export function getDirectiveValues(
   directiveDef: GraphQLDirective,
   node: { readonly directives?: ReadonlyArray<DirectiveNode> },

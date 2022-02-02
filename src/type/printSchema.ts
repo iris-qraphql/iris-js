@@ -2,9 +2,10 @@ import { Kind } from 'graphql';
 import { isPrintableAsBlockString } from 'graphql/language/blockString';
 import { pluck } from 'ramda';
 
-import type { Maybe } from '../jsutils/Maybe';
-
 import { print } from '../language/printer';
+
+import { astFromValue } from '../conversion/astFromValue';
+import type { Maybe } from '../utils/type-level';
 
 import type {
   IrisArgument,
@@ -13,14 +14,12 @@ import type {
   IrisNamedType,
   IrisResolverType,
   IrisVariant,
-} from '../type/definition';
-import { isResolverType } from '../type/definition';
-import type { GraphQLDirective } from '../type/directives';
-import { isSpecifiedDirective } from '../type/directives';
-import { isSpecifiedScalarType } from '../type/scalars';
-import type { IrisSchema } from '../type/schema';
-
-import { astFromValue } from './astFromValue';
+} from './definition';
+import { isResolverType } from './definition';
+import type { GraphQLDirective } from './directives';
+import { isSpecifiedDirective } from './directives';
+import { isSpecifiedScalarType } from './scalars';
+import type { IrisSchema } from './schema';
 
 export function printSchema(schema: IrisSchema): string {
   return printFilteredSchema(
