@@ -1,7 +1,5 @@
 import { identity } from 'ramda';
 
-import type { ObjMap } from '../../jsutils/ObjMap';
-
 import { parseValue } from '../../language/parser';
 
 import type { IrisStrictType } from '../../type/definition';
@@ -13,6 +11,8 @@ import {
   IrisInt,
   IrisString,
 } from '../../type/scalars';
+
+import type { ObjMap } from '../../utils/ObjMap';
 
 import { valueFromAST } from '../valueFromAST';
 

@@ -1,7 +1,5 @@
 import { Kind } from 'graphql';
 
-import { isIterableObject, isObjectLike } from '../jsutils/ObjMap';
-
 import type {
   ObjectFieldNode,
   ObjectValueNode,
@@ -17,6 +15,7 @@ import { isTypeRef } from '../type/definition';
 import { IrisID } from '../type/scalars';
 
 import { inspect } from '../utils/legacy';
+import { isIterableObject, isObjectLike } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
 
 /**

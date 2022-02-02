@@ -1,7 +1,7 @@
 import type { GraphQLScalarTypeConfig } from 'graphql';
 import { GraphQLScalarType } from 'graphql';
 
-import type { ObjMap } from '../jsutils/ObjMap';
+import type { ObjMap } from '../utils/ObjMap';
 
 import type {
   IrisField,

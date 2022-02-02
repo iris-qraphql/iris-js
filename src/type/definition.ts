@@ -10,9 +10,6 @@ import {
 } from 'graphql';
 import { pluck } from 'ramda';
 
-import type { ObjMap } from '../jsutils/ObjMap';
-import { mapValue } from '../jsutils/ObjMap';
-
 import type {
   _VariantDefinitionNode,
   ArgumentDefinitionNode,
@@ -33,6 +30,8 @@ import {
   instanceOf,
   suggestionList,
 } from '../utils/legacy';
+import type { ObjMap } from '../utils/ObjMap';
+import { mapValue } from '../utils/ObjMap';
 import type { ConfigMap, Maybe } from '../utils/type-level';
 
 export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({
@@ -201,6 +200,21 @@ export type IrisResolverVariantConfig = IrisEntity & {
   astNode?: _VariantDefinitionNode<'resolver'>;
 };
 
+export type VARIANT_CONFIG = {
+  resolver: IrisResolverVariantConfig;
+  data: IrisVariant<'data'>;
+};
+
+export type IrisVariantConfig<R extends Role> = VARIANT_CONFIG[R];
+
+type IrisDataTypeConfig<I, O> = Readonly<{
+  name: string;
+  description?: Maybe<string>;
+  variants?: ReadonlyArray<IrisVariant<'data'>>;
+  scalar?: GraphQLScalarType<I, O>;
+  astNode?: Maybe<DataTypeDefinitionNode>;
+}>;
+
 export type IrisResolverTypeConfig = {
   name: string;
   description?: Maybe<string>;
@@ -293,14 +307,6 @@ export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
 
   toJSON = (): string => this.toString();
 }
-
-type IrisDataTypeConfig<I, O> = Readonly<{
-  name: string;
-  description?: Maybe<string>;
-  variants?: ReadonlyArray<IrisVariant<'data'>>;
-  scalar?: GraphQLScalarType<I, O>;
-  astNode?: Maybe<DataTypeDefinitionNode>;
-}>;
 
 const lookupVariant = <V extends { name: string }>(
   typeName: string,

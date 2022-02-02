@@ -1,5 +1,5 @@
-import { iris, IrisResolverType, IrisSchema, IrisString } from '../index';
-import { toJSONDeep } from '../utils/toJSONDeep';
+import { iris, IrisResolverType, IrisSchema, IrisString } from '../../index';
+import { toJSONDeep } from '../../utils/toJSONDeep';
 
 const schema = new IrisSchema({
   query: new IrisResolverType({

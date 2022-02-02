@@ -1,6 +1,3 @@
-import type { ObjMap } from '../../jsutils/ObjMap';
-import { keyMap } from '../../jsutils/ObjMap';
-
 import type { ArgumentDefinitionNode } from '../../language/ast';
 import { IrisKind } from '../../language/kinds';
 import { print } from '../../language/printer';
@@ -12,6 +9,8 @@ import { specifiedDirectives } from '../../type/directives';
 
 import { GraphQLError } from '../../error';
 import { inspect } from '../../utils/legacy';
+import type { ObjMap } from '../../utils/ObjMap';
+import { keyMap } from '../../utils/ObjMap';
 
 import type {
   SDLValidationContext,

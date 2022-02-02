@@ -1,10 +1,8 @@
 import type { ParseOptions, Source } from 'graphql';
 
-import type { ObjMap } from '../jsutils/ObjMap';
-import { keyMap } from '../jsutils/ObjMap';
-
 import type {
   ArgumentDefinitionNode,
+  DataVariantDefinitionNode,
   DirectiveDefinitionNode,
   DocumentNode,
   FieldDefinitionNode,
@@ -13,7 +11,7 @@ import type {
   Role,
   TypeDefinitionNode,
   TypeNode,
-  VariantDefinitionNode,
+  VariantDefinition,
 } from '../language/ast';
 import { IrisKind } from '../language/kinds';
 import { parse } from '../language/parser';
@@ -23,15 +21,17 @@ import { validateSDL } from '../validation/validate';
 
 import { valueFromAST } from '../conversion/valueFromAST';
 import { getDirectiveValues } from '../conversion/values';
+import type { ObjMap } from '../utils/ObjMap';
+import { keyMap } from '../utils/ObjMap';
 import type { ConfigMap, Maybe } from '../utils/type-level';
 
 import type {
   IrisArgument,
   IrisFieldConfig,
   IrisNamedType,
-  IrisResolverVariantConfig,
   IrisType,
   IrisVariant,
+  IrisVariantConfig,
 } from './definition';
 import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
 import { GraphQLDeprecatedDirective, GraphQLDirective } from './directives';
@@ -162,8 +162,8 @@ export function buildASTSchema(
 
   function buildVariant<R extends Role>(
     role: R,
-    astNode: ResolverVariantDefinitionNode,
-  ): IrisResolverVariantConfig | IrisVariant<'data'> {
+    astNode: VariantDefinition<R>,
+  ): IrisVariantConfig<R> {
     const name = astNode.name.value;
     const description = astNode.description?.value;
     const deprecationReason = getDeprecationReason(astNode);
@@ -175,7 +175,7 @@ export function buildASTSchema(
         deprecationReason,
         astNode,
         type: getNamedType(astNode),
-      };
+      } as IrisVariantConfig<R>;
     }
 
     if (role === 'data') {
@@ -196,7 +196,7 @@ export function buildASTSchema(
       deprecationReason,
       fields: buildFieldMap<'resolver'>(astNode.fields ?? []),
       astNode,
-    };
+    } as IrisVariantConfig<'resolver'>;
   }
 
   function buildType(astNode: TypeDefinitionNode): IrisNamedType {
@@ -216,7 +216,7 @@ export function buildASTSchema(
         return new IrisDataType({
           name,
           description: astNode.description?.value,
-          variants: astNode.variants.map((v) => buildVariant('data', v)) as any,
+          variants: astNode.variants.map((v) => buildVariant('data', v)),
           astNode,
         });
       }
@@ -227,6 +227,9 @@ export function buildASTSchema(
 const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
 
 const getDeprecationReason = (
-  node: FieldDefinitionNode | ArgumentDefinitionNode | VariantDefinitionNode,
+  node:
+    | FieldDefinitionNode
+    | ArgumentDefinitionNode
+    | DataVariantDefinitionNode,
 ): Maybe<string> =>
   getDirectiveValues(GraphQLDeprecatedDirective, node)?.reason as string;

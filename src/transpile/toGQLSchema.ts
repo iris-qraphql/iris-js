@@ -16,9 +16,6 @@ import {
   GraphQLUnionType,
   specifiedScalarTypes,
 } from 'graphql';
-import type { ObjMap } from 'graphql/jsutils/ObjMap';
-
-import { keyMap, mapValue } from '../jsutils/ObjMap';
 
 import type {
   IrisDataType,
@@ -31,6 +28,9 @@ import type {
 import { isDataType, isTypeRef } from '../type/definition';
 import { isSpecifiedScalarType } from '../type/scalars';
 import type { IrisSchema } from '../type/schema';
+
+import type { ObjMap } from '../utils/ObjMap';
+import { keyMap, mapValue } from '../utils/ObjMap';
 
 const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
 

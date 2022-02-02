@@ -101,10 +101,3 @@ export type {
   ResolverTypeDefinitionNode,
   DirectiveDefinitionNode,
 } from './language/index';
-
-export {
-  buildSchema,
-  printSchema,
-  printType,
-  astFromValue,
-} from './utilities/index';
