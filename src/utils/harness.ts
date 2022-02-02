@@ -2,12 +2,11 @@ import type { Maybe } from '../jsutils/Maybe';
 
 import { parse } from '../language/parser';
 
+import { buildSchema } from '../type/buildASTSchema';
 import type { IrisSchema } from '../type/schema';
 
 import { validateSDL } from '../validation/validate';
 import type { SDLValidationRule } from '../validation/ValidationContext';
-
-import { buildSchema } from '../type/buildASTSchema';
 
 import { toJSONDeep } from './toJSONDeep';
 

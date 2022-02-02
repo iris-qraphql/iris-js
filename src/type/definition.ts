@@ -10,7 +10,6 @@ import {
 } from 'graphql';
 import { pluck } from 'ramda';
 
-import { inspect } from '../jsutils/inspect';
 import type { Maybe } from '../jsutils/Maybe';
 import type { ObjMap } from '../jsutils/ObjMap';
 import { mapValue } from '../jsutils/ObjMap';
@@ -30,7 +29,7 @@ import type {
 import { print } from '../language/printer';
 
 import { GraphQLError } from '../error';
-import { instanceOf } from '../utils/legacy';
+import { inspect, instanceOf } from '../utils/legacy';
 import type { ConfigMap } from '../utils/type-level';
 
 export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({

@@ -1,13 +1,11 @@
-import { inspect } from '../../jsutils/inspect';
-
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import { buildSchema } from '../buildASTSchema';
-
 import { GraphQLError } from '../../error';
+import { inspect } from '../../utils/legacy';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { ConfigMapValue } from '../../utils/type-level';
 
+import { buildSchema } from '../buildASTSchema';
 import type {
   IrisArgument,
   IrisFieldConfig,

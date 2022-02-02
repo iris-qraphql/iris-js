@@ -6,6 +6,8 @@ import type { Maybe } from '../jsutils/Maybe';
 
 import { print } from '../language/printer';
 
+import { astFromValue } from '../conversion/astFromValue';
+
 import type {
   IrisArgument,
   IrisDataType,
@@ -19,8 +21,6 @@ import type { GraphQLDirective } from './directives';
 import { isSpecifiedDirective } from './directives';
 import { isSpecifiedScalarType } from './scalars';
 import type { IrisSchema } from './schema';
-
-import { astFromValue } from '../conversion/astFromValue';
 
 export function printSchema(schema: IrisSchema): string {
   return printFilteredSchema(

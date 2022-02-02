@@ -1,9 +1,8 @@
 import { parseValue } from '../../language/parser';
 import { visit } from '../../language/visitor';
 
-import { IrisSchema } from '../../type/schema';
-
 import { buildSchema } from '../../type/buildASTSchema';
+import { IrisSchema } from '../../type/schema';
 
 import { TypeInfo, visitWithTypeInfo } from '../TypeInfo';
 

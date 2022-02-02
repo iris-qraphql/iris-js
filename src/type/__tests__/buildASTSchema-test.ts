@@ -1,21 +1,14 @@
 import { IrisKind } from '../../language/kinds';
 
-import { assertDataType, assertResolverType } from '../definition';
-import { GraphQLDeprecatedDirective } from '../directives';
-import {
-  IrisBool,
-  IrisFloat,
-  IrisID,
-  IrisInt,
-  IrisString,
-} from '../scalars';
-import { IrisSchema } from '../schema';
-import { validateSchema } from '../validate';
-
 import { dedent } from '../../utils/dedent';
 
 import { buildASTSchema, buildSchema } from '../buildASTSchema';
+import { assertDataType, assertResolverType } from '../definition';
+import { GraphQLDeprecatedDirective } from '../directives';
 import { printSchema } from '../printSchema';
+import { IrisBool, IrisFloat, IrisID, IrisInt, IrisString } from '../scalars';
+import { IrisSchema } from '../schema';
+import { validateSchema } from '../validate';
 
 /**
  * This function does a full cycle of going from a string with the contents of

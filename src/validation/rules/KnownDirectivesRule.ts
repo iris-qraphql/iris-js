@@ -1,6 +1,5 @@
 import type { Kind } from 'graphql';
 
-import { inspect } from '../../jsutils/inspect';
 import { invariant } from '../../jsutils/invariant';
 
 import type { ASTNode } from '../../language/ast';
@@ -11,6 +10,7 @@ import type { ASTVisitor } from '../../language/visitor';
 import { specifiedDirectives } from '../../type/directives';
 
 import { GraphQLError } from '../../error';
+import { inspect } from '../../utils/legacy';
 
 import type {
   SDLValidationContext,

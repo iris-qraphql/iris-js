@@ -1,4 +1,3 @@
-import { inspect } from '../../jsutils/inspect';
 import type { ObjMap } from '../../jsutils/ObjMap';
 import { keyMap } from '../../jsutils/ObjMap';
 
@@ -12,6 +11,7 @@ import { isRequiredArgument, isType } from '../../type/definition';
 import { specifiedDirectives } from '../../type/directives';
 
 import { GraphQLError } from '../../error';
+import { inspect } from '../../utils/legacy';
 
 import type {
   SDLValidationContext,

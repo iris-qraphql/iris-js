@@ -20,6 +20,12 @@ import { IrisKind } from '../language/kinds';
 import { parse } from '../language/parser';
 import { isTypeDefinitionNode } from '../language/predicates';
 
+import { validateSDL } from '../validation/validate';
+
+import { valueFromAST } from '../conversion/valueFromAST';
+import { getDirectiveValues } from '../conversion/values';
+import type { ConfigMap } from '../utils/type-level';
+
 import type {
   IrisArgument,
   IrisFieldConfig,
@@ -28,24 +34,11 @@ import type {
   IrisType,
   IrisVariant,
 } from './definition';
-import {
-  IrisDataType,
-  IrisResolverType,
-  IrisTypeRef,
-} from './definition';
-import {
-  GraphQLDeprecatedDirective,
-  GraphQLDirective,
-} from './directives';
+import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
+import { GraphQLDeprecatedDirective, GraphQLDirective } from './directives';
 import { specifiedScalarTypes } from './scalars';
 import type { IrisSchemaValidationOptions } from './schema';
 import { IrisSchema } from './schema';
-
-import { validateSDL } from '../validation/validate';
-
-import { valueFromAST } from '../conversion/valueFromAST';
-import { getDirectiveValues } from '../conversion/values';
-import type { ConfigMap } from '../utils/type-level';
 
 export function buildSchema(
   source: string | Source,

@@ -1,11 +1,11 @@
 import { OperationTypeNode } from 'graphql';
 
-import { inspect } from '../jsutils/inspect';
 import type { Maybe } from '../jsutils/Maybe';
 
 import type { ASTNode, DirectiveNode } from '../language/ast';
 
 import { GraphQLError } from '../error';
+import { inspect } from '../utils/legacy';
 
 import type {
   IrisDataType,

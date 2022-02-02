@@ -1,7 +1,5 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import { printSchema } from '../printSchema';
-
 import { dedent } from '../../utils/dedent';
 
 import type { IrisResolverType } from '../definition';
@@ -13,6 +11,7 @@ import {
   gqlObject,
   gqlScalar,
 } from '../make';
+import { printSchema } from '../printSchema';
 import { IrisBool, IrisInt, IrisString } from '../scalars';
 import { IrisSchema } from '../schema';
 

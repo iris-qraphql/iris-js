@@ -1,4 +1,3 @@
-import { inspect } from '../../jsutils/inspect';
 import { keyMap } from '../../jsutils/ObjMap';
 import { didYouMean, suggestionList } from '../../jsutils/suggestions';
 
@@ -15,6 +14,7 @@ import {
 } from '../../type/definition';
 
 import { GraphQLError } from '../../error';
+import { inspect } from '../../utils/legacy';
 import { lookupObjectTypename } from '../../utils/type-level';
 
 import type { ValidationContext } from '../ValidationContext';
