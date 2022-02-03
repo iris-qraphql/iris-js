@@ -1,5 +1,3 @@
-import { GraphQLError } from 'graphql';
-
 import type { ValueNode } from '../../language/ast';
 import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
@@ -12,7 +10,7 @@ import {
   unpackMaybe,
 } from '../../type/definition';
 
-import { irisError } from '../../error';
+import { irisError, isIrisError } from '../../error';
 import { didYouMean, inspect, suggestionList } from '../../utils/legacy';
 import { keyMap } from '../../utils/ObjMap';
 import { lookupObjectTypename } from '../../utils/type-level';
@@ -130,7 +128,7 @@ function isValidValueNode(context: ValidationContext, node: ValueNode): void {
     }
   } catch (error) {
     const typeStr = inspect(locationType);
-    if (error instanceof GraphQLError) {
+    if (isIrisError(error)) {
       context.reportError(error);
     } else {
       context.reportError(

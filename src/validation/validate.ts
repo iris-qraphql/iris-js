@@ -3,7 +3,7 @@ import { visit, visitInParallel } from '../language/visitor';
 
 import type { IrisSchema } from '../type/schema';
 
-import type { GraphQLError } from '../error';
+import type { IrisError } from '../error';
 import type { Maybe } from '../utils/type-level';
 
 import { specifiedSDLRules } from './specifiedRules';
@@ -17,8 +17,8 @@ export function validateSDL(
   documentAST: DocumentNode,
   schemaToExtend?: Maybe<IrisSchema>,
   rules: ReadonlyArray<SDLValidationRule> = specifiedSDLRules,
-): ReadonlyArray<GraphQLError> {
-  const errors: Array<GraphQLError> = [];
+): ReadonlyArray<IrisError> {
+  const errors: Array<IrisError> = [];
   const context = new SDLValidationContext(
     documentAST,
     schemaToExtend,

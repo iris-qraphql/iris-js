@@ -12,7 +12,7 @@ import type {
 import type { GraphQLDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
 
-import type { GraphQLError } from '../error';
+import type { IrisError } from '../error';
 import type { Maybe } from '../utils/type-level';
 
 import type { TypeInfo } from './TypeInfo';
@@ -24,9 +24,9 @@ import type { TypeInfo } from './TypeInfo';
  */
 export class ASTValidationContext {
   private _ast: DocumentNode;
-  private _onError: (error: GraphQLError) => void;
+  private _onError: (error: IrisError) => void;
 
-  constructor(ast: DocumentNode, onError: (error: GraphQLError) => void) {
+  constructor(ast: DocumentNode, onError: (error: IrisError) => void) {
     this._ast = ast;
     this._onError = onError;
   }
@@ -35,7 +35,7 @@ export class ASTValidationContext {
     return 'ASTValidationContext';
   }
 
-  reportError(error: GraphQLError): void {
+  reportError(error: IrisError): void {
     this._onError(error);
   }
 
@@ -52,7 +52,7 @@ export class SDLValidationContext extends ASTValidationContext {
   constructor(
     ast: DocumentNode,
     schema: Maybe<IrisSchema>,
-    onError: (error: GraphQLError) => void,
+    onError: (error: IrisError) => void,
   ) {
     super(ast, onError);
     this._schema = schema;
@@ -77,7 +77,7 @@ export class ValidationContext extends ASTValidationContext {
     schema: IrisSchema,
     ast: DocumentNode,
     typeInfo: TypeInfo,
-    onError: (error: GraphQLError) => void,
+    onError: (error: IrisError) => void,
   ) {
     super(ast, onError);
     this._schema = schema;
