@@ -2,7 +2,7 @@ import type { ASTVisitor } from '../../../language/visitor';
 
 import { getNamedType, isDataType } from '../../../type/definition';
 
-import { GraphQLError } from '../../../error';
+import { irisError } from '../../../error';
 import { invariant } from '../../../utils/legacy';
 
 import type { ValidationContext } from '../../ValidationContext';
@@ -26,9 +26,9 @@ export function NoDeprecatedCustomRule(context: ValidationContext): ASTVisitor {
         const directiveDef = context.getDirective();
         if (directiveDef != null) {
           context.reportError(
-            new GraphQLError(
+            irisError(
               `Directive "@${directiveDef.name}" argument "${argDef.name}" is deprecated. ${deprecationReason}`,
-              node,
+              { node },
             ),
           );
         } else {
@@ -36,9 +36,9 @@ export function NoDeprecatedCustomRule(context: ValidationContext): ASTVisitor {
           const fieldDef = context.getFieldDef();
           invariant(parentType != null && fieldDef != null);
           context.reportError(
-            new GraphQLError(
+            irisError(
               `Field "${parentType.name}.${fieldDef.name}" argument "${argDef.name}" is deprecated. ${deprecationReason}`,
-              node,
+              { node },
             ),
           );
         }
@@ -51,9 +51,9 @@ export function NoDeprecatedCustomRule(context: ValidationContext): ASTVisitor {
         const deprecationReason = inputFieldDef?.deprecationReason;
         if (deprecationReason != null) {
           context.reportError(
-            new GraphQLError(
+            irisError(
               `The input field ${def.name}.${inputFieldDef?.name} is deprecated. ${deprecationReason}`,
-              node,
+              { node },
             ),
           );
         }
@@ -66,9 +66,9 @@ export function NoDeprecatedCustomRule(context: ValidationContext): ASTVisitor {
         const enumTypeDef = getNamedType(context.getInputType());
         invariant(enumTypeDef != null);
         context.reportError(
-          new GraphQLError(
+          irisError(
             `The Variant "${enumTypeDef.name}.${enumValueDef.name}" is deprecated. ${deprecationReason}`,
-            node,
+            { node },
           ),
         );
       }

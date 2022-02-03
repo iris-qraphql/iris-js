@@ -1,57 +1,20 @@
-import type { ASTNode as GQLASTNode, Source } from 'graphql';
-import { GraphQLError as GQLError } from 'graphql';
-import type {
-  GraphQLErrorArgs,
-  GraphQLErrorExtensions,
-} from 'graphql/error/GraphQLError';
+import type { ASTNode as Node, Source } from 'graphql';
+import { GraphQLError } from 'graphql';
+import type { GraphQLErrorArgs } from 'graphql/error/GraphQLError';
 
 import type { ASTNode } from './language/ast';
 
-import type { Maybe } from './utils/type-level';
+type ErrorNode = ReadonlyArray<ASTNode> | ASTNode | null;
 
 type IrisErrorArgs = GraphQLErrorArgs & {
-  node: ReadonlyArray<ASTNode> | ASTNode | null;
+  node?: ErrorNode;
 };
 
-export class GraphQLError extends GQLError {
-  constructor(message: string, args?: IrisErrorArgs);
-  constructor(
-    message: string,
-    nodes?: ReadonlyArray<ASTNode> | ASTNode | null | IrisErrorArgs,
-    source?: Maybe<Source>,
-    positions?: Maybe<ReadonlyArray<number>>,
-    path?: Maybe<ReadonlyArray<string | number>>,
-    originalError?: Maybe<
-      Error & {
-        readonly extensions?: unknown;
-      }
-    >,
-    extensions?: Maybe<GraphQLErrorExtensions>,
-  );
-  constructor(
-    message: string,
-    nodes?: ReadonlyArray<ASTNode> | ASTNode | null | IrisErrorArgs,
-    source?: Maybe<Source>,
-    positions?: Maybe<ReadonlyArray<number>>,
-    path?: Maybe<ReadonlyArray<string | number>>,
-    originalError?: Maybe<
-      Error & {
-        readonly extensions?: unknown;
-      }
-    >,
-    extensions?: Maybe<GraphQLErrorExtensions>,
-  ) {
-    super(
-      message,
-      nodes as GQLASTNode,
-      source,
-      positions,
-      path,
-      originalError,
-      extensions,
-    );
-  }
-}
+export const irisError = (message: string, args?: IrisErrorArgs) =>
+  new GraphQLError(message, args);
+
+export const irisNodeError = (message: string, node?: ErrorNode) =>
+  new GraphQLError(message, node as Node);
 
 export const syntaxError = (
   source: Source,
@@ -61,5 +24,4 @@ export const syntaxError = (
   new GraphQLError(`Syntax Error: ${description}`, {
     source,
     positions: [position],
-    node: null,
   });

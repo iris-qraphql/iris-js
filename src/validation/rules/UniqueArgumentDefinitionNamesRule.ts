@@ -7,7 +7,7 @@ import type {
 } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { GraphQLError } from '../../error';
+import { irisNodeError } from '../../error';
 
 import type { SDLValidationContext } from '../ValidationContext';
 
@@ -51,7 +51,7 @@ export function UniqueArgumentDefinitionNamesRule(
     forEachObjIndexed((argNodes, argName) => {
       if (argNodes.length > 1) {
         context.reportError(
-          new GraphQLError(
+          irisNodeError(
             `Argument "${parentName}(${argName}:)" can only be defined once.`,
             argNodes.map((node) => node.name),
           ),

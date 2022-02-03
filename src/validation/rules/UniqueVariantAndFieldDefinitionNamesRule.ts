@@ -7,7 +7,7 @@ import type {
 } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { GraphQLError } from '../../error';
+import { irisNodeError } from '../../error';
 
 import type { SDLValidationContext } from '../ValidationContext';
 
@@ -38,7 +38,7 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
 
       if (knownVariantNames[variantName]) {
         context.reportError(
-          new GraphQLError(
+          irisNodeError(
             `Variant "${typeName}.${variantName}" can only be defined once.`,
             [knownVariantNames[variantName], variant.name],
           ),
@@ -72,7 +72,7 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
 
       if (fieldNames[fieldName]) {
         context.reportError(
-          new GraphQLError(
+          irisNodeError(
             `Field "${typeName}.${fieldName}" can only be defined once.`,
             [fieldNames[fieldName], fieldDef.name],
           ),

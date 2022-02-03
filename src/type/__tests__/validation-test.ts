@@ -1,6 +1,6 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import { GraphQLError } from '../../error';
+import { irisError } from '../../error';
 import { inspect } from '../../utils/legacy';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 import type { ConfigMapValue } from '../../utils/type-level';
@@ -515,7 +515,7 @@ describe('assertValidSchema', () => {
   it('include multiple errors into a description', () => {
     const schema = buildSchema('resolver SomeType');
     expect(validateSchema(schema)).toEqual([
-      new GraphQLError('Query root type must be provided.'),
+      irisError('Query root type must be provided.'),
     ]);
   });
 });

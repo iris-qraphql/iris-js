@@ -1,8 +1,9 @@
+import type { GraphQLError } from 'graphql';
 import { OperationTypeNode } from 'graphql';
 
 import type { ASTNode, DirectiveNode } from '../language/ast';
 
-import { GraphQLError } from '../error';
+import { irisNodeError } from '../error';
 import { inspect } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
@@ -72,7 +73,7 @@ class SchemaValidationContext {
     const _nodes = Array.isArray(nodes)
       ? (nodes.filter(Boolean) as ReadonlyArray<ASTNode>)
       : (nodes as Maybe<ASTNode>);
-    this._errors.push(new GraphQLError(message, _nodes));
+    this._errors.push(irisNodeError(message, _nodes));
   }
 
   getErrors(): ReadonlyArray<GraphQLError> {

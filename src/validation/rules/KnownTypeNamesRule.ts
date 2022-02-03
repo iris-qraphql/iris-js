@@ -7,7 +7,7 @@ import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedScalarTypes } from '../../type/scalars';
 
-import { GraphQLError } from '../../error';
+import { irisNodeError } from '../../error';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type {
@@ -56,7 +56,7 @@ export function KnownTypeNamesRule(
           isSDL ? standardTypeNames.concat(typeNames) : typeNames,
         );
         context.reportError(
-          new GraphQLError(
+          irisNodeError(
             `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
             node,
           ),
@@ -81,7 +81,7 @@ export function KnownTypeNamesRule(
           isSDL ? standardTypeNames.concat(typeNames) : typeNames,
         );
         context.reportError(
-          new GraphQLError(
+          irisNodeError(
             `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
             node,
           ),

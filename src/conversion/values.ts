@@ -7,7 +7,7 @@ import type { IrisField } from '../type/definition';
 import { isMaybeType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 
-import { GraphQLError } from '../error';
+import { irisError } from '../error';
 import { inspect } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap } from '../utils/ObjMap';
@@ -35,10 +35,10 @@ function getArgumentValues(
       if (argDef.defaultValue !== undefined) {
         coercedValues[name] = argDef.defaultValue;
       } else if (!isMaybeType(argType)) {
-        throw new GraphQLError(
+        throw irisError(
           `Argument "${name}" of required type "${inspect(argType)}" ` +
             'was not provided.',
-          node,
+          { node },
         );
       }
       continue;
@@ -56,10 +56,10 @@ function getArgumentValues(
         if (argDef.defaultValue !== undefined) {
           coercedValues[name] = argDef.defaultValue;
         } else if (!isMaybeType(argType)) {
-          throw new GraphQLError(
+          throw irisError(
             `Argument "${name}" of required type "${inspect(argType)}" ` +
               `was provided the variable "$${variableName}" which was not provided a runtime value.`,
-            valueNode,
+            { node: valueNode },
           );
         }
         continue;
@@ -68,10 +68,10 @@ function getArgumentValues(
     }
 
     if (isNull && !isMaybeType(argType)) {
-      throw new GraphQLError(
+      throw irisError(
         `Argument "${name}" of non-null type "${inspect(argType)}" ` +
           'must not be null.',
-        valueNode,
+        { node: valueNode },
       );
     }
 
@@ -80,9 +80,9 @@ function getArgumentValues(
       // Note: ValuesOfCorrectTypeRule validation should catch this before
       // execution. This is a runtime check to ensure execution does not
       // continue with an invalid argument value.
-      throw new GraphQLError(
+      throw irisError(
         `Argument "${name}" has invalid value ${print(valueNode)}.`,
-        valueNode,
+        { node: valueNode },
       );
     }
     coercedValues[name] = coercedValue;

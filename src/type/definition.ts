@@ -23,7 +23,7 @@ import type {
 } from '../language/ast';
 import { print } from '../language/printer';
 
-import { GraphQLError } from '../error';
+import { irisError } from '../error';
 import {
   didYouMean,
   inspect,
@@ -315,7 +315,7 @@ const lookupVariant = <V extends { name: string }>(
 ): V => {
   if (!name) {
     if (variants.length !== 1) {
-      throw new GraphQLError(
+      throw irisError(
         `Object ${inspect(
           name,
         )} must provide variant name for type "${typeName}"`,
@@ -327,7 +327,7 @@ const lookupVariant = <V extends { name: string }>(
   const variant = variants.find((v) => v.name === name);
 
   if (!variant) {
-    throw new GraphQLError(
+    throw irisError(
       `Data "${typeName}" cannot represent value: ${inspect(name)}` +
         didYouMean(
           'the variant',
@@ -342,7 +342,7 @@ const lookupVariant = <V extends { name: string }>(
 const assertString = (type: string, value: unknown): string => {
   if (typeof value !== 'string') {
     const valueStr = inspect(value);
-    throw new GraphQLError(
+    throw irisError(
       `Data "${type}" cannot represent non-string value: ${valueStr}.`,
     );
   }
@@ -402,7 +402,7 @@ export class IrisDataType<I = unknown, O = I> {
 
     // Note: variables will be resolved to a value before calling this function.
     if (valueNode.kind !== Kind.ENUM) {
-      throw new GraphQLError(
+      throw irisError(
         `Data "${this.name}" cannot represent value: ${print(valueNode)}.`,
         { node: valueNode },
       );
