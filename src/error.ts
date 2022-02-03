@@ -14,9 +14,23 @@ type IrisErrorArgs = GraphQLErrorArgs & {
 };
 
 export class GraphQLError extends GQLError {
+  constructor(message: string, args?: IrisErrorArgs);
   constructor(
     message: string,
-    nodes?: ReadonlyArray<ASTNode> | ASTNode | null,
+    nodes?: ReadonlyArray<ASTNode> | ASTNode | null | IrisErrorArgs,
+    source?: Maybe<Source>,
+    positions?: Maybe<ReadonlyArray<number>>,
+    path?: Maybe<ReadonlyArray<string | number>>,
+    originalError?: Maybe<
+      Error & {
+        readonly extensions?: unknown;
+      }
+    >,
+    extensions?: Maybe<GraphQLErrorExtensions>,
+  );
+  constructor(
+    message: string,
+    nodes?: ReadonlyArray<ASTNode> | ASTNode | null | IrisErrorArgs,
     source?: Maybe<Source>,
     positions?: Maybe<ReadonlyArray<number>>,
     path?: Maybe<ReadonlyArray<string | number>>,
@@ -37,17 +51,15 @@ export class GraphQLError extends GQLError {
       extensions,
     );
   }
-
-  // @ts-expect-error
-  constructor(message: string, args?: IrisErrorArgs);
 }
 
-export function syntaxError(
+export const syntaxError = (
   source: Source,
   position: number,
   description: string,
-): GraphQLError {
-  return new GraphQLError(`Syntax Error: ${description}`, undefined, source, [
-    position,
-  ]);
-}
+): GraphQLError =>
+  new GraphQLError(`Syntax Error: ${description}`, {
+    source,
+    positions: [position],
+    node: null,
+  });
