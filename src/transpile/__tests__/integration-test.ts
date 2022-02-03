@@ -1,23 +1,19 @@
-import { iris, IrisResolverType, IrisSchema, IrisString } from '../../index';
+import { buildSchema } from '../../type/buildASTSchema';
+
+import { iris } from '../../index';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 
-const schema = new IrisSchema({
-  query: new IrisResolverType({
-    name: 'Query',
-    variants: [
-      {
-        name: 'Query',
-        fields: { hello: { type: IrisString } },
-      },
-    ],
-  }),
-});
-
-const rootValue = {
-  hello: () => 'world',
-};
-
 describe('Integration', () => {
+  const schema = buildSchema(`
+  resolver Query = {
+    hello: String
+  }
+`);
+
+  const rootValue = {
+    hello: () => 'world',
+  };
+
   it('hello world App', async () => {
     const result = await iris({ schema, rootValue, source: '{ hello }' });
 
