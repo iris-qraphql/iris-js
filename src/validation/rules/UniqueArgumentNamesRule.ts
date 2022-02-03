@@ -3,7 +3,7 @@ import { forEachObjIndexed, groupBy } from 'ramda';
 import type { ArgumentNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { GraphQLError } from '../../error';
+import { irisError } from '../../error';
 
 import type { ASTValidationContext } from '../ValidationContext';
 
@@ -32,10 +32,9 @@ export function UniqueArgumentNamesRule(
     forEachObjIndexed((argNodes, argName) => {
       if (argNodes.length > 1) {
         context.reportError(
-          new GraphQLError(
-            `There can be only one argument named "${argName}".`,
-            argNodes.map((node) => node.name),
-          ),
+          irisError(`There can be only one argument named "${argName}".`, {
+            node: argNodes.map((node) => node.name),
+          }),
         );
       }
     }, seenArgs);

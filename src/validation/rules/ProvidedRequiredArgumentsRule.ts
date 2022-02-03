@@ -7,7 +7,7 @@ import type { IrisArgument } from '../../type/definition';
 import { isRequiredArgument, isType } from '../../type/definition';
 import { specifiedDirectives } from '../../type/directives';
 
-import { GraphQLError } from '../../error';
+import { irisError } from '../../error';
 import { inspect } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 import { keyMap } from '../../utils/ObjMap';
@@ -62,9 +62,9 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
                 ? inspect(argDef.type)
                 : print(argDef.type);
               context.reportError(
-                new GraphQLError(
+                irisError(
                   `Directive "@${directiveName}" argument "${argName}" of type "${argType}" is required, but it was not provided.`,
-                  directiveNode,
+                  { node: directiveNode },
                 ),
               );
             }

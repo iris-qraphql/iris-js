@@ -10,7 +10,7 @@ import {
   unpackMaybe,
 } from '../../type/definition';
 
-import { GraphQLError } from '../../error';
+import { irisError, isIrisError } from '../../error';
 import { didYouMean, inspect, suggestionList } from '../../utils/legacy';
 import { keyMap } from '../../utils/ObjMap';
 import { lookupObjectTypename } from '../../utils/type-level';
@@ -43,13 +43,13 @@ export const ValuesOfCorrectTypeRule = (
       (fieldDef) => {
         if (!nodeFields[fieldDef.name] && !isMaybeType(fieldDef.type)) {
           context.reportError(
-            new GraphQLError(
+            irisError(
               `Field "${type.name}.${
                 fieldDef.name
               }" of required type "${inspect(
                 fieldDef.type,
               )}" was not provided.`,
-              node,
+              { node },
             ),
           );
         }
@@ -65,10 +65,10 @@ export const ValuesOfCorrectTypeRule = (
         Object.keys(parentType.variantBy().fields ?? {}),
       );
       context.reportError(
-        new GraphQLError(
+        irisError(
           `Field "${node.name.value}" is not defined by type "${parentType.name}".` +
             didYouMean(suggestions),
-          node,
+          { node },
         ),
       );
     }
@@ -77,9 +77,9 @@ export const ValuesOfCorrectTypeRule = (
     const type = context.getInputType();
     if (!isMaybeType(type)) {
       context.reportError(
-        new GraphQLError(
+        irisError(
           `Expected value of type "${inspect(type)}", found ${print(node)}.`,
-          node,
+          { node },
         ),
       );
     }
@@ -107,10 +107,9 @@ function isValidValueNode(context: ValidationContext, node: ValueNode): void {
   if (!isDataType(type)) {
     const typeStr = inspect(locationType);
     context.reportError(
-      new GraphQLError(
-        `Expected value of type "${typeStr}", found ${print(node)}.`,
+      irisError(`Expected value of type "${typeStr}", found ${print(node)}.`, {
         node,
-      ),
+      }),
     );
     return;
   }
@@ -121,26 +120,22 @@ function isValidValueNode(context: ValidationContext, node: ValueNode): void {
     if (type.parseLiteral(node) === undefined) {
       const typeStr = inspect(locationType);
       context.reportError(
-        new GraphQLError(
+        irisError(
           `Expected value of type "${typeStr}", found ${print(node)}.`,
-          node,
+          { node },
         ),
       );
     }
   } catch (error) {
     const typeStr = inspect(locationType);
-    if (error instanceof GraphQLError) {
+    if (isIrisError(error)) {
       context.reportError(error);
     } else {
       context.reportError(
-        new GraphQLError(
+        irisError(
           `Expected value of type "${typeStr}", found ${print(node)}; ` +
             error.message,
-          node,
-          undefined,
-          undefined,
-          undefined,
-          error, // Ensure a reference to the original error is maintained.
+          { node, originalError: error },
         ),
       );
     }

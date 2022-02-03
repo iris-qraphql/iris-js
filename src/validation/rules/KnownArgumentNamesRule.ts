@@ -3,7 +3,7 @@ import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
 
-import { GraphQLError } from '../../error';
+import { irisError } from '../../error';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type {
@@ -34,10 +34,10 @@ export function KnownArgumentNamesRule(context: ValidationContext): ASTVisitor {
         const knownArgsNames = fieldDef.args.map((arg) => arg.name);
         const suggestions = suggestionList(argName, knownArgsNames);
         context.reportError(
-          new GraphQLError(
+          irisError(
             `Unknown argument "${argName}" on field "${parentType.name}.${fieldDef.name}".` +
               didYouMean(suggestions),
-            argNode,
+            { node: argNode },
           ),
         );
       }
@@ -81,10 +81,10 @@ export function KnownArgumentNamesOnDirectivesRule(
           if (!knownArgs.includes(argName)) {
             const suggestions = suggestionList(argName, knownArgs);
             context.reportError(
-              new GraphQLError(
+              irisError(
                 `Unknown argument "${argName}" on directive "@${directiveName}".` +
                   didYouMean(suggestions),
-                argNode,
+                { node: argNode },
               ),
             );
           }

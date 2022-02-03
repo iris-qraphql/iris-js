@@ -2,7 +2,8 @@ import { OperationTypeNode } from 'graphql';
 
 import type { ASTNode, DirectiveNode } from '../language/ast';
 
-import { GraphQLError } from '../error';
+import type { IrisError } from '../error';
+import { irisNodeError } from '../error';
 import { inspect } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
@@ -32,9 +33,7 @@ import { assertSchema } from './schema';
  * Validation runs synchronously, returning an array of encountered errors, or
  * an empty array if no errors were encountered and the Schema is valid.
  */
-export function validateSchema(
-  schema: IrisSchema,
-): ReadonlyArray<GraphQLError> {
+export function validateSchema(schema: IrisSchema): ReadonlyArray<IrisError> {
   // First check to ensure the provided value is in fact a IrisSchema.
   assertSchema(schema);
 
@@ -57,7 +56,7 @@ export function validateSchema(
 }
 
 class SchemaValidationContext {
-  readonly _errors: Array<GraphQLError>;
+  readonly _errors: Array<IrisError>;
   readonly schema: IrisSchema;
 
   constructor(schema: IrisSchema) {
@@ -72,10 +71,10 @@ class SchemaValidationContext {
     const _nodes = Array.isArray(nodes)
       ? (nodes.filter(Boolean) as ReadonlyArray<ASTNode>)
       : (nodes as Maybe<ASTNode>);
-    this._errors.push(new GraphQLError(message, _nodes));
+    this._errors.push(irisNodeError(message, _nodes));
   }
 
-  getErrors(): ReadonlyArray<GraphQLError> {
+  getErrors(): ReadonlyArray<IrisError> {
     return this._errors;
   }
 }
