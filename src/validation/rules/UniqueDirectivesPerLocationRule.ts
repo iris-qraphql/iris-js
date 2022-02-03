@@ -4,7 +4,7 @@ import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
 
-import { GraphQLError } from '../../error';
+import { irisError } from '../../error';
 
 import type {
   SDLValidationContext,
@@ -67,9 +67,9 @@ export function UniqueDirectivesPerLocationRule(
         if (uniqueDirectiveMap[directiveName]) {
           if (seenDirectives[directiveName]) {
             context.reportError(
-              new GraphQLError(
+              irisError(
                 `The directive "@${directiveName}" can only be used once at this location.`,
-                [seenDirectives[directiveName], directive],
+                { node: [seenDirectives[directiveName], directive] },
               ),
             );
           } else {

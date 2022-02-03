@@ -7,7 +7,7 @@ import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
 
-import { GraphQLError } from '../../error';
+import { irisError } from '../../error';
 import { inspect, invariant } from '../../utils/legacy';
 
 import type {
@@ -50,7 +50,7 @@ export function KnownDirectivesRule(
 
       if (!locations) {
         context.reportError(
-          new GraphQLError(`Unknown directive "@${name}".`, node),
+          irisError(`Unknown directive "@${name}".`, { node }),
         );
         return;
       }
@@ -58,9 +58,9 @@ export function KnownDirectivesRule(
       const candidateLocation = getDirectiveLocationForASTPath(ancestors);
       if (candidateLocation && !locations.includes(candidateLocation)) {
         context.reportError(
-          new GraphQLError(
+          irisError(
             `Directive "@${name}" may not be used on ${candidateLocation}.`,
-            node,
+            { node },
           ),
         );
       }

@@ -1,7 +1,7 @@
 import type { ParseOptions } from 'graphql';
 import { Kind, Location, Source } from 'graphql';
 
-import type { GraphQLError } from '../error';
+import type { IrisError } from '../error';
 import { syntaxError } from '../error';
 import { instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
@@ -45,7 +45,7 @@ import { TokenKind } from './tokenKind';
 
 /**
  * Given a GraphQL source, parses it into a Document.
- * Throws GraphQLError if a syntax error is encountered.
+ * Throws IrisError if a syntax error is encountered.
  */
 export function parse(
   source: string | Source,
@@ -58,7 +58,7 @@ export function parse(
 /**
  * Given a string containing a GraphQL value (ex. `[42]`), parse the AST for
  * that value.
- * Throws GraphQLError if a syntax error is encountered.
+ * Throws IrisError if a syntax error is encountered.
  *
  * This is useful within tools that operate upon GraphQL Values directly and
  * in isolation of complete GraphQL documents.
@@ -94,7 +94,7 @@ export function parseConstValue(
 /**
  * Given a string containing a GraphQL Type (ex. `[Int!]`), parse the AST for
  * that type.
- * Throws GraphQLError if a syntax error is encountered.
+ * Throws IrisError if a syntax error is encountered.
  *
  * This is useful within tools that operate upon GraphQL Types directly and
  * in isolation of complete GraphQL documents.
@@ -682,7 +682,7 @@ export class Parser {
   /**
    * Helper function for creating an error when an unexpected lexed token is encountered.
    */
-  unexpected(atToken?: Maybe<Token>): GraphQLError {
+  unexpected(atToken?: Maybe<Token>): IrisError {
     const token = atToken ?? this._lexer.token;
     return syntaxError(
       this._lexer.source,

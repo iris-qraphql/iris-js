@@ -1,56 +1,32 @@
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-import type { Source } from 'graphql';
-import { GraphQLError as GQLError } from 'graphql';
-import { locatedError as func } from 'graphql/error';
-import type {
-  GraphQLErrorArgs,
-  GraphQLErrorExtensions,
-} from 'graphql/error/GraphQLError';
+import type { ASTNode as Node, Source } from 'graphql';
+import { GraphQLError } from 'graphql';
+import type { GraphQLErrorArgs } from 'graphql/error/GraphQLError';
 
 import type { ASTNode } from './language/ast';
 
-import type { Maybe } from './utils/type-level';
+export type IrisError = GraphQLError;
+
+type ErrorNode = ReadonlyArray<ASTNode> | ASTNode | null;
 
 type IrisErrorArgs = GraphQLErrorArgs & {
-  node: ReadonlyArray<ASTNode> | ASTNode | null;
+  node?: ErrorNode;
 };
 
-export class GraphQLError extends GQLError {
-  constructor(
-    message: string,
-    nodes?: ReadonlyArray<ASTNode> | ASTNode | null,
-    source?: Maybe<Source>,
-    positions?: Maybe<ReadonlyArray<number>>,
-    path?: Maybe<ReadonlyArray<string | number>>,
-    originalError?: Maybe<
-      Error & {
-        readonly extensions?: unknown;
-      }
-    >,
-    extensions?: Maybe<GraphQLErrorExtensions>,
-  ) {
-    // @ts-expect-error
-    super(message, nodes, source, positions, path, originalError, extensions);
-  }
+export const irisError = (message: string, args?: IrisErrorArgs) =>
+  new GraphQLError(message, args);
 
-  // @ts-expect-error
-  constructor(message: string, args?: IrisErrorArgs);
-}
+export const irisNodeError = (message: string, node?: ErrorNode) =>
+  new GraphQLError(message, node as Node);
 
-export const locatedError = (
-  rawOriginalError: unknown,
-  nodes: ASTNode | ReadonlyArray<ASTNode> | undefined | null,
-  path?: Maybe<ReadonlyArray<string | number>>,
-): GraphQLError =>
-  // @ts-expect-error
-  func(rawOriginalError, nodes, path);
+export const isIrisError = (err: unknown): err is IrisError =>
+  err instanceof GraphQLError;
 
-export function syntaxError(
+export const syntaxError = (
   source: Source,
   position: number,
   description: string,
-): GraphQLError {
-  return new GraphQLError(`Syntax Error: ${description}`, undefined, source, [
-    position,
-  ]);
-}
+): IrisError =>
+  irisError(`Syntax Error: ${description}`, {
+    source,
+    positions: [position],
+  });

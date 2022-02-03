@@ -1,6 +1,6 @@
 import { uniqBy } from 'ramda';
 
-import type { GraphQLError } from '../error';
+import type { IrisError } from '../error';
 import { inspect, instanceOf } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
@@ -28,7 +28,7 @@ export class IrisSchema {
   description: Maybe<string>;
 
   // Used as a cache for validateSchema().
-  __validationErrors: Maybe<ReadonlyArray<GraphQLError>>;
+  __validationErrors: Maybe<ReadonlyArray<IrisError>>;
 
   private _queryType: Maybe<IrisResolverType>;
   private _mutationType: Maybe<IrisResolverType>;

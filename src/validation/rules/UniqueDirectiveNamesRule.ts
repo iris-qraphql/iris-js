@@ -1,6 +1,6 @@
 import type { ASTVisitor } from '../../language/visitor';
 
-import { GraphQLError } from '../../error';
+import { irisError } from '../../error';
 
 import type { SDLValidationContext } from '../ValidationContext';
 
@@ -21,9 +21,9 @@ export function UniqueDirectiveNamesRule(
 
       if (schema?.getDirective(directiveName)) {
         context.reportError(
-          new GraphQLError(
+          irisError(
             `Directive "@${directiveName}" already exists in the schema. It cannot be redefined.`,
-            node.name,
+            { node: node.name },
           ),
         );
         return;
@@ -31,9 +31,9 @@ export function UniqueDirectiveNamesRule(
 
       if (knownDirectiveNames[directiveName]) {
         context.reportError(
-          new GraphQLError(
+          irisError(
             `There can be only one directive named "@${directiveName}".`,
-            [knownDirectiveNames[directiveName], node.name],
+            { node: [knownDirectiveNames[directiveName], node.name] },
           ),
         );
       } else {
