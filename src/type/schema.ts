@@ -89,7 +89,7 @@ export class IrisSchema {
 
       if (this._typeMap[typeName] !== undefined) {
         throw new Error(
-          `Schema must contain uniquely named types but contains multiple types named "${typeName}".`,
+          `Iris Schema must contain uniquely named types but contains multiple types named "${typeName}".`,
         );
       }
       this._typeMap[typeName] = namedType;
@@ -112,9 +112,7 @@ export class IrisSchema {
     return this._subscriptionType ?? undefined;
   }
 
-  getTypeMap(): TypeMap {
-    return this._typeMap;
-  }
+  getTypeMap = (): TypeMap => this._typeMap;
 
   getType(name: string): IrisNamedType | undefined {
     return this.getTypeMap()[name];
