@@ -45,8 +45,8 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     return type;
   };
 
-  const lookup = (name: string): GraphQLNamedOutputType => {
-    const namedType = typeMap[name];
+  const lookup = <T extends GraphQLNamedOutputType>(name: string): T => {
+    const namedType = typeMap[name] as T;
     if (!namedType) {
       throw new Error(`Unknown type ${name}`);
     }
@@ -87,13 +87,14 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
       new GraphQLUnionType({
         name,
         description,
-        types: variants.map(transpileVariant),
+        types: variants.map((v) => transpileVariant(v, name)),
       }),
     );
   };
 
   const transpileVariant = (
     variant: IrisVariant<'resolver'>,
+    namespace?: string,
   ): GraphQLObjectType => {
     const { name, description } = variant;
 
@@ -101,13 +102,19 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
       _: { type: GraphQLBoolean },
     };
 
+    if (!variant.fields && variant.type) {
+      return lookup(variant.type.name);
+    }
+
     const fields: ThunkObjMap<GraphQLFieldConfig<any, any>> = () =>
       variant.fields ? mapValue(variant.fields, transpileField) : empty;
 
+    const variantTypeName = namespace ? `${namespace}_${name}` : name;
+
     return register(
-      name,
+      variantTypeName,
       new GraphQLObjectType({
-        name,
+        name: variantTypeName,
         description,
         fields,
       }),

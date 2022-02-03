@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toGQLSchema hello world App 1`] = `
+"type Query {
+  hello: String!
+}"
+`;
+
+exports[`toGQLSchema hello world App 2`] = `
+"scalar Lifespan
+
+type God {
+  name: String!
+  lifespan: Lifespan!
+}
+
+union Deity = God | Deity_Titan
+
+type Deity_Titan {
+  name: String!
+}
+
+type Query {
+  deities: [Deity!]!
+}"
+`;
