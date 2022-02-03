@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-useless-constructor */
-import type { Source } from 'graphql';
+import type { ASTNode as GQLASTNode, Source } from 'graphql';
 import { GraphQLError as GQLError } from 'graphql';
-import { locatedError as func } from 'graphql/error';
 import type {
   GraphQLErrorArgs,
   GraphQLErrorExtensions,
@@ -29,21 +27,20 @@ export class GraphQLError extends GQLError {
     >,
     extensions?: Maybe<GraphQLErrorExtensions>,
   ) {
-    // @ts-expect-error
-    super(message, nodes, source, positions, path, originalError, extensions);
+    super(
+      message,
+      nodes as GQLASTNode,
+      source,
+      positions,
+      path,
+      originalError,
+      extensions,
+    );
   }
 
   // @ts-expect-error
   constructor(message: string, args?: IrisErrorArgs);
 }
-
-export const locatedError = (
-  rawOriginalError: unknown,
-  nodes: ASTNode | ReadonlyArray<ASTNode> | undefined | null,
-  path?: Maybe<ReadonlyArray<string | number>>,
-): GraphQLError =>
-  // @ts-expect-error
-  func(rawOriginalError, nodes, path);
 
 export function syntaxError(
   source: Source,

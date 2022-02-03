@@ -3,6 +3,8 @@ import { Token } from 'graphql';
 import { syntaxError } from 'graphql/error/syntaxError';
 import { dedentBlockStringLines } from 'graphql/language/blockString';
 
+import type { Maybe } from '../utils/type-level';
+
 import { isDigit, isNameContinue, isNameStart } from './characterClasses';
 import { TokenKind } from './tokenKind';
 
@@ -73,10 +75,9 @@ export class Lexer {
         } else {
           // Read the next token and form a link in the token linked-list.
           const nextToken = readNextToken(this, token.end);
-          // @ts-expect-error next is only mutable during parsing.
-          token.next = nextToken;
-          // @ts-expect-error prev is only mutable during parsing.
-          nextToken.prev = token;
+          //  next and prev are mutable during parsing.
+          (token.next as Maybe<Token>) = nextToken;
+          (nextToken.prev as Maybe<Token>) = token;
           token = nextToken;
         }
       } while (token.kind === TokenKind.COMMENT);
