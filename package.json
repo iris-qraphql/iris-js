@@ -84,10 +84,7 @@
       "**/__tests__/*.(js|ts)"
     ],
     "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/lib/",
-      "<rootDir>/test/fixtures/",
-      "<rootDir>/test/test-utils"
+      "<rootDir>/node_modules/"
     ],
     "moduleFileExtensions": [
       "ts",
