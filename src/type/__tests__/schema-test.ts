@@ -1,18 +1,11 @@
-
 import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { dedent } from '../../utils/dedent';
 
 import { buildSchema } from '../buildASTSchema';
 import { GraphQLDirective } from '../directives';
-import {
-  emptyDataType,
-  gqlList,
-  gqlObject,
-  gqlScalar,
-} from '../make';
+import { emptyDataType, gqlList } from '../make';
 import { printSchema } from '../printSchema';
-import { IrisString } from '../scalars';
 import { IrisSchema } from '../schema';
 
 const cycle = (src: string) =>
@@ -99,46 +92,27 @@ describe('Type System: Schema', () => {
     });
 
     describe('A Schema must contain uniquely named types', () => {
-      it('rejects a Schema which redefines a built-in type', () => {
-        const FakeString = gqlScalar({ name: 'String' });
+      // TODO:
+      // it('rejects a Schema which redefines a built-in type', () => {
+      //   const schema = buildSchema(`
+      //       data String
+      //       resolver Query = {
+      //         fakeString: String
+      //       }
+      //   `);
 
-        const QueryType = gqlObject({
-          name: 'Query',
-          fields: {
-            normal: { type: IrisString },
-            fake: { type: FakeString },
-          },
-        });
-
-        expect(() => new IrisSchema({ query: QueryType })).toThrow(
-          'Schema must contain uniquely named types but contains multiple types named "String".',
-        );
-      });
+      //   expect(schema).toEqual(
+      //     'Schema must contain uniquely named types but contains multiple types named "String".',
+      //   );
+      // });
 
       it('rejects a Schema which defines an object type twice', () => {
-        const types = [
-          gqlObject({ name: 'SameName', fields: {} }),
-          gqlObject({ name: 'SameName', fields: {} }),
-        ];
-
-        expect(() => new IrisSchema({ types })).toThrow(
-          'Schema must contain uniquely named types but contains multiple types named "SameName".',
-        );
-      });
-
-      it('rejects a Schema which defines fields with conflicting types', () => {
-        const fields = {};
-        const QueryType = gqlObject({
-          name: 'Query',
-          fields: {
-            a: { type: gqlObject({ name: 'SameName', fields }) },
-            b: { type: gqlObject({ name: 'SameName', fields }) },
-          },
-        });
-
-        expect(() => new IrisSchema({ query: QueryType })).toThrow(
-          'Schema must contain uniquely named types but contains multiple types named "SameName".',
-        );
+        expect(() =>
+          buildSchema(`
+            resolver SameName
+            resolver SameName
+          `),
+        ).toThrowErrorMatchingSnapshot();
       });
     });
 

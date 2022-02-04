@@ -3,7 +3,12 @@ import { identity } from 'ramda';
 import { parseValue } from '../../language/parser';
 
 import type { IrisStrictType } from '../../type/definition';
-import { gqlInput, gqlList, gqlScalar, maybe } from '../../type/make';
+import {
+  gqlList,
+  gqlScalar,
+  maybe,
+  sampleType,
+} from '../../type/make';
 import {
   IrisBool,
   IrisFloat,
@@ -150,13 +155,14 @@ describe('valueFromAST', () => {
     expectValueFrom('[true, null]', listOfBool).toEqual(undefined);
   });
 
-  const testInputObj = gqlInput({
+  const testInputObj = sampleType({
+    role: 'data',
     name: 'TestInput',
-    fields: {
-      int: { type: maybe(IrisInt) },
-      bool: { type: maybeBool },
-      requiredBool: { type: bool },
-    },
+    body: `{ 
+        int: Int?
+        bool: Boolean?
+        requiredBool: Boolean
+      }`,
   });
 
   it('coerces input objects according to input coercion rules', () => {
