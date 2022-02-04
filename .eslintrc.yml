@@ -7,7 +7,6 @@ env:
   jest: true
 reportUnusedDisableDirectives: true
 plugins:
-  - internal-rules
   - node
   - import
   - simple-import-sort
@@ -16,13 +15,6 @@ settings:
     tryExtensions: ['.js', '.json', '.node', '.ts', '.d.ts']
 
 rules:
-  ##############################################################################
-  # Internal rules located in 'resources/eslint-internal-rules'.
-  # See './resources/eslint-internal-rules/README.md'
-  ##############################################################################
-
-  internal-rules/only-ascii: error
-
   ##############################################################################
   # `eslint-plugin-node` rule list based on `v11.1.x`
   ##############################################################################
@@ -653,31 +645,8 @@ overrides:
       import/no-deprecated: off
       import/no-restricted-paths: off
       import/no-extraneous-dependencies: [error, { devDependencies: true }]
-  - files: 'integrationTests/*'
+  - files: 'scripts/**'
     rules:
-      node/no-sync: off
-      node/no-unpublished-require: [error, { allowModules: [] }]
-      import/no-extraneous-dependencies: [error, { devDependencies: true }]
-      import/no-nodejs-modules: off
-  - files: 'integrationTests/*/**'
-    rules:
-      node/no-sync: off
-      node/no-missing-require: [error, { allowModules: ['graphql'] }]
-      import/no-commonjs: off
-      import/no-nodejs-modules: off
-      no-console: off
-  - files: 'benchmark/**'
-    rules:
-      internal-rules/only-ascii: [error, { allowEmoji: true }]
-      node/no-sync: off
-      node/no-missing-require: off
-      import/no-nodejs-modules: off
-      import/no-commonjs: off
-      no-console: off
-      no-await-in-loop: off
-  - files: 'resources/**'
-    rules:
-      internal-rules/only-ascii: [error, { allowEmoji: true }]
       node/no-unpublished-require: off
       node/no-sync: off
       import/no-extraneous-dependencies: [error, { devDependencies: true }]

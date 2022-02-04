@@ -30,10 +30,8 @@
     "node": "^12.22.0 || ^14.16.0 || >=16.0.0"
   },
   "scripts": {
-    "preversion": ". ./resources/checkgit.sh && npm ci --ignore-scripts",
-    "version": "node resources/gen-version.js && npm test && git add src/version.ts",
-    "changelog": "node resources/gen-changelog.js",
-    "benchmark": "node benchmark/benchmark.js",
+    "version": "node scripts/gen-version.js && npm test && git add src/version.ts",
+    "changelog": "node scripts/gen-changelog.js",
     "test": "npm run lint && npm run check && npm run testonly && npm run prettier:check && npm run check:spelling",
     "lint": "eslint --cache --max-warnings 0 .",
     "check": "tsc --pretty",
@@ -42,10 +40,7 @@
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "build:npm": "node resources/build-npm.js",
-    "build:deno": "node resources/build-deno.js",
-    "gitpublish:npm": "bash ./resources/gitpublish.sh npm npmDist",
-    "gitpublish:deno": "bash ./resources/gitpublish.sh deno denoDist"
+    "build:npm": "node scripts/build-npm.js"
   },
   "devDependencies": {
     "@babel/core": "7.16.5",
@@ -62,7 +57,6 @@
     "cspell": "5.13.4",
     "eslint": "8.5.0",
     "eslint-plugin-import": "2.25.3",
-    "eslint-plugin-internal-rules": "file:./resources/eslint-internal-rules",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-simple-import-sort": "7.0.0",
     "eslint-plugin-tsdoc": "0.2.14",
@@ -90,10 +84,7 @@
       "**/__tests__/*.(js|ts)"
     ],
     "testPathIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/lib/",
-      "<rootDir>/test/fixtures/",
-      "<rootDir>/test/test-utils"
+      "<rootDir>/node_modules/"
     ],
     "moduleFileExtensions": [
       "ts",
