@@ -54,14 +54,12 @@ export const fromConfig = <T extends {}>(
     ),
   );
 
-
 type TYPE_MAP = {
   data: IrisDataType;
-  resolver: IrisResolverType
-}
+  resolver: IrisResolverType;
+};
 
 export type IrisTypeDefinition<R extends Role> = TYPE_MAP[R];
-
 
 export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
 export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;

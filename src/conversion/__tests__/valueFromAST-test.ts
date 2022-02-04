@@ -3,12 +3,7 @@ import { identity } from 'ramda';
 import { parseValue } from '../../language/parser';
 
 import type { IrisStrictType } from '../../type/definition';
-import {
-  gqlList,
-  gqlScalar,
-  maybe,
-  sampleType,
-} from '../../type/make';
+import { gqlList, gqlScalar, maybe, sampleType } from '../../type/make';
 import {
   IrisBool,
   IrisFloat,

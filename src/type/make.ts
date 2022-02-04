@@ -21,7 +21,6 @@ import {
 
 export const emptyDataType = (name: string) => new IrisDataType({ name });
 
-
 type GQLObject = {
   name: string;
   description?: string;
@@ -48,14 +47,17 @@ export const maybe = <T extends IrisType>(ofType: T) =>
 export const gqlList = <T extends IrisType>(ofType: T) =>
   new IrisTypeRef('LIST', ofType);
 
-
 type TypeDef<R extends Role> = {
   role: R;
   name: string;
   body: string;
 };
 
-export const sampleType = <R extends Role>({ role, name, body }: TypeDef<R>) => {
+export const sampleType = <R extends Role>({
+  role,
+  name,
+  body,
+}: TypeDef<R>) => {
   const schema = buildSchema(`
     ${role} ${name} = ${body}
     resolver Query = {
@@ -65,4 +67,3 @@ export const sampleType = <R extends Role>({ role, name, body }: TypeDef<R>) => 
 
   return schema.getType(name) as IrisTypeDefinition<R>;
 };
-
