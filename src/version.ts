@@ -2,16 +2,16 @@
 // automatically updated by "npm version" command.
 
 /**
- * A string containing the version of the GraphQL.js library
+ * A string containing the version of the Iris.js library
  */
-export const version = '16.2.0' as string;
+export const version = '0.1.0' as string;
 
 /**
- * An object containing the components of the GraphQL.js version string
+ * An object containing the components of the Iris.js version string
  */
 export const versionInfo = Object.freeze({
-  major: 16 as number,
-  minor: 2 as number,
+  major: 0 as number,
+  minor: 1 as number,
   patch: 0 as number,
   preReleaseTag: null as string | null,
 });
