@@ -58,7 +58,6 @@
     "cspell": "5.13.4",
     "eslint": "8.5.0",
     "eslint-plugin-import": "2.25.3",
-    "eslint-plugin-internal-rules": "file:./resources/eslint-internal-rules",
     "eslint-plugin-node": "11.1.0",
     "eslint-plugin-simple-import-sort": "7.0.0",
     "eslint-plugin-tsdoc": "0.2.14",

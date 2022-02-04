@@ -17,13 +17,6 @@ settings:
 
 rules:
   ##############################################################################
-  # Internal rules located in 'resources/eslint-internal-rules'.
-  # See './resources/eslint-internal-rules/README.md'
-  ##############################################################################
-
-  internal-rules/only-ascii: error
-
-  ##############################################################################
   # `eslint-plugin-node` rule list based on `v11.1.x`
   ##############################################################################
 
