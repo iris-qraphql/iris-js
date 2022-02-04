@@ -18,6 +18,28 @@ Object {
 }
 `;
 
+exports[`Sophisticated Integration conditional union selections 2`] = `
+Object {
+  "data": null,
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 13,
+          "line": 6,
+        },
+      ],
+      "message": "Data \\"Lifespan\\" cannot represent value: \\"Thor\\"",
+      "path": Array [
+        "deities",
+        0,
+        "lifespan",
+      ],
+    },
+  ],
+}
+`;
+
 exports[`Sophisticated Integration union type names 1`] = `
 Object {
   "data": Object {

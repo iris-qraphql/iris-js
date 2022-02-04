@@ -45,31 +45,31 @@ describe('Sophisticated Integration', () => {
   }
   `);
 
-  const rootValue = {
-    deities: () => [
-      {
-        __typename: 'God',
-        name: 'Morpheus',
-        lifespan: 'Immortal',
-      },
-      {
-        // inline variant Deity.Titan
-        __typename: 'Deity_Titan',
-        name: 'Cronos',
-      },
-    ],
-  };
+  const validDeities = () => [
+    {
+      __typename: 'God',
+      name: 'Morpheus',
+      lifespan: 'Immortal',
+    },
+    {
+      __typename: 'Deity_Titan',
+      name: 'Cronos',
+    },
+  ];
 
-  const api = (query: string) => iris({ schema, rootValue, source: query });
+  const api = (deities: () => Array<unknown>, query: string) =>
+    iris({ schema, rootValue: { deities }, source: query });
 
   it('union type names', async () => {
-    const result = await api('{ deities { __typename } }');
+    const result = await api(validDeities, '{ deities { __typename } }');
 
     expect(toJSONDeep(result)).toMatchSnapshot();
   });
 
   it('conditional union selections', async () => {
-    const result = await api(`{ 
+    const result = await api(
+      validDeities,
+      `{ 
         deities { 
           __typename
           ... on God {
@@ -80,7 +80,34 @@ describe('Sophisticated Integration', () => {
             name
           }
         } 
-    }`);
+    }`,
+    );
+
+    expect(toJSONDeep(result)).toMatchSnapshot();
+  });
+
+  it('conditional union selections', async () => {
+    const result = await api(
+      () => [
+        {
+          __typename: 'God',
+          name: 'Morpheus',
+          lifespan: 'Thor',
+        },
+      ],
+      `{ 
+        deities { 
+          __typename
+          ... on God {
+            name
+            lifespan
+          }
+          ... on Deity_Titan {
+            name
+          }
+        } 
+    }`,
+    );
 
     expect(toJSONDeep(result)).toMatchSnapshot();
   });
