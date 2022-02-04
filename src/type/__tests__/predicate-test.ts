@@ -1,7 +1,10 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
+import { buildSchema } from '../buildASTSchema';
 import type { IrisArgument, IrisStrictType } from '../definition';
 import {
+  assertDataType,
+  assertResolverType,
   getNamedType,
   isDataType,
   isInputType,
@@ -20,15 +23,7 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import {
-  gqlEnum,
-  gqlInput,
-  gqlList,
-  gqlObject,
-  gqlScalar,
-  gqlUnion,
-  maybe,
-} from '../make';
+import { gqlList, gqlScalar, maybe } from '../make';
 import {
   IrisBool,
   IrisFloat,
@@ -38,13 +33,25 @@ import {
   isSpecifiedScalarType,
 } from '../scalars';
 
-const ObjectType = gqlObject({ name: 'Object', fields: {} });
-const UnionType = gqlUnion({ name: 'Union', types: [ObjectType] });
-const EnumType = gqlEnum('Enum', ['foo']);
-const InputObjectType = gqlInput({
-  name: 'InputObject',
-  fields: {},
-});
+const schema = buildSchema(`
+  data Enum = foo{}
+
+  data InputObject = {}
+
+  resolver Object = {}
+
+  resolver Union = Object
+
+  resolver Query = {
+    object: Object
+    union: Union
+  }
+`);
+
+const ObjectType = assertResolverType(schema.getType('Object'));
+const UnionType = assertResolverType(schema.getType('Union'));
+const EnumType = assertDataType(schema.getType('Enum'));
+const InputObjectType = assertDataType(schema.getType('InputObject'));
 const ScalarType = gqlScalar({ name: 'Scalar' });
 const Directive = new GraphQLDirective({
   name: 'Directive',

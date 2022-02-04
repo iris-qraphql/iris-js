@@ -54,6 +54,15 @@ export const fromConfig = <T extends {}>(
     ),
   );
 
+
+type TYPE_MAP = {
+  data: IrisDataType;
+  resolver: IrisResolverType
+}
+
+export type IrisTypeDefinition<R extends Role> = TYPE_MAP[R];
+
+
 export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
 export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
 
@@ -194,7 +203,7 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   type?: R extends 'resolver' ? IrisResolverType : never;
 };
 
-export type IrisResolverVariantConfig = IrisEntity & {
+type IrisResolverVariantConfig = IrisEntity & {
   fields?: ConfigMap<IrisFieldConfig<'resolver'>>;
   type?: IrisResolverType;
   astNode?: _VariantDefinitionNode<'resolver'>;

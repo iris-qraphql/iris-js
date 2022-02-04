@@ -1,4 +1,10 @@
-import { gqlEnum, gqlInput, gqlList, gqlScalar, maybe } from '../../type/make';
+import {
+  gqlInput,
+  gqlList,
+  gqlScalar,
+  maybe,
+  sampleType,
+} from '../../type/make';
 import {
   IrisBool,
   IrisFloat,
@@ -234,7 +240,11 @@ describe('astFromValue', () => {
     expect(astFromValue(null, IrisBool)).toEqual(null);
   });
 
-  const myEnum = gqlEnum('MyEnum', ['HELLO', 'GOODBYE']);
+  const myEnum = sampleType({
+    role: 'data',
+    name: 'MyEnum',
+    body: ' HELLO{} | GOODBYE{}',
+  });
 
   it('converts string values to Enum ASTs if possible', () => {
     expect(astFromValue('HELLO', myEnum)).toEqual({
