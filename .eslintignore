@@ -3,6 +3,3 @@
 /node_modules
 /coverage
 /npmDist
-
-# Ignore TS files inside integration test
-/integrationTests/ts/*.ts

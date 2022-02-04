@@ -33,7 +33,6 @@
     "preversion": ". ./resources/checkgit.sh && npm ci --ignore-scripts",
     "version": "node resources/gen-version.js && npm test && git add src/version.ts",
     "changelog": "node resources/gen-changelog.js",
-    "benchmark": "node benchmark/benchmark.js",
     "test": "npm run lint && npm run check && npm run testonly && npm run prettier:check && npm run check:spelling",
     "lint": "eslint --cache --max-warnings 0 .",
     "check": "tsc --pretty",
@@ -42,8 +41,7 @@
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "build:npm": "node resources/build-npm.js",
-    "gitpublish:npm": "bash ./resources/gitpublish.sh npm npmDist"
+    "build:npm": "node resources/build-npm.js"
   },
   "devDependencies": {
     "@babel/core": "7.16.5",
