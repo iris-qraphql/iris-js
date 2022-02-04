@@ -645,7 +645,7 @@ overrides:
       import/no-deprecated: off
       import/no-restricted-paths: off
       import/no-extraneous-dependencies: [error, { devDependencies: true }]
-  - files: 'resources/**'
+  - files: 'scripts/**'
     rules:
       node/no-unpublished-require: off
       node/no-sync: off

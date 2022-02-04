@@ -30,8 +30,8 @@
     "node": "^12.22.0 || ^14.16.0 || >=16.0.0"
   },
   "scripts": {
-    "version": "node resources/gen-version.js && npm test && git add src/version.ts",
-    "changelog": "node resources/gen-changelog.js",
+    "version": "node scripts/gen-version.js && npm test && git add src/version.ts",
+    "changelog": "node scripts/gen-changelog.js",
     "test": "npm run lint && npm run check && npm run testonly && npm run prettier:check && npm run check:spelling",
     "lint": "eslint --cache --max-warnings 0 .",
     "check": "tsc --pretty",
@@ -40,7 +40,7 @@
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "build:npm": "node resources/build-npm.js"
+    "build:npm": "node scripts/build-npm.js"
   },
   "devDependencies": {
     "@babel/core": "7.16.5",
