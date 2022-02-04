@@ -16,7 +16,7 @@ import type {
 } from '../definition';
 import { assertDataType, assertResolverType } from '../definition';
 import { GraphQLDirective } from '../directives';
-import { gqlEnum, gqlList, gqlObject, maybe } from '../make';
+import { gqlList, gqlObject, maybe } from '../make';
 import { IrisString } from '../scalars';
 import { IrisSchema } from '../schema';
 import { validateSchema } from '../validate';
@@ -64,13 +64,17 @@ const inputTypes: ReadonlyArray<IrisStrictType> = [
   ...withModifiers(SomeInputObjectType),
 ];
 
-function schemaWithFieldType(type: IrisType): IrisSchema {
-  return new IrisSchema({
-    query: gqlObject({
-      name: 'Query',
-      fields: { f: { type } },
-    }),
-  });
+function schemaWithFieldType(
+  kind: 'data' | 'resolver',
+  name: string,
+  body: string,
+): IrisSchema {
+  return buildSchema(`
+    ${kind} ${name} = ${body}
+    resolver Query = {
+      f: ${name}
+    }
+  `);
 }
 
 const expectJSON = (schema: IrisSchema) =>
@@ -78,6 +82,9 @@ const expectJSON = (schema: IrisSchema) =>
 
 const expectJSONEqual = (schema: IrisSchema, value: unknown) =>
   expect(toJSONDeep(validateSchema(schema))).toEqual(value);
+
+const snapshot = (schema: IrisSchema) =>
+  expect(toJSONDeep(validateSchema(schema))).toMatchSnapshot();
 
 describe('Type System: A Schema must have Object root types', () => {
   it('rejects a Schema whose query root resolver is not an Object', () => {
@@ -159,68 +166,35 @@ describe('Type System: Objects must have fields', () => {
   });
 
   it('rejects an Object type with incorrectly named fields', () => {
-    const schema = schemaWithFieldType(
-      gqlObject({
-        name: 'SomeObject',
-        fields: {
-          __badName: { type: IrisString },
-        },
-      }),
+    snapshot(
+      schemaWithFieldType('resolver', 'SomeObject', '{ __badName: String}'),
     );
-    expectJSONEqual(schema, [
-      {
-        message:
-          'Name "__badName" must not begin with "__", which is reserved by GraphQL introspection.',
-      },
-    ]);
   });
 });
 
 describe('Type System: Fields args must be properly named', () => {
   it('accepts field args with valid names', () => {
     const schema = schemaWithFieldType(
-      gqlObject({
-        name: 'SomeObject',
-        fields: {
-          goodField: {
-            type: IrisString,
-            args: {
-              goodArg: { type: IrisString },
-            },
-          },
-        },
-      }),
+      'resolver',
+      'SomeObject',
+      '{ goodField(goodArg: String): String }',
     );
     expectJSONEqual(schema, []);
   });
 
   it('rejects field arg with invalid names', () => {
-    const schema = schemaWithFieldType(
-      gqlObject({
-        name: 'SomeObject',
-        fields: {
-          badField: {
-            type: IrisString,
-            args: {
-              __badName: { type: IrisString },
-            },
-          },
-        },
-      }),
+    snapshot(
+      schemaWithFieldType(
+        'resolver',
+        'SomeObject',
+        '{ badField(__badName: String): String}',
+      ),
     );
-
-    expectJSONEqual(schema, [
-      {
-        message:
-          'Name "__badName" must not begin with "__", which is reserved by GraphQL introspection.',
-      },
-    ]);
   });
-});
 
-describe('Type System: Union types must be valid', () => {
-  it('accepts a Union type with member types', () => {
-    const schema = buildSchema(`
+  describe('Type System: Union types must be valid', () => {
+    it('accepts a Union type with member types', () => {
+      const schema = buildSchema(`
       resolver Query = {
         test: GoodUnion
       }
@@ -237,11 +211,11 @@ describe('Type System: Union types must be valid', () => {
         = TypeA
         | TypeB
     `);
-    expectJSONEqual(schema, []);
-  });
+      expectJSONEqual(schema, []);
+    });
 
-  it('rejects a Union type with non-Object members types', () => {
-    const schema = buildSchema(`
+    it('rejects a Union type with non-Object members types', () => {
+      const schema = buildSchema(`
       resolver Query = {
         test: BadUnion
       }
@@ -261,24 +235,24 @@ describe('Type System: Union types must be valid', () => {
         | Int
     `);
 
-    expectJSONEqual(schema, [
-      {
-        message:
-          'Union type BadUnion can only include Object types, it cannot include String.',
-        locations: [{ line: 16, column: 11 }],
-      },
-      {
-        message:
-          'Union type BadUnion can only include Object types, it cannot include Int.',
-        locations: [{ line: 18, column: 11 }],
-      },
-    ]);
+      expectJSONEqual(schema, [
+        {
+          message:
+            'Union type BadUnion can only include Object types, it cannot include String.',
+          locations: [{ line: 16, column: 11 }],
+        },
+        {
+          message:
+            'Union type BadUnion can only include Object types, it cannot include Int.',
+          locations: [{ line: 18, column: 11 }],
+        },
+      ]);
+    });
   });
-});
 
-describe('Type System: Input Objects must have fields', () => {
-  it('accepts an Input Object type with fields', () => {
-    const schema = buildSchema(`
+  describe('Type System: Input Objects must have fields', () => {
+    it('accepts an Input Object type with fields', () => {
+      const schema = buildSchema(`
       resolver Query = {
         field(arg: SomeInputObject): String
       }
@@ -287,11 +261,11 @@ describe('Type System: Input Objects must have fields', () => {
         field: String
       }
     `);
-    expectJSONEqual(schema, []);
-  });
+      expectJSONEqual(schema, []);
+    });
 
-  it('accept empty data type', () => {
-    const schema = buildSchema(`
+    it('accept empty data type', () => {
+      const schema = buildSchema(`
       resolver Query = {
         field(arg: SomeInputObject): String
       }
@@ -299,11 +273,11 @@ describe('Type System: Input Objects must have fields', () => {
       data SomeInputObject
     `);
 
-    expectJSONEqual(schema, []);
-  });
+      expectJSONEqual(schema, []);
+    });
 
-  it('accepts an Input Object with breakable circular reference', () => {
-    const schema = buildSchema(`
+    it('accepts an Input Object with breakable circular reference', () => {
+      const schema = buildSchema(`
       resolver Query = {
         field(arg: SomeInputObject): String
       }
@@ -321,11 +295,11 @@ describe('Type System: Input Objects must have fields', () => {
       }
     `);
 
-    expectJSONEqual(schema, []);
-  });
+      expectJSONEqual(schema, []);
+    });
 
-  it('accept recursive data types', () => {
-    const schema = buildSchema(`
+    it('accept recursive data types', () => {
+      const schema = buildSchema(`
       resolver Query = {
         field(arg: SomeInputObject): String
       }
@@ -335,11 +309,11 @@ describe('Type System: Input Objects must have fields', () => {
       }
     `);
 
-    expectJSONEqual(schema, []);
-  });
+      expectJSONEqual(schema, []);
+    });
 
-  it('rejects an Input Object type with incorrectly typed fields', () => {
-    const schema = buildSchema(`
+    it('rejects an Input Object type with incorrectly typed fields', () => {
+      const schema = buildSchema(`
       resolver Query = {
         field(arg: SomeInputObject): String
       }
@@ -356,66 +330,59 @@ describe('Type System: Input Objects must have fields', () => {
         goodInputObject: SomeInputObject
       }
     `);
-    expectJSONEqual(schema, [
-      {
-        message:
-          'The type of SomeInputObject.badObject must be Input Type but got: SomeObject.',
-        locations: [{ line: 13, column: 20 }],
-      },
-      {
-        message:
-          'The type of SomeInputObject.badUnion must be Input Type but got: SomeUnion.',
-        locations: [{ line: 14, column: 19 }],
-      },
-    ]);
-  });
-});
-
-describe('Type System: Enum types must be well defined', () => {
-  it('rejects an Enum type with incorrectly named values', () => {
-    const schema = schemaWithFieldType(gqlEnum('SomeEnum', ['__badName']));
-
-    expectJSONEqual(schema, [
-      {
-        message:
-          'Name "__badName" must not begin with "__", which is reserved by GraphQL introspection.',
-      },
-    ]);
-  });
-});
-
-describe('Type System: Object fields must have output types', () => {
-  function schemaWithObjectField(
-    fieldConfig: IrisFieldConfig<'resolver'>,
-  ): IrisSchema {
-    const BadObjectType = gqlObject({
-      name: 'BadObject',
-      fields: {
-        badField: fieldConfig,
-      },
-    });
-
-    return new IrisSchema({
-      query: gqlObject({
-        name: 'Query',
-        fields: {
-          f: { type: BadObjectType },
+      expectJSONEqual(schema, [
+        {
+          message:
+            'The type of SomeInputObject.badObject must be Input Type but got: SomeObject.',
+          locations: [{ line: 13, column: 20 }],
         },
-      }),
-      types: [SomeObjectType],
+        {
+          message:
+            'The type of SomeInputObject.badUnion must be Input Type but got: SomeUnion.',
+          locations: [{ line: 14, column: 19 }],
+        },
+      ]);
     });
-  }
+  });
 
-  for (const type of outputTypes) {
-    const typeName = inspect(type);
-    it(`accepts an output type as an Object field type: ${typeName}`, () => {
-      const schema = schemaWithObjectField({ type });
-      expectJSONEqual(schema, []);
+  describe('Type System: Enum types must be well defined', () => {
+    it('rejects an Enum type with incorrectly named values', () => {
+      snapshot(schemaWithFieldType('data', 'SomeEnum', '__badName {}'));
     });
-  }
+  });
 
-  it('accept data as resolver field type', () => {
-    const schema = buildSchema(`
+  describe('Type System: Object fields must have output types', () => {
+    function schemaWithObjectField(
+      fieldConfig: IrisFieldConfig<'resolver'>,
+    ): IrisSchema {
+      const BadObjectType = gqlObject({
+        name: 'BadObject',
+        fields: {
+          badField: fieldConfig,
+        },
+      });
+
+      return new IrisSchema({
+        query: gqlObject({
+          name: 'Query',
+          fields: {
+            f: { type: BadObjectType },
+          },
+        }),
+        types: [SomeObjectType],
+      });
+    }
+
+    for (const type of outputTypes) {
+      const typeName = inspect(type);
+      it(`accepts an output type as an Object field type: ${typeName}`, () => {
+        const schema = schemaWithObjectField({ type });
+        expectJSONEqual(schema, []);
+      });
+    }
+
+    it('accept data as resolver field type', () => {
+      const schema = buildSchema(`
       resolver Query = {
         field: [SomeInputObject]
       }
@@ -424,53 +391,55 @@ describe('Type System: Object fields must have output types', () => {
         field: String
       }
     `);
-    expectJSONEqual(schema, []);
-  });
-});
-
-describe('Type System: Arguments must have data  types', () => {
-  function schemaWithArg(argConfig: ConfigMapValue<IrisArgument>): IrisSchema {
-    const BadObjectType = gqlObject({
-      name: 'BadObject',
-      fields: {
-        badField: {
-          type: IrisString,
-          args: {
-            badArg: argConfig,
-          },
-        },
-      },
-    });
-
-    return new IrisSchema({
-      query: gqlObject({
-        name: 'Query',
-        fields: {
-          f: { type: BadObjectType },
-        },
-      }),
-      directives: [
-        new GraphQLDirective({
-          name: 'BadDirective',
-          args: {
-            badArg: argConfig,
-          },
-          locations: [DirectiveLocation.QUERY],
-        }),
-      ],
-    });
-  }
-
-  for (const type of inputTypes) {
-    const typeName = inspect(type);
-    it(`accepts an data  type as a field arg type: ${typeName}`, () => {
-      const schema = schemaWithArg({ type });
       expectJSONEqual(schema, []);
     });
-  }
+  });
 
-  it('rejects an required argument that is deprecated', () => {
-    const schema = buildSchema(`
+  describe('Type System: Arguments must have data  types', () => {
+    function schemaWithArg(
+      argConfig: ConfigMapValue<IrisArgument>,
+    ): IrisSchema {
+      const BadObjectType = gqlObject({
+        name: 'BadObject',
+        fields: {
+          badField: {
+            type: IrisString,
+            args: {
+              badArg: argConfig,
+            },
+          },
+        },
+      });
+
+      return new IrisSchema({
+        query: gqlObject({
+          name: 'Query',
+          fields: {
+            f: { type: BadObjectType },
+          },
+        }),
+        directives: [
+          new GraphQLDirective({
+            name: 'BadDirective',
+            args: {
+              badArg: argConfig,
+            },
+            locations: [DirectiveLocation.QUERY],
+          }),
+        ],
+      });
+    }
+
+    for (const type of inputTypes) {
+      const typeName = inspect(type);
+      it(`accepts an data  type as a field arg type: ${typeName}`, () => {
+        const schema = schemaWithArg({ type });
+        expectJSONEqual(schema, []);
+      });
+    }
+
+    it('rejects an required argument that is deprecated', () => {
+      const schema = buildSchema(`
       directive @BadDirective(
         badArg: String @deprecated
         optionalArg: String? @deprecated
@@ -485,11 +454,11 @@ describe('Type System: Arguments must have data  types', () => {
         ): String
       }
     `);
-    expectJSON(schema).toMatchSnapshot();
-  });
+      expectJSON(schema).toMatchSnapshot();
+    });
 
-  it('rejects a non-input type as a field arg with locations', () => {
-    const schema = buildSchema(`
+    it('rejects a non-input type as a field arg with locations', () => {
+      const schema = buildSchema(`
       resolver Query = {
         test(arg: SomeObject): String
       }
@@ -498,24 +467,25 @@ describe('Type System: Arguments must have data  types', () => {
         foo: String
       }
     `);
-    expectJSON(schema).toMatchSnapshot();
+      expectJSON(schema).toMatchSnapshot();
+    });
   });
-});
 
-describe('assertValidSchema', () => {
-  it('do not throw on valid schemas', () => {
-    const schema = buildSchema(`
+  describe('assertValidSchema', () => {
+    it('do not throw on valid schemas', () => {
+      const schema = buildSchema(`
       resolver Query = {
         foo: String
       }
     `);
-    expect(validateSchema(schema)).toEqual([]);
-  });
+      expect(validateSchema(schema)).toEqual([]);
+    });
 
-  it('include multiple errors into a description', () => {
-    const schema = buildSchema('resolver SomeType');
-    expect(validateSchema(schema)).toEqual([
-      irisError('Query root type must be provided.'),
-    ]);
+    it('include multiple errors into a description', () => {
+      const schema = buildSchema('resolver SomeType');
+      expect(validateSchema(schema)).toEqual([
+        irisError('Query root type must be provided.'),
+      ]);
+    });
   });
 });

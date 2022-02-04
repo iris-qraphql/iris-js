@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Type System: Schema Validity A Schema must contain uniquely named types rejects a Schema which defines an object type twice 1`] = `"There can be only one type named \\"SameName\\"."`;

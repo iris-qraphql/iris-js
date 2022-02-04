@@ -2,94 +2,18 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { dedent } from '../../utils/dedent';
 
-import type { IrisResolverType } from '../definition';
+import { buildSchema } from '../buildASTSchema';
 import { GraphQLDirective } from '../directives';
-import {
-  emptyDataType,
-  gqlInput,
-  gqlList,
-  gqlObject,
-  gqlScalar,
-} from '../make';
+import { emptyDataType, gqlList } from '../make';
 import { printSchema } from '../printSchema';
-import { IrisBool, IrisInt, IrisString } from '../scalars';
 import { IrisSchema } from '../schema';
+
+const cycle = (src: string) =>
+  expect(printSchema(buildSchema(src))).toEqual(dedent([src]));
 
 describe('Type System: Schema', () => {
   it('Define sample schema', () => {
-    const BlogImage = gqlObject({
-      name: 'Image',
-      fields: {
-        url: { type: IrisString },
-        width: { type: IrisInt },
-        height: { type: IrisInt },
-      },
-    });
-
-    const BlogAuthor: IrisResolverType = gqlObject({
-      name: 'Author',
-      fields: () => ({
-        id: { type: IrisString },
-        name: { type: IrisString },
-        pic: {
-          args: { width: { type: IrisInt }, height: { type: IrisInt } },
-          type: BlogImage,
-        },
-        recentArticle: { type: BlogArticle },
-      }),
-    });
-
-    const BlogArticle: IrisResolverType = gqlObject({
-      name: 'Article',
-      fields: {
-        id: { type: IrisString },
-        isPublished: { type: IrisBool },
-        author: { type: BlogAuthor },
-        title: { type: IrisString },
-        body: { type: IrisString },
-      },
-    });
-
-    const BlogQuery = gqlObject({
-      name: 'Query',
-      fields: {
-        article: {
-          args: { id: { type: IrisString } },
-          type: BlogArticle,
-        },
-        feed: {
-          type: gqlList(BlogArticle),
-        },
-      },
-    });
-
-    const BlogMutation = gqlObject({
-      name: 'Mutation',
-      fields: {
-        writeArticle: {
-          type: BlogArticle,
-        },
-      },
-    });
-
-    const BlogSubscription = gqlObject({
-      name: 'Subscription',
-      fields: {
-        articleSubscribe: {
-          args: { id: { type: IrisString } },
-          type: BlogArticle,
-        },
-      },
-    });
-
-    const schema = new IrisSchema({
-      description: 'Sample schema',
-      query: BlogQuery,
-      mutation: BlogMutation,
-      subscription: BlogSubscription,
-    });
-
-    expect(printSchema(schema)).toEqual(dedent`
+    cycle(`
       resolver Query = {
         article(id: String): Article
         feed: [Article]
@@ -127,30 +51,6 @@ describe('Type System: Schema', () => {
   });
 
   describe('Type Map', () => {
-    it('includes nested data  objects in the map', () => {
-      const NestedInputObject = emptyDataType('NestedInputObject');
-
-      const SomeInputObject = gqlInput({
-        name: 'SomeInputObject',
-        fields: { nested: { type: NestedInputObject } },
-      });
-
-      const schema = new IrisSchema({
-        query: gqlObject({
-          name: 'Query',
-          fields: {
-            something: {
-              type: IrisString,
-              args: { input: { type: SomeInputObject } },
-            },
-          },
-        }),
-      });
-
-      expect(schema.getType('SomeInputObject')).toEqual(SomeInputObject);
-      expect(schema.getType('NestedInputObject')).toEqual(NestedInputObject);
-    });
-
     it('includes data types only used in directives', () => {
       const directive = new GraphQLDirective({
         name: 'dir',
@@ -192,46 +92,27 @@ describe('Type System: Schema', () => {
     });
 
     describe('A Schema must contain uniquely named types', () => {
-      it('rejects a Schema which redefines a built-in type', () => {
-        const FakeString = gqlScalar({ name: 'String' });
+      // TODO:
+      // it('rejects a Schema which redefines a built-in type', () => {
+      //   const schema = buildSchema(`
+      //       data String
+      //       resolver Query = {
+      //         fakeString: String
+      //       }
+      //   `);
 
-        const QueryType = gqlObject({
-          name: 'Query',
-          fields: {
-            normal: { type: IrisString },
-            fake: { type: FakeString },
-          },
-        });
-
-        expect(() => new IrisSchema({ query: QueryType })).toThrow(
-          'Schema must contain uniquely named types but contains multiple types named "String".',
-        );
-      });
+      //   expect(schema).toEqual(
+      //     'Schema must contain uniquely named types but contains multiple types named "String".',
+      //   );
+      // });
 
       it('rejects a Schema which defines an object type twice', () => {
-        const types = [
-          gqlObject({ name: 'SameName', fields: {} }),
-          gqlObject({ name: 'SameName', fields: {} }),
-        ];
-
-        expect(() => new IrisSchema({ types })).toThrow(
-          'Schema must contain uniquely named types but contains multiple types named "SameName".',
-        );
-      });
-
-      it('rejects a Schema which defines fields with conflicting types', () => {
-        const fields = {};
-        const QueryType = gqlObject({
-          name: 'Query',
-          fields: {
-            a: { type: gqlObject({ name: 'SameName', fields }) },
-            b: { type: gqlObject({ name: 'SameName', fields }) },
-          },
-        });
-
-        expect(() => new IrisSchema({ query: QueryType })).toThrow(
-          'Schema must contain uniquely named types but contains multiple types named "SameName".',
-        );
+        expect(() =>
+          buildSchema(`
+            resolver SameName
+            resolver SameName
+          `),
+        ).toThrowErrorMatchingSnapshot();
       });
     });
 

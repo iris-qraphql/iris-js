@@ -1,4 +1,6 @@
-import { gqlEnum, gqlInput, gqlList, gqlScalar, maybe } from '../../type/make';
+import { buildSchema } from '../../type/buildASTSchema';
+import { assertDataType } from '../../type/definition';
+import { gqlList, gqlScalar, maybe } from '../../type/make';
 import {
   IrisBool,
   IrisFloat,
@@ -234,7 +236,23 @@ describe('astFromValue', () => {
     expect(astFromValue(null, IrisBool)).toEqual(null);
   });
 
-  const myEnum = gqlEnum('MyEnum', ['HELLO', 'GOODBYE']);
+  const schema = buildSchema(`
+    data MyEnum 
+      = HELLO {} 
+      | GOODBYE {}
+
+    data MyInputObj = {
+      foo: Float?
+      bar: MyEnum?
+    }
+
+    resolver Query = {
+      f: MyInputObj
+    }
+  `);
+
+  const myEnum = assertDataType(schema.getType('MyEnum'));
+  const inputObj = assertDataType(schema.getType('MyInputObj'));
 
   it('converts string values to Enum ASTs if possible', () => {
     expect(astFromValue('HELLO', myEnum)).toEqual({
@@ -303,14 +321,6 @@ describe('astFromValue', () => {
         { kind: 'StringValue', value: 'BAR' },
       ],
     });
-  });
-
-  const inputObj = gqlInput({
-    name: 'MyInputObj',
-    fields: {
-      foo: { type: maybe(IrisFloat) },
-      bar: { type: maybe(myEnum) },
-    },
   });
 
   it('converts input objects', () => {
