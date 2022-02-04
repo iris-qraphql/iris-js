@@ -17,3 +17,5 @@ export const lookupObjectTypename = (
   const variantType = obj.__typename?.value;
   return variantType?.kind === Kind.STRING ? variantType.value : undefined;
 };
+
+export const notNill = <T>(x: Maybe<T>): x is T => Boolean(x);

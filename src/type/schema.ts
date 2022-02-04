@@ -4,13 +4,12 @@ import type { IrisError } from '../error';
 import { inspect, instanceOf } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
+import { notNill } from '../utils/type-level';
 
-import type { IrisNamedType, IrisResolverType, IrisType } from './definition';
-import { getNamedType, isDataType, isResolverType } from './definition';
+import { collectAllReferencedTypes } from './collectAllReferencedTypes';
+import type { IrisNamedType, IrisResolverType } from './definition';
 import type { GraphQLDirective } from './directives';
-import { isDirective, specifiedDirectives } from './directives';
-
-const notNill = <T>(x: Maybe<T>): x is T => Boolean(x);
+import { specifiedDirectives } from './directives';
 
 /**
  * Test if the given value is a GraphQL schema.
@@ -58,21 +57,21 @@ export class IrisSchema {
     ].filter(notNill);
 
     collectAllReferencedTypes(types, this._directives).forEach((namedType) => {
-      const typeName = namedType.name;
+      const { name } = namedType;
 
-      if (!typeName) {
+      if (!name) {
         throw new Error(
           'One of the provided types for building the Schema is missing a name.',
         );
       }
 
-      if (this._typeMap[typeName] !== undefined) {
+      if (this._typeMap[name] !== undefined) {
         throw new Error(
-          `Iris Schema must contain uniquely named types but contains multiple types named "${typeName}".`,
+          `Iris Schema must contain uniquely named types but contains multiple types named "${name}".`,
         );
       }
 
-      this._typeMap[typeName] = namedType;
+      this._typeMap[name] = namedType;
     });
   }
 
@@ -114,73 +113,4 @@ export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
   subscription?: Maybe<IrisResolverType>;
   types?: Maybe<ReadonlyArray<IrisNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
-}
-
-const collectAllReferencedTypes = (
-  types: ReadonlyArray<IrisNamedType>,
-  directives: ReadonlyArray<GraphQLDirective>,
-): Set<IrisNamedType> => {
-  const allReferencedTypes: Set<IrisNamedType> = new Set(types);
-
-  types.forEach((type) => {
-    allReferencedTypes.delete(type);
-    collectReferencedTypes(type, allReferencedTypes);
-  });
-
-  collectDirectiveRefs(directives, allReferencedTypes);
-  return allReferencedTypes;
-};
-
-const collectDirectiveRefs = (
-  directives: ReadonlyArray<GraphQLDirective>,
-  allReferencedTypes: Set<IrisNamedType>,
-) => {
-  for (const directive of directives) {
-    // Directives are not validated until validateSchema() is called.
-    if (isDirective(directive)) {
-      directive.args.forEach((arg) =>
-        collectReferencedTypes(arg.type, allReferencedTypes),
-      );
-    }
-  }
-};
-
-function collectReferencedTypes(
-  type: IrisType,
-  typeSet: Set<IrisNamedType>,
-): void {
-  const namedType = getNamedType(type);
-
-  if (typeSet.has(namedType)) {
-    return;
-  }
-
-  typeSet.add(namedType);
-
-  if (isResolverType(namedType)) {
-    const variants = namedType.variants();
-    if (namedType.isVariantType()) {
-      const fields = Object.values(variants[0]?.fields ?? {});
-      for (const field of fields) {
-        collectReferencedTypes(field.type, typeSet);
-        for (const arg of field.args) {
-          collectReferencedTypes(arg.type, typeSet);
-        }
-      }
-    } else {
-      for (const variant of variants) {
-        if (variant.type) {
-          collectReferencedTypes(variant.type, typeSet);
-        }
-      }
-    }
-    return;
-  }
-
-  if (isDataType(namedType)) {
-    namedType
-      .variants()
-      .flatMap((x) => Object.values(x.fields ?? {}))
-      .forEach((field) => collectReferencedTypes(field.type, typeSet));
-  }
 }
