@@ -57,23 +57,9 @@ export class IrisSchema {
       ...(config.types ?? []),
     ].filter(notNill);
 
-    // To preserve order of user-provided types, we add first to add them to
-    // the set of "collected" types, so `collectReferencedTypes` ignore them.
-    const allReferencedTypes: Set<IrisNamedType> = new Set(config.types);
-
-    types.forEach((type) => {
-      allReferencedTypes.delete(type);
-      collectReferencedTypes(type, allReferencedTypes);
-    });
-
-    collectDirectiveRefs(this._directives, allReferencedTypes);
-
-    for (const namedType of allReferencedTypes) {
-      if (namedType == null) {
-        continue;
-      }
-
+    collectAllReferencedTypes(types, this._directives).forEach((namedType) => {
       const typeName = namedType.name;
+
       if (!typeName) {
         throw new Error(
           'One of the provided types for building the Schema is missing a name.',
@@ -85,8 +71,9 @@ export class IrisSchema {
           `Iris Schema must contain uniquely named types but contains multiple types named "${typeName}".`,
         );
       }
+
       this._typeMap[typeName] = namedType;
-    }
+    });
   }
 
   get [Symbol.toStringTag]() {
@@ -128,6 +115,21 @@ export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
   types?: Maybe<ReadonlyArray<IrisNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
 }
+
+const collectAllReferencedTypes = (
+  types: ReadonlyArray<IrisNamedType>,
+  directives: ReadonlyArray<GraphQLDirective>,
+): Set<IrisNamedType> => {
+  const allReferencedTypes: Set<IrisNamedType> = new Set(types);
+
+  types.forEach((type) => {
+    allReferencedTypes.delete(type);
+    collectReferencedTypes(type, allReferencedTypes);
+  });
+
+  collectDirectiveRefs(directives, allReferencedTypes);
+  return allReferencedTypes;
+};
 
 const collectDirectiveRefs = (
   directives: ReadonlyArray<GraphQLDirective>,
