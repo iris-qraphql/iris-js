@@ -4,6 +4,8 @@ import type { ObjectFieldNode } from '../language/ast';
 
 import type { ObjMap } from './ObjMap';
 
+export type IrisMaybe<T> = T | undefined;
+
 export type Maybe<T> = null | undefined | T;
 export type Override<T, T2> = Omit<T, keyof T2> & T2;
 

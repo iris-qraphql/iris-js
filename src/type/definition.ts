@@ -59,9 +59,12 @@ type TYPE_MAP = {
   resolver: IrisResolverType;
 };
 
-export type IrisTypeDefinition<R extends Role> = TYPE_MAP[R];
+export type IrisNamedType<R extends Role = Role> = TYPE_MAP[R];
 
-export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
+export type IrisType<R extends Role = Role> =
+  | IrisNamedType<R>
+  | IrisTypeRef<IrisType<R>>;
+
 export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
 
 export const isInputType = (type: unknown): type is IrisStrictType =>
@@ -120,7 +123,6 @@ export class IrisTypeRef<T extends IrisType> {
     return this.toString();
   }
 }
-export type IrisNamedType = IrisResolverType | IrisDataType;
 
 export const isTypeRef = <T extends IrisType>(
   type: unknown,
@@ -198,7 +200,7 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   astNode?: _VariantDefinitionNode<R>;
   toJSON?: () => string;
   fields?: ObjMap<IrisField<R>>;
-  type?: R extends 'resolver' ? IrisResolverType : never;
+  type?: IrisNamedType<R>;
 };
 
 type IrisResolverVariantConfig = IrisEntity & {
