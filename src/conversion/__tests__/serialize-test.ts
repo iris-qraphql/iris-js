@@ -55,34 +55,17 @@ describe('serializeValue', () => {
   });
 
   it('converts String values to String ASTs', () => {
-    expect(serializeValue('hello', IrisString)).toEqual({
-      kind: 'StringValue',
-      value: 'hello',
-    });
+    expect(serializeValue('hello', IrisString)).toEqual('hello');
 
-    expect(serializeValue('VALUE', IrisString)).toEqual({
-      kind: 'StringValue',
-      value: 'VALUE',
-    });
+    expect(serializeValue('VALUE', IrisString)).toEqual('VALUE');
 
-    expect(serializeValue('VA\nLUE', IrisString)).toEqual({
-      kind: 'StringValue',
-      value: 'VA\nLUE',
-    });
+    expect(serializeValue('VA\nLUE', IrisString)).toEqual('VA\nLUE');
 
-    expect(serializeValue(123, IrisString)).toEqual({
-      kind: 'StringValue',
-      value: '123',
-    });
+    expect(serializeValue(123, IrisString)).toEqual('123');
 
-    expect(serializeValue(false, IrisString)).toEqual({
-      kind: 'StringValue',
-      value: 'false',
-    });
+    expect(serializeValue(false, IrisString)).toEqual('false');
 
-    expect(serializeValue(null, maybe(IrisString))).toEqual({
-      kind: 'NullValue',
-    });
+    expect(serializeValue(null, maybe(IrisString))).toEqual(null);
 
     expect(serializeValue(undefined, IrisString)).toEqual(null);
   });
