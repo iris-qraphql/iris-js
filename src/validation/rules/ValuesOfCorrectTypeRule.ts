@@ -10,6 +10,7 @@ import {
   unpackMaybe,
 } from '../../type/definition';
 
+import { valueFromAST } from '../../conversion/valueFromAST';
 import { irisError, isIrisError } from '../../error';
 import { didYouMean, inspect, suggestionList } from '../../utils/legacy';
 import { keyMap } from '../../utils/ObjMap';
@@ -32,7 +33,7 @@ export const ValuesOfCorrectTypeRule = (
   },
   ObjectValue(node) {
     const type = getNamedType(context.getInputType());
-    if (!(isDataType(type) && !type.isPrimitive)) {
+    if (!(isDataType(type) && !type.boxedScalar)) {
       isValidValueNode(context, node);
       return false; // Don't traverse further.
     }
@@ -117,7 +118,7 @@ function isValidValueNode(context: ValidationContext, node: ValueNode): void {
   // Scalars and Enums determine if a literal value is valid via parseLiteral(),
   // which may throw or return an invalid value to indicate failure.
   try {
-    if (type.parseLiteral(node) === undefined) {
+    if (valueFromAST(node, type) === undefined) {
       const typeStr = inspect(locationType);
       context.reportError(
         irisError(

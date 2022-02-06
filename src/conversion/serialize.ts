@@ -2,6 +2,7 @@ import { isNil } from 'ramda';
 
 import type {
   IrisDataType,
+  IrisField,
   IrisStrictType,
   IrisVariant,
 } from '../type/definition';
@@ -46,7 +47,7 @@ const serializeList: Serializer<IrisStrictType> = (value, type) => {
   return valuesNodes;
 };
 
-type IrisObject = {
+export type IrisVariantValue = {
   name?: string;
   fields: Record<string, unknown>;
 };
@@ -56,8 +57,8 @@ const parseDataType: Serializer<IrisDataType> = (value, type) => {
     throw cannotRepresent(value, type);
   }
 
-  if (type.isPrimitive) {
-    const serialized = type.serialize(value);
+  if (type.boxedScalar) {
+    const serialized = type.boxedScalar.serialize(value);
 
     if (typeof serialized === 'number' && !Number.isFinite(serialized)) {
       throw cannotRepresent(value, type);
@@ -66,17 +67,24 @@ const parseDataType: Serializer<IrisDataType> = (value, type) => {
     return serialized;
   }
 
-  return parseDataVariant(value, type);
+  return parseVariantWith(parseVariantValue, value, type);
 };
 
-const parseDataVariant: Serializer<IrisDataType> = (value, type) => {
-  const object = decodeValue(value, type.name);
+export const parseVariantWith = <T>(
+  f: (o: IrisVariantValue, v: IrisVariant<'data'>) => T,
+  value: unknown,
+  type: IrisDataType,
+): T => {
+  const object = toVariantObject(value, type.name);
   const variant = type.variantBy(object.name);
   const variantType = variant.type ? variant.type.variantBy() : variant;
-  return parseVariantValue(object, variantType);
+  return f(object, variantType);
 };
 
-const decodeValue = (value: unknown, typeName: string): IrisObject => {
+const toVariantObject = (
+  value: unknown,
+  typeName: string,
+): IrisVariantValue => {
   if (typeof value === 'string') {
     return { name: value, fields: {} };
   }
@@ -89,17 +97,22 @@ const decodeValue = (value: unknown, typeName: string): IrisObject => {
   throw cannotRepresent(value, typeName);
 };
 
+export const isEmptyVariant = (
+  { name, fields }: IrisVariantValue,
+  variantFields: Array<IrisField<'data'>>,
+): boolean =>
+  Boolean(name) &&
+  variantFields.filter(({ type }) => !isMaybeType(type)).length === 0 &&
+  Object.values(fields).length === 0;
+
 const parseVariantValue = (
-  { name: __typename, fields }: IrisObject,
+  object: IrisVariantValue,
   variant: IrisVariant<'data'>,
 ): IrisMaybe<JSON> => {
+  const { name: __typename, fields } = object;
   const variantFields = Object.values(variant.fields ?? {});
 
-  if (
-    __typename &&
-    variantFields.filter(({ type }) => !isMaybeType(type)).length === 0 &&
-    Object.values(fields).length === 0
-  ) {
+  if (isEmptyVariant(object, variantFields)) {
     return __typename;
   }
 

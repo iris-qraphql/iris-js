@@ -106,7 +106,7 @@ export function valueFromAST(
     return;
   }
 
-  if (valueNode.kind === Kind.OBJECT && !type.isPrimitive) {
+  if (valueNode.kind === Kind.OBJECT && !type.boxedScalar) {
     const variantName = valueNode.fields.find(
       (x) => x.name.value === '__typename',
     )?.value;
@@ -124,7 +124,7 @@ export function valueFromAST(
   // no value is returned.
   let result;
   try {
-    result = type.parseLiteral(valueNode);
+    result = type.boxedScalar?.parseLiteral(valueNode);
   } catch (_error) {
     return; // Invalid: intentionally return no value.
   }
