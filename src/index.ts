@@ -18,7 +18,6 @@ export { version, versionInfo } from './version';
 
 export {
   parse,
-  parseValue,
   parseConstValue,
   parseType,
   // Print

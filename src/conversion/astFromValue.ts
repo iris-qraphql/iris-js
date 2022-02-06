@@ -1,10 +1,6 @@
 import { Kind } from 'graphql';
 
-import type {
-  ObjectFieldNode,
-  ObjectValueNode,
-  ValueNode,
-} from '../language/ast';
+import type { ObjectFieldNode, ValueNode } from '../language/ast';
 
 import type {
   IrisDataType,
@@ -17,6 +13,9 @@ import { IrisID } from '../type/scalars';
 import { inspect } from '../utils/legacy';
 import { isIterableObject, isObjectLike } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
+
+import type { IrisVariantValue } from './serialize';
+import { isEmptyVariant, parseVariantWith } from './serialize';
 
 /**
  * Produces a GraphQL Value AST given a JavaScript object.
@@ -89,15 +88,13 @@ const parseDataType = (
   value: unknown,
   type: IrisDataType,
 ): Maybe<ValueNode> => {
-  if (!type.isPrimitive && isObjectLike(value)) {
-    const variantName = value.__typename as string | undefined;
-    const variant = type.variantBy(variantName);
-    return parseVariantValue(value, variant);
+  if (!type.boxedScalar && (isObjectLike(value) || typeof value === 'string')) {
+    return parseVariantWith(parseVariantValue, value, type);
   }
 
   // Since value is an internally represented value, it must be serialized
   // to an externally represented value before converting into an AST.
-  const serialized = type.serialize(value);
+  const serialized = type.boxedScalar?.serialize(value);
   if (serialized == null) {
     return null;
   }
@@ -117,7 +114,7 @@ const parseDataType = (
 
   if (typeof serialized === 'string') {
     // Enum types use Enum literals.
-    if (!type.isPrimitive) {
+    if (!type.boxedScalar) {
       return { kind: Kind.ENUM, value: serialized };
     }
 
@@ -136,13 +133,19 @@ const parseDataType = (
 };
 
 const parseVariantValue = (
-  value: Record<string, unknown>,
+  object: IrisVariantValue,
   variant: IrisVariant<'data'>,
-): ObjectValueNode => {
+): ValueNode => {
   const fieldNodes: Array<ObjectFieldNode> = [];
+  const variantFields = Object.values(variant.fields ?? {});
+  const { name: __typename, fields } = object;
+
+  if (isEmptyVariant(object, variantFields)) {
+    return { kind: Kind.ENUM, value: __typename ?? '' };
+  }
 
   Object.values(variant.fields ?? {}).forEach(({ name, type }) => {
-    const fieldValue = astFromValue(value[name], type);
+    const fieldValue = astFromValue(fields[name], type);
     if (fieldValue) {
       fieldNodes.push({
         kind: Kind.OBJECT_FIELD,

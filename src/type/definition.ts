@@ -6,7 +6,6 @@ import {
   GraphQLID,
   GraphQLInt,
   GraphQLString,
-  Kind,
 } from 'graphql';
 import { pluck } from 'ramda';
 
@@ -18,10 +17,8 @@ import type {
   FieldDefinitionNode,
   ResolverTypeDefinitionNode,
   Role,
-  ValueNode,
   WrapperKind,
 } from '../language/ast';
-import { print } from '../language/printer';
 
 import { irisError } from '../error';
 import {
@@ -59,9 +56,12 @@ type TYPE_MAP = {
   resolver: IrisResolverType;
 };
 
-export type IrisTypeDefinition<R extends Role> = TYPE_MAP[R];
+export type IrisNamedType<R extends Role = Role> = TYPE_MAP[R];
 
-export type IrisType = IrisNamedType | IrisTypeRef<IrisType>;
+export type IrisType<R extends Role = Role> =
+  | IrisNamedType<R>
+  | IrisTypeRef<IrisType<R>>;
+
 export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
 
 export const isInputType = (type: unknown): type is IrisStrictType =>
@@ -120,7 +120,6 @@ export class IrisTypeRef<T extends IrisType> {
     return this.toString();
   }
 }
-export type IrisNamedType = IrisResolverType | IrisDataType;
 
 export const isTypeRef = <T extends IrisType>(
   type: unknown,
@@ -198,7 +197,7 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   astNode?: _VariantDefinitionNode<R>;
   toJSON?: () => string;
   fields?: ObjMap<IrisField<R>>;
-  type?: R extends 'resolver' ? IrisResolverType : never;
+  type?: IrisNamedType<R>;
 };
 
 type IrisResolverVariantConfig = IrisEntity & {
@@ -346,21 +345,11 @@ const lookupVariant = <V extends { name: string }>(
   return variant;
 };
 
-const assertString = (type: string, value: unknown): string => {
-  if (typeof value !== 'string') {
-    const valueStr = inspect(value);
-    throw irisError(
-      `Data "${type}" cannot represent non-string value: ${valueStr}.`,
-    );
-  }
-  return value;
-};
-
 export class IrisDataType<I = unknown, O = I> {
   name: string;
   description: Maybe<string>;
+  boxedScalar?: GraphQLScalarType;
   #variants: ReadonlyArray<IrisVariant<'data'>>;
-  #scalar?: GraphQLScalarType;
   astNode: Maybe<DataTypeDefinitionNode>;
 
   constructor(config: IrisDataTypeConfig<I, O>) {
@@ -368,11 +357,7 @@ export class IrisDataType<I = unknown, O = I> {
     this.name = assertName(config.name);
     this.description = config.description;
     this.#variants = config.variants ?? [];
-    this.#scalar = config.scalar ?? stdScalars[this.#variants[0]?.name];
-  }
-
-  get isPrimitive() {
-    return Boolean(this.#scalar);
+    this.boxedScalar = config.scalar ?? stdScalars[this.#variants[0]?.name];
   }
 
   get [Symbol.toStringTag]() {
@@ -391,30 +376,4 @@ export class IrisDataType<I = unknown, O = I> {
 
   variantBy = (name?: string): IrisVariant<'data'> =>
     buildVariant(lookupVariant(this.name, this.#variants, name));
-
-  serialize = (value: unknown): Maybe<any> =>
-    this.#scalar
-      ? this.#scalar.serialize(value)
-      : this.variantBy(assertString(this.name, value))?.name;
-
-  parseValue = (value: unknown): Maybe<any> =>
-    this.#scalar
-      ? this.#scalar.parseValue(value)
-      : this.variantBy(assertString(this.name, value))?.name;
-
-  parseLiteral(valueNode: ValueNode): Maybe<any> {
-    if (this.#scalar) {
-      return this.#scalar.parseLiteral(valueNode);
-    }
-
-    // Note: variables will be resolved to a value before calling this function.
-    if (valueNode.kind !== Kind.ENUM) {
-      throw irisError(
-        `Data "${this.name}" cannot represent value: ${print(valueNode)}.`,
-        { node: valueNode },
-      );
-    }
-
-    return this.#variants.find((x) => x.name === valueNode.value);
-  }
 }

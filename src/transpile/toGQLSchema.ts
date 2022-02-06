@@ -29,6 +29,8 @@ import { isDataType, isTypeRef } from '../type/definition';
 import { isSpecifiedScalarType } from '../type/scalars';
 import type { IrisSchema } from '../type/schema';
 
+import { serializeValue } from '../conversion/serialize';
+import { irisError } from '../error';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';
 
@@ -68,10 +70,18 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   };
 
   const transpileDataDefinition = (type: IrisDataType): GraphQLScalarType => {
-    const { name, serialize, parseValue, parseLiteral } = type;
+    const { name } = type;
+    const typeCheck = (value: unknown) => serializeValue(value, type);
     return register(
       name,
-      new GraphQLScalarType({ name, serialize, parseValue, parseLiteral }),
+      new GraphQLScalarType({
+        name,
+        serialize: typeCheck,
+        parseValue: typeCheck,
+        parseLiteral: () => {
+          throw irisError('literals are not supported');
+        },
+      }),
     );
   };
 

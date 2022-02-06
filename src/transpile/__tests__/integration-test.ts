@@ -25,7 +25,7 @@ describe('Simple Integration', () => {
   });
 });
 
-describe('Sophisticated Integration', () => {
+describe('Sophisticated Integration:', () => {
   const schema = buildSchema(`
   data Lifespan
     = Immortal {}
@@ -62,31 +62,55 @@ describe('Sophisticated Integration', () => {
 
   it('union type names', async () => {
     const result = await api(validDeities, '{ deities { __typename } }');
-
     expect(toJSONDeep(result)).toMatchSnapshot();
   });
 
+  const unionSelection = `
+    { deities { 
+        __typename
+
+        ... on God {
+          name
+          lifespan
+        }
+
+        ... on Deity_Titan {
+          name
+        }
+      } 
+    }`;
+
   it('conditional union selections', async () => {
+    const result = await api(validDeities, unionSelection);
+    expect(toJSONDeep(result)).toMatchSnapshot();
+  });
+
+  it('valid variant object', async () => {
     const result = await api(
-      validDeities,
-      `{ 
-        deities { 
-          __typename
-          ... on God {
-            name
-            lifespan
-          }
-          ... on Deity_Titan {
-            name
-          }
-        } 
-    }`,
+      () => [
+        {
+          __typename: 'God',
+          name: 'Morpheus',
+          lifespan: { __typename: 'Limited' },
+        },
+        {
+          __typename: 'God',
+          name: 'Zeus',
+          lifespan: { __typename: 'Limited', max: 2000 },
+        },
+        {
+          __typename: 'God',
+          name: 'Morpheus',
+          lifespan: 'Limited',
+        },
+      ],
+      unionSelection,
     );
 
     expect(toJSONDeep(result)).toMatchSnapshot();
   });
 
-  it('conditional union selections', async () => {
+  it('invalid variant name', async () => {
     const result = await api(
       () => [
         {
@@ -95,18 +119,7 @@ describe('Sophisticated Integration', () => {
           lifespan: 'Thor',
         },
       ],
-      `{ 
-        deities { 
-          __typename
-          ... on God {
-            name
-            lifespan
-          }
-          ... on Deity_Titan {
-            name
-          }
-        } 
-    }`,
+      unionSelection,
     );
 
     expect(toJSONDeep(result)).toMatchSnapshot();

@@ -8,8 +8,8 @@ import type { ObjMap } from '../utils/ObjMap';
 import { buildSchema } from './buildASTSchema';
 import type {
   IrisFieldConfig,
+  IrisNamedType,
   IrisType,
-  IrisTypeDefinition,
   Thunk,
 } from './definition';
 import {
@@ -65,5 +65,5 @@ export const sampleType = <R extends Role>({
     }
   `);
 
-  return schema.getType(name) as IrisTypeDefinition<R>;
+  return schema.getType(name) as IrisNamedType<R>;
 };

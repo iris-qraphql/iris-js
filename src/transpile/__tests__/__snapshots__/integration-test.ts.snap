@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Sophisticated Integration conditional union selections 1`] = `
+exports[`Sophisticated Integration: conditional union selections 1`] = `
 Object {
   "data": Object {
     "deities": Array [
@@ -18,15 +18,15 @@ Object {
 }
 `;
 
-exports[`Sophisticated Integration conditional union selections 2`] = `
+exports[`Sophisticated Integration: invalid variant name 1`] = `
 Object {
   "data": null,
   "errors": Array [
     Object {
       "locations": Array [
         Object {
-          "column": 13,
-          "line": 6,
+          "column": 11,
+          "line": 7,
         },
       ],
       "message": "Data \\"Lifespan\\" cannot represent value: \\"Thor\\"",
@@ -40,7 +40,7 @@ Object {
 }
 `;
 
-exports[`Sophisticated Integration union type names 1`] = `
+exports[`Sophisticated Integration: union type names 1`] = `
 Object {
   "data": Object {
     "deities": Array [
@@ -49,6 +49,33 @@ Object {
       },
       Object {
         "__typename": "Deity_Titan",
+      },
+    ],
+  },
+}
+`;
+
+exports[`Sophisticated Integration: valid variant object 1`] = `
+Object {
+  "data": Object {
+    "deities": Array [
+      Object {
+        "__typename": "God",
+        "lifespan": "Limited",
+        "name": "Morpheus",
+      },
+      Object {
+        "__typename": "God",
+        "lifespan": Object {
+          "__typename": "Limited",
+          "max": 2000,
+        },
+        "name": "Zeus",
+      },
+      Object {
+        "__typename": "God",
+        "lifespan": "Limited",
+        "name": "Morpheus",
       },
     ],
   },
