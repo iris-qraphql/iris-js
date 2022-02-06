@@ -26,28 +26,13 @@ describe('serializeValue', () => {
   });
 
   it('converts Int values to Int ASTs', () => {
-    expect(serializeValue(-1, IrisInt)).toEqual({
-      kind: 'IntValue',
-      value: '-1',
-    });
-
-    expect(serializeValue(123.0, IrisInt)).toEqual({
-      kind: 'IntValue',
-      value: '123',
-    });
-
-    expect(serializeValue(1e4, IrisInt)).toEqual({
-      kind: 'IntValue',
-      value: '10000',
-    });
-
-    // GraphQL spec does not allow coercing non-integer values to Int to avoid
-    // accidental data loss.
+    expect(serializeValue(-1, IrisInt)).toEqual(-1);
+    expect(serializeValue(123.0, IrisInt)).toEqual(123);
+    expect(serializeValue(1e4, IrisInt)).toEqual(10000);
     expect(() => serializeValue(123.5, IrisInt)).toThrow(
       'Int cannot represent non-integer value: 123.5',
     );
 
-    // Note: outside the bounds of 32bit signed int.
     expect(() => serializeValue(1e40, IrisInt)).toThrow(
       'Int cannot represent non 32-bit signed integer value: 1e+40',
     );
@@ -58,30 +43,15 @@ describe('serializeValue', () => {
   });
 
   it('converts Float values to Int/Float ASTs', () => {
-    expect(serializeValue(-1, IrisFloat)).toEqual({
-      kind: 'IntValue',
-      value: '-1',
-    });
+    expect(serializeValue(-1, IrisFloat)).toEqual(-1);
 
-    expect(serializeValue(123.0, IrisFloat)).toEqual({
-      kind: 'IntValue',
-      value: '123',
-    });
+    expect(serializeValue(123.0, IrisFloat)).toEqual(123);
 
-    expect(serializeValue(123.5, IrisFloat)).toEqual({
-      kind: 'FloatValue',
-      value: '123.5',
-    });
+    expect(serializeValue(123.5, IrisFloat)).toEqual(123.5);
 
-    expect(serializeValue(1e4, IrisFloat)).toEqual({
-      kind: 'IntValue',
-      value: '10000',
-    });
+    expect(serializeValue(1e4, IrisFloat)).toEqual(10000);
 
-    expect(serializeValue(1e40, IrisFloat)).toEqual({
-      kind: 'FloatValue',
-      value: '1e+40',
-    });
+    expect(serializeValue(1e40, IrisFloat)).toEqual(1e40);
   });
 
   it('converts String values to String ASTs', () => {
