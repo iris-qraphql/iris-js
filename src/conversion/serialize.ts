@@ -12,19 +12,20 @@ import { inspect } from '../utils/legacy';
 import { isIterableObject, isObjectLike } from '../utils/ObjMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
 
+const cannotRepresent = <T>(value: unknown, type: T) =>
+  irisError(`type ${type} cannot represent value: ${inspect(value)}.`);
+
 type JSON = unknown;
 
 type Serializer<T> = (value: unknown, type: T) => Maybe<JSON>;
 
 export const serializeValue: Serializer<IrisStrictType> = (value, type) => {
   if (isTypeRef(type)) {
-    const itemType = type.ofType;
-
     switch (type.kind) {
       case 'MAYBE':
-        return isNil(value) ? null : serializeValue(value, itemType);
+        return isNil(value) ? null : serializeValue(value, type.ofType);
       case 'LIST': {
-        return serializeList(value, itemType);
+        return serializeList(value, type.ofType);
       }
     }
   }
@@ -34,7 +35,7 @@ export const serializeValue: Serializer<IrisStrictType> = (value, type) => {
 
 const serializeList: Serializer<IrisStrictType> = (value, type) => {
   if (!isIterableObject(value)) {
-    throw new TypeError('Required Type!');
+    throw cannotRepresent(value, `[${type}]`);
   }
 
   const valuesNodes = [];
@@ -52,16 +53,14 @@ type IrisObject = {
 
 const parseDataType: Serializer<IrisDataType> = (value, type) => {
   if (isNil(value)) {
-    throw new TypeError('Required Type!');
+    throw cannotRepresent(value, type);
   }
 
   if (type.isPrimitive) {
     const serialized = type.serialize(value);
 
     if (typeof serialized === 'number' && !Number.isFinite(serialized)) {
-      throw new TypeError(
-        `Cannot convert value to AST: ${inspect(serialized)}.`,
-      );
+      throw cannotRepresent(value, type);
     }
 
     return serialized;
@@ -87,9 +86,7 @@ const decodeValue = (value: unknown, typeName: string): IrisObject => {
     return { name: __typename as string, fields };
   }
 
-  throw irisError(
-    `Data "${typeName}" cannot represent value: ${inspect(value)}.`,
-  );
+  throw cannotRepresent(value, typeName);
 };
 
 const parseVariantValue = (

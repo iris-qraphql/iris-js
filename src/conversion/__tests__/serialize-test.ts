@@ -9,8 +9,6 @@ import {
   IrisString,
 } from '../../type/scalars';
 
-import { toJSONError } from '../../utils/toJSONDeep';
-
 import { serializeValue } from '../serialize';
 
 const maybeBool = maybe(IrisBool);
@@ -65,11 +63,17 @@ describe('serializeValue', () => {
 
     expect(serializeValue(false, IrisString)).toEqual('false');
 
+    // optional
     expect(serializeValue(null, maybe(IrisString))).toEqual(null);
-
     expect(serializeValue(undefined, maybe(IrisString))).toEqual(null);
 
-    expect(serializeValue(undefined, IrisString)).toEqual(undefined);
+    // required
+    expect(() =>
+      serializeValue(undefined, IrisString),
+    ).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      serializeValue(null, IrisString),
+    ).toThrowErrorMatchingSnapshot();
   });
 
   it('converts ID values to Int/String ASTs', () => {
@@ -87,16 +91,16 @@ describe('serializeValue', () => {
 
     expect(serializeValue('01', IrisID)).toEqual('01');
 
-    expect(() => serializeValue(false, IrisID)).toThrow(
-      'ID cannot represent value: false',
-    );
-
+    // nullable
     expect(serializeValue(null, maybe(IrisID))).toEqual(null);
-
     expect(serializeValue(undefined, maybe(IrisID))).toEqual(null);
 
-    expect(serializeValue(undefined, IrisID)).toEqual(undefined);
-    expect(serializeValue(null, IrisID)).toEqual(undefined);
+    // required
+    expect(() => serializeValue(false, IrisID)).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      serializeValue(undefined, IrisID),
+    ).toThrowErrorMatchingSnapshot();
+    expect(() => serializeValue(null, IrisID)).toThrowErrorMatchingSnapshot();
   });
 
   it('converts using serialize from a custom scalar type', () => {
@@ -109,12 +113,12 @@ describe('serializeValue', () => {
 
     expect(serializeValue('value', passthroughScalar)).toEqual('value');
 
-    expect(() => serializeValue(NaN, passthroughScalar)).toThrow(
-      'Cannot convert value to AST: NaN.',
-    );
-    expect(() => serializeValue(Infinity, passthroughScalar)).toThrow(
-      'Cannot convert value to AST: Infinity.',
-    );
+    expect(() =>
+      serializeValue(NaN, passthroughScalar),
+    ).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      serializeValue(Infinity, passthroughScalar),
+    ).toThrowErrorMatchingSnapshot();
 
     const returnNullScalar = gqlScalar({
       name: 'ReturnNullScalar',
@@ -124,23 +128,10 @@ describe('serializeValue', () => {
     });
 
     expect(serializeValue('value', returnNullScalar)).toEqual(null);
-
-    class SomeClass {}
-
-    const returnCustomClassScalar = gqlScalar({
-      name: 'ReturnCustomClassScalar',
-      serialize() {
-        return new SomeClass();
-      },
-    });
-
-    expect(() => serializeValue('value', returnCustomClassScalar)).toThrow(
-      'Cannot convert value to AST: {}.',
-    );
   });
 
   it('does not converts NonNull values to NullValue', () => {
-    expect(serializeValue(null, IrisBool)).toEqual(undefined);
+    expect(() => serializeValue(null, IrisBool)).toThrowErrorMatchingSnapshot();
   });
 
   const schema = buildSchema(`
@@ -198,10 +189,12 @@ describe('serializeValue', () => {
   });
 
   it('reject invalid lists', () => {
-    expect(serializeValue(['FOO', null], gqlList(IrisString))).toEqual(
-      undefined,
-    );
-    expect(serializeValue('FOO', gqlList(IrisString))).toEqual(undefined);
+    expect(() =>
+      serializeValue(['FOO', null], gqlList(IrisString)),
+    ).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      serializeValue('FOO', gqlList(IrisString)),
+    ).toThrowErrorMatchingSnapshot();
   });
 
   it('converts data objects', () => {
@@ -210,13 +203,14 @@ describe('serializeValue', () => {
   });
 
   it('converts input objects with explicit nulls', () => {
-    expect(serializeValue({ foo: null }, inputObj)).toEqual({ foo: null });
+    expect(serializeValue({ foo: null }, inputObj)).toEqual({
+      foo: null,
+      bar: null,
+    });
   });
 
   it('does not converts non-object values as input objects', () => {
-    expect(toJSONError(() => serializeValue(5, inputObj))).toEqual({
-      message: 'Data "MyInputObj" cannot represent value: 5.',
-    });
+    expect(() => serializeValue(5, inputObj)).toThrowErrorMatchingSnapshot();
   });
 });
 
@@ -244,9 +238,13 @@ describe('parse simple data variants', () => {
   });
 
   it('require field names for non-empty variants', () => {
-    expect(parseNode('Leaf')).toEqual(undefined);
-    expect(parseNode({ __typename: 'Leaf' })).toEqual(undefined);
-    expect(parseNode({ __typename: 'Node' })).toEqual(undefined);
+    expect(() => parseNode('Leaf')).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      parseNode({ __typename: 'Leaf' }),
+    ).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      parseNode({ __typename: 'Node' }),
+    ).toThrowErrorMatchingSnapshot();
   });
 
   it('accept simple leaf', () => {
@@ -308,7 +306,12 @@ describe('circular data types', () => {
   it('ignore optional fields variants', () => {
     expect(parseNode('Leaf')).toEqual('Leaf');
     expect(parseNode({ __typename: 'Leaf' })).toEqual('Leaf');
-    expect(parseNode({ __typename: 'Node' })).toEqual(undefined);
+  });
+
+  it('must provide required fields on variants', () => {
+    expect(() =>
+      parseNode({ __typename: 'Node' }),
+    ).toThrowErrorMatchingSnapshot();
   });
 
   it('accept simple leaf', () => {
