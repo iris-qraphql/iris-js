@@ -293,15 +293,15 @@ Object {
 }
 `;
 
-exports[`circular data types reject invalid circular types 1`] = `"value 3 should be either string or object to match type NodeType."`;
+exports[`circular data types reject invalid circular types 1`] = `"Data \\"NodeType\\" cannot represent value: 3."`;
 
-exports[`circular data types reject invalid circular types 2`] = `"value [{ __typename: \\"Leaf\\", name: \\"abc\\" }] should be either string or object to match type NodeType."`;
+exports[`circular data types reject invalid circular types 2`] = `"Data \\"NodeType\\" cannot represent value: [{ __typename: \\"Leaf\\", name: \\"abc\\" }]."`;
 
-exports[`circular data types reject invalid circular types 3`] = `"value 3 should be either string or object to match type NodeType."`;
+exports[`circular data types reject invalid circular types 3`] = `"Data \\"NodeType\\" cannot represent value: 3."`;
 
-exports[`circular data types reject invalid circular types 4`] = `"value 3 should be either string or object to match type NodeType."`;
+exports[`circular data types reject invalid circular types 4`] = `"Data \\"NodeType\\" cannot represent value: 3."`;
 
-exports[`circular data types reject invalid circular types 5`] = `"value 3 should be either string or object to match type NodeType."`;
+exports[`circular data types reject invalid circular types 5`] = `"Data \\"NodeType\\" cannot represent value: 3."`;
 
 exports[`parse simple data variants accept recursive nodes 1`] = `
 Object {
@@ -596,16 +596,16 @@ Object {
 }
 `;
 
-exports[`parse simple data variants don't accept non data values 1`] = `"value [\\"Leaf\\"] should be either string or object to match type NodeType."`;
+exports[`parse simple data variants don't accept non data values 1`] = `"Data \\"NodeType\\" cannot represent value: [\\"Leaf\\"]."`;
 
-exports[`parse simple data variants don't accept non data values 2`] = `"value [{ __typename: \\"Leaf\\", name: \\"abcd\\" }] should be either string or object to match type NodeType."`;
+exports[`parse simple data variants don't accept non data values 2`] = `"Data \\"NodeType\\" cannot represent value: [{ __typename: \\"Leaf\\", name: \\"abcd\\" }]."`;
 
-exports[`parse simple data variants reject invalid recursive nodes 1`] = `"value 3 should be either string or object to match type NodeType."`;
+exports[`parse simple data variants reject invalid recursive nodes 1`] = `"Data \\"NodeType\\" cannot represent value: 3."`;
 
-exports[`parse simple data variants reject invalid recursive nodes 2`] = `"value [{ __typename: \\"Leaf\\", name: \\"abc\\" }] should be either string or object to match type NodeType."`;
+exports[`parse simple data variants reject invalid recursive nodes 2`] = `"Data \\"NodeType\\" cannot represent value: [{ __typename: \\"Leaf\\", name: \\"abc\\" }]."`;
 
-exports[`parse simple data variants reject invalid recursive nodes 3`] = `"value 3 should be either string or object to match type NodeType."`;
+exports[`parse simple data variants reject invalid recursive nodes 3`] = `"Data \\"NodeType\\" cannot represent value: 3."`;
 
-exports[`parse simple data variants reject invalid recursive nodes 4`] = `"value 3 should be either string or object to match type NodeType."`;
+exports[`parse simple data variants reject invalid recursive nodes 4`] = `"Data \\"NodeType\\" cannot represent value: 3."`;
 
-exports[`parse simple data variants reject invalid recursive nodes 5`] = `"value 3 should be either string or object to match type NodeType."`;
+exports[`parse simple data variants reject invalid recursive nodes 5`] = `"Data \\"NodeType\\" cannot represent value: 3."`;

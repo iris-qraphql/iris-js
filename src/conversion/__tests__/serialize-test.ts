@@ -67,7 +67,9 @@ describe('serializeValue', () => {
 
     expect(serializeValue(null, maybe(IrisString))).toEqual(null);
 
-    expect(serializeValue(undefined, IrisString)).toEqual(null);
+    expect(serializeValue(undefined, maybe(IrisString))).toEqual(null);
+
+    expect(serializeValue(undefined, IrisString)).toEqual(undefined);
   });
 
   it('converts ID values to Int/String ASTs', () => {
@@ -91,7 +93,10 @@ describe('serializeValue', () => {
 
     expect(serializeValue(null, maybe(IrisID))).toEqual(null);
 
-    expect(serializeValue(undefined, IrisID)).toEqual(null);
+    expect(serializeValue(undefined, maybe(IrisID))).toEqual(null);
+
+    expect(serializeValue(undefined, IrisID)).toEqual(undefined);
+    expect(serializeValue(null, IrisID)).toEqual(undefined);
   });
 
   it('converts using serialize from a custom scalar type', () => {
@@ -210,7 +215,7 @@ describe('serializeValue', () => {
 
   it('does not converts non-object values as input objects', () => {
     expect(toJSONError(() => serializeValue(5, inputObj))).toEqual({
-      message: 'Data "MyInputObj" cannot represent non-string value: 5.',
+      message: 'Data "MyInputObj" cannot represent value: 5.',
     });
   });
 });
