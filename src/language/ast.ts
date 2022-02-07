@@ -43,12 +43,12 @@ export type ASTNode =
   | DirectiveNode
   | NamedTypeNode
   | ListTypeNode
-  | FieldDefinitionNode
+  | _FieldDefinitionNode<Role>
   | ArgumentDefinitionNode
   | ResolverTypeDefinitionNode
   | DataTypeDefinitionNode
   | DirectiveDefinitionNode
-  | DataVariantDefinitionNode
+  | VariantDefinitionNode<Role>
   | MaybeTypeNode;
 
 /**
@@ -235,7 +235,7 @@ export type TypeDefinition<R extends Role> = {
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly variants: ReadonlyArray<_VariantDefinitionNode<R>>;
+  readonly variants: ReadonlyArray<VariantDefinitionNode<R>>;
 };
 
 export type VariantDefinition<R extends Role> = {
@@ -247,35 +247,31 @@ export type VariantDefinition<R extends Role> = {
   readonly fields?: ReadonlyArray<_FieldDefinitionNode<R>>;
 };
 
-export type DataFieldDefinitionNode = {
+export type _FieldDefinitionNode<R extends Role> = {
   readonly kind: IrisKind.FIELD_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly type: TypeNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly arguments?: ArgumentdsDefinitionNode<R>
 };
 
-export type FieldDefinitionNode = DataFieldDefinitionNode & {
-  readonly arguments?: ReadonlyArray<ArgumentDefinitionNode>;
-};
+export type ArgumentdsDefinitionNode<R extends Role> = ARGS[R]
 
-type FIELD_DEF = {
-  data: DataFieldDefinitionNode;
-  resolver: FieldDefinitionNode;
-};
+type ARGS = {
+   resolver: ReadonlyArray<ArgumentDefinitionNode>
+  data: undefined
+}
 
 type TYPE_DEF = {
   data: DataTypeDefinitionNode;
   resolver: ResolverTypeDefinitionNode;
 };
 
-export type _FieldDefinitionNode<T extends Role> = FIELD_DEF[T];
-export type _VariantDefinitionNode<R extends Role> = VariantDefinition<R>;
+export type VariantDefinitionNode<R extends Role> = VariantDefinition<R>;
 export type _TypeDefinitionNode<T extends Role> = TYPE_DEF[T];
 
-export type DataVariantDefinitionNode = VariantDefinition<'data'>;
-export type ResolverVariantDefinitionNode = VariantDefinition<'resolver'>;
 
 /** Directive Definitions */
 

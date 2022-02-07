@@ -3,12 +3,12 @@ import { TokenKind } from 'graphql';
 import type {
   _FieldDefinitionNode,
   _TypeDefinitionNode,
-  _VariantDefinitionNode,
+  ArgumentdsDefinitionNode,
   DefinitionNode,
-  FieldDefinitionNode,
   NameNode,
   Role,
   TypeDefinition,
+  VariantDefinitionNode,
 } from './ast';
 import { IrisKind } from './kinds';
 import type { Parser } from './parser';
@@ -43,7 +43,7 @@ export const parseTypeDefinition = <R extends Role>(
   parser.expectKeyword(role);
   const name = parser.parseName();
   const directives = parser.parseConstDirectives();
-  const variants: ReadonlyArray<_VariantDefinitionNode<R>> =
+  const variants: ReadonlyArray<VariantDefinitionNode<R>> =
     parseVariantsDefinition(role, name, parser);
   return parser.node<TypeDefinition<R>>(start, {
     kind: ROLE_KIND[role],
@@ -58,7 +58,7 @@ export const parseVariantsDefinition = <R extends Role>(
   role: R,
   name: NameNode,
   parser: Parser,
-): ReadonlyArray<_VariantDefinitionNode<R>> => {
+): ReadonlyArray<VariantDefinitionNode<R>> => {
   const equal = parser.expectOptionalToken(TokenKind.EQUALS);
   if (!equal) {
     return [];
@@ -81,13 +81,13 @@ const parseVariantDefinition = <R extends Role>(
   role: R,
   parser: Parser,
   typeName?: NameNode,
-): _VariantDefinitionNode<R> => {
+): VariantDefinitionNode<R> => {
   const start = parser.lookAhead();
   const description = parser.parseDescription();
   const name = typeName ?? parseVariantName(parser);
   const directives = parser.parseConstDirectives();
   const fields = parseFieldsDefinition(role, parser);
-  return parser.node<_VariantDefinitionNode<R>>(start, {
+  return parser.node<VariantDefinitionNode<R>>(start, {
     kind: IrisKind.VARIANT_DEFINITION,
     description,
     name,
@@ -124,11 +124,11 @@ const parseFieldDefinition =
     const start = parser.lookAhead();
     const description = parser.parseDescription();
     const name = parser.parseName();
-    const args = role === 'resolver' ? parser.parseArgumentDefs() : undefined;
+    const args = (role === 'resolver' ? parser.parseArgumentDefs() : undefined) as ArgumentdsDefinitionNode<R> ;
     parser.expectToken(TokenKind.COLON);
     const type = parser.parseTypeReference();
     const directives = parser.parseConstDirectives();
-    return parser.node<FieldDefinitionNode>(start, {
+    return parser.node<_FieldDefinitionNode<R>>(start, {
       kind: IrisKind.FIELD_DEFINITION,
       description,
       name,
