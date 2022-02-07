@@ -4,10 +4,7 @@ import { GraphQLScalarType } from 'graphql';
 import type { Role } from '../language/ast';
 
 import { buildSchema } from './buildASTSchema';
-import type {
-  IrisNamedType,
-  IrisType,
-} from './definition';
+import type { IrisNamedType, IrisType } from './definition';
 import { IrisTypeDefinition, IrisTypeRef } from './definition';
 
 export const emptyDataType = (name: string) =>
