@@ -1,50 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Type System: Fields args must be properly named Type System: Arguments must have data  types rejects a non-input type as a field arg with locations 1`] = `
-Array [
-  Object {
-    "locations": Array [
-      Object {
-        "column": 19,
-        "line": 3,
-      },
-    ],
-    "message": "The type of Query.test(arg:) must be Input Type but got: SomeObject.",
-  },
-]
-`;
-
-exports[`Type System: Fields args must be properly named Type System: Arguments must have data  types rejects an required argument that is deprecated 1`] = `
-Array [
-  Object {
-    "locations": Array [
-      Object {
-        "column": 24,
-        "line": 3,
-      },
-      Object {
-        "column": 17,
-        "line": 3,
-      },
-    ],
-    "message": "Required argument @BadDirective(badArg:) cannot be deprecated.",
-  },
-  Object {
-    "locations": Array [
-      Object {
-        "column": 26,
-        "line": 10,
-      },
-      Object {
-        "column": 19,
-        "line": 10,
-      },
-    ],
-    "message": "Required argument Query.test(badArg:) cannot be deprecated.",
-  },
-]
-`;
-
 exports[`Type System: Fields args must be properly named Type System: Enum types must be well defined rejects an Enum type with incorrectly named values 1`] = `
 Array [
   Object {
