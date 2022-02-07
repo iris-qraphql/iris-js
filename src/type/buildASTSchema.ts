@@ -31,7 +31,7 @@ import type {
   IrisTypeConfig,
   IrisVariantConfig,
 } from './definition';
-import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
+import { IrisTypeDefinition, IrisTypeRef } from './definition';
 import { GraphQLDeprecatedDirective, GraphQLDirective } from './directives';
 import { specifiedScalarTypes } from './scalars';
 import type { IrisSchemaValidationOptions } from './schema';
@@ -72,9 +72,9 @@ export function buildASTSchema(
   return new IrisSchema({
     description: undefined,
     types: Object.values(typeMap),
-    query: typeMap.Query as IrisResolverType,
-    mutation: typeMap.Mutation as IrisResolverType,
-    subscription: typeMap.Subscription as IrisResolverType,
+    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
+    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
+    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
     directives: directiveDefs.map(buildDirective),
     assumeValid: options?.assumeValid ?? false,
   });
@@ -183,9 +183,11 @@ export function buildASTSchema(
   }
 
   function buildTypeConfig<R extends Role>(
+    role: R,
     astNode: TypeDefinitionNode<R>,
   ): IrisTypeConfig<R> {
     return {
+      role,
       name: astNode.name.value,
       description: astNode.description?.value,
       variants: () => astNode.variants.map(buildVariant),
@@ -198,12 +200,12 @@ export function buildASTSchema(
   ): Maybe<IrisNamedType> {
     switch (node.kind) {
       case IrisKind.RESOLVER_TYPE_DEFINITION:
-        return new IrisResolverType(
-          buildTypeConfig(node as TypeDefinitionNode<'resolver'>),
+        return new IrisTypeDefinition(
+          buildTypeConfig('resolver', node as TypeDefinitionNode<'resolver'>),
         );
       case IrisKind.DATA_TYPE_DEFINITION:
-        return new IrisDataType(
-          buildTypeConfig(node as TypeDefinitionNode<'data'>),
+        return new IrisTypeDefinition(
+          buildTypeConfig('data', node as TypeDefinitionNode<'data'>),
         );
     }
   }

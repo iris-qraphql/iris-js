@@ -18,14 +18,13 @@ import {
 } from 'graphql';
 
 import type {
-  IrisDataType,
   IrisField,
   IrisNamedType,
-  IrisResolverType,
   IrisType,
+  IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
-import { isDataType, isTypeRef } from '../type/definition';
+import { isTypeRef } from '../type/definition';
 import { isSpecifiedScalarType } from '../type/scalars';
 import type { IrisSchema } from '../type/schema';
 
@@ -57,19 +56,20 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   };
 
   const transpileRootTypeDefinition = (
-    type?: IrisResolverType,
+    type?: IrisTypeDefinition<'resolver'>,
   ): GraphQLObjectType | undefined =>
     type ? (transpileResolverDefinition(type) as GraphQLObjectType) : undefined;
 
   const transpileTypeDefinition = (type: IrisNamedType): GraphQLNamedType => {
-    if (isDataType(type)) {
-      return transpileDataDefinition(type);
+    switch (type.role) {
+      case 'data':
+        return transpileDataDefinition(type as IrisNamedType<'data'>);
+      case 'resolver':
+        return transpileResolverDefinition(type as IrisNamedType<'resolver'>)
     }
-
-    return transpileResolverDefinition(type);
   };
 
-  const transpileDataDefinition = (type: IrisDataType): GraphQLScalarType => {
+  const transpileDataDefinition = (type: IrisTypeDefinition<'data'>): GraphQLScalarType => {
     const { name } = type;
     const typeCheck = (value: unknown) => serializeValue(value, type);
     return register(
@@ -86,7 +86,7 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   };
 
   const transpileResolverDefinition = (
-    type: IrisResolverType,
+    type: IrisTypeDefinition<'resolver'>,
   ): GraphQLObjectType | GraphQLUnionType => {
     const { name, description } = type;
     const variants = type.variants();

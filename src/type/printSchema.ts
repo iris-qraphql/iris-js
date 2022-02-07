@@ -2,6 +2,7 @@ import { Kind } from 'graphql';
 import { isPrintableAsBlockString } from 'graphql/language/blockString';
 import { pluck } from 'ramda';
 
+import type { Role } from '../language/ast';
 import { print } from '../language/printer';
 
 import { astFromValue } from '../conversion/astFromValue';
@@ -12,10 +13,8 @@ import type {
   IrisDataType,
   IrisField,
   IrisNamedType,
-  IrisResolverType,
-  IrisVariant,
-} from './definition';
-import { isResolverType } from './definition';
+  IrisTypeDefinition,
+  IrisVariant} from './definition';
 import type { GraphQLDirective } from './directives';
 import { isSpecifiedDirective } from './directives';
 import { isSpecifiedScalarType } from './scalars';
@@ -49,15 +48,16 @@ function printFilteredSchema(
     .join('\n\n');
 }
 
-export function printType(type: IrisNamedType): string {
-  if (isResolverType(type)) {
-    return printResolver(type);
+export function printType(type: IrisTypeDefinition<Role>): string {
+  switch (type.role) {
+    case 'resolver':
+      return printResolver(type as IrisTypeDefinition<'resolver'>);
+    case 'data':
+      return printDATA(type as IrisTypeDefinition<'data'>);
   }
-
-  return printDATA(type);
 }
 
-function printResolver(type: IrisResolverType): string {
+function printResolver(type: IrisTypeDefinition<'resolver'>): string {
   const variants = type.variants();
   const start = printDescription(type) + `resolver ${type.name}`;
 

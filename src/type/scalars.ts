@@ -7,11 +7,12 @@ import {
   GraphQLString,
 } from 'graphql';
 
-import type { IrisNamedType } from './definition';
-import { IrisDataType } from './definition';
+import type { IrisDataType,IrisNamedType} from './definition';
+import {IrisTypeDefinition  } from './definition';
 
 const liftScalar = <I, O = I>(scalar: GraphQLScalarType<I, O>) =>
-  new IrisDataType<I, O>({
+  new IrisTypeDefinition({
+    role: 'data',
     name: scalar.name,
     description: scalar.description,
     variants: [{ name: scalar.name }],

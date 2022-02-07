@@ -10,7 +10,7 @@ import type { Maybe } from '../utils/type-level';
 import type {
   IrisDataType,
   IrisField,
-  IrisResolverType,
+  IrisTypeDefinition,
   IrisVariant,
 } from './definition';
 import {
@@ -191,7 +191,7 @@ function validateTypes(ctx: SchemaValidationContext): void {
 
 const validateResolverType = (
   context: SchemaValidationContext,
-  type: IrisResolverType,
+  type: IrisTypeDefinition<'resolver'>,
 ) => {
   const variants = type.variants();
   if (type.isVariantType()) {

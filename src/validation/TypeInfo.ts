@@ -8,9 +8,9 @@ import { getEnterLeaveForKind } from '../language/visitor';
 import type {
   IrisArgument,
   IrisField,
-  IrisResolverType,
   IrisStrictType,
   IrisType,
+  IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
 import {
@@ -34,7 +34,7 @@ import type { Maybe } from '../utils/type-level';
 export class TypeInfo {
   private _schema: IrisSchema;
   private _typeStack: Array<Maybe<IrisType>>;
-  private _parentTypeStack: Array<Maybe<IrisResolverType>>;
+  private _parentTypeStack: Array<Maybe<IrisTypeDefinition<'resolver'>>>;
   private _inputTypeStack: Array<Maybe<IrisStrictType>>;
   private _fieldDefStack: Array<Maybe<IrisField<'resolver'>>>;
   private _defaultValueStack: Array<Maybe<unknown>>;
@@ -82,7 +82,7 @@ export class TypeInfo {
     }
   }
 
-  getParentType(): Maybe<IrisResolverType> {
+  getParentType(): Maybe<IrisTypeDefinition<'resolver'>> {
     if (this._parentTypeStack.length > 0) {
       return this._parentTypeStack[this._parentTypeStack.length - 1];
     }
