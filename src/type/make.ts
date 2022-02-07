@@ -12,14 +12,10 @@ import type {
   IrisType,
   Thunk,
 } from './definition';
-import {
-  IrisDataType,
-  IrisResolverType,
-  IrisTypeRef,
-  resolveThunk,
-} from './definition';
+import { IrisTypeDefinition, IrisTypeRef, resolveThunk } from './definition';
 
-export const emptyDataType = (name: string) => new IrisDataType({ name });
+export const emptyDataType = (name: string) =>
+  new IrisTypeDefinition({ role: 'data', name, variants: [] });
 
 type GQLObject = {
   name: string;
@@ -28,17 +24,20 @@ type GQLObject = {
 };
 
 export const gqlObject = ({ name, fields, description }: GQLObject) =>
-  new IrisResolverType({
+  new IrisTypeDefinition({
+    role: 'resolver',
     name,
     variants: () => [{ name, description, fields: resolveThunk(fields) }],
     description,
   });
 
 export const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>
-  new IrisDataType<I, O>({
+  new IrisTypeDefinition({
+    role: 'data',
     name: config.name,
     description: config.description,
     scalar: new GraphQLScalarType(config),
+    variants: [],
   });
 
 export const maybe = <T extends IrisType>(ofType: T) =>

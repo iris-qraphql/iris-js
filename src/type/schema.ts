@@ -7,7 +7,7 @@ import type { Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
 
 import { collectAllReferencedTypes } from './collectAllReferencedTypes';
-import type { IrisNamedType, IrisResolverType } from './definition';
+import type { IrisNamedType, IrisTypeDefinition } from './definition';
 import type { GraphQLDirective } from './directives';
 import { specifiedDirectives } from './directives';
 
@@ -31,9 +31,9 @@ export class IrisSchema {
   // Used as a cache for validateSchema().
   __validationErrors: Maybe<ReadonlyArray<IrisError>>;
 
-  private _queryType: Maybe<IrisResolverType>;
-  private _mutationType: Maybe<IrisResolverType>;
-  private _subscriptionType: Maybe<IrisResolverType>;
+  private _queryType: Maybe<IrisTypeDefinition<'resolver'>>;
+  private _mutationType: Maybe<IrisTypeDefinition<'resolver'>>;
+  private _subscriptionType: Maybe<IrisTypeDefinition<'resolver'>>;
   private _directives: ReadonlyArray<GraphQLDirective>;
   private _typeMap: TypeMap;
 
@@ -79,13 +79,13 @@ export class IrisSchema {
     return 'IrisSchema';
   }
 
-  getQueryType = (): IrisResolverType | undefined =>
+  getQueryType = (): IrisTypeDefinition<'resolver'> | undefined =>
     this._queryType ?? undefined;
 
-  getMutationType = (): IrisResolverType | undefined =>
+  getMutationType = (): IrisTypeDefinition<'resolver'> | undefined =>
     this._mutationType ?? undefined;
 
-  getSubscriptionType = (): IrisResolverType | undefined =>
+  getSubscriptionType = (): IrisTypeDefinition<'resolver'> | undefined =>
     this._subscriptionType ?? undefined;
 
   getTypeMap = (): TypeMap => this._typeMap;
@@ -108,9 +108,9 @@ export type IrisSchemaValidationOptions = {
 
 export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
   description?: Maybe<string>;
-  query?: Maybe<IrisResolverType>;
-  mutation?: Maybe<IrisResolverType>;
-  subscription?: Maybe<IrisResolverType>;
+  query?: Maybe<IrisTypeDefinition<'resolver'>>;
+  mutation?: Maybe<IrisTypeDefinition<'resolver'>>;
+  subscription?: Maybe<IrisTypeDefinition<'resolver'>>;
   types?: Maybe<ReadonlyArray<IrisNamedType>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
 }

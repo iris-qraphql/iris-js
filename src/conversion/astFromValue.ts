@@ -3,8 +3,8 @@ import { Kind } from 'graphql';
 import type { ObjectFieldNode, ValueNode } from '../language/ast';
 
 import type {
-  IrisDataType,
   IrisStrictType,
+  IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
 import { isTypeRef } from '../type/definition';
@@ -86,7 +86,7 @@ const integerStringRegExp = /^-?(?:0|[1-9][0-9]*)$/;
 
 const parseDataType = (
   value: unknown,
-  type: IrisDataType,
+  type: IrisTypeDefinition<'data'>,
 ): Maybe<ValueNode> => {
   if (!type.boxedScalar && (isObjectLike(value) || typeof value === 'string')) {
     return parseVariantWith(parseVariantValue, value, type);

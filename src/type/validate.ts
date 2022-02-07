@@ -7,12 +7,7 @@ import { irisNodeError } from '../error';
 import { inspect } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
-import type {
-  IrisDataType,
-  IrisField,
-  IrisResolverType,
-  IrisVariant,
-} from './definition';
+import type { IrisField, IrisTypeDefinition, IrisVariant } from './definition';
 import {
   isDataType,
   isInputType,
@@ -191,7 +186,7 @@ function validateTypes(ctx: SchemaValidationContext): void {
 
 const validateResolverType = (
   context: SchemaValidationContext,
-  type: IrisResolverType,
+  type: IrisTypeDefinition<'resolver'>,
 ) => {
   const variants = type.variants();
   if (type.isVariantType()) {
@@ -281,7 +276,7 @@ function validateUnionMembers(
 
 const validateDataType = (
   context: SchemaValidationContext,
-  type: IrisDataType,
+  type: IrisTypeDefinition<'data'>,
 ): void => {
   type.variants().forEach((variant) => {
     validateName(context, variant);

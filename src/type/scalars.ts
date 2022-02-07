@@ -8,10 +8,11 @@ import {
 } from 'graphql';
 
 import type { IrisNamedType } from './definition';
-import { IrisDataType } from './definition';
+import { IrisTypeDefinition } from './definition';
 
 const liftScalar = <I, O = I>(scalar: GraphQLScalarType<I, O>) =>
-  new IrisDataType<I, O>({
+  new IrisTypeDefinition({
+    role: 'data',
     name: scalar.name,
     description: scalar.description,
     variants: [{ name: scalar.name }],
@@ -28,13 +29,8 @@ export const IrisBool = liftScalar(GraphQLBoolean);
 
 export const IrisID = liftScalar(GraphQLID);
 
-export const specifiedScalarTypes: ReadonlyArray<IrisDataType> = Object.freeze([
-  IrisString,
-  IrisInt,
-  IrisFloat,
-  IrisBool,
-  IrisID,
-]);
+export const specifiedScalarTypes: ReadonlyArray<IrisTypeDefinition<'data'>> =
+  Object.freeze([IrisString, IrisInt, IrisFloat, IrisBool, IrisID]);
 
 export function isSpecifiedScalarType(type: IrisNamedType): boolean {
   return specifiedScalarTypes.some(({ name }) => type.name === name);

@@ -2,16 +2,14 @@ import type { ParseOptions, Source } from 'graphql';
 
 import type {
   ArgumentDefinitionNode,
-  DataVariantDefinitionNode,
   DirectiveDefinitionNode,
   DocumentNode,
   FieldDefinitionNode,
   NamedTypeNode,
-  ResolverVariantDefinitionNode,
   Role,
   TypeDefinitionNode,
   TypeNode,
-  VariantDefinition,
+  VariantDefinitionNode,
 } from '../language/ast';
 import { IrisKind } from '../language/kinds';
 import { parse } from '../language/parser';
@@ -30,10 +28,10 @@ import type {
   IrisFieldConfig,
   IrisNamedType,
   IrisType,
-  IrisVariant,
+  IrisTypeConfig,
   IrisVariantConfig,
 } from './definition';
-import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
+import { IrisTypeDefinition, IrisTypeRef } from './definition';
 import { GraphQLDeprecatedDirective, GraphQLDirective } from './directives';
 import { specifiedScalarTypes } from './scalars';
 import type { IrisSchemaValidationOptions } from './schema';
@@ -74,25 +72,24 @@ export function buildASTSchema(
   return new IrisSchema({
     description: undefined,
     types: Object.values(typeMap),
-    query: typeMap.Query as IrisResolverType,
-    mutation: typeMap.Mutation as IrisResolverType,
-    subscription: typeMap.Subscription as IrisResolverType,
+    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
+    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
+    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
     directives: directiveDefs.map(buildDirective),
     assumeValid: options?.assumeValid ?? false,
   });
 
-  function getNamedType(node: ResolverVariantDefinitionNode): IrisResolverType;
-  function getNamedType(node: NamedTypeNode): IrisNamedType;
-  function getNamedType(
-    node: NamedTypeNode | ResolverVariantDefinitionNode,
-  ): IrisNamedType {
+  function getNamedType<R extends Role>(
+    node: NamedTypeNode | VariantDefinitionNode<R>,
+  ): IrisNamedType<R> {
     const name = node.name.value;
     const type = stdTypeMap[name] ?? typeMap[name];
 
     if (type === undefined) {
       throw new Error(`Unknown type: "${name}".`);
     }
-    return type;
+
+    return type as IrisNamedType<R>;
   }
 
   function getWrappedType(node: TypeNode): IrisType {
@@ -140,7 +137,7 @@ export function buildASTSchema(
   }
 
   function buildFieldMap<R extends Role>(
-    fields: ReadonlyArray<FieldDefinitionNode>,
+    fields: ReadonlyArray<FieldDefinitionNode<R>>,
   ): ObjMap<IrisFieldConfig<R>> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
@@ -160,8 +157,7 @@ export function buildASTSchema(
   }
 
   function buildVariant<R extends Role>(
-    role: R,
-    astNode: VariantDefinition<R>,
+    astNode: VariantDefinitionNode<R>,
   ): IrisVariantConfig<R> {
     const name = astNode.name.value;
     const description = astNode.description?.value;
@@ -174,51 +170,43 @@ export function buildASTSchema(
         deprecationReason,
         astNode,
         type: getNamedType(astNode),
-      } as IrisVariantConfig<R>;
-    }
-
-    if (role === 'data') {
-      return {
-        name,
-        description,
-        deprecationReason,
-        fields: astNode.fields
-          ? () => buildFieldMap<'data'>(astNode?.fields ?? [])
-          : undefined,
-        astNode,
-      } as IrisVariant<'data'>;
+      };
     }
 
     return {
       name,
       description,
       deprecationReason,
-      fields: buildFieldMap<'resolver'>(astNode.fields ?? []),
+      fields: buildFieldMap(astNode.fields ?? []),
       astNode,
-    } as IrisVariantConfig<'resolver'>;
+    };
   }
 
-  function buildType(astNode: TypeDefinitionNode): IrisNamedType {
-    const name = astNode.name.value;
+  function buildTypeConfig<R extends Role>(
+    role: R,
+    astNode: TypeDefinitionNode<R>,
+  ): IrisTypeConfig<R> {
+    return {
+      role,
+      name: astNode.name.value,
+      description: astNode.description?.value,
+      variants: () => astNode.variants.map(buildVariant),
+      astNode,
+    };
+  }
 
-    switch (astNode.kind) {
-      case IrisKind.RESOLVER_TYPE_DEFINITION: {
-        return new IrisResolverType({
-          name,
-          description: astNode.description?.value,
-          variants: () =>
-            astNode.variants.map((v) => buildVariant('resolver', v)),
-          astNode,
-        });
-      }
-      case IrisKind.DATA_TYPE_DEFINITION: {
-        return new IrisDataType({
-          name,
-          description: astNode.description?.value,
-          variants: astNode.variants.map((v) => buildVariant('data', v)),
-          astNode,
-        });
-      }
+  function buildType<R extends Role>(
+    node: TypeDefinitionNode<R>,
+  ): Maybe<IrisNamedType> {
+    switch (node.kind) {
+      case IrisKind.RESOLVER_TYPE_DEFINITION:
+        return new IrisTypeDefinition(
+          buildTypeConfig('resolver', node as TypeDefinitionNode<'resolver'>),
+        );
+      case IrisKind.DATA_TYPE_DEFINITION:
+        return new IrisTypeDefinition(
+          buildTypeConfig('data', node as TypeDefinitionNode<'data'>),
+        );
     }
   }
 }
@@ -227,8 +215,8 @@ const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
 
 const getDeprecationReason = (
   node:
-    | FieldDefinitionNode
+    | FieldDefinitionNode<Role>
     | ArgumentDefinitionNode
-    | DataVariantDefinitionNode,
+    | VariantDefinitionNode<Role>,
 ): Maybe<string> =>
   getDirectiveValues(GraphQLDeprecatedDirective, node)?.reason as string;

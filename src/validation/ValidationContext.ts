@@ -4,9 +4,9 @@ import type { ASTVisitor } from '../language/visitor';
 import type {
   IrisArgument,
   IrisField,
-  IrisResolverType,
   IrisStrictType,
   IrisType,
+  IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
@@ -96,7 +96,7 @@ export class ValidationContext extends ASTValidationContext {
     return this._typeInfo.getType();
   }
 
-  getParentType(): Maybe<IrisResolverType> {
+  getParentType(): Maybe<IrisTypeDefinition<'resolver'>> {
     return this._typeInfo.getParentType();
   }
 

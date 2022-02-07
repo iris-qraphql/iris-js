@@ -2,9 +2,12 @@ import type {
   ArgumentNode,
   BooleanValueNode,
   ConstArgumentNode,
+  ConstDirectiveNode,
   ConstListValueNode,
   ConstObjectFieldNode,
   ConstObjectValueNode,
+  ConstValueNode,
+  DirectiveNode,
   EnumValueNode,
   FloatValueNode,
   IntValueNode,
@@ -16,12 +19,11 @@ import type {
   ObjectValueNode,
   StringValueNode,
   Token,
+  ValueNode,
   VariableNode,
 } from 'graphql';
 
 import type { IrisKind } from './kinds';
-
-export { Location, Token };
 
 /**
  * The list of all possible AST node types.
@@ -43,12 +45,11 @@ export type ASTNode =
   | DirectiveNode
   | NamedTypeNode
   | ListTypeNode
-  | FieldDefinitionNode
+  | FieldDefinitionNode<Role>
   | ArgumentDefinitionNode
-  | ResolverTypeDefinitionNode
-  | DataTypeDefinitionNode
+  | TypeDefinitionNode
   | DirectiveDefinitionNode
-  | DataVariantDefinitionNode
+  | VariantDefinitionNode<Role>
   | MaybeTypeNode;
 
 /**
@@ -99,44 +100,19 @@ export function isNode(maybeNode: any): maybeNode is ASTNode {
 
 /** Name */
 
-export interface NameNode {
+export type NameNode = {
   readonly kind: Kind.NAME;
   readonly loc?: Location;
   readonly value: string;
-}
+};
 
 /** Document */
 
-export interface DocumentNode {
+export type DocumentNode = {
   readonly kind: IrisKind.DOCUMENT;
   readonly loc?: Location;
   readonly definitions: ReadonlyArray<DefinitionNode>;
-}
-
-export type DefinitionNode = TypeSystemDefinitionNode;
-
-/** Values */
-
-export type ValueNode =
-  | VariableNode
-  | IntValueNode
-  | FloatValueNode
-  | StringValueNode
-  | BooleanValueNode
-  | NullValueNode
-  | EnumValueNode
-  | ListValueNode
-  | ObjectValueNode;
-
-export type ConstValueNode =
-  | IntValueNode
-  | FloatValueNode
-  | StringValueNode
-  | BooleanValueNode
-  | NullValueNode
-  | EnumValueNode
-  | ConstListValueNode
-  | ConstObjectValueNode;
+};
 
 export type {
   VariableNode,
@@ -154,23 +130,13 @@ export type {
   ConstObjectFieldNode,
   ArgumentNode,
   ConstArgumentNode,
+  ConstDirectiveNode,
+  DirectiveNode,
+  ValueNode,
+  ConstValueNode,
+  Location,
+  Token,
 };
-
-/** Directives */
-
-export interface DirectiveNode {
-  readonly kind: Kind.DIRECTIVE;
-  readonly loc?: Location;
-  readonly name: NameNode;
-  readonly arguments?: ReadonlyArray<ArgumentNode>;
-}
-
-export interface ConstDirectiveNode {
-  readonly kind: Kind.DIRECTIVE;
-  readonly loc?: Location;
-  readonly name: NameNode;
-  readonly arguments?: ReadonlyArray<ConstArgumentNode>;
-}
 
 /** Type Reference */
 
@@ -178,37 +144,31 @@ export type WrapperKind = 'LIST' | 'MAYBE';
 
 export type TypeNode = NamedTypeNode | ListTypeNode | MaybeTypeNode;
 
-export interface NamedTypeNode {
+export type NamedTypeNode = {
   readonly kind: IrisKind.NAMED_TYPE;
   readonly loc?: Location;
   readonly name: NameNode;
-}
+};
 
-export interface ListTypeNode {
+export type ListTypeNode = {
   readonly kind: IrisKind.LIST_TYPE;
   readonly loc?: Location;
   readonly type: TypeNode;
-}
+};
 
-export interface MaybeTypeNode {
+export type MaybeTypeNode = {
   readonly kind: IrisKind.MAYBE_TYPE;
   readonly loc?: Location;
   readonly type: NamedTypeNode | ListTypeNode;
-}
-
-/** Type System Definition */
-
-export type TypeSystemDefinitionNode =
-  | TypeDefinitionNode
-  | DirectiveDefinitionNode;
+};
 
 /** Type Definition */
 
-export type TypeDefinitionNode =
-  | ResolverTypeDefinitionNode
-  | DataTypeDefinitionNode;
+export type DefinitionNode = TypeDefinitionNode | DirectiveDefinitionNode;
 
-export interface ArgumentDefinitionNode {
+export type Role = 'resolver' | 'data';
+
+export type ArgumentDefinitionNode = {
   readonly kind: IrisKind.ARGUMENT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
@@ -216,68 +176,44 @@ export interface ArgumentDefinitionNode {
   readonly type: TypeNode;
   readonly defaultValue?: ConstValueNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-}
-
-export type Role = 'resolver' | 'data';
-
-export type DataTypeDefinitionNode = TypeDefinition<'data'>;
-
-export type ResolverTypeDefinitionNode = TypeDefinition<'resolver'>;
-
-type ROLE_KIND = {
-  resolver: IrisKind.RESOLVER_TYPE_DEFINITION;
-  data: IrisKind.DATA_TYPE_DEFINITION;
 };
 
-export type TypeDefinition<R extends Role> = {
-  readonly kind: ROLE_KIND[R];
-  readonly loc?: Location;
-  readonly description?: StringValueNode;
-  readonly name: NameNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly variants: ReadonlyArray<_VariantDefinitionNode<R>>;
-};
+export type ArgumentsDefinitionNode<R extends Role> = R extends 'resolver'
+  ? ReadonlyArray<ArgumentDefinitionNode>
+  : undefined;
 
-export type VariantDefinition<R extends Role> = {
-  readonly kind: IrisKind.VARIANT_DEFINITION;
-  readonly loc?: Location;
-  readonly description?: StringValueNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly name: NameNode;
-  readonly fields?: ReadonlyArray<_FieldDefinitionNode<R>>;
-};
-
-export type DataFieldDefinitionNode = {
+export type FieldDefinitionNode<R extends Role> = {
   readonly kind: IrisKind.FIELD_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly type: TypeNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly arguments?: ArgumentsDefinitionNode<R>;
 };
 
-export type FieldDefinitionNode = DataFieldDefinitionNode & {
-  readonly arguments?: ReadonlyArray<ArgumentDefinitionNode>;
+export type VariantDefinitionNode<R extends Role> = {
+  readonly kind: IrisKind.VARIANT_DEFINITION;
+  readonly loc?: Location;
+  readonly description?: StringValueNode;
+  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly name: NameNode;
+  readonly fields?: ReadonlyArray<FieldDefinitionNode<R>>;
 };
 
-type FIELD_DEF = {
-  data: DataFieldDefinitionNode;
-  resolver: FieldDefinitionNode;
+type ROLE_TO_KIND = {
+  resolver: IrisKind.RESOLVER_TYPE_DEFINITION;
+  data: IrisKind.DATA_TYPE_DEFINITION;
 };
 
-type TYPE_DEF = {
-  data: DataTypeDefinitionNode;
-  resolver: ResolverTypeDefinitionNode;
+export type TypeDefinitionNode<R extends Role = Role> = {
+  readonly kind: ROLE_TO_KIND[R];
+  readonly loc?: Location;
+  readonly description?: StringValueNode;
+  readonly name: NameNode;
+  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly variants: ReadonlyArray<VariantDefinitionNode<R>>;
 };
-
-export type _FieldDefinitionNode<T extends Role> = FIELD_DEF[T];
-export type _VariantDefinitionNode<R extends Role> = VariantDefinition<R>;
-export type _TypeDefinitionNode<T extends Role> = TYPE_DEF[T];
-
-export type DataVariantDefinitionNode = VariantDefinition<'data'>;
-export type ResolverVariantDefinitionNode = VariantDefinition<'resolver'>;
-
-/** Directive Definitions */
 
 export interface DirectiveDefinitionNode {
   readonly kind: IrisKind.DIRECTIVE_DEFINITION;
