@@ -1,67 +1,36 @@
-import { DirectiveLocation } from '../../language/directiveLocation';
-
 import { irisError } from '../../error';
 import { inspect } from '../../utils/legacy';
 import { toJSONDeep } from '../../utils/toJSONDeep';
-import type { ConfigMapValue } from '../../utils/type-level';
 
 import { buildSchema } from '../buildASTSchema';
-import type {
-  IrisArgument,
-  IrisFieldConfig,
-  IrisNamedType,
-  IrisStrictType,
-  IrisType,
-  IrisTypeRef,
-} from '../definition';
-import { assertDataType, assertResolverType } from '../definition';
-import { GraphQLDirective } from '../directives';
-import { gqlList, gqlObject, maybe } from '../make';
-import { IrisString } from '../scalars';
-import { IrisSchema } from '../schema';
+import type { IrisSchema } from '../schema';
 import { validateSchema } from '../validate';
 
-const SomeSchema = buildSchema(`
+const resolverField = (name: string): IrisSchema =>
+  buildSchema(`
   data SomeScalar = Int
-
   resolver SomeObject = { f: SomeObject }
-
   resolver SomeUnion = SomeObject
-
   data SomeEnum = ONLY {}
-
   data SomeInputObject = { val: String }
-
   directive @SomeDirective on QUERY
+
+  resolver BadObject = {
+      badField: ${name}
+  }
+  
+  resolver Query = {
+      f: BadObject
+    }
 `);
 
-const SomeScalarType = assertDataType(SomeSchema.getType('SomeScalar'));
-const SomeObjectType = assertResolverType(SomeSchema.getType('SomeObject'));
-const SomeUnionType = assertResolverType(SomeSchema.getType('SomeUnion'));
-const SomeEnumType = assertDataType(SomeSchema.getType('SomeEnum'));
-const SomeInputObjectType = assertDataType(
-  SomeSchema.getType('SomeInputObject'),
-);
-
-function withModifiers<T extends IrisNamedType>(
-  type: T,
-): Array<T | IrisTypeRef<T | IrisTypeRef<T>>> {
-  return [type, gqlList(type), maybe(type), maybe(gqlList(type))];
-}
-
-const outputTypes: ReadonlyArray<IrisType> = [
-  ...withModifiers(IrisString),
-  ...withModifiers(SomeScalarType),
-  ...withModifiers(SomeEnumType),
-  ...withModifiers(SomeObjectType),
-  ...withModifiers(SomeUnionType),
-];
-
-const inputTypes: ReadonlyArray<IrisStrictType> = [
-  ...withModifiers(IrisString),
-  ...withModifiers(SomeScalarType),
-  ...withModifiers(SomeEnumType),
-  ...withModifiers(SomeInputObjectType),
+const withWrappers = (type: string): Array<string> => [
+  type,
+  `${type}?`,
+  `[${type}]`,
+  `[${type}]?`,
+  `[${type}?]`,
+  `[${type}?]?`,
 ];
 
 function schemaWithFieldType(
@@ -76,9 +45,6 @@ function schemaWithFieldType(
     }
   `);
 }
-
-const expectJSON = (schema: IrisSchema) =>
-  expect(toJSONDeep(validateSchema(schema)));
 
 const expectJSONEqual = (schema: IrisSchema, value: unknown) =>
   expect(toJSONDeep(validateSchema(schema))).toEqual(value);
@@ -352,32 +318,19 @@ describe('Type System: Fields args must be properly named', () => {
   });
 
   describe('Type System: Object fields must have output types', () => {
-    function schemaWithObjectField(
-      fieldConfig: IrisFieldConfig<'resolver'>,
-    ): IrisSchema {
-      const BadObjectType = gqlObject({
-        name: 'BadObject',
-        fields: {
-          badField: fieldConfig,
-        },
-      });
+    const outputTypes = [
+      'String',
+      'SomeScalar',
+      'SomeEnum',
+      'SomeObject',
+      'SomeUnion',
+    ];
 
-      return new IrisSchema({
-        query: gqlObject({
-          name: 'Query',
-          fields: {
-            f: { type: BadObjectType },
-          },
-        }),
-        types: [SomeObjectType],
-      });
-    }
-
-    for (const type of outputTypes) {
-      const typeName = inspect(type);
-      it(`accepts an output type as an Object field type: ${typeName}`, () => {
-        const schema = schemaWithObjectField({ type });
-        expectJSONEqual(schema, []);
+    for (const type of outputTypes.flatMap(withWrappers)) {
+      it(`accepts an output type as an Object field type: ${inspect(
+        type,
+      )}`, () => {
+        expectJSONEqual(resolverField(type), []);
       });
     }
 
@@ -392,82 +345,6 @@ describe('Type System: Fields args must be properly named', () => {
       }
     `);
       expectJSONEqual(schema, []);
-    });
-  });
-
-  describe('Type System: Arguments must have data  types', () => {
-    function schemaWithArg(
-      argConfig: ConfigMapValue<IrisArgument>,
-    ): IrisSchema {
-      const BadObjectType = gqlObject({
-        name: 'BadObject',
-        fields: {
-          badField: {
-            type: IrisString,
-            args: {
-              badArg: argConfig,
-            },
-          },
-        },
-      });
-
-      return new IrisSchema({
-        query: gqlObject({
-          name: 'Query',
-          fields: {
-            f: { type: BadObjectType },
-          },
-        }),
-        directives: [
-          new GraphQLDirective({
-            name: 'BadDirective',
-            args: {
-              badArg: argConfig,
-            },
-            locations: [DirectiveLocation.QUERY],
-          }),
-        ],
-      });
-    }
-
-    for (const type of inputTypes) {
-      const typeName = inspect(type);
-      it(`accepts an data  type as a field arg type: ${typeName}`, () => {
-        const schema = schemaWithArg({ type });
-        expectJSONEqual(schema, []);
-      });
-    }
-
-    it('rejects an required argument that is deprecated', () => {
-      const schema = buildSchema(`
-      directive @BadDirective(
-        badArg: String @deprecated
-        optionalArg: String? @deprecated
-        anotherOptionalArg: String = "" @deprecated
-      ) on FIELD
-
-      resolver Query = {
-        test(
-          badArg: String @deprecated
-          optionalArg: String? @deprecated
-          anotherOptionalArg: String = "" @deprecated
-        ): String
-      }
-    `);
-      expectJSON(schema).toMatchSnapshot();
-    });
-
-    it('rejects a non-input type as a field arg with locations', () => {
-      const schema = buildSchema(`
-      resolver Query = {
-        test(arg: SomeObject): String
-      }
-
-      resolver SomeObject = {
-        foo: String
-      }
-    `);
-      expectJSON(schema).toMatchSnapshot();
     });
   });
 
