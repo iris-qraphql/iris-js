@@ -19,7 +19,8 @@ import {
   resolveThunk,
 } from './definition';
 
-export const emptyDataType = (name: string) => new IrisDataType({ name });
+export const emptyDataType = (name: string) =>
+  new IrisDataType({ name, variants: [] });
 
 type GQLObject = {
   name: string;
@@ -39,6 +40,7 @@ export const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>
     name: config.name,
     description: config.description,
     scalar: new GraphQLScalarType(config),
+    variants: [],
   });
 
 export const maybe = <T extends IrisType>(ofType: T) =>

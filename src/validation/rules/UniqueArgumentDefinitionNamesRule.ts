@@ -1,8 +1,8 @@
 import { forEachObjIndexed, groupBy } from 'ramda';
 
 import type {
-  _FieldDefinitionNode,
   ArgumentDefinitionNode,
+  FieldDefinitionNode,
   NameNode,
   Role,
 } from '../../language/ast';
@@ -31,7 +31,7 @@ export function UniqueArgumentDefinitionNamesRule(
 
   function checkArgUniquenessPerField(typeNode: {
     readonly name: NameNode;
-    readonly fields?: ReadonlyArray<_FieldDefinitionNode<Role>>;
+    readonly fields?: ReadonlyArray<FieldDefinitionNode<Role>>;
   }) {
     const typeName = typeNode.name.value;
     const fieldNodes = typeNode.fields ?? [];

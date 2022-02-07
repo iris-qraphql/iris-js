@@ -1,15 +1,14 @@
 import type { ParseOptions, Source } from 'graphql';
 
 import type {
-  _FieldDefinitionNode,
   ArgumentDefinitionNode,
   DirectiveDefinitionNode,
   DocumentNode,
+  FieldDefinitionNode,
   NamedTypeNode,
   Role,
   TypeDefinitionNode,
   TypeNode,
-  VariantDefinition,
   VariantDefinitionNode,
 } from '../language/ast';
 import { IrisKind } from '../language/kinds';
@@ -137,7 +136,7 @@ export function buildASTSchema(
   }
 
   function buildFieldMap<R extends Role>(
-    fields: ReadonlyArray<_FieldDefinitionNode<R>>,
+    fields: ReadonlyArray<FieldDefinitionNode<R>>,
   ): ObjMap<IrisFieldConfig<R>> {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
@@ -157,7 +156,7 @@ export function buildASTSchema(
   }
 
   function buildVariant<R extends Role>(
-    astNode: VariantDefinition<R>,
+    astNode: VariantDefinitionNode<R>,
   ): IrisVariantConfig<R> {
     const name = astNode.name.value;
     const description = astNode.description?.value;
@@ -182,23 +181,25 @@ export function buildASTSchema(
     };
   }
 
-  function buildType(astNode: TypeDefinitionNode): IrisNamedType {
-    const name = astNode.name.value;
+  function buildType<R extends Role>(node: TypeDefinitionNode<R>): Maybe<IrisNamedType> {
+    const name = node.name.value;
 
-    switch (astNode.kind) {
+    switch (node.kind) {
       case IrisKind.RESOLVER_TYPE_DEFINITION: {
+        const astNode = node as TypeDefinitionNode<'resolver'>
         return new IrisResolverType({
           name,
           description: astNode.description?.value,
-          variants: () => astNode.variants.map((v) => buildVariant(v)),
+          variants: () => astNode.variants.map(buildVariant),
           astNode,
         });
       }
       case IrisKind.DATA_TYPE_DEFINITION: {
+        const astNode = node as TypeDefinitionNode<'data'>
         return new IrisDataType({
           name,
           description: astNode.description?.value,
-          variants: () => astNode.variants.map((v) => buildVariant(v)),
+          variants: () => astNode.variants.map(buildVariant),
           astNode,
         });
       }
@@ -210,7 +211,7 @@ const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
 
 const getDeprecationReason = (
   node:
-    | _FieldDefinitionNode<Role>
+    | FieldDefinitionNode<Role>
     | ArgumentDefinitionNode
     | VariantDefinitionNode<Role>,
 ): Maybe<string> =>

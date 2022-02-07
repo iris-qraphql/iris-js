@@ -10,12 +10,10 @@ import {
 import { pluck } from 'ramda';
 
 import type {
-  _FieldDefinitionNode,
   ArgumentDefinitionNode,
-  DataTypeDefinitionNode,
-  ResolverTypeDefinitionNode,
+  FieldDefinitionNode,
   Role,
-  TypeDefinition,
+  TypeDefinitionNode,
   VariantDefinitionNode,
   WrapperKind,
 } from '../language/ast';
@@ -179,7 +177,7 @@ export const isRequiredArgument = (arg: IrisArgument): boolean =>
 
 export type IrisField<R extends Role> = IrisEntity & {
   type: R extends 'data' ? IrisStrictType : IrisType;
-  astNode?: _FieldDefinitionNode<R>;
+  astNode?: FieldDefinitionNode<R>;
 } & (R extends 'resolver'
     ? {
         args: ReadonlyArray<IrisArgument>;
@@ -212,7 +210,7 @@ export type IrisTypeConfig<R extends Role> = {
   name: string;
   description?: Maybe<string>;
   variants: Thunk<ReadonlyArray<IrisVariantConfig<R>>>;
-  astNode?: Maybe<TypeDefinition<R>>;
+  astNode?: Maybe<TypeDefinitionNode<R>>;
 };
 
 type IrisTypeDef<T> = {
@@ -256,7 +254,7 @@ const buildVariant = <R extends Role>({
 export class IrisResolverType implements IrisTypeDef<IrisVariant<'resolver'>> {
   name: string;
   description: Maybe<string>;
-  astNode: Maybe<ResolverTypeDefinitionNode>;
+  astNode: Maybe<TypeDefinitionNode<'resolver'>>;
   #thunkVariants: () => ReadonlyArray<IrisVariantConfig<'resolver'>>;
   #resolvedVariants?: ReadonlyArray<IrisVariant<'resolver'>>;
 
@@ -334,7 +332,7 @@ export class IrisDataType<I = unknown, O = I> {
   #scalar?: GraphQLScalarType;
   #thunkVariants: () => ReadonlyArray<IrisVariantConfig<'data'>>;
   #resolvedVariants?: ReadonlyArray<IrisVariant<'data'>>;
-  astNode: Maybe<DataTypeDefinitionNode>;
+  astNode: Maybe<TypeDefinitionNode<'data'>>;
 
   constructor(
     config: IrisTypeConfig<'data'> & {

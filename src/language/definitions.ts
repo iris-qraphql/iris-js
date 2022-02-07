@@ -1,13 +1,12 @@
 import { TokenKind } from 'graphql';
 
 import type {
-  _FieldDefinitionNode,
-  _TypeDefinitionNode,
-  ArgumentdsDefinitionNode,
+  ArgumentsDefinitionNode,
   DefinitionNode,
+  FieldDefinitionNode,
   NameNode,
   Role,
-  TypeDefinition,
+  TypeDefinitionNode,
   VariantDefinitionNode,
 } from './ast';
 import { IrisKind } from './kinds';
@@ -37,7 +36,7 @@ const ROLE_KIND = {
 export const parseTypeDefinition = <R extends Role>(
   role: R,
   parser: Parser,
-): TypeDefinition<R> => {
+): TypeDefinitionNode<R> => {
   const start = parser.lookAhead();
   const description = parser.parseDescription();
   parser.expectKeyword(role);
@@ -45,7 +44,7 @@ export const parseTypeDefinition = <R extends Role>(
   const directives = parser.parseConstDirectives();
   const variants: ReadonlyArray<VariantDefinitionNode<R>> =
     parseVariantsDefinition(role, name, parser);
-  return parser.node<TypeDefinition<R>>(start, {
+  return parser.node<TypeDefinitionNode<R>>(start, {
     kind: ROLE_KIND[role],
     description,
     name,
@@ -107,7 +106,7 @@ const parseVariantName = (parser: Parser): NameNode => {
 const parseFieldsDefinition = <R extends Role>(
   role: R,
   parser: Parser,
-): ReadonlyArray<_FieldDefinitionNode<R>> | undefined => {
+): ReadonlyArray<FieldDefinitionNode<R>> | undefined => {
   const nodes = [];
   if (parser.expectOptionalToken(TokenKind.BRACE_L)) {
     while (!parser.expectOptionalToken(TokenKind.BRACE_R)) {
@@ -120,15 +119,17 @@ const parseFieldsDefinition = <R extends Role>(
 
 const parseFieldDefinition =
   <R extends Role>(role: R, parser: Parser) =>
-  (): _FieldDefinitionNode<R> => {
+  (): FieldDefinitionNode<R> => {
     const start = parser.lookAhead();
     const description = parser.parseDescription();
     const name = parser.parseName();
-    const args = (role === 'resolver' ? parser.parseArgumentDefs() : undefined) as ArgumentdsDefinitionNode<R> ;
+    const args = (
+      role === 'resolver' ? parser.parseArgumentDefs() : undefined
+    ) as ArgumentsDefinitionNode<R>;
     parser.expectToken(TokenKind.COLON);
     const type = parser.parseTypeReference();
     const directives = parser.parseConstDirectives();
-    return parser.node<_FieldDefinitionNode<R>>(start, {
+    return parser.node<FieldDefinitionNode<R>>(start, {
       kind: IrisKind.FIELD_DEFINITION,
       description,
       name,

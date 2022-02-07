@@ -12,11 +12,7 @@ export {
 } from './visitor';
 export type { ASTVisitor, ASTVisitorKeyMap } from './visitor';
 
-export type {
-  ResolverTypeDefinitionNode,
-  DataTypeDefinitionNode,
-  DirectiveDefinitionNode,
-} from './ast';
+export type { TypeDefinitionNode, DirectiveDefinitionNode } from './ast';
 
 export {
   isValueNode,
