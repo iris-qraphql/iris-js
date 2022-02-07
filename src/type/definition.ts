@@ -348,7 +348,7 @@ const lookupVariant = <V extends { name: string }>(
 export class IrisDataType<I = unknown, O = I> {
   name: string;
   description: Maybe<string>;
-  boxedScalar?: GraphQLScalarType;
+  #scalar?: GraphQLScalarType;
   #variants: ReadonlyArray<IrisVariant<'data'>>;
   astNode: Maybe<DataTypeDefinitionNode>;
 
@@ -357,11 +357,20 @@ export class IrisDataType<I = unknown, O = I> {
     this.name = assertName(config.name);
     this.description = config.description;
     this.#variants = config.variants ?? [];
-    this.boxedScalar = config.scalar ?? stdScalars[this.#variants[0]?.name];
+    this.#scalar = config.scalar ?? stdScalars[this.#variants[0]?.name];
   }
 
   get [Symbol.toStringTag]() {
     return 'IrisDataType';
+  }
+
+  get boxedScalar() {
+    if(this.#scalar){
+      return this.#scalar
+    }
+    
+    const [variant] = this.variants()
+    return stdScalars[variant?.name];
   }
 
   toString = (): string => this.name;
