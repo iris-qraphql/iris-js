@@ -60,7 +60,7 @@ export type IrisType<R extends Role = Role> =
   | IrisNamedType<R>
   | IrisTypeRef<IrisType<R>>;
 
-export type IrisStrictType = IrisDataType | IrisTypeRef<IrisStrictType>;
+export type IrisStrictType = IrisType<'data'>;
 
 export const isInputType = (type: unknown): type is IrisStrictType =>
   isDataType(type) || (isTypeRef(type) && isInputType(type.ofType));
@@ -176,7 +176,7 @@ export const isRequiredArgument = (arg: IrisArgument): boolean =>
   !isMaybeType(arg.type) && arg.defaultValue === undefined;
 
 export type IrisField<R extends Role> = IrisEntity & {
-  type: R extends 'data' ? IrisStrictType : IrisType;
+  type: R extends 'data' ? IrisType<'data'> : IrisType;
   astNode?: FieldDefinitionNode<R>;
 } & (R extends 'resolver'
     ? {

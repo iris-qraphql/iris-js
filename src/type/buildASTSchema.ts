@@ -28,6 +28,7 @@ import type {
   IrisFieldConfig,
   IrisNamedType,
   IrisType,
+  IrisTypeConfig,
   IrisVariantConfig,
 } from './definition';
 import { IrisDataType, IrisResolverType, IrisTypeRef } from './definition';
@@ -181,28 +182,29 @@ export function buildASTSchema(
     };
   }
 
-  function buildType<R extends Role>(node: TypeDefinitionNode<R>): Maybe<IrisNamedType> {
-    const name = node.name.value;
+  function buildTypeConfig<R extends Role>(
+    astNode: TypeDefinitionNode<R>,
+  ): IrisTypeConfig<R> {
+    return {
+      name: astNode.name.value,
+      description: astNode.description?.value,
+      variants: () => astNode.variants.map(buildVariant),
+      astNode,
+    };
+  }
 
+  function buildType<R extends Role>(
+    node: TypeDefinitionNode<R>,
+  ): Maybe<IrisNamedType> {
     switch (node.kind) {
-      case IrisKind.RESOLVER_TYPE_DEFINITION: {
-        const astNode = node as TypeDefinitionNode<'resolver'>
-        return new IrisResolverType({
-          name,
-          description: astNode.description?.value,
-          variants: () => astNode.variants.map(buildVariant),
-          astNode,
-        });
-      }
-      case IrisKind.DATA_TYPE_DEFINITION: {
-        const astNode = node as TypeDefinitionNode<'data'>
-        return new IrisDataType({
-          name,
-          description: astNode.description?.value,
-          variants: () => astNode.variants.map(buildVariant),
-          astNode,
-        });
-      }
+      case IrisKind.RESOLVER_TYPE_DEFINITION:
+        return new IrisResolverType(
+          buildTypeConfig(node as TypeDefinitionNode<'resolver'>),
+        );
+      case IrisKind.DATA_TYPE_DEFINITION:
+        return new IrisDataType(
+          buildTypeConfig(node as TypeDefinitionNode<'data'>),
+        );
     }
   }
 }

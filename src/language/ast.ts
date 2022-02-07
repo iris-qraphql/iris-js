@@ -6,6 +6,7 @@ import type {
   ConstListValueNode,
   ConstObjectFieldNode,
   ConstObjectValueNode,
+  ConstValueNode,
   DirectiveNode,
   EnumValueNode,
   FloatValueNode,
@@ -18,12 +19,11 @@ import type {
   ObjectValueNode,
   StringValueNode,
   Token,
+  ValueNode,
   VariableNode,
 } from 'graphql';
 
 import type { IrisKind } from './kinds';
-
-export { Location, Token };
 
 /**
  * The list of all possible AST node types.
@@ -114,29 +114,6 @@ export type DocumentNode = {
   readonly definitions: ReadonlyArray<DefinitionNode>;
 };
 
-/** Values */
-
-export type ValueNode =
-  | VariableNode
-  | IntValueNode
-  | FloatValueNode
-  | StringValueNode
-  | BooleanValueNode
-  | NullValueNode
-  | EnumValueNode
-  | ListValueNode
-  | ObjectValueNode;
-
-export type ConstValueNode =
-  | IntValueNode
-  | FloatValueNode
-  | StringValueNode
-  | BooleanValueNode
-  | NullValueNode
-  | EnumValueNode
-  | ConstListValueNode
-  | ConstObjectValueNode;
-
 export type {
   VariableNode,
   IntValueNode,
@@ -155,6 +132,10 @@ export type {
   ConstArgumentNode,
   ConstDirectiveNode,
   DirectiveNode,
+  ValueNode,
+  ConstValueNode,
+  Location,
+  Token,
 };
 
 /** Type Reference */
