@@ -67,7 +67,6 @@ export const isTypeDefinition = (
   type: unknown,
 ): type is IrisTypeDefinition<Role> => instanceOf(type, IrisTypeDefinition);
 
-
 export const isResolverType = (
   type: unknown,
 ): type is IrisTypeDefinition<'resolver'> =>
@@ -142,7 +141,7 @@ export const unpackMaybe = (type: Maybe<IrisType>): IrisType | undefined => {
 };
 
 export function getNamedType(type: undefined | null): void;
-export function getNamedType(type: IrisStrictType): IrisDataType;
+export function getNamedType(type: IrisStrictType): IrisTypeDefinition<'data'>;
 export function getNamedType(type: IrisType): IrisNamedType;
 export function getNamedType(type: Maybe<IrisType>): IrisNamedType | undefined;
 export function getNamedType(type: Maybe<IrisType>): IrisNamedType | undefined {
@@ -252,9 +251,6 @@ const buildVariant = <R extends Role>({
   toJSON: () => name,
 });
 
-export type IrisDataType = IrisTypeDefinition<'data'>;
-export type IrisResolverType = IrisTypeDefinition<'resolver'>;
-
 export class IrisTypeDefinition<R extends Role> {
   name: string;
   description: Maybe<string>;
@@ -275,7 +271,7 @@ export class IrisTypeDefinition<R extends Role> {
   }
 
   get [Symbol.toStringTag]() {
-    return this.role === 'resolver' ? 'IrisResolverType' : 'IrisDataType';
+    return 'IrisTypeDefinition';
   }
 
   get boxedScalar() {

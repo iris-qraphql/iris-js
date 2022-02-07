@@ -1,9 +1,9 @@
 import { isNil } from 'ramda';
 
 import type {
-  IrisDataType,
   IrisField,
   IrisStrictType,
+  IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
 import { isMaybeType, isTypeRef } from '../type/definition';
@@ -52,7 +52,7 @@ export type IrisVariantValue = {
   fields: Record<string, unknown>;
 };
 
-const parseDataType: Serializer<IrisDataType> = (value, type) => {
+const parseDataType: Serializer<IrisTypeDefinition<'data'>> = (value, type) => {
   if (isNil(value)) {
     throw cannotRepresent(value, type);
   }
@@ -73,7 +73,7 @@ const parseDataType: Serializer<IrisDataType> = (value, type) => {
 export const parseVariantWith = <T>(
   f: (o: IrisVariantValue, v: IrisVariant<'data'>) => T,
   value: unknown,
-  type: IrisDataType,
+  type: IrisTypeDefinition<'data'>,
 ): T => {
   const object = toVariantObject(value, type.name);
   const variant = type.variantBy(object.name);

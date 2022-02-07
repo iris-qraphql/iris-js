@@ -26,7 +26,7 @@ serving queries against that type schema.
 First, build a Iris type schema which maps to your codebase.
 
 ```js
-import { iris, IrisSchema, IrisResolverType, IrisString } from 'iris';
+import { iris, IrisSchema, IrisString } from 'iris';
 
 var schema = new IrisSchema({
   query: new IrisResolver({

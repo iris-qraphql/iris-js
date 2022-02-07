@@ -65,11 +65,13 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
       case 'data':
         return transpileDataDefinition(type as IrisNamedType<'data'>);
       case 'resolver':
-        return transpileResolverDefinition(type as IrisNamedType<'resolver'>)
+        return transpileResolverDefinition(type as IrisNamedType<'resolver'>);
     }
   };
 
-  const transpileDataDefinition = (type: IrisTypeDefinition<'data'>): GraphQLScalarType => {
+  const transpileDataDefinition = (
+    type: IrisTypeDefinition<'data'>,
+  ): GraphQLScalarType => {
     const { name } = type;
     const typeCheck = (value: unknown) => serializeValue(value, type);
     return register(

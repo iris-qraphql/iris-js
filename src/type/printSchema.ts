@@ -10,11 +10,11 @@ import type { Maybe } from '../utils/type-level';
 
 import type {
   IrisArgument,
-  IrisDataType,
   IrisField,
   IrisNamedType,
   IrisTypeDefinition,
-  IrisVariant} from './definition';
+  IrisVariant,
+} from './definition';
 import type { GraphQLDirective } from './directives';
 import { isSpecifiedDirective } from './directives';
 import { isSpecifiedScalarType } from './scalars';
@@ -78,7 +78,7 @@ function printResolver(type: IrisTypeDefinition<'resolver'>): string {
   return start + ' = ' + pluck('name', variants).join(' | ');
 }
 
-function printDATA(type: IrisDataType): string {
+function printDATA(type: IrisTypeDefinition<'data'>): string {
   const variants = type.variants();
   const start = printDescription(type) + `data ${type.name}`;
 
