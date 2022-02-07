@@ -5,7 +5,6 @@ import { pluck } from 'ramda';
 import type { Role } from '../language/ast';
 import { print } from '../language/printer';
 
-import { astFromValue } from '../conversion/astFromValue';
 import type { Maybe } from '../utils/type-level';
 
 import type {
@@ -169,11 +168,12 @@ function printArgs(
 const printArgument = ({
   name,
   type,
-  defaultValue,
   deprecationReason,
+  astNode,
 }: IrisArgument): string => {
-  const value = astFromValue(defaultValue, type);
-  const printedDefaultValue = value ? ` = ${print(value)}` : '';
+  const printedDefaultValue = astNode?.defaultValue
+    ? ` = ${print(astNode.defaultValue)}`
+    : '';
 
   return `${name}: ${type.toString()}${printedDefaultValue}${printDeprecated(
     deprecationReason,

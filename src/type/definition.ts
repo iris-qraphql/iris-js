@@ -172,7 +172,7 @@ export const resolveThunk = <T>(thunk: Thunk<T>): T =>
 export type IrisArgument = IrisEntity & {
   type: IrisStrictType;
   defaultValue?: unknown;
-  astNode?: Maybe<ArgumentDefinitionNode>;
+  astNode?: ArgumentDefinitionNode;
 };
 
 export const isRequiredArgument = (arg: IrisArgument): boolean =>
