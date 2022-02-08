@@ -1,10 +1,7 @@
 import type { GraphQLScalarTypeConfig } from 'graphql';
 import { GraphQLScalarType } from 'graphql';
 
-import type { Role } from '../language/ast';
-
-import { buildSchema } from './buildASTSchema';
-import type { IrisNamedType, IrisType } from './definition';
+import type { IrisType } from './definition';
 import { IrisTypeDefinition, IrisTypeRef } from './definition';
 
 export const emptyDataType = (name: string) =>
@@ -24,24 +21,3 @@ export const maybe = <T extends IrisType>(ofType: T) =>
 
 export const gqlList = <T extends IrisType>(ofType: T) =>
   new IrisTypeRef('LIST', ofType);
-
-export type TypeDef<R extends Role = Role> = {
-  role: R;
-  name: string;
-  body: string;
-};
-
-export const sampleType = <R extends Role>({
-  role,
-  name,
-  body,
-}: TypeDef<R>) => {
-  const schema = buildSchema(`
-    ${role} ${name} = ${body}
-    resolver Query = {
-      f: ${name}
-    }
-  `);
-
-  return schema.getType(name) as IrisNamedType<R>;
-};

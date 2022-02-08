@@ -2,8 +2,10 @@ import { identity } from 'ramda';
 
 import { parseValue } from '../../language/parser';
 
+import { buildSchema } from '../../type/buildASTSchema';
 import type { IrisStrictType } from '../../type/definition';
-import { gqlList, gqlScalar, maybe, sampleType } from '../../type/make';
+import { assertDataType } from '../../type/definition';
+import { gqlList, gqlScalar, maybe } from '../../type/make';
 import {
   IrisBool,
   IrisFloat,
@@ -150,15 +152,19 @@ describe('valueFromAST', () => {
     expectValueFrom('[true, null]', listOfBool).toEqual(undefined);
   });
 
-  const testInputObj = sampleType({
-    role: 'data',
-    name: 'TestInput',
-    body: `{ 
+  const schema = buildSchema(`
+      data TestInput = { 
         int: Int?
         bool: Boolean?
         requiredBool: Boolean
-      }`,
-  });
+      }
+
+      resolver Query = {
+        f: TestInput
+      }
+  `);
+
+  const testInputObj = assertDataType(schema.getType('TestInput'));
 
   it('coerces input objects according to input coercion rules', () => {
     expectValueFrom('null', maybe(testInputObj)).toEqual(null);

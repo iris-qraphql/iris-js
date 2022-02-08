@@ -37,7 +37,7 @@ export class IrisSchema {
   private _directives: ReadonlyArray<GraphQLDirective>;
   private _typeMap: TypeMap;
 
-  constructor(config: Readonly<GraphQLSchemaConfig>) {
+  constructor(config: Readonly<IrisSchemaConfig>) {
     this.__validationErrors = config.assumeValid === true ? [] : undefined;
     this._typeMap = {};
     this.description = config.description;
@@ -106,7 +106,7 @@ export type IrisSchemaValidationOptions = {
   assumeValidSDL?: boolean;
 };
 
-export interface GraphQLSchemaConfig extends IrisSchemaValidationOptions {
+export interface IrisSchemaConfig extends IrisSchemaValidationOptions {
   description?: Maybe<string>;
   query?: Maybe<IrisTypeDefinition<'resolver'>>;
   mutation?: Maybe<IrisTypeDefinition<'resolver'>>;

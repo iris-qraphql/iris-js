@@ -32,6 +32,5 @@ export const IrisID = liftScalar(GraphQLID);
 export const specifiedScalarTypes: ReadonlyArray<IrisTypeDefinition<'data'>> =
   Object.freeze([IrisString, IrisInt, IrisFloat, IrisBool, IrisID]);
 
-export function isSpecifiedScalarType(type: IrisNamedType): boolean {
-  return specifiedScalarTypes.some(({ name }) => type.name === name);
-}
+export const isSpecifiedScalarType = (type: IrisNamedType): boolean =>
+  specifiedScalarTypes.some(({ name }) => type.name === name);

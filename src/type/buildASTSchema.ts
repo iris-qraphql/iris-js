@@ -19,9 +19,8 @@ import { validateSDL } from '../validation/validate';
 
 import { valueFromAST } from '../conversion/valueFromAST';
 import { getDirectiveValues } from '../conversion/values';
-import type { ObjMap } from '../utils/ObjMap';
 import { keyMap } from '../utils/ObjMap';
-import type { ConfigMap, Maybe } from '../utils/type-level';
+import type { ConfigMap, IrisMaybe, Maybe } from '../utils/type-level';
 
 import type {
   IrisArgument,
@@ -94,47 +93,32 @@ export function buildASTSchema(
   }
 
   function buildArgumentMap(
-    args: Maybe<ReadonlyArray<ArgumentDefinitionNode>>,
+    argsNodes: IrisMaybe<ReadonlyArray<ArgumentDefinitionNode>> = [],
   ): ConfigMap<IrisArgument> {
-    const argsNodes = /* c8 ignore next */ args ?? [];
-
-    const argConfigMap = Object.create(null);
-    for (const arg of argsNodes) {
-      // Note: While this could make assertions to get the correctly typed
-      // value, that would throw immediately while type system validation
-      // with validateSchema() will produce more actionable results.
-      const type: any = getWrappedType(arg.type);
-
-      argConfigMap[arg.name.value] = {
+    const argConfigMap: ConfigMap<IrisArgument> = {};
+    for (const astNode of argsNodes) {
+      const type: any = getWrappedType(astNode.type);
+      argConfigMap[astNode.name.value] = {
         type,
-        description: arg.description?.value,
-        defaultValue: valueFromAST(arg.defaultValue, type),
-        deprecationReason: getDeprecationReason(arg),
-        astNode: arg,
+        description: astNode.description?.value,
+        defaultValue: valueFromAST(astNode.defaultValue, type),
+        deprecationReason: getDeprecationReason(astNode),
+        astNode,
       };
     }
     return argConfigMap;
   }
 
-  const buildFieldMap = <R extends Role>(
-    fields: ReadonlyArray<FieldDefinitionNode<R>>,
-  ): ObjMap<IrisFieldConfig<R>> => {
-    const entries = fields.map((field) => {
-      const type: any = getWrappedType(field.type);
-      return [
-        field.name.value,
-        {
-          type,
-          description: field.description?.value,
-          deprecationReason: getDeprecationReason(field),
-          astNode: field,
-          args: field.arguments ? buildArgumentMap(field.arguments) : undefined,
-        },
-      ];
-    });
-
-    return Object.fromEntries(entries);
-  };
+  const buildField = <R extends Role>(
+    field: FieldDefinitionNode<R>,
+  ): IrisFieldConfig<R> =>
+    ({
+      type: getWrappedType(field.type),
+      description: field.description?.value,
+      deprecationReason: getDeprecationReason(field),
+      astNode: field,
+      args: field.arguments ? buildArgumentMap(field.arguments) : undefined,
+    } as IrisFieldConfig<R>);
 
   const buildVariant = <R extends Role>(
     astNode: VariantDefinitionNode<R>,
@@ -157,7 +141,12 @@ export function buildASTSchema(
       name,
       description,
       deprecationReason,
-      fields: buildFieldMap(astNode.fields ?? []),
+      fields: Object.fromEntries(
+        (astNode.fields ?? []).map((field) => [
+          field.name.value,
+          buildField(field),
+        ]),
+      ),
       astNode,
     };
   };
