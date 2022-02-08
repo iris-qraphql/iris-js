@@ -1,6 +1,5 @@
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import { buildSchema } from '../buildASTSchema';
 import type { IrisArgument, IrisStrictType } from '../definition';
 import {
   assertDataType,
@@ -32,6 +31,7 @@ import {
   IrisString,
   isSpecifiedScalarType,
 } from '../scalars';
+import { buildSchema } from '../schema';
 
 const schema = buildSchema(`
   data Scalar = Int

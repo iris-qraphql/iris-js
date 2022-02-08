@@ -2,8 +2,8 @@ import { irisError } from '../../error';
 import { inspect } from '../../utils/legacy';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 
-import { buildSchema } from '../buildASTSchema';
 import type { IrisSchema } from '../schema';
+import { buildSchema } from '../schema';
 import { validateSchema } from '../validate';
 
 const resolverField = (name: string): IrisSchema =>
