@@ -1,3 +1,5 @@
+import type { Role } from '../language/ast';
+
 import type { IrisNamedType, IrisType, IrisVariant } from './definition';
 import { getNamedType } from './definition';
 import type { GraphQLDirective } from './directives';
@@ -49,7 +51,7 @@ function collectReferencedTypes(
 }
 
 const exploreVariant = (
-  variant: IrisVariant<'resolver'>,
+  variant: IrisVariant<Role>,
   typeSet: Set<IrisNamedType>,
 ) => {
   if (variant.type) {
@@ -58,6 +60,8 @@ const exploreVariant = (
 
   Object.values(variant.fields ?? {}).forEach((field) => {
     collectReferencedTypes(field.type, typeSet);
-    field.args.forEach((arg) => collectReferencedTypes(arg.type, typeSet));
+    if ('args' in field) {
+      field.args?.forEach?.((arg) => collectReferencedTypes(arg.type, typeSet));
+    }
   });
 };

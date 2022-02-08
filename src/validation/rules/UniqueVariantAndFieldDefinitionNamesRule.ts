@@ -22,8 +22,7 @@ export function UniqueVariantAndFieldDefinitionNamesRule(
   const knownFieldNames = Object.create(null);
 
   return {
-    DataTypeDefinition: checkVariantUniqueness,
-    ResolverTypeDefinition: checkVariantUniqueness,
+    TypeDefinition: checkVariantUniqueness,
   };
 
   function checkVariantUniqueness({ variants, name }: TypeDefinitionNode) {

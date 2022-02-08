@@ -15,8 +15,7 @@ export function UniqueTypeNamesRule(context: SDLValidationContext): ASTVisitor {
   const schema = context.getSchema();
 
   return {
-    ResolverTypeDefinition: checkTypeName,
-    DataTypeDefinition: checkTypeName,
+    TypeDefinition: checkTypeName,
   };
 
   function checkTypeName(node: TypeDefinitionNode) {

@@ -28,7 +28,6 @@ import type {
   IrisFieldConfig,
   IrisNamedType,
   IrisType,
-  IrisTypeConfig,
   IrisVariantConfig,
 } from './definition';
 import { IrisTypeDefinition, IrisTypeRef } from './definition';
@@ -59,25 +58,6 @@ export function buildASTSchema(
 
   const directiveDefs: Array<DirectiveDefinitionNode> = [];
   const typeMap: Record<string, IrisNamedType> = {};
-
-  documentAST.definitions.forEach((def) => {
-    if (isTypeDefinitionNode(def)) {
-      const name = def.name.value;
-      typeMap[name] = stdTypeMap[name] ?? buildType(def);
-    } else if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
-      directiveDefs.push(def);
-    }
-  });
-
-  return new IrisSchema({
-    description: undefined,
-    types: Object.values(typeMap),
-    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
-    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
-    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
-    directives: directiveDefs.map(buildDirective),
-    assumeValid: options?.assumeValid ?? false,
-  });
 
   function getNamedType<R extends Role>(
     node: NamedTypeNode | VariantDefinitionNode<R>,
@@ -136,9 +116,9 @@ export function buildASTSchema(
     return argConfigMap;
   }
 
-  function buildFieldMap<R extends Role>(
+  const buildFieldMap = <R extends Role>(
     fields: ReadonlyArray<FieldDefinitionNode<R>>,
-  ): ObjMap<IrisFieldConfig<R>> {
+  ): ObjMap<IrisFieldConfig<R>> => {
     const entries = fields.map((field) => {
       const type: any = getWrappedType(field.type);
       return [
@@ -154,11 +134,11 @@ export function buildASTSchema(
     });
 
     return Object.fromEntries(entries);
-  }
+  };
 
-  function buildVariant<R extends Role>(
+  const buildVariant = <R extends Role>(
     astNode: VariantDefinitionNode<R>,
-  ): IrisVariantConfig<R> {
+  ): IrisVariantConfig<R> => {
     const name = astNode.name.value;
     const description = astNode.description?.value;
     const deprecationReason = getDeprecationReason(astNode);
@@ -180,35 +160,37 @@ export function buildASTSchema(
       fields: buildFieldMap(astNode.fields ?? []),
       astNode,
     };
-  }
+  };
 
-  function buildTypeConfig<R extends Role>(
-    role: R,
+  const buildType = <R extends Role>(
     astNode: TypeDefinitionNode<R>,
-  ): IrisTypeConfig<R> {
-    return {
-      role,
+  ): IrisTypeDefinition<R> =>
+    new IrisTypeDefinition({
+      role: astNode.role,
       name: astNode.name.value,
       description: astNode.description?.value,
       variants: () => astNode.variants.map(buildVariant),
       astNode,
-    };
-  }
+    });
 
-  function buildType<R extends Role>(
-    node: TypeDefinitionNode<R>,
-  ): Maybe<IrisNamedType> {
-    switch (node.kind) {
-      case IrisKind.RESOLVER_TYPE_DEFINITION:
-        return new IrisTypeDefinition(
-          buildTypeConfig('resolver', node as TypeDefinitionNode<'resolver'>),
-        );
-      case IrisKind.DATA_TYPE_DEFINITION:
-        return new IrisTypeDefinition(
-          buildTypeConfig('data', node as TypeDefinitionNode<'data'>),
-        );
+  documentAST.definitions.forEach((def) => {
+    if (isTypeDefinitionNode(def)) {
+      const name = def.name.value;
+      typeMap[name] = stdTypeMap[name] ?? buildType(def);
+    } else if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
+      directiveDefs.push(def);
     }
-  }
+  });
+
+  return new IrisSchema({
+    description: undefined,
+    types: Object.values(typeMap),
+    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
+    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
+    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
+    directives: directiveDefs.map(buildDirective),
+    assumeValid: options?.assumeValid ?? false,
+  });
 }
 
 const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);

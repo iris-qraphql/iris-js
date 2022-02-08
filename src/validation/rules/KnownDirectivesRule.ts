@@ -77,15 +77,13 @@ function getDirectiveLocationForASTPath(
   switch (appliedTo.kind) {
     case IrisKind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
-    case IrisKind.RESOLVER_TYPE_DEFINITION:
+    case IrisKind.TYPE_DEFINITION:
       return DirectiveLocation.UNION;
-    case IrisKind.DATA_TYPE_DEFINITION:
-      return DirectiveLocation.INPUT_OBJECT;
     case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
       const kinds: ReadonlyArray<IrisKind | Kind> = [
-        IrisKind.DATA_TYPE_DEFINITION,
+        IrisKind.TYPE_DEFINITION,
         IrisKind.VARIANT_DEFINITION,
       ];
       return kinds.includes(parentNode.kind)
