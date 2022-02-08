@@ -50,15 +50,11 @@ describe('AST node predicates', () => {
   it('isTypeSystemDefinitionNode', () => {
     expect(filterNodes(isTypeSystemDefinitionNode)).toEqual([
       'DirectiveDefinition',
-      'ResolverTypeDefinition',
-      'DataTypeDefinition',
+      'TypeDefinition',
     ]);
   });
 
   it('isTypeDefinitionNode', () => {
-    expect(filterNodes(isTypeDefinitionNode)).toEqual([
-      'ResolverTypeDefinition',
-      'DataTypeDefinition',
-    ]);
+    expect(filterNodes(isTypeDefinitionNode)).toEqual(['TypeDefinition']);
   });
 });

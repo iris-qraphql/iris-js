@@ -73,27 +73,16 @@ const printDocASTReducer: ASTReducer<string> = {
       ),
   },
 
-  ResolverTypeDefinition: {
-    leave: ({ description, name, directives, variants }) =>
+  TypeDefinition: {
+    leave: ({ role, description, name, directives, variants }) =>
       wrap('', description, '\n') +
       join(
-        [
-          'resolver',
-          name,
-          join(directives, ' '),
-          wrap('= ', join(variants, ' | ')),
-        ],
+        [role, name, join(directives, ' '), wrap('= ', join(variants, ' | '))],
         ' ',
       ),
   },
 
-  VariantDefinition: { leave: ({ name }) => name },
-
-  DataTypeDefinition: {
-    leave: ({ description, name, directives, variants }) =>
-      wrap('', description, '\n') +
-      join(['data', name, join(directives, ' '), block(variants)], ' '),
-  },
+  VariantDefinition: { leave: ({ name }) => name + block([]) },
 
   DirectiveDefinition: {
     leave: ({ description, name, arguments: args, repeatable, locations }) =>
