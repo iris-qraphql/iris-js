@@ -2,7 +2,6 @@ import { identity } from 'ramda';
 
 import { parseValue } from '../../language/parser';
 
-import { buildSchema } from '../../type/buildASTSchema';
 import type { IrisStrictType } from '../../type/definition';
 import { assertDataType } from '../../type/definition';
 import { gqlList, gqlScalar, maybe } from '../../type/make';
@@ -13,6 +12,7 @@ import {
   IrisInt,
   IrisString,
 } from '../../type/scalars';
+import { buildSchema } from '../../type/schema';
 
 import type { ObjMap } from '../../utils/ObjMap';
 

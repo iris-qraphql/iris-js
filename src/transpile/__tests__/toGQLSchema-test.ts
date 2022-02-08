@@ -1,6 +1,6 @@
 import { printSchema } from 'graphql';
 
-import { buildSchema } from '../../type/buildASTSchema';
+import { buildSchema } from '../../type/schema';
 
 import { toGQLSchema } from '../toGQLSchema';
 

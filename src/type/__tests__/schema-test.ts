@@ -2,11 +2,10 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import { dedent } from '../../utils/dedent';
 
-import { buildSchema } from '../buildASTSchema';
 import { GraphQLDirective } from '../directives';
 import { emptyDataType, gqlList } from '../make';
 import { printSchema } from '../printSchema';
-import { IrisSchema } from '../schema';
+import { buildSchema, IrisSchema } from '../schema';
 
 const cycle = (src: string) =>
   expect(printSchema(buildSchema(src))).toEqual(dedent([src]));

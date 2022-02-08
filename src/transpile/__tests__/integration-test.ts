@@ -1,4 +1,4 @@
-import { buildSchema } from '../../type/buildASTSchema';
+import { buildSchema } from '../../type/schema';
 
 import { iris } from '../../index';
 import { toJSONDeep } from '../../utils/toJSONDeep';

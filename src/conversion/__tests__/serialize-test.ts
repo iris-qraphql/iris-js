@@ -1,4 +1,3 @@
-import { buildSchema } from '../../type/buildASTSchema';
 import { assertDataType } from '../../type/definition';
 import { gqlList, gqlScalar, maybe } from '../../type/make';
 import {
@@ -8,6 +7,7 @@ import {
   IrisInt,
   IrisString,
 } from '../../type/scalars';
+import { buildSchema } from '../../type/schema';
 
 import { serializeValue } from '../serialize';
 
