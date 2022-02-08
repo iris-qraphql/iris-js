@@ -27,7 +27,7 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
     Object.create(null);
 
   const schema = context.getSchema();
-  const definedDirectives = schema?.getDirectives() ?? specifiedDirectives;
+  const definedDirectives = schema?.directives ?? specifiedDirectives;
   for (const directive of definedDirectives) {
     requiredArgsMap[directive.name] = keyMap(
       directive.args.filter(isRequiredArgument),

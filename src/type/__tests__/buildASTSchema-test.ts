@@ -27,12 +27,10 @@ describe('Schema Builder', () => {
       definitions: [],
     });
 
-    expect(sdlSchema.getDirectives()).toEqual(schema.getDirectives());
+    expect(sdlSchema.directives).toEqual(schema.directives);
 
-    expect(sdlSchema.getTypeMap()).toEqual(schema.getTypeMap());
-    expect(Object.keys(sdlSchema.getTypeMap())).toEqual(
-      Object.keys(schema.getTypeMap()),
-    );
+    expect(sdlSchema.typeMap).toEqual(schema.typeMap);
+    expect(Object.keys(sdlSchema.typeMap)).toEqual(Object.keys(schema.typeMap));
   });
 
   it('Empty type', () => {
@@ -121,7 +119,7 @@ describe('Schema Builder', () => {
       directive @specifiedBy on FIELD_DEFINITION
     `);
 
-    expect(schema.getDirectives()).toHaveLength(4);
+    expect(schema.directives).toHaveLength(4);
     expect(schema.getDirective('deprecated')).not.toEqual(
       GraphQLDeprecatedDirective,
     );

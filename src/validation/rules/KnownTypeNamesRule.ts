@@ -27,7 +27,7 @@ export function KnownTypeNamesRule(
   context: ValidationContext | SDLValidationContext,
 ): ASTVisitor {
   const schema = context.getSchema();
-  const existingTypesMap = schema ? schema.getTypeMap() : Object.create(null);
+  const existingTypesMap = schema ? schema.typeMap : Object.create(null);
 
   const definedTypes = Object.create(null);
   for (const def of context.getDocument().definitions) {

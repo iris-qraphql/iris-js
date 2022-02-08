@@ -76,7 +76,7 @@ class SchemaValidationContext {
 
 function validateRootTypes(context: SchemaValidationContext): void {
   const schema = context.schema;
-  const queryType = schema.getQueryType();
+  const queryType = schema.query;
   if (!queryType) {
     context.reportError('Query root type must be provided.');
   } else if (!isObjectType(queryType)) {
@@ -89,7 +89,7 @@ function validateRootTypes(context: SchemaValidationContext): void {
     );
   }
 
-  const mutationType = schema.getMutationType();
+  const mutationType = schema.mutation;
   if (mutationType && !isObjectType(mutationType)) {
     context.reportError(
       'Mutation root type must be Object type if provided, it cannot be ' +
@@ -99,7 +99,7 @@ function validateRootTypes(context: SchemaValidationContext): void {
     );
   }
 
-  const subscriptionType = schema.getSubscriptionType();
+  const subscriptionType = schema.subscription;
   if (subscriptionType && !isObjectType(subscriptionType)) {
     context.reportError(
       'Subscription root type must be Object type if provided, it cannot be ' +
@@ -118,7 +118,7 @@ function getOperationTypeNode(
 }
 
 function validateDirectives(context: SchemaValidationContext): void {
-  for (const directive of context.schema.getDirectives()) {
+  for (const directive of context.schema.directives) {
     // Ensure all directives are in fact GraphQL directives.
     if (!isDirective(directive)) {
       context.reportError(
@@ -169,7 +169,7 @@ function validateName(
 }
 
 function validateTypes(ctx: SchemaValidationContext): void {
-  Object.values(ctx.schema.getTypeMap()).forEach((type) => {
+  Object.values(ctx.schema.typeMap).forEach((type) => {
     if (isResolverType(type)) {
       return validateResolverType(ctx, type);
     }

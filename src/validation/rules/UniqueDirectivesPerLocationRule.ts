@@ -25,9 +25,7 @@ export function UniqueDirectivesPerLocationRule(
   const uniqueDirectiveMap = Object.create(null);
 
   const schema = context.getSchema();
-  const definedDirectives = schema
-    ? schema.getDirectives()
-    : specifiedDirectives;
+  const definedDirectives = schema ? schema.directives : specifiedDirectives;
   for (const directive of definedDirectives) {
     uniqueDirectiveMap[directive.name] = !directive.isRepeatable;
   }

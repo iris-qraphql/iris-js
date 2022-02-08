@@ -66,7 +66,7 @@ describe('Type System: Schema', () => {
       });
       const schema = new IrisSchema({ directives: [directive] });
 
-      expect(Object.keys(schema.getTypeMap())).toEqual(
+      expect(Object.keys(schema.typeMap)).toEqual(
         expect.arrayContaining(['Foo', 'Bar']),
       );
     });

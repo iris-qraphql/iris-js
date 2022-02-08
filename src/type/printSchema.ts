@@ -36,8 +36,8 @@ function printFilteredSchema(
   directiveFilter: (type: GraphQLDirective) => boolean,
   typeFilter: (type: IrisNamedType) => boolean,
 ): string {
-  const directives = schema.getDirectives().filter(directiveFilter);
-  const types = Object.values(schema.getTypeMap()).filter(typeFilter);
+  const directives = schema.directives.filter(directiveFilter);
+  const types = Object.values(schema.typeMap).filter(typeFilter);
 
   return [
     ...directives.map((directive) => printDirective(directive)),

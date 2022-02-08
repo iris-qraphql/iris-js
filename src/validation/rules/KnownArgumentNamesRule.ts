@@ -54,9 +54,7 @@ export function KnownArgumentNamesOnDirectivesRule(
   const directiveArgs = Object.create(null);
 
   const schema = context.getSchema();
-  const definedDirectives = schema
-    ? schema.getDirectives()
-    : specifiedDirectives;
+  const definedDirectives = schema ? schema.directives : specifiedDirectives;
   for (const directive of definedDirectives) {
     directiveArgs[directive.name] = directive.args.map((arg) => arg.name);
   }

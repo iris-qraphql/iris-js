@@ -29,9 +29,7 @@ export function KnownDirectivesRule(
   const locationsMap = Object.create(null);
 
   const schema = context.getSchema();
-  const definedDirectives = schema
-    ? schema.getDirectives()
-    : specifiedDirectives;
+  const definedDirectives = schema ? schema.directives : specifiedDirectives;
   for (const directive of definedDirectives) {
     locationsMap[directive.name] = directive.locations;
   }
