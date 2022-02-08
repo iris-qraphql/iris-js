@@ -28,11 +28,6 @@ export const parseDefinitions = (
   return undefined;
 };
 
-const ROLE_KIND = {
-  resolver: IrisKind.RESOLVER_TYPE_DEFINITION,
-  data: IrisKind.DATA_TYPE_DEFINITION,
-} as const;
-
 export const parseTypeDefinition = <R extends Role>(
   role: R,
   parser: Parser,
@@ -45,7 +40,8 @@ export const parseTypeDefinition = <R extends Role>(
   const variants: ReadonlyArray<VariantDefinitionNode<R>> =
     parseVariantsDefinition(role, name, parser);
   return parser.node<TypeDefinitionNode<R>>(start, {
-    kind: ROLE_KIND[role],
+    kind: IrisKind.TYPE_DEFINITION,
+    role,
     description,
     name,
     directives,

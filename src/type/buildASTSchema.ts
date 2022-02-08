@@ -29,9 +29,10 @@ import type {
   IrisNamedType,
   IrisType,
   IrisTypeConfig,
+  IrisTypeDefinition,
   IrisVariantConfig,
 } from './definition';
-import { IrisTypeDefinition, IrisTypeRef } from './definition';
+import { IrisTypeRef } from './definition';
 import { GraphQLDeprecatedDirective, GraphQLDirective } from './directives';
 import { specifiedScalarTypes } from './scalars';
 import type { IrisSchemaValidationOptions } from './schema';
@@ -67,16 +68,6 @@ export function buildASTSchema(
     } else if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       directiveDefs.push(def);
     }
-  });
-
-  return new IrisSchema({
-    description: undefined,
-    types: Object.values(typeMap),
-    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
-    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
-    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
-    directives: directiveDefs.map(buildDirective),
-    assumeValid: options?.assumeValid ?? false,
   });
 
   function getNamedType<R extends Role>(
@@ -182,12 +173,11 @@ export function buildASTSchema(
     };
   }
 
-  function buildTypeConfig<R extends Role>(
-    role: R,
+  function buildType<R extends Role>(
     astNode: TypeDefinitionNode<R>,
   ): IrisTypeConfig<R> {
     return {
-      role,
+      role: astNode.role,
       name: astNode.name.value,
       description: astNode.description?.value,
       variants: () => astNode.variants.map(buildVariant),
@@ -195,20 +185,15 @@ export function buildASTSchema(
     };
   }
 
-  function buildType<R extends Role>(
-    node: TypeDefinitionNode<R>,
-  ): Maybe<IrisNamedType> {
-    switch (node.kind) {
-      case IrisKind.RESOLVER_TYPE_DEFINITION:
-        return new IrisTypeDefinition(
-          buildTypeConfig('resolver', node as TypeDefinitionNode<'resolver'>),
-        );
-      case IrisKind.DATA_TYPE_DEFINITION:
-        return new IrisTypeDefinition(
-          buildTypeConfig('data', node as TypeDefinitionNode<'data'>),
-        );
-    }
-  }
+  return new IrisSchema({
+    description: undefined,
+    types: Object.values(typeMap),
+    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
+    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
+    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
+    directives: directiveDefs.map(buildDirective),
+    assumeValid: options?.assumeValid ?? false,
+  });
 }
 
 const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);

@@ -54,8 +54,5 @@ export function isTypeSystemDefinitionNode(
 export function isTypeDefinitionNode(
   node: ASTNode,
 ): node is TypeDefinitionNode {
-  return (
-    node.kind === IrisKind.RESOLVER_TYPE_DEFINITION ||
-    node.kind === IrisKind.DATA_TYPE_DEFINITION
-  );
+  return node.kind === IrisKind.TYPE_DEFINITION;
 }

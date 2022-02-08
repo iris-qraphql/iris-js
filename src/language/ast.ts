@@ -83,8 +83,7 @@ export const QueryDocumentKeys: {
     'defaultValue',
     'directives',
   ],
-  ResolverTypeDefinition: ['description', 'name', 'directives', 'variants'],
-  DataTypeDefinition: ['description', 'name', 'directives', 'variants'],
+  TypeDefinition: ['description', 'name', 'directives', 'variants'],
   VariantDefinition: ['name', 'fields'],
   DirectiveDefinition: ['description', 'name', 'arguments', 'locations'],
 };
@@ -201,13 +200,9 @@ export type VariantDefinitionNode<R extends Role> = {
   readonly fields?: ReadonlyArray<FieldDefinitionNode<R>>;
 };
 
-type ROLE_TO_KIND = {
-  resolver: IrisKind.RESOLVER_TYPE_DEFINITION;
-  data: IrisKind.DATA_TYPE_DEFINITION;
-};
-
 export type TypeDefinitionNode<R extends Role = Role> = {
-  readonly kind: ROLE_TO_KIND[R];
+  readonly kind: IrisKind.TYPE_DEFINITION;
+  readonly role: R;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;

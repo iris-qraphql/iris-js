@@ -6,9 +6,8 @@ export enum IrisKind {
   LIST_TYPE = 'ListType',
   MAYBE_TYPE = 'MaybeType',
   FIELD_DEFINITION = 'FieldDefinition',
-  RESOLVER_TYPE_DEFINITION = 'ResolverTypeDefinition',
-  DATA_TYPE_DEFINITION = 'DataTypeDefinition',
   VARIANT_DEFINITION = 'VariantDefinition',
+  TYPE_DEFINITION = 'TypeDefinition',
   DIRECTIVE_DEFINITION = 'DirectiveDefinition',
   DOCUMENT = 'Document',
 }
