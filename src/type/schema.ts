@@ -264,9 +264,9 @@ export function buildASTSchema(
 
   documentAST.definitions.forEach((def) => {
     const name = def.name.value;
-    switch(def.kind){
+    switch (def.kind) {
       case IrisKind.TYPE_DEFINITION:
-        typeMap[name] = stdTypeMap[name] ?? buildType(def)
+        typeMap[name] = stdTypeMap[name] ?? buildType(def);
         break;
       case IrisKind.DIRECTIVE_DEFINITION:
         directiveDefs.push(def);
