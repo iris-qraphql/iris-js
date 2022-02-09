@@ -1,3 +1,5 @@
+import { all } from 'ramda';
+
 import { DirectiveLocation } from '../../language/directiveLocation';
 
 import type { IrisArgument, IrisStrictType } from '../definition';
@@ -74,11 +76,7 @@ describe('Type predicates', () => {
 
   describe('isSpecifiedScalarType', () => {
     it('returns true for specified scalars', () => {
-      expect(isSpecifiedScalarType(IrisScalars.String)).toEqual(true);
-      expect(isSpecifiedScalarType(IrisScalars.Int)).toEqual(true);
-      expect(isSpecifiedScalarType(IrisScalars.Float)).toEqual(true);
-      expect(isSpecifiedScalarType(IrisScalars.Boolean)).toEqual(true);
-      expect(isSpecifiedScalarType(IrisScalars.ID)).toEqual(true);
+      expect(all(isSpecifiedScalarType, Object.values(IrisScalars))).toBe(true);
     });
 
     it('returns false for custom scalar', () => {
