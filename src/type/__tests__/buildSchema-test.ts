@@ -5,7 +5,7 @@ import { dedent } from '../../utils/dedent';
 import { assertDataType, assertResolverType } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { printSchema } from '../printSchema';
-import { IrisBool, IrisFloat, IrisID, IrisInt, IrisString } from '../scalars';
+import { IrisScalars } from '../scalars';
 import { buildASTSchema, buildSchema, IrisSchema } from '../schema';
 import { validateSchema } from '../validate';
 
@@ -52,12 +52,12 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
 
     const schema = buildSchema(sdl);
-    // Built-ins are used
-    expect(schema.getType('Int')).toEqual(IrisInt);
-    expect(schema.getType('Float')).toEqual(IrisFloat);
-    expect(schema.getType('String')).toEqual(IrisString);
-    expect(schema.getType('Boolean')).toEqual(IrisBool);
-    expect(schema.getType('ID')).toEqual(IrisID);
+
+    const scalars = Object.keys(IrisScalars);
+
+    for (const name of scalars) {
+      expect(schema.getType(name)).toEqual(IrisScalars[name]);
+    }
   });
 
   it('include standard type only if it is used', () => {
@@ -446,7 +446,7 @@ describe('Schema Builder', () => {
       data ID = String
     `);
 
-    expect(schema.getType('ID')).toEqual(IrisID);
+    expect(schema.getType('ID')).toEqual(IrisScalars.ID);
   });
 
   it('Rejects invalid SDL', () => {

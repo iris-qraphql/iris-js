@@ -8,7 +8,7 @@ import type { ConfigMap, Maybe } from '../utils/type-level';
 
 import type { IrisArgument } from './definition';
 import { buildArguments } from './definition';
-import { IrisString } from './scalars';
+import { IrisScalars } from './scalars';
 
 /**
  * Test if the given value is a GraphQL directive.
@@ -25,17 +25,6 @@ export function assertDirective(directive: unknown): GraphQLDirective {
   }
   return directive;
 }
-
-/**
- * Custom extensions
- *
- * @remarks
- * Use a unique identifier name for your extension, for example the name of
- * your library or project. Do not use a shortened identifier as this increases
- * the risk of conflicts. We recommend you add at most one extension field,
- * an object which can contain all the values you need.
- */
-export type GraphQLDirectiveExtensions = Record<string, unknown>;
 
 /**
  * Directives are used by the GraphQL runtime as a way of modifying execution
@@ -95,7 +84,7 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     ],
     args: {
       reason: {
-        type: IrisString,
+        type: IrisScalars.String,
         description:
           'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
         defaultValue: '',

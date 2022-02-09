@@ -3,74 +3,54 @@ import { identity } from 'ramda';
 import { parseValue } from '../../language/parser';
 
 import type { IrisStrictType } from '../../type/definition';
-import { assertDataType } from '../../type/definition';
-import { gqlList, gqlScalar, maybe } from '../../type/make';
-import {
-  IrisBool,
-  IrisFloat,
-  IrisID,
-  IrisInt,
-  IrisString,
-} from '../../type/scalars';
-import { buildSchema } from '../../type/schema';
+import { gqlScalar, sampleTypeRef } from '../../type/make';
 
 import type { ObjMap } from '../../utils/ObjMap';
 
 import { valueFromAST } from '../valueFromAST';
 
-// Boolean?
-const maybeBool = maybe(IrisBool);
+const maybeListOfMaybeBool = sampleTypeRef<'data'>('[Boolean?]?');
+const ListOfMaybeBool = sampleTypeRef<'data'>('[Boolean?]');
+const listOfBool = sampleTypeRef<'data'>('[Boolean]');
+const maybeListOfBool = sampleTypeRef<'data'>('[Boolean]?');
 
-// Boolean
-const bool = IrisBool;
-
-// [Boolean?]?
-const maybeListOfMaybeBool = maybe(gqlList(maybeBool));
-
-// [Boolean?]
-const ListOfMaybeBool = gqlList(maybeBool);
-
-// [Boolean]
-const listOfBool = gqlList(bool);
-
-// [Boolean]?
-const maybeListOfBool = maybe(listOfBool);
+const expectValueFrom = (
+  valueText: string,
+  typeRef: IrisStrictType | string,
+  variables?: ObjMap<unknown>,
+) => {
+  const type =
+    typeof typeRef === 'string' ? sampleTypeRef<'data'>(typeRef) : typeRef;
+  const ast = parseValue(valueText);
+  const value = valueFromAST(ast, type, variables);
+  return expect(value);
+};
 
 describe('valueFromAST', () => {
-  function expectValueFrom(
-    valueText: string,
-    type: IrisStrictType,
-    variables?: ObjMap<unknown>,
-  ) {
-    const ast = parseValue(valueText);
-    const value = valueFromAST(ast, type, variables);
-    return expect(value);
-  }
-
   it('rejects empty input', () => {
-    expect(valueFromAST(null, maybeBool)).toEqual(undefined);
+    expect(valueFromAST(null, sampleTypeRef('Boolean?'))).toEqual(undefined);
   });
 
   it('converts according to input coercion rules', () => {
-    expectValueFrom('true', maybeBool).toEqual(true);
-    expectValueFrom('false', maybeBool).toEqual(false);
-    expectValueFrom('123', IrisInt).toEqual(123);
-    expectValueFrom('123', IrisFloat).toEqual(123);
-    expectValueFrom('123.456', IrisFloat).toEqual(123.456);
-    expectValueFrom('"abc123"', IrisString).toEqual('abc123');
-    expectValueFrom('123456', IrisID).toEqual('123456');
-    expectValueFrom('"123456"', IrisID).toEqual('123456');
+    expectValueFrom('true', 'Boolean?').toEqual(true);
+    expectValueFrom('false', 'Boolean?').toEqual(false);
+    expectValueFrom('123', 'Int').toEqual(123);
+    expectValueFrom('123', 'Float').toEqual(123);
+    expectValueFrom('123.456', 'Float').toEqual(123.456);
+    expectValueFrom('"abc123"', 'String').toEqual('abc123');
+    expectValueFrom('123456', 'ID').toEqual('123456');
+    expectValueFrom('"123456"', 'ID').toEqual('123456');
   });
 
   it('does not convert when input coercion rules reject a value', () => {
-    expectValueFrom('123', maybeBool).toEqual(undefined);
-    expectValueFrom('123.456', IrisInt).toEqual(undefined);
-    expectValueFrom('true', IrisInt).toEqual(undefined);
-    expectValueFrom('"123"', IrisInt).toEqual(undefined);
-    expectValueFrom('"123"', IrisFloat).toEqual(undefined);
-    expectValueFrom('123', IrisString).toEqual(undefined);
-    expectValueFrom('true', IrisString).toEqual(undefined);
-    expectValueFrom('123.456', IrisString).toEqual(undefined);
+    expectValueFrom('123', 'Boolean?').toEqual(undefined);
+    expectValueFrom('123.456', 'Int').toEqual(undefined);
+    expectValueFrom('true', 'Int').toEqual(undefined);
+    expectValueFrom('"123"', 'Int').toEqual(undefined);
+    expectValueFrom('"123"', 'Float').toEqual(undefined);
+    expectValueFrom('123', 'String').toEqual(undefined);
+    expectValueFrom('true', 'String').toEqual(undefined);
+    expectValueFrom('123.456', 'String').toEqual(undefined);
   });
 
   it('convert using parseLiteral from a custom scalar type', () => {
@@ -108,8 +88,8 @@ describe('valueFromAST', () => {
   });
 
   it('coerces to null unless non-null', () => {
-    expectValueFrom('null', maybeBool).toEqual(null);
-    expectValueFrom('null', bool).toEqual(undefined);
+    expectValueFrom('null', 'Boolean?').toEqual(null);
+    expectValueFrom('null', 'Boolean').toEqual(undefined);
   });
 
   it('coerces lists of values', () => {
@@ -152,22 +132,22 @@ describe('valueFromAST', () => {
     expectValueFrom('[true, null]', listOfBool).toEqual(undefined);
   });
 
-  const schema = buildSchema(`
+  const sampleInput = (ref: string) =>
+    sampleTypeRef<'data'>(
+      ref,
+      `
       data TestInput = { 
         int: Int?
         bool: Boolean?
         requiredBool: Boolean
       }
+    `,
+    );
 
-      resolver Query = {
-        f: TestInput
-      }
-  `);
-
-  const testInputObj = assertDataType(schema.getType('TestInput'));
+  const testInputObj = sampleInput('TestInput');
 
   it('coerces input objects according to input coercion rules', () => {
-    expectValueFrom('null', maybe(testInputObj)).toEqual(null);
+    expectValueFrom('null', sampleInput('TestInput?')).toEqual(null);
     expectValueFrom('123', testInputObj).toEqual(undefined);
     expectValueFrom('[]', testInputObj).toEqual(undefined);
     expectValueFrom('{ int: 123, requiredBool: false }', testInputObj).toEqual({
@@ -189,10 +169,10 @@ describe('valueFromAST', () => {
   });
 
   it('accepts variable values assuming already coerced', () => {
-    expectValueFrom('$var', maybeBool, {}).toEqual(undefined);
-    expectValueFrom('$var', maybeBool, { var: true }).toEqual(true);
-    expectValueFrom('$var', maybeBool, { var: null }).toEqual(null);
-    expectValueFrom('$var', bool, { var: null }).toEqual(undefined);
+    expectValueFrom('$var', 'Boolean?', {}).toEqual(undefined);
+    expectValueFrom('$var', 'Boolean?', { var: true }).toEqual(true);
+    expectValueFrom('$var', 'Boolean?', { var: null }).toEqual(null);
+    expectValueFrom('$var', 'Boolean', { var: null }).toEqual(undefined);
   });
 
   it('asserts variables are provided as items in lists', () => {

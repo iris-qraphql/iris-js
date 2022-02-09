@@ -1,106 +1,100 @@
+import type { IrisType } from '../../type/definition';
 import { assertDataType } from '../../type/definition';
-import { gqlList, gqlScalar, maybe } from '../../type/make';
-import {
-  IrisBool,
-  IrisFloat,
-  IrisID,
-  IrisInt,
-  IrisString,
-} from '../../type/scalars';
+import { gqlList, gqlScalar, sampleTypeRef } from '../../type/make';
 import { buildSchema } from '../../type/schema';
 
 import { serializeValue } from '../serialize';
 
-const maybeBool = maybe(IrisBool);
+const serializeWith = (value: unknown, typeRef: string | IrisType<'data'>) => {
+  const type =
+    typeof typeRef === 'string' ? sampleTypeRef<'data'>(typeRef) : typeRef;
+  return serializeValue(value, type);
+};
 
 describe('serializeValue', () => {
   it('converts boolean values to ASTs', () => {
-    expect(serializeValue(true, maybeBool)).toEqual(true);
-    expect(serializeValue(false, maybeBool)).toEqual(false);
-    expect(serializeValue(undefined, maybeBool)).toEqual(null);
-    expect(serializeValue(null, maybeBool)).toEqual(null);
-    expect(serializeValue(0, IrisBool)).toEqual(false);
-    expect(serializeValue(1, IrisBool)).toEqual(true);
+    expect(serializeWith(true, 'Boolean?')).toEqual(true);
+    expect(serializeWith(false, 'Boolean?')).toEqual(false);
+    expect(serializeWith(undefined, 'Boolean?')).toEqual(null);
+    expect(serializeWith(null, 'Boolean?')).toEqual(null);
+    expect(serializeWith(0, 'Boolean')).toEqual(false);
+    expect(serializeWith(1, 'Boolean')).toEqual(true);
   });
 
   it('converts Int values to Int ASTs', () => {
-    expect(serializeValue(-1, IrisInt)).toEqual(-1);
-    expect(serializeValue(123.0, IrisInt)).toEqual(123);
-    expect(serializeValue(1e4, IrisInt)).toEqual(10000);
-    expect(() => serializeValue(123.5, IrisInt)).toThrow(
+    expect(serializeWith(-1, 'Int')).toEqual(-1);
+    expect(serializeWith(123.0, 'Int')).toEqual(123);
+    expect(serializeWith(1e4, 'Int')).toEqual(10000);
+    expect(() => serializeWith(123.5, 'Int')).toThrow(
       'Int cannot represent non-integer value: 123.5',
     );
 
-    expect(() => serializeValue(1e40, IrisInt)).toThrow(
+    expect(() => serializeWith(1e40, 'Int')).toThrow(
       'Int cannot represent non 32-bit signed integer value: 1e+40',
     );
 
-    expect(() => serializeValue(NaN, IrisInt)).toThrow(
+    expect(() => serializeWith(NaN, 'Int')).toThrow(
       'Int cannot represent non-integer value: NaN',
     );
   });
 
   it('converts Float values to Int/Float ASTs', () => {
-    expect(serializeValue(-1, IrisFloat)).toEqual(-1);
+    expect(serializeWith(-1, 'Float')).toEqual(-1);
 
-    expect(serializeValue(123.0, IrisFloat)).toEqual(123);
+    expect(serializeWith(123.0, 'Float')).toEqual(123);
 
-    expect(serializeValue(123.5, IrisFloat)).toEqual(123.5);
+    expect(serializeWith(123.5, 'Float')).toEqual(123.5);
 
-    expect(serializeValue(1e4, IrisFloat)).toEqual(10000);
+    expect(serializeWith(1e4, 'Float')).toEqual(10000);
 
-    expect(serializeValue(1e40, IrisFloat)).toEqual(1e40);
+    expect(serializeWith(1e40, 'Float')).toEqual(1e40);
   });
 
   it('converts String values to String ASTs', () => {
-    expect(serializeValue('hello', IrisString)).toEqual('hello');
+    expect(serializeWith('hello', 'String')).toEqual('hello');
 
-    expect(serializeValue('VALUE', IrisString)).toEqual('VALUE');
+    expect(serializeWith('VALUE', 'String')).toEqual('VALUE');
 
-    expect(serializeValue('VA\nLUE', IrisString)).toEqual('VA\nLUE');
+    expect(serializeWith('VA\nLUE', 'String')).toEqual('VA\nLUE');
 
-    expect(serializeValue(123, IrisString)).toEqual('123');
+    expect(serializeWith(123, 'String')).toEqual('123');
 
-    expect(serializeValue(false, IrisString)).toEqual('false');
+    expect(serializeWith(false, 'String')).toEqual('false');
 
     // optional
-    expect(serializeValue(null, maybe(IrisString))).toEqual(null);
-    expect(serializeValue(undefined, maybe(IrisString))).toEqual(null);
+    expect(serializeWith(null, 'String?')).toEqual(null);
+    expect(serializeWith(undefined, 'String?')).toEqual(null);
 
     // required
     expect(() =>
-      serializeValue(undefined, IrisString),
+      serializeWith(undefined, 'String'),
     ).toThrowErrorMatchingSnapshot();
-    expect(() =>
-      serializeValue(null, IrisString),
-    ).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(null, 'String')).toThrowErrorMatchingSnapshot();
   });
 
   it('converts ID values to Int/String ASTs', () => {
-    expect(serializeValue('hello', IrisID)).toEqual('hello');
+    expect(serializeWith('hello', 'ID')).toEqual('hello');
 
-    expect(serializeValue('VALUE', IrisID)).toEqual('VALUE');
+    expect(serializeWith('VALUE', 'ID')).toEqual('VALUE');
 
-    expect(serializeValue('VA\nLUE', IrisID)).toEqual('VA\nLUE');
+    expect(serializeWith('VA\nLUE', 'ID')).toEqual('VA\nLUE');
 
-    expect(serializeValue(-1, IrisID)).toEqual('-1');
+    expect(serializeWith(-1, 'ID')).toEqual('-1');
 
-    expect(serializeValue(123, IrisID)).toEqual('123');
+    expect(serializeWith(123, 'ID')).toEqual('123');
 
-    expect(serializeValue('123', IrisID)).toEqual('123');
+    expect(serializeWith('123', 'ID')).toEqual('123');
 
-    expect(serializeValue('01', IrisID)).toEqual('01');
+    expect(serializeWith('01', 'ID')).toEqual('01');
 
     // nullable
-    expect(serializeValue(null, maybe(IrisID))).toEqual(null);
-    expect(serializeValue(undefined, maybe(IrisID))).toEqual(null);
+    expect(serializeWith(null, 'ID?')).toEqual(null);
+    expect(serializeWith(undefined, 'ID?')).toEqual(null);
 
     // required
-    expect(() => serializeValue(false, IrisID)).toThrowErrorMatchingSnapshot();
-    expect(() =>
-      serializeValue(undefined, IrisID),
-    ).toThrowErrorMatchingSnapshot();
-    expect(() => serializeValue(null, IrisID)).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(false, 'ID')).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(undefined, 'ID')).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(null, 'ID')).toThrowErrorMatchingSnapshot();
   });
 
   it('converts using serialize from a custom scalar type', () => {
@@ -111,13 +105,13 @@ describe('serializeValue', () => {
       },
     });
 
-    expect(serializeValue('value', passthroughScalar)).toEqual('value');
+    expect(serializeWith('value', passthroughScalar)).toEqual('value');
 
     expect(() =>
-      serializeValue(NaN, passthroughScalar),
+      serializeWith(NaN, passthroughScalar),
     ).toThrowErrorMatchingSnapshot();
     expect(() =>
-      serializeValue(Infinity, passthroughScalar),
+      serializeWith(Infinity, passthroughScalar),
     ).toThrowErrorMatchingSnapshot();
 
     const returnNullScalar = gqlScalar({
@@ -127,11 +121,11 @@ describe('serializeValue', () => {
       },
     });
 
-    expect(serializeValue('value', returnNullScalar)).toEqual(null);
+    expect(serializeWith('value', returnNullScalar)).toEqual(null);
   });
 
   it('does not converts NonNull values to NullValue', () => {
-    expect(() => serializeValue(null, IrisBool)).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(null, 'Boolean')).toThrowErrorMatchingSnapshot();
   });
 
   const schema = buildSchema(`
@@ -153,26 +147,26 @@ describe('serializeValue', () => {
   const inputObj = assertDataType(schema.getType('MyInputObj'));
 
   it('converts string values to Enum ASTs if possible', () => {
-    expect(serializeValue('HELLO', myEnum)).toEqual('HELLO');
+    expect(serializeWith('HELLO', myEnum)).toEqual('HELLO');
 
     // Note: case sensitive
-    expect(() => serializeValue('hello', myEnum)).toThrow(
+    expect(() => serializeWith('hello', myEnum)).toThrow(
       'Data "MyEnum" cannot represent value: "hello"',
     );
 
     // Note: Not a valid enum value
-    expect(() => serializeValue('UNKNOWN_VALUE', myEnum)).toThrow(
+    expect(() => serializeWith('UNKNOWN_VALUE', myEnum)).toThrow(
       'Data "MyEnum" cannot represent value: "UNKNOWN_VALUE"',
     );
   });
 
   it('converts array values to List ASTs', () => {
-    expect(serializeValue(['FOO', 'BAR'], gqlList(IrisString))).toEqual([
+    expect(serializeWith(['FOO', 'BAR'], sampleTypeRef('[String]'))).toEqual([
       'FOO',
       'BAR',
     ]);
 
-    expect(serializeValue(['HELLO', 'GOODBYE'], gqlList(myEnum))).toEqual([
+    expect(serializeWith(['HELLO', 'GOODBYE'], gqlList(myEnum))).toEqual([
       'HELLO',
       'GOODBYE',
     ]);
@@ -183,34 +177,34 @@ describe('serializeValue', () => {
       yield 3;
     }
 
-    expect(serializeValue(listGenerator(), gqlList(IrisInt))).toEqual([
+    expect(serializeWith(listGenerator(), sampleTypeRef('[Int]'))).toEqual([
       1, 2, 3,
     ]);
   });
 
   it('reject invalid lists', () => {
     expect(() =>
-      serializeValue(['FOO', null], gqlList(IrisString)),
+      serializeWith(['FOO', null], sampleTypeRef('[String]')),
     ).toThrowErrorMatchingSnapshot();
     expect(() =>
-      serializeValue('FOO', gqlList(IrisString)),
+      serializeWith('FOO', sampleTypeRef('[String]')),
     ).toThrowErrorMatchingSnapshot();
   });
 
   it('converts data objects', () => {
     const object = { foo: 3, bar: 'HELLO' };
-    expect(serializeValue(object, inputObj)).toEqual(object);
+    expect(serializeWith(object, inputObj)).toEqual(object);
   });
 
   it('converts input objects with explicit nulls', () => {
-    expect(serializeValue({ foo: null }, inputObj)).toEqual({
+    expect(serializeWith({ foo: null }, inputObj)).toEqual({
       foo: null,
       bar: null,
     });
   });
 
   it('does not converts non-object values as input objects', () => {
-    expect(() => serializeValue(5, inputObj)).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(5, inputObj)).toThrowErrorMatchingSnapshot();
   });
 });
 
@@ -228,7 +222,7 @@ describe('parse simple data variants', () => {
   const leaf = (name: string) => ({ __typename: 'Leaf', name });
 
   const nodeType = assertDataType(schema.getType('NodeType'));
-  const parseNode = (n: unknown) => serializeValue(n, nodeType);
+  const parseNode = (n: unknown) => serializeWith(n, nodeType);
 
   it("don't accept non data values", () => {
     expect(() => parseNode(['Leaf'])).toThrowErrorMatchingSnapshot();
@@ -301,7 +295,7 @@ describe('circular data types', () => {
   const leaf = (name?: string) => ({ __typename: 'Leaf', name });
 
   const nodeType = assertDataType(schema.getType('NodeType'));
-  const parseNode = (n: unknown) => serializeValue(n, nodeType);
+  const parseNode = (n: unknown) => serializeWith(n, nodeType);
 
   it('ignore optional fields variants', () => {
     expect(parseNode('Leaf')).toEqual('Leaf');

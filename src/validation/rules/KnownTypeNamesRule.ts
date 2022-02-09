@@ -5,7 +5,7 @@ import {
 } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { specifiedScalarTypes } from '../../type/scalars';
+import { scalarNames } from '../../type/scalars';
 
 import { irisNodeError } from '../../error';
 import { didYouMean, suggestionList } from '../../utils/legacy';
@@ -47,13 +47,13 @@ export function KnownTypeNamesRule(
       if (!existingTypesMap[typeName] && !definedTypes[typeName]) {
         const definitionNode = ancestors[2] ?? parent;
         const isSDL = definitionNode != null && isSDLNode(definitionNode);
-        if (isSDL && standardTypeNames.includes(typeName)) {
+        if (isSDL && scalarNames.includes(typeName)) {
           return;
         }
 
         const suggestedTypes = suggestionList(
           typeName,
-          isSDL ? standardTypeNames.concat(typeNames) : typeNames,
+          isSDL ? scalarNames.concat(typeNames) : typeNames,
         );
         context.reportError(
           irisNodeError(
@@ -72,13 +72,13 @@ export function KnownTypeNamesRule(
       if (!existingTypesMap[typeName] && !definedTypes[typeName]) {
         const definitionNode = ancestors[2] ?? parent;
         const isSDL = definitionNode != null && isSDLNode(definitionNode);
-        if (isSDL && standardTypeNames.includes(typeName)) {
+        if (isSDL && scalarNames.includes(typeName)) {
           return;
         }
 
         const suggestedTypes = suggestionList(
           typeName,
-          isSDL ? standardTypeNames.concat(typeNames) : typeNames,
+          isSDL ? scalarNames.concat(typeNames) : typeNames,
         );
         context.reportError(
           irisNodeError(
@@ -90,8 +90,6 @@ export function KnownTypeNamesRule(
     },
   };
 }
-
-const standardTypeNames = [...specifiedScalarTypes].map((type) => type.name);
 
 function isSDLNode(value: ASTNode | ReadonlyArray<ASTNode>): boolean {
   return 'kind' in value && isTypeSystemDefinitionNode(value);
