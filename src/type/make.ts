@@ -25,7 +25,10 @@ export const maybe = <T extends IrisType>(ofType: T) =>
 export const gqlList = <T extends IrisType>(ofType: T) =>
   new IrisTypeRef('LIST', ofType);
 
-export const sampleTypeRef = <R extends Role>(ref: string , defs: string = ''): IrisType<R> => {
+export const sampleTypeRef = <R extends Role>(
+  ref: string,
+  defs: string = '',
+): IrisType<R> => {
   const { query } = buildSchema(`
     ${defs}
     resolver Query = {

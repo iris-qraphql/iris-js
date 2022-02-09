@@ -23,10 +23,7 @@ import {
   isSpecifiedDirective,
 } from '../directives';
 import { gqlList, maybe, sampleTypeRef } from '../make';
-import {
-  IrisScalars,
-  isSpecifiedScalarType,
-} from '../scalars';
+import { IrisScalars, isSpecifiedScalarType } from '../scalars';
 import { buildSchema } from '../schema';
 
 const schema = buildSchema(`

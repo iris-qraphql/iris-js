@@ -1,6 +1,6 @@
 import type { IrisType } from '../../type/definition';
 import { assertDataType } from '../../type/definition';
-import { gqlList, gqlScalar,  sampleTypeRef } from '../../type/make';
+import { gqlList, gqlScalar, sampleTypeRef } from '../../type/make';
 import { buildSchema } from '../../type/schema';
 
 import { serializeValue } from '../serialize';

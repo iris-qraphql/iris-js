@@ -65,7 +65,7 @@ var source = `
         }
       } 
     }
-  `
+  `;
 
 iris({ schema, source }).then((result) => {
   // Prints
