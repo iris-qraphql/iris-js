@@ -54,7 +54,7 @@ export function assertSchema(schema: unknown): IrisSchema {
   return schema;
 }
 
-export class IrisSchema {
+class IrisSchema {
   description: Maybe<string>;
 
   readonly query?: IrisTypeDefinition<'resolver'>;
@@ -283,3 +283,5 @@ const getDeprecationReason = (
     | VariantDefinitionNode<Role>,
 ): Maybe<string> =>
   getDirectiveValues(GraphQLDeprecatedDirective, node)?.reason as string;
+
+export type { IrisSchema };
