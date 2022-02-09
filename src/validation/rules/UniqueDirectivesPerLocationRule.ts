@@ -1,13 +1,10 @@
-import { GraphQLError } from '../../error/GraphQLError';
-
-import { Kind } from '../../language/kinds';
-import {
-  isTypeDefinitionNode,
-  isTypeExtensionNode,
-} from '../../language/predicates';
+import { IrisKind } from '../../language/kinds';
+import { isTypeDefinitionNode } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { specifiedDirectives } from '../../type/directives';
+
+import { irisError } from '../../error';
 
 import type {
   SDLValidationContext,
@@ -28,21 +25,18 @@ export function UniqueDirectivesPerLocationRule(
   const uniqueDirectiveMap = Object.create(null);
 
   const schema = context.getSchema();
-  const definedDirectives = schema
-    ? schema.getDirectives()
-    : specifiedDirectives;
+  const definedDirectives = schema ? schema.directives : specifiedDirectives;
   for (const directive of definedDirectives) {
     uniqueDirectiveMap[directive.name] = !directive.isRepeatable;
   }
 
   const astDefinitions = context.getDocument().definitions;
   for (const def of astDefinitions) {
-    if (def.kind === Kind.DIRECTIVE_DEFINITION) {
+    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       uniqueDirectiveMap[def.name.value] = !def.repeatable;
     }
   }
 
-  const schemaDirectives = Object.create(null);
   const typeDirectivesMap = Object.create(null);
 
   return {
@@ -55,12 +49,7 @@ export function UniqueDirectivesPerLocationRule(
       }
 
       let seenDirectives;
-      if (
-        node.kind === Kind.SCHEMA_DEFINITION ||
-        node.kind === Kind.SCHEMA_EXTENSION
-      ) {
-        seenDirectives = schemaDirectives;
-      } else if (isTypeDefinitionNode(node) || isTypeExtensionNode(node)) {
+      if (isTypeDefinitionNode(node)) {
         const typeName = node.name.value;
         seenDirectives = typeDirectivesMap[typeName];
         if (seenDirectives === undefined) {
@@ -76,9 +65,9 @@ export function UniqueDirectivesPerLocationRule(
         if (uniqueDirectiveMap[directiveName]) {
           if (seenDirectives[directiveName]) {
             context.reportError(
-              new GraphQLError(
+              irisError(
                 `The directive "@${directiveName}" can only be used once at this location.`,
-                [seenDirectives[directiveName], directive],
+                { node: [seenDirectives[directiveName], directive] },
               ),
             );
           } else {

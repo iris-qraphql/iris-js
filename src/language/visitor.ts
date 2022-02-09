@@ -1,9 +1,9 @@
-import { devAssert } from '../jsutils/devAssert';
-import { inspect } from '../jsutils/inspect';
+import { BREAK } from 'graphql';
 
 import type { ASTNode } from './ast';
 import { isNode, QueryDocumentKeys } from './ast';
-import { Kind } from './kinds';
+import type { KIND } from './kinds';
+import { KINDS } from './kinds';
 
 /**
  * A visitor is provided to visit, it contains the collection of
@@ -26,7 +26,7 @@ interface EnterLeaveVisitor<TVisitedNode extends ASTNode> {
  * A visitor is comprised of visit functions, which are called on each node
  * during the visitor's traversal.
  */
-export type ASTVisitFn<TVisitedNode extends ASTNode> = (
+type ASTVisitFn<TVisitedNode extends ASTNode> = (
   /** The current node being visiting. */
   node: TVisitedNode,
   /** The index or key to this node from the parent node or Array. */
@@ -85,8 +85,6 @@ type ReducedField<T, R> = T extends null | undefined
 export type ASTVisitorKeyMap = {
   [NodeT in ASTNode as NodeT['kind']]?: ReadonlyArray<keyof NodeT>;
 };
-
-export const BREAK: unknown = Object.freeze({});
 
 /**
  * visit() will walk through an AST using a depth-first traversal, calling
@@ -181,8 +179,8 @@ export function visit(
   visitor: ASTVisitor | ASTReducer<any>,
   visitorKeys: ASTVisitorKeyMap = QueryDocumentKeys,
 ): any {
-  const enterLeaveMap = new Map<Kind, EnterLeaveVisitor<ASTNode>>();
-  for (const kind of Object.values(Kind)) {
+  const enterLeaveMap = new Map<KIND, EnterLeaveVisitor<ASTNode>>();
+  for (const kind of KINDS) {
     enterLeaveMap.set(kind, getEnterLeaveForKind(visitor, kind));
   }
 
@@ -250,8 +248,6 @@ export function visit(
 
     let result;
     if (!Array.isArray(node)) {
-      devAssert(isNode(node), `Invalid AST Node: ${inspect(node)}.`);
-
       const visitFn = isLeaving
         ? enterLeaveMap.get(node.kind)?.leave
         : enterLeaveMap.get(node.kind)?.enter;
@@ -318,7 +314,7 @@ export function visitInParallel(
   const skipping = new Array(visitors.length).fill(null);
   const mergedVisitor = Object.create(null);
 
-  for (const kind of Object.values(Kind)) {
+  for (const kind of KINDS) {
     let hasVisitor = false;
     const enterList = new Array(visitors.length).fill(undefined);
     const leaveList = new Array(visitors.length).fill(undefined);
@@ -378,7 +374,7 @@ export function visitInParallel(
  */
 export function getEnterLeaveForKind(
   visitor: ASTVisitor,
-  kind: Kind,
+  kind: KIND,
 ): EnterLeaveVisitor<ASTNode> {
   const kindVisitor:
     | ASTVisitFn<ASTNode>
@@ -406,7 +402,7 @@ export function getEnterLeaveForKind(
 /* c8 ignore next 8 */
 export function getVisitFn(
   visitor: ASTVisitor,
-  kind: Kind,
+  kind: KIND,
   isLeaving: boolean,
 ): ASTVisitFn<ASTNode> | undefined {
   const { enter, leave } = getEnterLeaveForKind(visitor, kind);

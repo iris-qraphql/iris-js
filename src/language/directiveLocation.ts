@@ -19,14 +19,14 @@ export enum DirectiveLocation {
   ARGUMENT_DEFINITION = 'ARGUMENT_DEFINITION',
   INTERFACE = 'INTERFACE',
   UNION = 'UNION',
-  ENUM = 'ENUM',
+  ENUM = 'DATA',
   ENUM_VALUE = 'ENUM_VALUE',
-  INPUT_OBJECT = 'INPUT_OBJECT',
+  INPUT_OBJECT = 'DATA',
   INPUT_FIELD_DEFINITION = 'INPUT_FIELD_DEFINITION',
 }
 
 /**
- * The enum type representing the directive location values.
+ * The Enum type representing the directive location values.
  *
  * @deprecated Please use `DirectiveLocation`. Will be remove in v17.
  */

@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Validate: Known type names within SDL unknown type references 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 16,
+        "line": 6,
+      },
+    ],
+    "message": "Unknown type \\"D\\". Did you mean \\"A\\", \\"B\\", or \\"ID\\"?",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 20,
+        "line": 6,
+      },
+    ],
+    "message": "Unknown type \\"E\\". Did you mean \\"A\\" or \\"B\\"?",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 30,
+        "line": 9,
+      },
+    ],
+    "message": "Unknown type \\"F\\". Did you mean \\"A\\" or \\"B\\"?",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 34,
+        "line": 9,
+      },
+    ],
+    "message": "Unknown type \\"G\\". Did you mean \\"A\\" or \\"B\\"?",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 14,
+        "line": 12,
+      },
+    ],
+    "message": "Unknown type \\"J\\". Did you mean \\"A\\" or \\"B\\"?",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 37,
+        "line": 15,
+      },
+    ],
+    "message": "Unknown type \\"K\\". Did you mean \\"A\\" or \\"B\\"?",
+  },
+]
+`;

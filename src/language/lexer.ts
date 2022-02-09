@@ -1,9 +1,11 @@
-import { syntaxError } from '../error/syntaxError';
+import type { Source } from 'graphql';
+import { Token } from 'graphql';
+import { syntaxError } from 'graphql/error/syntaxError';
+import { dedentBlockStringLines } from 'graphql/language/blockString';
 
-import { Token } from './ast';
-import { dedentBlockStringLines } from './blockString';
+import type { Maybe } from '../utils/type-level';
+
 import { isDigit, isNameContinue, isNameStart } from './characterClasses';
-import type { Source } from './source';
 import { TokenKind } from './tokenKind';
 
 /**
@@ -38,7 +40,7 @@ export class Lexer {
   lineStart: number;
 
   constructor(source: Source) {
-    const startOfFileToken = new Token(TokenKind.SOF, 0, 0, 0, 0);
+    const startOfFileToken = new Token(TokenKind.SOF as any, 0, 0, 0, 0);
 
     this.source = source;
     this.lastToken = startOfFileToken;
@@ -73,10 +75,9 @@ export class Lexer {
         } else {
           // Read the next token and form a link in the token linked-list.
           const nextToken = readNextToken(this, token.end);
-          // @ts-expect-error next is only mutable during parsing.
-          token.next = nextToken;
-          // @ts-expect-error prev is only mutable during parsing.
-          nextToken.prev = token;
+          //  next and prev are mutable during parsing.
+          (token.next as Maybe<Token>) = nextToken;
+          (nextToken.prev as Maybe<Token>) = token;
           token = nextToken;
         }
       } while (token.kind === TokenKind.COMMENT);
@@ -90,7 +91,7 @@ export class Lexer {
  */
 export function isPunctuatorTokenKind(kind: TokenKind): boolean {
   return (
-    kind === TokenKind.BANG ||
+    kind === TokenKind.QUESTION_MARK ||
     kind === TokenKind.DOLLAR ||
     kind === TokenKind.AMP ||
     kind === TokenKind.PAREN_L ||
@@ -178,7 +179,7 @@ function createToken(
 ): Token {
   const line = lexer.line;
   const col = 1 + start - lexer.lineStart;
-  return new Token(kind, start, end, line, col, value);
+  return new Token(kind as any, start, end, line, col, value);
 }
 
 /**
@@ -246,9 +247,14 @@ function readNextToken(lexer: Lexer, start: number): Token {
       //   - FloatValue
       //   - StringValue
       //
-      // Punctuator :: one of ! $ & ( ) ... : = @ [ ] { | }
-      case 0x0021: // !
-        return createToken(lexer, TokenKind.BANG, position, position + 1);
+      // Punctuator :: one of ! $ & ( ) ... : = @ [ ] { | } ?
+      case 0x003f: // ?
+        return createToken(
+          lexer,
+          TokenKind.QUESTION_MARK,
+          position,
+          position + 1,
+        );
       case 0x0024: // $
         return createToken(lexer, TokenKind.DOLLAR, position, position + 1);
       case 0x0026: // &

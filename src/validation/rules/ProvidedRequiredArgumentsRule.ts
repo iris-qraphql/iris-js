@@ -1,17 +1,16 @@
-import { inspect } from '../../jsutils/inspect';
-import { keyMap } from '../../jsutils/keyMap';
-import type { ObjMap } from '../../jsutils/ObjMap';
-
-import { GraphQLError } from '../../error/GraphQLError';
-
-import type { InputValueDefinitionNode } from '../../language/ast';
-import { Kind } from '../../language/kinds';
+import type { ArgumentDefinitionNode } from '../../language/ast';
+import { IrisKind } from '../../language/kinds';
 import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
 
-import type { GraphQLArgument } from '../../type/definition';
+import type { IrisArgument } from '../../type/definition';
 import { isRequiredArgument, isType } from '../../type/definition';
 import { specifiedDirectives } from '../../type/directives';
+
+import { irisError } from '../../error';
+import { inspect } from '../../utils/legacy';
+import type { ObjMap } from '../../utils/ObjMap';
+import { keyMap } from '../../utils/ObjMap';
 
 import type {
   SDLValidationContext,
@@ -19,58 +18,16 @@ import type {
 } from '../ValidationContext';
 
 /**
- * Provided required arguments
- *
- * A field or directive is only valid if all required (non-null without a
- * default value) field arguments have been provided.
- */
-export function ProvidedRequiredArgumentsRule(
-  context: ValidationContext,
-): ASTVisitor {
-  return {
-    // eslint-disable-next-line new-cap
-    ...ProvidedRequiredArgumentsOnDirectivesRule(context),
-    Field: {
-      // Validate on leave to allow for deeper errors to appear first.
-      leave(fieldNode) {
-        const fieldDef = context.getFieldDef();
-        if (!fieldDef) {
-          return false;
-        }
-
-        const providedArgs = new Set(
-          // FIXME: https://github.com/graphql/graphql-js/issues/2203
-          /* c8 ignore next */
-          fieldNode.arguments?.map((arg) => arg.name.value),
-        );
-        for (const argDef of fieldDef.args) {
-          if (!providedArgs.has(argDef.name) && isRequiredArgument(argDef)) {
-            const argTypeStr = inspect(argDef.type);
-            context.reportError(
-              new GraphQLError(
-                `Field "${fieldDef.name}" argument "${argDef.name}" of type "${argTypeStr}" is required, but it was not provided.`,
-                fieldNode,
-              ),
-            );
-          }
-        }
-      },
-    },
-  };
-}
-
-/**
  * @internal
  */
 export function ProvidedRequiredArgumentsOnDirectivesRule(
   context: ValidationContext | SDLValidationContext,
 ): ASTVisitor {
-  const requiredArgsMap: ObjMap<
-    ObjMap<GraphQLArgument | InputValueDefinitionNode>
-  > = Object.create(null);
+  const requiredArgsMap: ObjMap<ObjMap<IrisArgument | ArgumentDefinitionNode>> =
+    Object.create(null);
 
   const schema = context.getSchema();
-  const definedDirectives = schema?.getDirectives() ?? specifiedDirectives;
+  const definedDirectives = schema?.directives ?? specifiedDirectives;
   for (const directive of definedDirectives) {
     requiredArgsMap[directive.name] = keyMap(
       directive.args.filter(isRequiredArgument),
@@ -80,9 +37,7 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
 
   const astDefinitions = context.getDocument().definitions;
   for (const def of astDefinitions) {
-    if (def.kind === Kind.DIRECTIVE_DEFINITION) {
-      // FIXME: https://github.com/graphql/graphql-js/issues/2203
-      /* c8 ignore next */
+    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
       const argNodes = def.arguments ?? [];
 
       requiredArgsMap[def.name.value] = keyMap(
@@ -99,8 +54,6 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
         const directiveName = directiveNode.name.value;
         const requiredArgs = requiredArgsMap[directiveName];
         if (requiredArgs) {
-          // FIXME: https://github.com/graphql/graphql-js/issues/2203
-          /* c8 ignore next */
           const argNodes = directiveNode.arguments ?? [];
           const argNodeMap = new Set(argNodes.map((arg) => arg.name.value));
           for (const [argName, argDef] of Object.entries(requiredArgs)) {
@@ -109,9 +62,9 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
                 ? inspect(argDef.type)
                 : print(argDef.type);
               context.reportError(
-                new GraphQLError(
+                irisError(
                   `Directive "@${directiveName}" argument "${argName}" of type "${argType}" is required, but it was not provided.`,
-                  directiveNode,
+                  { node: directiveNode },
                 ),
               );
             }
@@ -122,6 +75,6 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
   };
 }
 
-function isRequiredArgumentNode(arg: InputValueDefinitionNode): boolean {
-  return arg.type.kind === Kind.NON_NULL_TYPE && arg.defaultValue == null;
+function isRequiredArgumentNode(arg: ArgumentDefinitionNode): boolean {
+  return arg.type.kind !== IrisKind.MAYBE_TYPE && arg.defaultValue == null;
 }

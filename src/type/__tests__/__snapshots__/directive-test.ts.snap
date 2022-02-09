@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Type System: Directive defines a directive with multiple args 1`] = `
+Object {
+  "args": Array [
+    Object {
+      "name": "foo",
+      "type": "String",
+    },
+    Object {
+      "name": "bar",
+      "type": "Int",
+    },
+  ],
+  "astNode": undefined,
+  "description": undefined,
+  "isRepeatable": false,
+  "locations": Array [
+    "QUERY",
+  ],
+  "name": "Foo",
+}
+`;
+
+exports[`Type System: Directive defines a directive with no args 1`] = `
+Object {
+  "args": Array [],
+  "astNode": undefined,
+  "description": undefined,
+  "isRepeatable": false,
+  "locations": Array [
+    "QUERY",
+  ],
+  "name": "Foo",
+}
+`;
+
+exports[`Type System: Directive defines a repeatable directive 1`] = `
+Object {
+  "args": Array [],
+  "astNode": undefined,
+  "description": undefined,
+  "isRepeatable": true,
+  "locations": Array [
+    "QUERY",
+  ],
+  "name": "Foo",
+}
+`;

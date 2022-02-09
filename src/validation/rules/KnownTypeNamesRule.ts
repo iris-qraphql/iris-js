@@ -1,18 +1,14 @@
-import { didYouMean } from '../../jsutils/didYouMean';
-import { suggestionList } from '../../jsutils/suggestionList';
-
-import { GraphQLError } from '../../error/GraphQLError';
-
 import type { ASTNode } from '../../language/ast';
 import {
   isTypeDefinitionNode,
   isTypeSystemDefinitionNode,
-  isTypeSystemExtensionNode,
 } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { introspectionTypes } from '../../type/introspection';
 import { specifiedScalarTypes } from '../../type/scalars';
+
+import { irisNodeError } from '../../error';
+import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type {
   SDLValidationContext,
@@ -31,7 +27,7 @@ export function KnownTypeNamesRule(
   context: ValidationContext | SDLValidationContext,
 ): ASTVisitor {
   const schema = context.getSchema();
-  const existingTypesMap = schema ? schema.getTypeMap() : Object.create(null);
+  const existingTypesMap = schema ? schema.typeMap : Object.create(null);
 
   const definedTypes = Object.create(null);
   for (const def of context.getDocument().definitions) {
@@ -60,7 +56,32 @@ export function KnownTypeNamesRule(
           isSDL ? standardTypeNames.concat(typeNames) : typeNames,
         );
         context.reportError(
-          new GraphQLError(
+          irisNodeError(
+            `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
+            node,
+          ),
+        );
+      }
+    },
+    VariantDefinition(node, _1, parent, _2, ancestors) {
+      if (node.fields) {
+        return undefined;
+      }
+
+      const typeName = node.name.value;
+      if (!existingTypesMap[typeName] && !definedTypes[typeName]) {
+        const definitionNode = ancestors[2] ?? parent;
+        const isSDL = definitionNode != null && isSDLNode(definitionNode);
+        if (isSDL && standardTypeNames.includes(typeName)) {
+          return;
+        }
+
+        const suggestedTypes = suggestionList(
+          typeName,
+          isSDL ? standardTypeNames.concat(typeNames) : typeNames,
+        );
+        context.reportError(
+          irisNodeError(
             `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
             node,
           ),
@@ -70,13 +91,8 @@ export function KnownTypeNamesRule(
   };
 }
 
-const standardTypeNames = [...specifiedScalarTypes, ...introspectionTypes].map(
-  (type) => type.name,
-);
+const standardTypeNames = [...specifiedScalarTypes].map((type) => type.name);
 
 function isSDLNode(value: ASTNode | ReadonlyArray<ASTNode>): boolean {
-  return (
-    'kind' in value &&
-    (isTypeSystemDefinitionNode(value) || isTypeSystemExtensionNode(value))
-  );
+  return 'kind' in value && isTypeSystemDefinitionNode(value);
 }
