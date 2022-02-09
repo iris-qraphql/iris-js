@@ -1,14 +1,19 @@
 {
-  "include": ["src/**/*"],
+  "testEnvironment": "node",
+  "include": ["src/**/*", "scripts/**/*"],
   "compilerOptions": {
+    "types": ["node", "jest"],
     "module": "commonjs",
     "lib": ["es2019", "es2020.promise", "es2020.bigint", "es2020.string"],
     "target": "es2019",
     "strict": true,
-    "useUnknownInCatchVariables": false,
     "noEmit": true,
+    "useUnknownInCatchVariables": false,
     "isolatedModules": true,
     "importsNotUsedAsValues": "error",
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   }
 }

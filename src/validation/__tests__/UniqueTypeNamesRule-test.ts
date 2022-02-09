@@ -1,162 +1,160 @@
-import { describe, it } from 'mocha';
+import { getSDLValidationErrors } from '../../utils/toJSONDeep';
 
-import type { GraphQLSchema } from '../../type/schema';
+import { UniqueNamesRule } from '../rules/UniqueNamesRule';
 
-import { buildSchema } from '../../utilities/buildASTSchema';
-
-import { UniqueTypeNamesRule } from '../rules/UniqueTypeNamesRule';
-
-import { expectSDLValidationErrors } from './harness';
-
-function expectSDLErrors(sdlStr: string, schema?: GraphQLSchema) {
-  return expectSDLValidationErrors(schema, UniqueTypeNamesRule, sdlStr);
+function expectSDLErrors(sdlStr: string) {
+  return expect(getSDLValidationErrors(UniqueNamesRule, sdlStr));
 }
 
-function expectValidSDL(sdlStr: string, schema?: GraphQLSchema) {
-  expectSDLErrors(sdlStr, schema).toDeepEqual([]);
-}
+const expectValidSDL = (sdlStr: string) => expectSDLErrors(sdlStr).toEqual([]);
 
 describe('Validate: Unique type names', () => {
-  it('no types', () => {
-    expectValidSDL(`
-      directive @test on SCHEMA
-    `);
-  });
-
   it('one type', () => {
     expectValidSDL(`
-      type Foo
+      resolver Foo
     `);
   });
 
   it('many types', () => {
     expectValidSDL(`
-      type Foo
-      type Bar
-      type Baz
-    `);
-  });
-
-  it('type and non-type definitions named the same', () => {
-    expectValidSDL(`
-      query Foo { __typename }
-      fragment Foo on Query { __typename }
-      directive @Foo on SCHEMA
-
-      type Foo
+      resolver Foo
+      resolver Bar
+      resolver Baz
     `);
   });
 
   it('types named the same', () => {
     expectSDLErrors(`
-      type Foo
+      resolver Foo
+      data Foo
+      data Foo
+    `).toMatchSnapshot();
+  });
+});
 
-      scalar Foo
-      type Foo
-      interface Foo
-      union Foo
-      enum Foo
-      input Foo
-    `).toDeepEqual([
-      {
-        message: 'There can be only one type named "Foo".',
-        locations: [
-          { line: 2, column: 12 },
-          { line: 4, column: 14 },
-        ],
-      },
-      {
-        message: 'There can be only one type named "Foo".',
-        locations: [
-          { line: 2, column: 12 },
-          { line: 5, column: 12 },
-        ],
-      },
-      {
-        message: 'There can be only one type named "Foo".',
-        locations: [
-          { line: 2, column: 12 },
-          { line: 6, column: 17 },
-        ],
-      },
-      {
-        message: 'There can be only one type named "Foo".',
-        locations: [
-          { line: 2, column: 12 },
-          { line: 7, column: 13 },
-        ],
-      },
-      {
-        message: 'There can be only one type named "Foo".',
-        locations: [
-          { line: 2, column: 12 },
-          { line: 8, column: 12 },
-        ],
-      },
-      {
-        message: 'There can be only one type named "Foo".',
-        locations: [
-          { line: 2, column: 12 },
-          { line: 9, column: 13 },
-        ],
-      },
-    ]);
+describe('Validate: Unique field definition names', () => {
+  it('no fields', () => {
+    expectValidSDL(`
+      resolver SomeObject
+      data SomeInputObject
+    `);
   });
 
-  it('adding new type to existing schema', () => {
-    const schema = buildSchema('type Foo');
+  it('one field', () => {
+    expectValidSDL(`
+      resolver SomeObject = {
+        foo: String
+      }
 
-    expectValidSDL('type Bar', schema);
+      data SomeInputObject = {
+        foo: String
+      }
+    `);
   });
 
-  it('adding new type to existing schema with same-named directive', () => {
-    const schema = buildSchema('directive @Foo on SCHEMA');
-
-    expectValidSDL('type Foo', schema);
+  it('multiple fields', () => {
+    expectValidSDL(`
+      resolver SomeObject = {
+        foo: String
+        bar: String
+      }
+  
+      data SomeInputObject = {
+        foo: String
+        bar: String
+      }
+    `);
   });
 
-  it('adding conflicting types to existing schema', () => {
-    const schema = buildSchema('type Foo');
-    const sdl = `
-      scalar Foo
-      type Foo
-      interface Foo
-      union Foo
-      enum Foo
-      input Foo
-    `;
+  it('duplicate fields inside the same type definition', () => {
+    expectSDLErrors(`
+      resolver SomeObject = {
+        foo: String
+        bar: String
+        foo: String
+      }
 
-    expectSDLErrors(sdl, schema).toDeepEqual([
-      {
-        message:
-          'Type "Foo" already exists in the schema. It cannot also be defined in this type definition.',
-        locations: [{ line: 2, column: 14 }],
-      },
-      {
-        message:
-          'Type "Foo" already exists in the schema. It cannot also be defined in this type definition.',
-        locations: [{ line: 3, column: 12 }],
-      },
-      {
-        message:
-          'Type "Foo" already exists in the schema. It cannot also be defined in this type definition.',
-        locations: [{ line: 4, column: 17 }],
-      },
-      {
-        message:
-          'Type "Foo" already exists in the schema. It cannot also be defined in this type definition.',
-        locations: [{ line: 5, column: 13 }],
-      },
-      {
-        message:
-          'Type "Foo" already exists in the schema. It cannot also be defined in this type definition.',
-        locations: [{ line: 6, column: 12 }],
-      },
-      {
-        message:
-          'Type "Foo" already exists in the schema. It cannot also be defined in this type definition.',
-        locations: [{ line: 7, column: 13 }],
-      },
-    ]);
+      data SomeInputObject = {
+        foo: String
+        bar: String
+        foo: String
+      }
+    `).toMatchSnapshot();
+  });
+});
+
+describe('Validate: Unique variant definition names', () => {
+  it('multiple variants', () => {
+    expectValidSDL(`
+      data SomData = A {} | B {}
+      resolver SomeResolver = A {} | B {}
+    `);
+  });
+
+  it('duplicate fields inside the same type definition', () => {
+    expectSDLErrors(`
+      data SomData 
+        = A {} 
+        | B {}
+        | A {}
+
+      resolver SomeResolver 
+        = C {} 
+        | D {}
+        | D {}
+    `).toMatchSnapshot();
+  });
+});
+
+describe('Validate: Unique argument definition names', () => {
+  it('no args', () => {
+    expectValidSDL(`
+      resolver SomeObject = {
+        someField: String
+      }
+
+      directive @someDirective on QUERY
+    `);
+  });
+
+  it('one argument', () => {
+    expectValidSDL(`
+      resolver SomeObject = { someField(foo: String): String }
+      directive @someDirective(foo: String) on QUERY
+    `);
+  });
+
+  it('multiple arguments', () => {
+    expectValidSDL(`
+      resolver SomeObject = {
+        someField(
+          foo: String
+          bar: String
+        ): String
+      }
+
+      directive @someDirective(
+        foo: String
+        bar: String
+      ) on QUERY
+    `);
+  });
+
+  it('duplicating arguments', () => {
+    expectSDLErrors(`
+      resolver SomeObject = {
+        someField(
+          foo: String
+          bar: String
+          foo: String
+        ): String
+      }
+
+      directive @someDirective(
+        foo: String
+        bar: String
+        foo: String
+      ) on QUERY
+    `).toMatchSnapshot();
   });
 });

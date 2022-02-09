@@ -1,23 +1,14 @@
-import { didYouMean } from '../../jsutils/didYouMean';
-import { suggestionList } from '../../jsutils/suggestionList';
-
-import { GraphQLError } from '../../error/GraphQLError';
-
-import type { ASTNode } from '../../language/ast';
+import { irisError } from '../../error';
+import type { ASTNode } from '../../types/ast';
 import {
   isTypeDefinitionNode,
   isTypeSystemDefinitionNode,
-  isTypeSystemExtensionNode,
-} from '../../language/predicates';
-import type { ASTVisitor } from '../../language/visitor';
+} from '../../types/ast';
+import { scalarNames } from '../../types/definition';
+import type { ASTVisitor } from '../../types/visitor';
+import { didYouMean, suggestionList } from '../../utils/legacy';
 
-import { introspectionTypes } from '../../type/introspection';
-import { specifiedScalarTypes } from '../../type/scalars';
-
-import type {
-  SDLValidationContext,
-  ValidationContext,
-} from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 /**
  * Known type names
@@ -27,12 +18,7 @@ import type {
  *
  * See https://spec.graphql.org/draft/#sec-Fragment-Spread-Type-Existence
  */
-export function KnownTypeNamesRule(
-  context: ValidationContext | SDLValidationContext,
-): ASTVisitor {
-  const schema = context.getSchema();
-  const existingTypesMap = schema ? schema.getTypeMap() : Object.create(null);
-
+export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
   const definedTypes = Object.create(null);
   for (const def of context.getDocument().definitions) {
     if (isTypeDefinitionNode(def)) {
@@ -40,29 +26,51 @@ export function KnownTypeNamesRule(
     }
   }
 
-  const typeNames = [
-    ...Object.keys(existingTypesMap),
-    ...Object.keys(definedTypes),
-  ];
+  const typeNames = [...Object.keys(definedTypes)];
 
   return {
     NamedType(node, _1, parent, _2, ancestors) {
       const typeName = node.name.value;
-      if (!existingTypesMap[typeName] && !definedTypes[typeName]) {
+      if (!definedTypes[typeName]) {
         const definitionNode = ancestors[2] ?? parent;
         const isSDL = definitionNode != null && isSDLNode(definitionNode);
-        if (isSDL && standardTypeNames.includes(typeName)) {
+        if (isSDL && scalarNames.includes(typeName)) {
           return;
         }
 
         const suggestedTypes = suggestionList(
           typeName,
-          isSDL ? standardTypeNames.concat(typeNames) : typeNames,
+          isSDL ? scalarNames.concat(typeNames) : typeNames,
         );
         context.reportError(
-          new GraphQLError(
+          irisError(
             `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
-            node,
+            { nodes: node },
+          ),
+        );
+      }
+    },
+    VariantDefinition(node, _1, parent, _2, ancestors) {
+      if (node.fields) {
+        return undefined;
+      }
+
+      const typeName = node.name.value;
+      if (!definedTypes[typeName]) {
+        const definitionNode = ancestors[2] ?? parent;
+        const isSDL = definitionNode != null && isSDLNode(definitionNode);
+        if (isSDL && scalarNames.includes(typeName)) {
+          return;
+        }
+
+        const suggestedTypes = suggestionList(
+          typeName,
+          isSDL ? scalarNames.concat(typeNames) : typeNames,
+        );
+        context.reportError(
+          irisError(
+            `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
+            { nodes: node },
           ),
         );
       }
@@ -70,13 +78,6 @@ export function KnownTypeNamesRule(
   };
 }
 
-const standardTypeNames = [...specifiedScalarTypes, ...introspectionTypes].map(
-  (type) => type.name,
-);
-
 function isSDLNode(value: ASTNode | ReadonlyArray<ASTNode>): boolean {
-  return (
-    'kind' in value &&
-    (isTypeSystemDefinitionNode(value) || isTypeSystemExtensionNode(value))
-  );
+  return 'kind' in value && isTypeSystemDefinitionNode(value);
 }

@@ -7,8 +7,6 @@ ignorePaths:
   - package.json
   - package-lock.json
   - tsconfig.json
-  - benchmark/github-schema.graphql
-  - benchmark/github-schema.json
 overrides:
   - filename: '**/docs/APIReference-*.md'
     ignoreRegExpList: ['/href="[^"]*"/']
@@ -17,34 +15,11 @@ ignoreRegExpList:
   - u\{[0-9a-f]{1,8}\}
 
 words:
-  - graphiql
-  - sublinks
   - instanceof
-
-  # Different names used inside tests
-  - Skywalker
-  - Leia
-  - Wilhuff
-  - Tarkin
-  - Artoo
-  - Threepio
-  - Odie
-  - Odie's
-  - Damerau
-  - Alderaan
-  - Tatooine
-  - astromech
-
-  # TODO: contribute upstream
-  - deno
-  - codecov
-
-  # TODO: remove bellow words
   - QLID # GraphQLID
-  - QLJS # GraphQLJS
-  - iface
   - Reqs
-  - FXXX
-  - XXXF
-  - bfnrt
-  - wrds
+  - transpiling
+  # Mythology
+  - Cronos
+  - Daviti
+  - Nalchevanidze

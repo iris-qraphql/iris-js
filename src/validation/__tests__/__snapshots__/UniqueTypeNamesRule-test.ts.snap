@@ -1,0 +1,125 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Validate: Unique argument definition names duplicating arguments 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 11,
+        "line": 4,
+      },
+      Object {
+        "column": 11,
+        "line": 6,
+      },
+    ],
+    "message": "Argument \\"SomeObject.someField(foo:)\\" can only be defined once.",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 9,
+        "line": 11,
+      },
+      Object {
+        "column": 9,
+        "line": 13,
+      },
+    ],
+    "message": "Argument \\"@someDirective(foo:)\\" can only be defined once.",
+  },
+]
+`;
+
+exports[`Validate: Unique field definition names duplicate fields inside the same type definition 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 9,
+        "line": 3,
+      },
+      Object {
+        "column": 9,
+        "line": 5,
+      },
+    ],
+    "message": "Field \\"SomeObject.foo\\" can only be defined once.",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 9,
+        "line": 9,
+      },
+      Object {
+        "column": 9,
+        "line": 11,
+      },
+    ],
+    "message": "Field \\"SomeInputObject.foo\\" can only be defined once.",
+  },
+]
+`;
+
+exports[`Validate: Unique type names types named the same 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 16,
+        "line": 2,
+      },
+      Object {
+        "column": 12,
+        "line": 3,
+      },
+    ],
+    "message": "There can be only one type named \\"Foo\\".",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 16,
+        "line": 2,
+      },
+      Object {
+        "column": 12,
+        "line": 4,
+      },
+    ],
+    "message": "There can be only one type named \\"Foo\\".",
+  },
+]
+`;
+
+exports[`Validate: Unique variant definition names duplicate fields inside the same type definition 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 11,
+        "line": 3,
+      },
+      Object {
+        "column": 11,
+        "line": 5,
+      },
+    ],
+    "message": "Variant \\"SomData.A\\" can only be defined once.",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 11,
+        "line": 9,
+      },
+      Object {
+        "column": 11,
+        "line": 10,
+      },
+    ],
+    "message": "Variant \\"SomeResolver.D\\" can only be defined once.",
+  },
+]
+`;

@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Sophisticated Integration: conditional union selections 1`] = `
+Object {
+  "data": Object {
+    "deities": Array [
+      Object {
+        "__typename": "God",
+        "lifespan": "Immortal",
+        "name": "Morpheus",
+      },
+      Object {
+        "__typename": "Deity_Titan",
+        "name": "Cronos",
+      },
+    ],
+  },
+}
+`;
+
+exports[`Sophisticated Integration: invalid variant name 1`] = `
+Object {
+  "data": null,
+  "errors": Array [
+    Object {
+      "locations": Array [
+        Object {
+          "column": 11,
+          "line": 7,
+        },
+      ],
+      "message": "Data \\"Lifespan\\" cannot represent value: \\"Thor\\"",
+      "path": Array [
+        "deities",
+        0,
+        "lifespan",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`Sophisticated Integration: union type names 1`] = `
+Object {
+  "data": Object {
+    "deities": Array [
+      Object {
+        "__typename": "God",
+      },
+      Object {
+        "__typename": "Deity_Titan",
+      },
+    ],
+  },
+}
+`;
+
+exports[`Sophisticated Integration: valid variant object 1`] = `
+Object {
+  "data": Object {
+    "deities": Array [
+      Object {
+        "__typename": "God",
+        "lifespan": "Limited",
+        "name": "Morpheus",
+      },
+      Object {
+        "__typename": "God",
+        "lifespan": Object {
+          "__typename": "Limited",
+          "max": 2000,
+        },
+        "name": "Zeus",
+      },
+      Object {
+        "__typename": "God",
+        "lifespan": "Limited",
+        "name": "Morpheus",
+      },
+    ],
+  },
+}
+`;

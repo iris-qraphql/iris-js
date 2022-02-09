@@ -1,12 +1,10 @@
-import { invariant } from '../../jsutils/invariant';
-import type { ObjMap } from '../../jsutils/ObjMap';
+import { irisError } from '../../error';
+import type { NameNode } from '../../types/ast';
+import type { ASTVisitor } from '../../types/visitor';
+import { invariant } from '../../utils/legacy';
+import type { ObjMap } from '../../utils/ObjMap';
 
-import { GraphQLError } from '../../error/GraphQLError';
-
-import type { NameNode } from '../../language/ast';
-import type { ASTVisitor } from '../../language/visitor';
-
-import type { ASTValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 /**
  * Unique input field names
@@ -17,7 +15,7 @@ import type { ASTValidationContext } from '../ValidationContext';
  * See https://spec.graphql.org/draft/#sec-Input-Object-Field-Uniqueness
  */
 export function UniqueInputFieldNamesRule(
-  context: ASTValidationContext,
+  context: IrisValidationContext,
 ): ASTVisitor {
   const knownNameStack: Array<ObjMap<NameNode>> = [];
   let knownNames: ObjMap<NameNode> = Object.create(null);
@@ -38,10 +36,9 @@ export function UniqueInputFieldNamesRule(
       const fieldName = node.name.value;
       if (knownNames[fieldName]) {
         context.reportError(
-          new GraphQLError(
-            `There can be only one input field named "${fieldName}".`,
-            [knownNames[fieldName], node.name],
-          ),
+          irisError(`There can be only one input field named "${fieldName}".`, {
+            nodes: [knownNames[fieldName], node.name],
+          }),
         );
       } else {
         knownNames[fieldName] = node.name;
