@@ -27,8 +27,6 @@ export const IrisFloat = IrisScalars.Float;
 
 export const IrisString = IrisScalars.String;
 
-export const IrisBool = IrisScalars.Boolean;
-
 export const IrisID = IrisScalars.ID;
 
 export const isSpecifiedScalarType = (type: IrisNamedType): boolean =>

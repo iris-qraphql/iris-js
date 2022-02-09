@@ -5,7 +5,13 @@ import { dedent } from '../../utils/dedent';
 import { assertDataType, assertResolverType } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { printSchema } from '../printSchema';
-import { IrisBool, IrisFloat, IrisID, IrisInt, IrisString } from '../scalars';
+import {
+  IrisFloat,
+  IrisID,
+  IrisInt,
+  IrisScalars,
+  IrisString,
+} from '../scalars';
 import { buildASTSchema, buildSchema, IrisSchema } from '../schema';
 import { validateSchema } from '../validate';
 
@@ -56,7 +62,7 @@ describe('Schema Builder', () => {
     expect(schema.getType('Int')).toEqual(IrisInt);
     expect(schema.getType('Float')).toEqual(IrisFloat);
     expect(schema.getType('String')).toEqual(IrisString);
-    expect(schema.getType('Boolean')).toEqual(IrisBool);
+    expect(schema.getType('Boolean')).toEqual(IrisScalars.Boolean);
     expect(schema.getType('ID')).toEqual(IrisID);
   });
 

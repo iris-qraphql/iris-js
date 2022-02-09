@@ -24,10 +24,10 @@ import {
 } from '../directives';
 import { gqlList, maybe } from '../make';
 import {
-  IrisBool,
   IrisFloat,
   IrisID,
   IrisInt,
+  IrisScalars,
   IrisString,
   isSpecifiedScalarType,
 } from '../scalars';
@@ -81,7 +81,7 @@ describe('Type predicates', () => {
       expect(isSpecifiedScalarType(IrisString)).toEqual(true);
       expect(isSpecifiedScalarType(IrisInt)).toEqual(true);
       expect(isSpecifiedScalarType(IrisFloat)).toEqual(true);
-      expect(isSpecifiedScalarType(IrisBool)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisScalars.Boolean)).toEqual(true);
       expect(isSpecifiedScalarType(IrisID)).toEqual(true);
     });
 
