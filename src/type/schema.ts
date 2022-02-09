@@ -4,7 +4,6 @@ import { uniqBy } from 'ramda';
 import type {
   ArgumentDefinitionNode,
   DirectiveDefinitionNode,
-  DocumentNode,
   FieldDefinitionNode,
   NamedTypeNode,
   Role,
@@ -138,15 +137,8 @@ export function buildSchema(
   source: string | Source,
   options?: IrisSchemaValidationOptions & ParseOptions,
 ): IrisSchema {
-  const document = parse(source, { noLocation: options?.noLocation });
+  const documentAST = parse(source, { noLocation: options?.noLocation });
 
-  return buildASTSchema(document, { ...options });
-}
-
-export function buildASTSchema(
-  documentAST: DocumentNode,
-  options?: IrisSchemaValidationOptions,
-): IrisSchema {
   if (options?.assumeValid !== true && options?.assumeValidSDL !== true) {
     const errors = validateSDL(documentAST);
     if (errors.length !== 0) {

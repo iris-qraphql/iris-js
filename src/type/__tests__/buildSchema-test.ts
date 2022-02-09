@@ -1,12 +1,10 @@
-import { IrisKind } from '../../language/kinds';
-
 import { dedent } from '../../utils/dedent';
 
 import { assertDataType, assertResolverType } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { printSchema } from '../printSchema';
 import { IrisScalars } from '../scalars';
-import { buildASTSchema, buildSchema, IrisSchema } from '../schema';
+import { buildSchema } from '../schema';
 import { validateSchema } from '../validate';
 
 /**
@@ -19,19 +17,6 @@ function cycleSDL(sdl: string): string {
 }
 
 describe('Schema Builder', () => {
-  it('Match order of default types and directives', () => {
-    const schema = new IrisSchema({});
-    const sdlSchema = buildASTSchema({
-      kind: IrisKind.DOCUMENT,
-      definitions: [],
-    });
-
-    expect(sdlSchema.directives).toEqual(schema.directives);
-
-    expect(sdlSchema.typeMap).toEqual(schema.typeMap);
-    expect(Object.keys(sdlSchema.typeMap)).toEqual(Object.keys(schema.typeMap));
-  });
-
   it('Empty type', () => {
     const sdl = dedent`
       resolver EmptyType

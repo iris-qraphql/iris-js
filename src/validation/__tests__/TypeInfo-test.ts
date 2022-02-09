@@ -1,12 +1,14 @@
 import { parseValue } from '../../language/parser';
 import { visit } from '../../language/visitor';
 
-import { buildSchema, IrisSchema } from '../../type/schema';
+import { buildSchema } from '../../type/schema';
 
 import { TypeInfo, visitWithTypeInfo } from '../TypeInfo';
 
 describe('TypeInfo', () => {
-  const schema = new IrisSchema({});
+  const schema = buildSchema(`
+    resolver Quety = {}
+  `)
 
   it('can be Object.toStringified', () => {
     const typeInfo = new TypeInfo(schema);
