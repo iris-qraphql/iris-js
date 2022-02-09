@@ -14,7 +14,6 @@ import type {
 } from '../language/ast';
 import { IrisKind } from '../language/kinds';
 import { parse } from '../language/parser';
-import { isTypeDefinitionNode } from '../language/predicates';
 
 import { validateSDL } from '../validation/validate';
 
@@ -264,11 +263,14 @@ export function buildASTSchema(
     });
 
   documentAST.definitions.forEach((def) => {
-    if (isTypeDefinitionNode(def)) {
-      const name = def.name.value;
-      typeMap[name] = stdTypeMap[name] ?? buildType(def);
-    } else if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
-      directiveDefs.push(def);
+    const name = def.name.value;
+    switch(def.kind){
+      case IrisKind.TYPE_DEFINITION:
+        typeMap[name] = stdTypeMap[name] ?? buildType(def)
+        break;
+      case IrisKind.DIRECTIVE_DEFINITION:
+        directiveDefs.push(def);
+        break;
     }
   });
 

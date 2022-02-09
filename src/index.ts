@@ -28,11 +28,6 @@ export {
   getVisitFn,
   getEnterLeaveForKind,
   DirectiveLocation,
-  // Predicates
-  isValueNode,
-  isConstValueNode,
-  isTypeSystemDefinitionNode,
-  isTypeDefinitionNode,
 } from './language/index';
 
 export type IrisArgs = Omit<GraphQLArgs, 'schema'> & {

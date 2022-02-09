@@ -14,12 +14,5 @@ export type { ASTVisitor, ASTVisitorKeyMap } from './visitor';
 
 export type { TypeDefinitionNode, DirectiveDefinitionNode } from './ast';
 
-export {
-  isValueNode,
-  isConstValueNode,
-  isTypeSystemDefinitionNode,
-  isTypeDefinitionNode,
-} from './predicates';
-
 export { DirectiveLocation } from './directiveLocation';
 export type { DirectiveLocationEnum } from './directiveLocation';
