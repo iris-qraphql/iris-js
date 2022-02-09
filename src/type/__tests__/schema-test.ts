@@ -1,4 +1,3 @@
-
 import { dedent } from '../../utils/dedent';
 
 import { printSchema } from '../printSchema';
@@ -54,7 +53,7 @@ describe('Type System: Schema', () => {
        directive @Foo(arg: Foo, argList: [Bar] ) on OBJECT
        resolver Query = {}
       `);
-      
+
       expect(Object.keys(schema.typeMap)).toEqual(
         expect.arrayContaining(['Foo', 'Bar']),
       );

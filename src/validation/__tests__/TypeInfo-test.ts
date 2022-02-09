@@ -7,8 +7,8 @@ import { TypeInfo, visitWithTypeInfo } from '../TypeInfo';
 
 describe('TypeInfo', () => {
   const schema = buildSchema(`
-    resolver Quety = {}
-  `)
+    resolver Query = {}
+  `);
 
   it('can be Object.toStringified', () => {
     const typeInfo = new TypeInfo(schema);

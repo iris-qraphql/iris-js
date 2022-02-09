@@ -19,7 +19,6 @@ import { validateSDL } from '../validation/validate';
 import { valueFromAST } from '../conversion/valueFromAST';
 import { getDirectiveValues } from '../conversion/values';
 import type { IrisError } from '../error';
-import { inspect, instanceOf } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
 import type { ConfigMap, IrisMaybe, Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
@@ -40,20 +39,6 @@ import {
 } from './directives';
 import { IrisScalars } from './scalars';
 
-/**
- * Test if the given value is a GraphQL schema.
- */
-export function isSchema(schema: unknown): schema is IrisSchema {
-  return instanceOf(schema, IrisSchema);
-}
-
-export function assertSchema(schema: unknown): IrisSchema {
-  if (!isSchema(schema)) {
-    throw new Error(`Expected ${inspect(schema)} to be a GraphQL schema.`);
-  }
-  return schema;
-}
-
 class IrisSchema {
   description: Maybe<string>;
 
@@ -67,7 +52,6 @@ class IrisSchema {
   __validationErrors: Maybe<ReadonlyArray<IrisError>>;
 
   constructor(config: Readonly<IrisSchemaConfig>) {
-    this.__validationErrors = config.assumeValid === true ? [] : undefined;
     this.description = config.description;
     this.query = config.query ?? undefined;
     this.mutation = config.mutation ?? undefined;
@@ -119,12 +103,7 @@ class IrisSchema {
 
 type TypeMap = ObjMap<IrisNamedType>;
 
-export type IrisSchemaValidationOptions = {
-  assumeValid?: boolean;
-  assumeValidSDL?: boolean;
-};
-
-export interface IrisSchemaConfig extends IrisSchemaValidationOptions {
+export interface IrisSchemaConfig {
   description?: Maybe<string>;
   query?: Maybe<IrisTypeDefinition<'resolver'>>;
   mutation?: Maybe<IrisTypeDefinition<'resolver'>>;
@@ -135,15 +114,13 @@ export interface IrisSchemaConfig extends IrisSchemaValidationOptions {
 
 export function buildSchema(
   source: string | Source,
-  options?: IrisSchemaValidationOptions & ParseOptions,
+  options?: ParseOptions,
 ): IrisSchema {
   const documentAST = parse(source, { noLocation: options?.noLocation });
+  const errors = validateSDL(documentAST);
 
-  if (options?.assumeValid !== true && options?.assumeValidSDL !== true) {
-    const errors = validateSDL(documentAST);
-    if (errors.length !== 0) {
-      throw new Error(errors.map((error) => error.message).join('\n\n'));
-    }
+  if (errors.length !== 0) {
+    throw new Error(errors.map((error) => error.message).join('\n\n'));
   }
 
   const directiveDefs: Array<DirectiveDefinitionNode> = [];
@@ -272,7 +249,6 @@ export function buildSchema(
     mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
     subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
     directives: directiveDefs.map(buildDirective),
-    assumeValid: options?.assumeValid ?? false,
   });
 }
 

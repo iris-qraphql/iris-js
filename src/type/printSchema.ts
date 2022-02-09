@@ -23,12 +23,8 @@ export function printSchema(schema: IrisSchema): string {
   return printFilteredSchema(
     schema,
     (n) => !isSpecifiedDirective(n),
-    isDefinedType,
+    (t) => !isSpecifiedScalarType(t),
   );
-}
-
-function isDefinedType(type: IrisNamedType): boolean {
-  return !isSpecifiedScalarType(type);
 }
 
 function printFilteredSchema(

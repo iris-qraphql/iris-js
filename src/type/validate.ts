@@ -19,7 +19,6 @@ import {
 } from './definition';
 import { GraphQLDeprecatedDirective, isDirective } from './directives';
 import type { IrisSchema } from './schema';
-import { assertSchema } from './schema';
 
 /**
  * Implements the "Type Validation" sub-sections of the specification's
@@ -29,9 +28,6 @@ import { assertSchema } from './schema';
  * an empty array if no errors were encountered and the Schema is valid.
  */
 export function validateSchema(schema: IrisSchema): ReadonlyArray<IrisError> {
-  // First check to ensure the provided value is in fact a IrisSchema.
-  assertSchema(schema);
-
   // If this Schema has already been validated, return the previous results.
   if (schema.__validationErrors) {
     return schema.__validationErrors;

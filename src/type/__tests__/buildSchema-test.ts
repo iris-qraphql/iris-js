@@ -366,26 +366,15 @@ describe('Schema Builder', () => {
 
     const schema = buildSchema(sdl);
 
-    const myEnum = assertDataType(schema.getType('MyEnum'));
-
-    const value = myEnum.variantBy('VALUE');
-    expect(value).toEqual(
-      expect.objectContaining({ deprecationReason: undefined }),
-    );
-
-    const oldValue = myEnum.variantBy('OLD_VALUE');
-    expect(oldValue).toEqual(
-      expect.objectContaining({
-        deprecationReason: '',
-      }),
-    );
-
-    const otherValue = myEnum.variantBy('OTHER_VALUE');
-    expect(otherValue).toEqual(
-      expect.objectContaining({
-        deprecationReason: 'Terrible reasons',
-      }),
-    );
+    expect(
+      assertDataType(schema.getType('MyEnum'))
+        .variants()
+        .map(({ name, deprecationReason }) => ({ name, deprecationReason })),
+    ).toEqual([
+      { name: 'VALUE', deprecationReason: undefined },
+      { name: 'OLD_VALUE', deprecationReason: '' },
+      { name: 'OTHER_VALUE', deprecationReason: 'Terrible reasons' },
+    ]);
 
     const rootFields =
       assertResolverType(schema.getType('Query')).variantBy().fields ?? {};
@@ -441,26 +430,5 @@ describe('Schema Builder', () => {
       }
     `;
     expect(() => buildSchema(sdl)).toThrow('Unknown directive "@unknown".');
-  });
-
-  it('Allows to disable SDL validation', () => {
-    const sdl = `
-      resolver Query = {
-        foo: String @unknown
-      }
-    `;
-    buildSchema(sdl, { assumeValid: true });
-    buildSchema(sdl, { assumeValidSDL: true });
-  });
-
-  it('Throws on unknown types', () => {
-    const sdl = `
-      resolver Query = {
-        unknown: UnknownType
-      }
-    `;
-    expect(() => buildSchema(sdl, { assumeValidSDL: true })).toThrow(
-      'Unknown type: "UnknownType".',
-    );
   });
 });
