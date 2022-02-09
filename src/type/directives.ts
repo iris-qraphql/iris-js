@@ -8,7 +8,7 @@ import type { ConfigMap, Maybe } from '../utils/type-level';
 
 import type { IrisArgument } from './definition';
 import { buildArguments } from './definition';
-import { IrisString } from './scalars';
+import { IrisScalars } from './scalars';
 
 /**
  * Test if the given value is a GraphQL directive.
@@ -84,7 +84,7 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     ],
     args: {
       reason: {
-        type: IrisString,
+        type: IrisScalars.String,
         description:
           'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
         defaultValue: '',

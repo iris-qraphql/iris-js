@@ -26,31 +26,46 @@ serving queries against that type schema.
 First, build a Iris type schema which maps to your codebase.
 
 ```js
-import { iris, IrisSchema, IrisString } from 'iris';
+import { iris, buildSchema } from 'iris';
 
-var schema = new IrisSchema({
-  query: new IrisResolver({
-    name: 'RootQueryType',
-    fields: {
-      hello: {
-        type: IrisString,
-        resolve() {
-          return 'world';
-        },
-      },
-    },
-  }),
-});
+const schema = buildSchema(`
+  data Lifespan
+    = Immortal {}
+    | Limited { max: Int? }
+
+  resolver God = {
+    name: String
+    lifespan: Lifespan
+  }
+
+  resolver Deity
+    = God
+    | Titan { name: String }
+
+  resolver Query = {
+    deities(lifespan: Lifespan?): [Deity]
+  }
+`);
 ```
 
 This defines a simple schema, with one type and one field, that resolves
 to a fixed value. The `resolve` function can return a value, a promise,
-or an array of promises. A more complex example is included in the top-level [tests](src/__tests__) directory.
-
 Then, serve the result of a query against that type schema.
 
 ```js
-var source = '{ hello }';
+var source = `
+    { deities { 
+        __typename
+        ... on God {
+          name
+          lifespan
+        }
+        ... on Deity_Titan {
+          name
+        }
+      } 
+    }
+  `
 
 iris({ schema, source }).then((result) => {
   // Prints
@@ -60,24 +75,3 @@ iris({ schema, source }).then((result) => {
   console.log(result);
 });
 ```
-
-This runs a query fetching the one field defined. The `iris` function will
-first ensure the query is syntactically and semantically valid before executing
-it, reporting errors otherwise.
-
-```js
-var source = '{ BoyHowdy }';
-
-iris({ schema, source }).then((result) => {
-  // Prints
-  // {
-  //   errors: [
-  //     { message: 'Cannot query field BoyHowdy on RootQueryType',
-  //       locations: [ { line: 1, column: 3 } ] }
-  //   ]
-  // }
-  console.log(result);
-});
-```
-
-**Note**: Please don't forget to set `NODE_ENV=production` if you are running a production server. It will disable some checks that can be useful during development but will significantly improve performance.

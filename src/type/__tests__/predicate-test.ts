@@ -22,13 +22,9 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlList, maybe } from '../make';
+import { gqlList, maybe, sampleTypeRef } from '../make';
 import {
-  IrisFloat,
-  IrisID,
-  IrisInt,
   IrisScalars,
-  IrisString,
   isSpecifiedScalarType,
 } from '../scalars';
 import { buildSchema } from '../schema';
@@ -47,6 +43,7 @@ const schema = buildSchema(`
   resolver Query = {
     object: Object
     union: Union
+    string: String
   }
 `);
 
@@ -59,6 +56,7 @@ const Directive = new GraphQLDirective({
   name: 'Directive',
   locations: [DirectiveLocation.QUERY],
 });
+const IrisString = IrisScalars.String;
 
 describe('Type predicates', () => {
   describe('isType', () => {
@@ -68,7 +66,8 @@ describe('Type predicates', () => {
     });
 
     it('returns true for wrapped types', () => {
-      expect(isType(IrisString)).toEqual(true);
+      expect(isType(sampleTypeRef('[String]'))).toEqual(true);
+      expect(isType(sampleTypeRef('String?'))).toEqual(true);
     });
 
     it('returns false for random garbage', () => {
@@ -78,11 +77,11 @@ describe('Type predicates', () => {
 
   describe('isSpecifiedScalarType', () => {
     it('returns true for specified scalars', () => {
-      expect(isSpecifiedScalarType(IrisString)).toEqual(true);
-      expect(isSpecifiedScalarType(IrisInt)).toEqual(true);
-      expect(isSpecifiedScalarType(IrisFloat)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisScalars.String)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisScalars.Int)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisScalars.Float)).toEqual(true);
       expect(isSpecifiedScalarType(IrisScalars.Boolean)).toEqual(true);
-      expect(isSpecifiedScalarType(IrisID)).toEqual(true);
+      expect(isSpecifiedScalarType(IrisScalars.ID)).toEqual(true);
     });
 
     it('returns false for custom scalar', () => {

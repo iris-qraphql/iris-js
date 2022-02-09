@@ -1,7 +1,6 @@
 import type { IrisType } from '../../type/definition';
 import { assertDataType } from '../../type/definition';
-import { gqlList, gqlScalar, maybe, sampleTypeRef } from '../../type/make';
-import { IrisFloat, IrisID, IrisInt, IrisString } from '../../type/scalars';
+import { gqlList, gqlScalar,  sampleTypeRef } from '../../type/make';
 import { buildSchema } from '../../type/schema';
 
 import { serializeValue } from '../serialize';
@@ -23,83 +22,79 @@ describe('serializeValue', () => {
   });
 
   it('converts Int values to Int ASTs', () => {
-    expect(serializeWith(-1, IrisInt)).toEqual(-1);
-    expect(serializeWith(123.0, IrisInt)).toEqual(123);
-    expect(serializeWith(1e4, IrisInt)).toEqual(10000);
-    expect(() => serializeWith(123.5, IrisInt)).toThrow(
+    expect(serializeWith(-1, 'Int')).toEqual(-1);
+    expect(serializeWith(123.0, 'Int')).toEqual(123);
+    expect(serializeWith(1e4, 'Int')).toEqual(10000);
+    expect(() => serializeWith(123.5, 'Int')).toThrow(
       'Int cannot represent non-integer value: 123.5',
     );
 
-    expect(() => serializeWith(1e40, IrisInt)).toThrow(
+    expect(() => serializeWith(1e40, 'Int')).toThrow(
       'Int cannot represent non 32-bit signed integer value: 1e+40',
     );
 
-    expect(() => serializeWith(NaN, IrisInt)).toThrow(
+    expect(() => serializeWith(NaN, 'Int')).toThrow(
       'Int cannot represent non-integer value: NaN',
     );
   });
 
   it('converts Float values to Int/Float ASTs', () => {
-    expect(serializeWith(-1, IrisFloat)).toEqual(-1);
+    expect(serializeWith(-1, 'Float')).toEqual(-1);
 
-    expect(serializeWith(123.0, IrisFloat)).toEqual(123);
+    expect(serializeWith(123.0, 'Float')).toEqual(123);
 
-    expect(serializeWith(123.5, IrisFloat)).toEqual(123.5);
+    expect(serializeWith(123.5, 'Float')).toEqual(123.5);
 
-    expect(serializeWith(1e4, IrisFloat)).toEqual(10000);
+    expect(serializeWith(1e4, 'Float')).toEqual(10000);
 
-    expect(serializeWith(1e40, IrisFloat)).toEqual(1e40);
+    expect(serializeWith(1e40, 'Float')).toEqual(1e40);
   });
 
   it('converts String values to String ASTs', () => {
-    expect(serializeWith('hello', IrisString)).toEqual('hello');
+    expect(serializeWith('hello', 'String')).toEqual('hello');
 
-    expect(serializeWith('VALUE', IrisString)).toEqual('VALUE');
+    expect(serializeWith('VALUE', 'String')).toEqual('VALUE');
 
-    expect(serializeWith('VA\nLUE', IrisString)).toEqual('VA\nLUE');
+    expect(serializeWith('VA\nLUE', 'String')).toEqual('VA\nLUE');
 
-    expect(serializeWith(123, IrisString)).toEqual('123');
+    expect(serializeWith(123, 'String')).toEqual('123');
 
-    expect(serializeWith(false, IrisString)).toEqual('false');
+    expect(serializeWith(false, 'String')).toEqual('false');
 
     // optional
-    expect(serializeWith(null, maybe(IrisString))).toEqual(null);
-    expect(serializeWith(undefined, maybe(IrisString))).toEqual(null);
+    expect(serializeWith(null, 'String?')).toEqual(null);
+    expect(serializeWith(undefined, 'String?')).toEqual(null);
 
     // required
     expect(() =>
-      serializeWith(undefined, IrisString),
+      serializeWith(undefined, 'String'),
     ).toThrowErrorMatchingSnapshot();
-    expect(() =>
-      serializeWith(null, IrisString),
-    ).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(null, 'String')).toThrowErrorMatchingSnapshot();
   });
 
   it('converts ID values to Int/String ASTs', () => {
-    expect(serializeWith('hello', IrisID)).toEqual('hello');
+    expect(serializeWith('hello', 'ID')).toEqual('hello');
 
-    expect(serializeWith('VALUE', IrisID)).toEqual('VALUE');
+    expect(serializeWith('VALUE', 'ID')).toEqual('VALUE');
 
-    expect(serializeWith('VA\nLUE', IrisID)).toEqual('VA\nLUE');
+    expect(serializeWith('VA\nLUE', 'ID')).toEqual('VA\nLUE');
 
-    expect(serializeWith(-1, IrisID)).toEqual('-1');
+    expect(serializeWith(-1, 'ID')).toEqual('-1');
 
-    expect(serializeWith(123, IrisID)).toEqual('123');
+    expect(serializeWith(123, 'ID')).toEqual('123');
 
-    expect(serializeWith('123', IrisID)).toEqual('123');
+    expect(serializeWith('123', 'ID')).toEqual('123');
 
-    expect(serializeWith('01', IrisID)).toEqual('01');
+    expect(serializeWith('01', 'ID')).toEqual('01');
 
     // nullable
-    expect(serializeWith(null, maybe(IrisID))).toEqual(null);
-    expect(serializeWith(undefined, maybe(IrisID))).toEqual(null);
+    expect(serializeWith(null, 'ID?')).toEqual(null);
+    expect(serializeWith(undefined, 'ID?')).toEqual(null);
 
     // required
-    expect(() => serializeWith(false, IrisID)).toThrowErrorMatchingSnapshot();
-    expect(() =>
-      serializeWith(undefined, IrisID),
-    ).toThrowErrorMatchingSnapshot();
-    expect(() => serializeWith(null, IrisID)).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(false, 'ID')).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(undefined, 'ID')).toThrowErrorMatchingSnapshot();
+    expect(() => serializeWith(null, 'ID')).toThrowErrorMatchingSnapshot();
   });
 
   it('converts using serialize from a custom scalar type', () => {

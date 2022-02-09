@@ -21,13 +21,5 @@ export const IrisScalars = keyMap(
 
 export const scalarNames = Object.keys(IrisScalars);
 
-export const IrisInt = IrisScalars.Int;
-
-export const IrisFloat = IrisScalars.Float;
-
-export const IrisString = IrisScalars.String;
-
-export const IrisID = IrisScalars.ID;
-
 export const isSpecifiedScalarType = (type: IrisNamedType): boolean =>
   Boolean(IrisScalars[type.name]);
