@@ -1,36 +1,35 @@
-import type { GraphQLScalarType } from 'graphql';
-import {
-  GraphQLBoolean,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLString,
-} from 'graphql';
+import { specifiedScalarTypes } from 'graphql';
+
+import { keyMap } from '../utils/ObjMap';
 
 import type { IrisNamedType } from './definition';
 import { IrisTypeDefinition } from './definition';
 
-const liftScalar = <I, O = I>(scalar: GraphQLScalarType<I, O>) =>
-  new IrisTypeDefinition({
-    role: 'data',
-    name: scalar.name,
-    description: scalar.description,
-    variants: [{ name: scalar.name }],
-    scalar,
-  });
+export const IrisScalars = keyMap(
+  specifiedScalarTypes.map(
+    (scalar) =>
+      new IrisTypeDefinition({
+        role: 'data',
+        name: scalar.name,
+        description: scalar.description,
+        variants: [{ name: scalar.name }],
+        scalar,
+      }),
+  ),
+  ({ name }) => name,
+);
 
-export const IrisInt = liftScalar<number>(GraphQLInt);
+export const scalarNames = Object.keys(IrisScalars);
 
-export const IrisFloat = liftScalar<number>(GraphQLFloat);
+export const IrisInt = IrisScalars.Int;
 
-export const IrisString = liftScalar(GraphQLString);
+export const IrisFloat = IrisScalars.Float;
 
-export const IrisBool = liftScalar(GraphQLBoolean);
+export const IrisString = IrisScalars.String;
 
-export const IrisID = liftScalar(GraphQLID);
+export const IrisBool = IrisScalars.Boolean;
 
-export const specifiedScalarTypes: ReadonlyArray<IrisTypeDefinition<'data'>> =
-  Object.freeze([IrisString, IrisInt, IrisFloat, IrisBool, IrisID]);
+export const IrisID = IrisScalars.ID;
 
 export const isSpecifiedScalarType = (type: IrisNamedType): boolean =>
-  specifiedScalarTypes.some(({ name }) => type.name === name);
+  Boolean(IrisScalars[type.name]);

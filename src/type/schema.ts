@@ -22,7 +22,6 @@ import { getDirectiveValues } from '../conversion/values';
 import type { IrisError } from '../error';
 import { inspect, instanceOf } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
-import { keyMap } from '../utils/ObjMap';
 import type { ConfigMap, IrisMaybe, Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
 
@@ -40,7 +39,7 @@ import {
   GraphQLDirective,
   specifiedDirectives,
 } from './directives';
-import { specifiedScalarTypes } from './scalars';
+import { IrisScalars } from './scalars';
 
 /**
  * Test if the given value is a GraphQL schema.
@@ -162,7 +161,7 @@ export function buildASTSchema(
     node: NamedTypeNode | VariantDefinitionNode<R>,
   ): IrisNamedType<R> {
     const name = node.name.value;
-    const type = stdTypeMap[name] ?? typeMap[name];
+    const type = IrisScalars[name] ?? typeMap[name];
 
     if (type === undefined) {
       throw new Error(`Unknown type: "${name}".`);
@@ -266,7 +265,7 @@ export function buildASTSchema(
     const name = def.name.value;
     switch (def.kind) {
       case IrisKind.TYPE_DEFINITION:
-        typeMap[name] = stdTypeMap[name] ?? buildType(def);
+        typeMap[name] = IrisScalars[name] ?? buildType(def);
         break;
       case IrisKind.DIRECTIVE_DEFINITION:
         directiveDefs.push(def);
@@ -284,8 +283,6 @@ export function buildASTSchema(
     assumeValid: options?.assumeValid ?? false,
   });
 }
-
-const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
 
 const getDeprecationReason = (
   node:
