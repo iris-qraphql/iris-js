@@ -389,14 +389,14 @@ describe('Schema Builder', () => {
       }),
     );
 
-    const field3OldArg = rootFields.field3.args[0];
+    const field3OldArg = rootFields.field3.args?.[0];
     expect(field3OldArg).toEqual(
       expect.objectContaining({
         deprecationReason: '',
       }),
     );
 
-    const field4OldArg = rootFields.field4.args[0];
+    const field4OldArg = rootFields.field4.args?.[0];
     expect(field4OldArg).toEqual(
       expect.objectContaining({
         deprecationReason: 'Why not?',

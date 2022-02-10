@@ -26,7 +26,7 @@ function getArgumentValues(
   const argumentNodes = node.arguments ?? [];
   const argNodeMap = keyMap(argumentNodes, (arg) => arg.name.value);
 
-  for (const argDef of def.args) {
+  for (const argDef of def.args ?? []) {
     const name = argDef.name;
     const argType = argDef.type;
     const argumentNode = argNodeMap[name];

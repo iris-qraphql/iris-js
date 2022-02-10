@@ -214,7 +214,7 @@ function validateFields(
     }
 
     // Ensure the arguments are valid
-    for (const arg of field.args) {
+    for (const arg of field.args ?? []) {
       const argName = arg.name;
 
       // Ensure they are named correctly.

@@ -159,19 +159,9 @@ export const isRequiredArgument = (arg: IrisArgument): boolean =>
   !isMaybeType(arg.type) && arg.defaultValue === undefined;
 
 export type IrisField<R extends Role> = IrisEntity & {
-  type: R extends 'data' ? IrisType<'data'> : IrisType;
   astNode?: FieldDefinitionNode<R>;
-} & (R extends 'resolver'
-    ? {
-        args: ReadonlyArray<IrisArgument>;
-      }
-    : {});
-
-export type IrisFieldConfig<R extends Role> = Omit<
-  IrisField<R>,
-  'args' | 'name'
-> & {
-  args?: R extends 'resolver' ? ReadonlyArray<IrisArgument> : never;
+  type: R extends 'data' ? IrisType<'data'> : IrisType;
+  args?: R extends 'data' ? never: ReadonlyArray<IrisArgument>;
 };
 
 export type IrisVariant<R extends Role> = IrisEntity & {
@@ -181,51 +171,14 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   type?: IrisNamedType<R>;
 };
 
-export type IrisVariantConfig<R extends Role> = Omit<
-  IrisVariant<R>,
-  'fields'
-> & {
-  fields?: ObjMap<IrisFieldConfig<R>>;
-  type?: IrisNamedType<R>;
-};
-
 export type IrisTypeConfig<R extends Role> = {
   role: R;
   name: string;
   description?: Maybe<string>;
-  variants: Thunk<ReadonlyArray<IrisVariantConfig<R>>>;
+  variants: Thunk<ReadonlyArray<IrisVariant<R>>>;
   astNode?: Maybe<TypeDefinitionNode<R>>;
   scalar?: R extends 'data' ? GraphQLScalarType<any, any> : undefined;
 };
-
-const buildField = <R extends Role>(
-  { description, args, type, deprecationReason, astNode }: IrisFieldConfig<R>,
-  fieldName: string,
-): IrisField<R> => ({
-  name: assertName(fieldName),
-  description,
-  type,
-  args: args ?? [],
-  deprecationReason,
-  astNode,
-});
-
-const buildVariant = <R extends Role>({
-  name,
-  description,
-  deprecationReason,
-  fields,
-  astNode,
-  type,
-}: IrisVariantConfig<R>): IrisVariant<R> => ({
-  name,
-  description,
-  deprecationReason,
-  fields: fields ? mapValue(fields, buildField) : undefined,
-  type,
-  astNode,
-  toJSON: () => name,
-});
 
 export class IrisTypeDefinition<R extends Role> {
   name: string;
@@ -233,7 +186,7 @@ export class IrisTypeDefinition<R extends Role> {
   astNode: Maybe<TypeDefinitionNode<R>>;
   role: R;
 
-  #thunkVariants: () => ReadonlyArray<IrisVariantConfig<R>>;
+  #thunkVariants: () => ReadonlyArray<IrisVariant<R>>;
   #resolvedVariants?: ReadonlyArray<IrisVariant<R>>;
   #scalar?: GraphQLScalarType;
 
@@ -273,7 +226,7 @@ export class IrisTypeDefinition<R extends Role> {
     if (this.#resolvedVariants) {
       return this.#resolvedVariants;
     }
-    this.#resolvedVariants = this.#thunkVariants().map(buildVariant);
+    this.#resolvedVariants = this.#thunkVariants();
 
     return this.#resolvedVariants;
   };

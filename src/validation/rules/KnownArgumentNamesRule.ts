@@ -31,7 +31,7 @@ export function KnownArgumentNamesRule(context: ValidationContext): ASTVisitor {
 
       if (!argDef && fieldDef && parentType) {
         const argName = argNode.name.value;
-        const knownArgsNames = fieldDef.args.map((arg) => arg.name);
+        const knownArgsNames = (fieldDef.args ?? []).map((arg) => arg.name);
         const suggestions = suggestionList(argName, knownArgsNames);
         context.reportError(
           irisError(

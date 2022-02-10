@@ -139,7 +139,7 @@ export class TypeInfo {
         let argType: unknown;
         const fieldOrDirective = this.getDirective() ?? this.getFieldDef();
         if (fieldOrDirective) {
-          argDef = fieldOrDirective.args.find(
+          argDef = fieldOrDirective.args?.find(
             (arg) => arg.name === node.name.value,
           );
           if (argDef) {

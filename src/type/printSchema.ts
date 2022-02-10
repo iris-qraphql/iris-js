@@ -120,7 +120,7 @@ const printFields = (fs: ReadonlyArray<IrisField<'resolver'>>): string => {
       printDescription(f, '  ', !i) +
       '  ' +
       f.name +
-      printArgs(f.args, '  ') +
+      printArgs(f.args ?? [], '  ') +
       ': ' +
       String(f.type) +
       printDeprecated(f.deprecationReason),

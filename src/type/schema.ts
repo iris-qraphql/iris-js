@@ -26,10 +26,10 @@ import { notNill } from '../utils/type-level';
 import { collectAllReferencedTypes } from './collectAllReferencedTypes';
 import type {
   IrisArgument,
-  IrisFieldConfig,
+  IrisField,
   IrisNamedType,
   IrisType,
-  IrisVariantConfig,
+  IrisVariant,
 } from './definition';
 import { IrisScalars, IrisTypeDefinition, IrisTypeRef } from './definition';
 import {
@@ -174,18 +174,20 @@ export function buildSchema(
 
   const buildField = <R extends Role>(
     field: FieldDefinitionNode<R>,
-  ): IrisFieldConfig<R> =>
+  ): IrisField<R> =>
     ({
+      name: field.name.value,
       type: getWrappedType(field.type),
       description: field.description?.value,
       deprecationReason: getDeprecationReason(field),
       astNode: field,
       args: field.arguments?.map(buildArgument),
-    } as IrisFieldConfig<R>);
+      toJSON: () => field.name.value,
+    } as IrisField<R>);
 
   const buildVariant = <R extends Role>(
     astNode: VariantDefinitionNode<R>,
-  ): IrisVariantConfig<R> => {
+  ): IrisVariant<R> => {
     const name = astNode.name.value;
     const description = astNode.description?.value;
     const deprecationReason = getDeprecationReason(astNode);
