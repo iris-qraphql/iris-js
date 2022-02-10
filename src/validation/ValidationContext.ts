@@ -6,7 +6,6 @@ import type { IrisSchema } from '../type/schema';
 import type { IrisError } from '../error';
 import type { Maybe } from '../utils/type-level';
 
-
 export class SDLValidationContext {
   private _ast: DocumentNode;
   private _onError: (error: IrisError) => void;

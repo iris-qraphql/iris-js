@@ -161,7 +161,7 @@ export const isRequiredArgument = (arg: IrisArgument): boolean =>
 export type IrisField<R extends Role> = IrisEntity & {
   astNode?: FieldDefinitionNode<R>;
   type: R extends 'data' ? IrisType<'data'> : IrisType;
-  args?: R extends 'data' ? never: ReadonlyArray<IrisArgument>;
+  args?: R extends 'data' ? never : ReadonlyArray<IrisArgument>;
 };
 
 export type IrisVariant<R extends Role> = IrisEntity & {

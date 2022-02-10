@@ -1,4 +1,4 @@
-import { getSDLValidationErrors } from '../../utils/harness';
+import { getSDLValidationErrors } from '../../utils/toJSONDeep';
 
 import { UniqueArgumentDefinitionNamesRule } from '../rules/UniqueArgumentDefinitionNamesRule';
 

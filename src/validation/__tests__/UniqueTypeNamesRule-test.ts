@@ -1,6 +1,6 @@
 import type { IrisSchema } from '../../type/schema';
 
-import { getSDLValidationErrors } from '../../utils/harness';
+import { getSDLValidationErrors } from '../../utils/toJSONDeep';
 
 import { UniqueTypeNamesRule } from '../rules/UniqueTypeNamesRule';
 

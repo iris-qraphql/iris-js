@@ -2,7 +2,11 @@ import { OperationTypeNode } from 'graphql';
 
 import type { ASTNode, DirectiveNode } from '../language/ast';
 
-import type { IrisField, IrisTypeDefinition, IrisVariant } from '../type/definition';
+import type {
+  IrisField,
+  IrisTypeDefinition,
+  IrisVariant,
+} from '../type/definition';
 import {
   isDataType,
   isInputType,
