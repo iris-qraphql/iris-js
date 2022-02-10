@@ -26,8 +26,6 @@ export {
   // Visit
   visit,
   visitInParallel,
-  getVisitFn,
-  getEnterLeaveForKind,
   DirectiveLocation,
 } from './language/index';
 

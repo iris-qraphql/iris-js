@@ -7,8 +7,6 @@ export { print } from './printer';
 export {
   visit,
   visitInParallel,
-  getVisitFn,
-  getEnterLeaveForKind,
 } from './visitor';
 export type { ASTVisitor, ASTVisitorKeyMap } from './visitor';
 
