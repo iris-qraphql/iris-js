@@ -1,5 +1,4 @@
-import type { IrisType } from '../../type/definition';
-import { assertDataType } from '../../type/definition';
+import type { IrisNamedType, IrisType } from '../../type/definition';
 import { gqlScalar, sampleTypeRef } from '../../type/make';
 import { buildSchema } from '../../type/schema';
 
@@ -218,8 +217,8 @@ describe('parse simple data variants', () => {
   });
   const leaf = (name: string) => ({ __typename: 'Leaf', name });
 
-  const nodeType = assertDataType(schema.getType('NodeType'));
-  const parseNode = (n: unknown) => serializeWith(n, nodeType);
+  const parseNode = (n: unknown) =>
+    serializeWith(n, schema.getType('NodeType') as IrisNamedType<'data'>);
 
   it("don't accept non data values", () => {
     expect(() => parseNode(['Leaf'])).toThrowErrorMatchingSnapshot();
@@ -291,8 +290,9 @@ describe('circular data types', () => {
   });
   const leaf = (name?: string) => ({ __typename: 'Leaf', name });
 
-  const nodeType = assertDataType(schema.getType('NodeType'));
-  const parseNode = (n: unknown) => serializeWith(n, nodeType);
+  const nodeType = schema.getType('NodeType');
+  const parseNode = (n: unknown) =>
+    serializeWith(n, nodeType as IrisNamedType<'data'>);
 
   it('ignore optional fields variants', () => {
     expect(parseNode('Leaf')).toEqual('Leaf');

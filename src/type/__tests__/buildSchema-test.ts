@@ -1,8 +1,10 @@
+import { printSchema } from '../../printing/printSchema';
 import { dedent } from '../../utils/dedent';
+import type { ObjMap } from '../../utils/ObjMap';
 
-import { assertDataType, assertResolverType, IrisScalars } from '../definition';
+import type { IrisField } from '../definition';
+import { IrisScalars } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
-import { printSchema } from '../printSchema';
 import { buildSchema } from '../schema';
 
 /**
@@ -353,8 +355,9 @@ describe('Schema Builder', () => {
     const schema = buildSchema(sdl);
 
     expect(
-      assertDataType(schema.getType('MyEnum'))
-        .variants()
+      schema
+        .getType('MyEnum')
+        ?.variants()
         .map(({ name, deprecationReason }) => ({ name, deprecationReason })),
     ).toEqual([
       { name: 'VALUE', deprecationReason: undefined },
@@ -363,7 +366,8 @@ describe('Schema Builder', () => {
     ]);
 
     const rootFields =
-      assertResolverType(schema.getType('Query')).variantBy().fields ?? {};
+      schema.getType('Query')?.variantBy().fields ??
+      ({} as ObjMap<IrisField<'resolver'>>);
 
     expect(rootFields.field1).toEqual(
       expect.objectContaining({

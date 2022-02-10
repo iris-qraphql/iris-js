@@ -1,6 +1,6 @@
+import { printSchema } from '../../printing/printSchema';
 import { dedent } from '../../utils/dedent';
 
-import { printSchema } from '../printSchema';
 import { buildSchema } from '../schema';
 
 const cycle = (src: string) =>

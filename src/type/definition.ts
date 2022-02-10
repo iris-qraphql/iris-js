@@ -38,39 +38,14 @@ export type IrisType<R extends Role = Role> =
 export type IrisStrictType = IrisType<'data'>;
 
 export const isInputType = (type: unknown): type is IrisStrictType =>
-  isDataType(type) || (isTypeRef(type) && isInputType(type.ofType));
+  (isTypeDefinition(type) && type.role === 'data') ||
+  (isTypeRef(type) && isInputType(type.ofType));
 
 export const isType = (type: unknown): type is IrisType =>
   isTypeDefinition(type) || isTypeRef(type);
 
-export const isTypeDefinition = (
-  type: unknown,
-): type is IrisTypeDefinition<Role> => instanceOf(type, IrisTypeDefinition);
-
-export const isResolverType = (
-  type: unknown,
-): type is IrisTypeDefinition<'resolver'> =>
-  isTypeDefinition(type) && type.role === 'resolver';
-
-export const isObjectType = (
-  type: unknown,
-): type is IrisTypeDefinition<'resolver'> =>
-  isResolverType(type) && type.isVariantType();
-
-export const isDataType = (type: unknown): type is IrisTypeDefinition<'data'> =>
-  isTypeDefinition(type) && type.role === 'data';
-
-export const assertBy =
-  <T>(kind: string, f: (type: unknown) => type is T) =>
-  (type: unknown): T => {
-    if (!f(type)) {
-      throw new Error(`Expected ${inspect(type)} to be a Iris ${kind} type.`);
-    }
-    return type;
-  };
-
-export const assertResolverType = assertBy('Resolver', isResolverType);
-export const assertDataType = assertBy('Data', isDataType);
+const isTypeDefinition = (type: unknown): type is IrisTypeDefinition<Role> =>
+  instanceOf(type, IrisTypeDefinition);
 
 export class IrisTypeRef<T extends IrisType> {
   readonly ofType: T;

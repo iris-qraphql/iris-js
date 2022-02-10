@@ -5,19 +5,19 @@ import { pluck } from 'ramda';
 import type { Role } from '../language/ast';
 import { print } from '../language/printer';
 
-import type { Maybe } from '../utils/type-level';
-
 import type {
   IrisArgument,
   IrisField,
   IrisNamedType,
   IrisTypeDefinition,
   IrisVariant,
-} from './definition';
-import { isSpecifiedScalarType } from './definition';
-import type { GraphQLDirective } from './directives';
-import { isSpecifiedDirective } from './directives';
-import type { IrisSchema } from './schema';
+} from '../type/definition';
+import { isSpecifiedScalarType } from '../type/definition';
+import type { GraphQLDirective } from '../type/directives';
+import { isSpecifiedDirective } from '../type/directives';
+import type { IrisSchema } from '../type/schema';
+
+import type { Maybe } from '../utils/type-level';
 
 export function printSchema(schema: IrisSchema): string {
   return printFilteredSchema(

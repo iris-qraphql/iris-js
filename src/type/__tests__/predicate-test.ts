@@ -2,17 +2,17 @@ import { all } from 'ramda';
 
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import type { IrisArgument, IrisStrictType, IrisType } from '../definition';
+import type {
+  IrisArgument,
+  IrisNamedType,
+  IrisStrictType,
+  IrisType,
+} from '../definition';
 import {
-  assertDataType,
-  assertResolverType,
   IrisScalars,
-  isDataType,
   isInputType,
   isListType,
-  isObjectType,
   isRequiredArgument,
-  isResolverType,
   isSpecifiedScalarType,
   isType,
   isTypeRef,
@@ -49,10 +49,10 @@ const schema = buildSchema(`
   }
 `);
 
-const ObjectType = assertResolverType(schema.getType('Object'));
-const EnumType = assertDataType(schema.getType('Enum'));
+const ObjectType = schema.getType('Object');
+const EnumType = schema.getType('Enum');
 
-const ScalarType = assertDataType(schema.getType('Scalar'));
+const ScalarType = schema.getType('Scalar');
 const Directive = new GraphQLDirective({
   name: 'Directive',
   locations: [DirectiveLocation.QUERY],
@@ -92,17 +92,9 @@ describe('Type predicates', () => {
     });
 
     it('returns false for custom scalar', () => {
-      expect(isSpecifiedScalarType(ScalarType)).toEqual(false);
-    });
-  });
-
-  describe('isObjectType', () => {
-    it('returns true for object type', () => {
-      check(isObjectType, 'Object').toEqual(true);
-    });
-
-    it('returns false for wrapped object type', () => {
-      check(isObjectType, '[Object]').toEqual(false);
+      expect(
+        isSpecifiedScalarType(ScalarType as IrisNamedType<'data'>),
+      ).toEqual(false);
     });
   });
 
@@ -131,42 +123,6 @@ describe('Type predicates', () => {
       for (const type of resolverTypes.flatMap(withWrappers)) {
         check(isInputType, type).toBe(false);
       }
-    });
-  });
-
-  describe('isDataType', () => {
-    it('returns true for scalar and enum types', () => {
-      expect(isDataType(ScalarType)).toEqual(true);
-      expect(isDataType(EnumType)).toEqual(true);
-    });
-
-    it('returns false for wrapped leaf type', () => {
-      check(isDataType, '[Scalar]').toBe(false);
-    });
-
-    it('returns false for non-leaf type', () => {
-      check(isDataType, 'Object').toEqual(false);
-      check(isDataType, '[Object]').toEqual(false);
-    });
-  });
-
-  describe('isCompositeType', () => {
-    it('returns true for resolver types', () => {
-      for (const type of resolverTypes) {
-        check(isResolverType, type).toBe(true);
-      }
-    });
-
-    it('returns false for wrapped composite type', () => {
-      check(isResolverType, '[Object]').toBe(false);
-    });
-
-    it('returns false for non-composite type', () => {
-      check(isResolverType, 'InputObject').toBe(false);
-    });
-
-    it('returns false for wrapped non-composite type', () => {
-      check(isResolverType, '[InputObject]').toBe(false);
     });
   });
 
