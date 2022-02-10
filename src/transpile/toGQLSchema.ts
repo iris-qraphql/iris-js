@@ -24,8 +24,7 @@ import type {
   IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
-import { isTypeRef } from '../type/definition';
-import { isSpecifiedScalarType } from '../type/scalars';
+import { isSpecifiedScalarType, isTypeRef } from '../type/definition';
 import type { IrisSchema } from '../type/schema';
 
 import { serializeValue } from '../conversion/serialize';

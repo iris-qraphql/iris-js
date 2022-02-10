@@ -1,9 +1,8 @@
 import { dedent } from '../../utils/dedent';
 
-import { assertDataType, assertResolverType } from '../definition';
+import { assertDataType, assertResolverType, IrisScalars } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { printSchema } from '../printSchema';
-import { IrisScalars } from '../scalars';
 import { buildSchema } from '../schema';
 import { validateSchema } from '../validate';
 

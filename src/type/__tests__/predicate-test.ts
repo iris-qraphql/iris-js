@@ -6,12 +6,14 @@ import type { IrisArgument, IrisStrictType, IrisType } from '../definition';
 import {
   assertDataType,
   assertResolverType,
+  IrisScalars,
   isDataType,
   isInputType,
   isListType,
   isObjectType,
   isRequiredArgument,
   isResolverType,
+  isSpecifiedScalarType,
   isType,
   isTypeRef,
 } from '../definition';
@@ -23,7 +25,6 @@ import {
   isSpecifiedDirective,
 } from '../directives';
 import { sampleTypeRef, withWrappers } from '../make';
-import { IrisScalars, isSpecifiedScalarType } from '../scalars';
 import { buildSchema } from '../schema';
 
 const definitions = `

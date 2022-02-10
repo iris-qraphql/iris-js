@@ -1,12 +1,5 @@
 import type { GraphQLScalarType } from 'graphql';
-import {
-  assertName,
-  GraphQLBoolean,
-  GraphQLFloat,
-  GraphQLID,
-  GraphQLInt,
-  GraphQLString,
-} from 'graphql';
+import { assertName, specifiedScalarTypes } from 'graphql';
 import { pluck } from 'ramda';
 
 import type {
@@ -26,28 +19,15 @@ import {
   suggestionList,
 } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
-import { mapValue } from '../utils/ObjMap';
-import type { ConfigMap, Maybe } from '../utils/type-level';
+import { keyMap, mapValue } from '../utils/ObjMap';
+import type { Maybe } from '../utils/type-level';
 
-export const stdScalars: Record<string, GraphQLScalarType> = Object.freeze({
-  String: GraphQLString,
-  Int: GraphQLInt,
-  Float: GraphQLFloat,
-  Bool: GraphQLBoolean,
-  ID: GraphQLID,
-});
+export const stdScalars = keyMap(specifiedScalarTypes, ({ name }) => name);
 
-export const fromConfig = <T extends {}>(
-  obj: Record<string, T>,
-): Record<string, T & { name: string }> =>
-  Object.fromEntries(
-    Object.entries(obj).map(
-      ([name, field]: [string, T]): [string, T & { name: string }] => [
-        name,
-        { ...field, name: assertName(name) },
-      ],
-    ),
-  );
+export const scalarNames = Object.keys(stdScalars);
+
+export const isSpecifiedScalarType = (type: IrisNamedType): boolean =>
+  Boolean(stdScalars[type.name]);
 
 export type IrisNamedType<R extends Role = Role> = IrisTypeDefinition<R>;
 
@@ -191,7 +171,7 @@ export type IrisFieldConfig<R extends Role> = Omit<
   IrisField<R>,
   'args' | 'name'
 > & {
-  args?: R extends 'resolver' ? ConfigMap<IrisArgument> : never;
+  args?: R extends 'resolver' ? ReadonlyArray<IrisArgument> : never;
 };
 
 export type IrisVariant<R extends Role> = IrisEntity & {
@@ -218,10 +198,6 @@ export type IrisTypeConfig<R extends Role> = {
   scalar?: R extends 'data' ? GraphQLScalarType<any, any> : undefined;
 };
 
-export const buildArguments = (
-  args: ConfigMap<IrisArgument>,
-): Array<IrisArgument> => Object.values(fromConfig(args));
-
 const buildField = <R extends Role>(
   { description, args, type, deprecationReason, astNode }: IrisFieldConfig<R>,
   fieldName: string,
@@ -229,7 +205,7 @@ const buildField = <R extends Role>(
   name: assertName(fieldName),
   description,
   type,
-  args: buildArguments(args ?? {}),
+  args: args ?? [],
   deprecationReason,
   astNode,
 });
@@ -340,3 +316,15 @@ const lookupVariant = <V extends { name: string }>(
 
   return variant;
 };
+
+export const IrisScalars = mapValue(
+  stdScalars,
+  (scalar) =>
+    new IrisTypeDefinition({
+      role: 'data',
+      name: scalar.name,
+      description: scalar.description,
+      variants: [{ name: scalar.name }],
+      scalar,
+    }),
+);

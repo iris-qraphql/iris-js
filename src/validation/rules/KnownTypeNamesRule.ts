@@ -5,7 +5,7 @@ import {
 } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { scalarNames } from '../../type/scalars';
+import { scalarNames } from '../../type/definition';
 
 import { irisNodeError } from '../../error';
 import { didYouMean, suggestionList } from '../../utils/legacy';

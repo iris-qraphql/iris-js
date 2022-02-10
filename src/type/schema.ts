@@ -20,7 +20,7 @@ import { valueFromAST } from '../conversion/valueFromAST';
 import { getDirectiveValues } from '../conversion/values';
 import type { IrisError } from '../error';
 import type { ObjMap } from '../utils/ObjMap';
-import type { ConfigMap, IrisMaybe, Maybe } from '../utils/type-level';
+import type { IrisMaybe, Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
 
 import { collectAllReferencedTypes } from './collectAllReferencedTypes';
@@ -31,13 +31,12 @@ import type {
   IrisType,
   IrisVariantConfig,
 } from './definition';
-import { IrisTypeDefinition, IrisTypeRef } from './definition';
+import { IrisScalars, IrisTypeDefinition, IrisTypeRef } from './definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,
   specifiedDirectives,
 } from './directives';
-import { IrisScalars } from './scalars';
 
 class IrisSchema {
   description: Maybe<string>;
@@ -155,26 +154,22 @@ export function buildSchema(
       description: node.description?.value,
       locations: node.locations.map(({ value }) => value as any),
       isRepeatable: node.repeatable,
-      args: buildArgumentMap(node.arguments),
+      args: node.arguments?.map(buildArgument),
       astNode: node,
     });
   }
 
-  function buildArgumentMap(
-    argsNodes: IrisMaybe<ReadonlyArray<ArgumentDefinitionNode>> = [],
-  ): ConfigMap<IrisArgument> {
-    const argConfigMap: ConfigMap<IrisArgument> = {};
-    for (const astNode of argsNodes) {
-      const type: any = getWrappedType(astNode.type);
-      argConfigMap[astNode.name.value] = {
-        type,
-        description: astNode.description?.value,
-        defaultValue: valueFromAST(astNode.defaultValue, type),
-        deprecationReason: getDeprecationReason(astNode),
-        astNode,
-      };
-    }
-    return argConfigMap;
+  function buildArgument(astNode: ArgumentDefinitionNode): IrisArgument {
+    const type: any = getWrappedType(astNode.type);
+    const name = astNode.name.value;
+    return {
+      name,
+      type,
+      description: astNode.description?.value,
+      defaultValue: valueFromAST(astNode.defaultValue, type),
+      deprecationReason: getDeprecationReason(astNode),
+      astNode,
+    };
   }
 
   const buildField = <R extends Role>(
@@ -185,7 +180,7 @@ export function buildSchema(
       description: field.description?.value,
       deprecationReason: getDeprecationReason(field),
       astNode: field,
-      args: field.arguments ? buildArgumentMap(field.arguments) : undefined,
+      args: field.arguments?.map(buildArgument),
     } as IrisFieldConfig<R>);
 
   const buildVariant = <R extends Role>(

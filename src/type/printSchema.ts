@@ -14,9 +14,9 @@ import type {
   IrisTypeDefinition,
   IrisVariant,
 } from './definition';
+import { isSpecifiedScalarType } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isSpecifiedDirective } from './directives';
-import { isSpecifiedScalarType } from './scalars';
 import type { IrisSchema } from './schema';
 
 export function printSchema(schema: IrisSchema): string {
