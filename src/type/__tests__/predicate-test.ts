@@ -6,7 +6,6 @@ import type { IrisArgument, IrisStrictType, IrisType } from '../definition';
 import {
   assertDataType,
   assertResolverType,
-  getNamedType,
   isDataType,
   isInputType,
   isListType,
@@ -23,7 +22,7 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlList, sampleTypeRef, withWrappers } from '../make';
+import { sampleTypeRef, withWrappers } from '../make';
 import { IrisScalars, isSpecifiedScalarType } from '../scalars';
 import { buildSchema } from '../schema';
 
@@ -50,7 +49,6 @@ const schema = buildSchema(`
 `);
 
 const ObjectType = assertResolverType(schema.getType('Object'));
-const UnionType = assertResolverType(schema.getType('Union'));
 const EnumType = assertDataType(schema.getType('Enum'));
 
 const ScalarType = assertDataType(schema.getType('Scalar'));
@@ -64,11 +62,11 @@ const resolverTypes = ['Object', 'Union'];
 
 const typeRef = (exp: string) => sampleTypeRef(exp, definitions);
 
+const check = (f: (_: IrisType) => boolean, exp: string) =>
+  expect(f(typeRef(exp)));
+
 const tautology = (f: (_: IrisType) => boolean, exp: string): void =>
   expect(f(typeRef(exp))).toEqual(true);
-
-const falsum = (f: (_: IrisType) => boolean, exp: string): void =>
-  expect(f(typeRef(exp))).toEqual(false);
 
 describe('Type predicates', () => {
   describe('isType', () => {
@@ -99,21 +97,21 @@ describe('Type predicates', () => {
 
   describe('isObjectType', () => {
     it('returns true for object type', () => {
-      expect(isObjectType(ObjectType)).toEqual(true);
+      check(isObjectType, 'Object').toEqual(true);
     });
 
     it('returns false for wrapped object type', () => {
-      expect(isObjectType(gqlList(ObjectType))).toEqual(false);
+      check(isObjectType, '[Object]').toEqual(false);
     });
   });
 
   describe('isListType', () => {
     it('returns true for a list wrapped type', () => {
-      expect(isListType(gqlList(ObjectType))).toEqual(true);
+      tautology(isListType, '[Object]');
     });
 
     it('returns false for an unwrapped type', () => {
-      expect(isListType(ObjectType)).toEqual(false);
+      check(isListType, 'Object').toBe(false);
     });
 
     it('returns false for a non-list wrapped type', () => {
@@ -123,26 +121,14 @@ describe('Type predicates', () => {
 
   describe('isInputType', () => {
     it('returns true for an data  type', () => {
-      for (const type of dataTypes) {
-        tautology(isInputType, type);
-      }
-    });
-
-    it('returns true for a wrapped data  type', () => {
       for (const type of dataTypes.flatMap(withWrappers)) {
         tautology(isInputType, type);
       }
     });
 
     it('returns false for an output type', () => {
-      for (const type of resolverTypes) {
-        falsum(isInputType, type);
-      }
-    });
-
-    it('returns false for a wrapped output type', () => {
       for (const type of resolverTypes.flatMap(withWrappers)) {
-        falsum(isInputType, type);
+        check(isInputType, type).toBe(false);
       }
     });
   });
@@ -154,34 +140,32 @@ describe('Type predicates', () => {
     });
 
     it('returns false for wrapped leaf type', () => {
-      expect(isDataType(gqlList(ScalarType))).toEqual(false);
+      check(isDataType, '[Scalar]').toBe(false);
     });
 
     it('returns false for non-leaf type', () => {
-      expect(isDataType(ObjectType)).toEqual(false);
-    });
-
-    it('returns false for wrapped non-leaf type', () => {
-      expect(isDataType(gqlList(ObjectType))).toEqual(false);
+      check(isDataType, 'Object').toEqual(false);
+      check(isDataType, '[Object]').toEqual(false);
     });
   });
 
   describe('isCompositeType', () => {
     it('returns true for resolver types', () => {
-      expect(isResolverType(ObjectType)).toEqual(true);
-      expect(isResolverType(UnionType)).toEqual(true);
+      for (const type of resolverTypes) {
+        check(isResolverType, type).toBe(true);
+      }
     });
 
     it('returns false for wrapped composite type', () => {
-      expect(isResolverType(gqlList(ObjectType))).toEqual(false);
+      check(isResolverType, '[Object]').toBe(false);
     });
 
     it('returns false for non-composite type', () => {
-      falsum(isResolverType, 'InputObject');
+      check(isResolverType, 'InputObject').toBe(false);
     });
 
     it('returns false for wrapped non-composite type', () => {
-      falsum(isResolverType, '[InputObject]');
+      check(isResolverType, '[InputObject]').toBe(false);
     });
   });
 
@@ -193,26 +177,6 @@ describe('Type predicates', () => {
 
     it('returns false for unwrapped types', () => {
       expect(isTypeRef(ObjectType)).toEqual(false);
-    });
-  });
-
-  describe('getNamedType', () => {
-    it('returns undefined for no type', () => {
-      expect(getNamedType(undefined)).toEqual(undefined);
-      expect(getNamedType(null)).toEqual(undefined);
-    });
-
-    it('returns self for a unwrapped type', () => {
-      expect(getNamedType(ObjectType)).toEqual(ObjectType);
-    });
-
-    it('unwraps wrapper types', () => {
-      expect(getNamedType(ObjectType)).toEqual(ObjectType);
-      expect(getNamedType(gqlList(ObjectType))).toEqual(ObjectType);
-    });
-
-    it('unwraps deeply wrapper types', () => {
-      expect(getNamedType(gqlList(ObjectType))).toEqual(ObjectType);
     });
   });
 
