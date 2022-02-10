@@ -10,10 +10,7 @@ import { scalarNames } from '../../type/definition';
 import { irisNodeError } from '../../error';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
-import type {
-  SDLValidationContext,
-  ValidationContext,
-} from '../ValidationContext';
+import type { SDLValidationContext } from '../ValidationContext';
 
 /**
  * Known type names
@@ -23,9 +20,7 @@ import type {
  *
  * See https://spec.graphql.org/draft/#sec-Fragment-Spread-Type-Existence
  */
-export function KnownTypeNamesRule(
-  context: ValidationContext | SDLValidationContext,
-): ASTVisitor {
+export function KnownTypeNamesRule(context: SDLValidationContext): ASTVisitor {
   const schema = context.getSchema();
   const existingTypesMap = schema ? schema.typeMap : Object.create(null);
 

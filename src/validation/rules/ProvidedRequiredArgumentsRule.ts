@@ -12,16 +12,13 @@ import { inspect } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 import { keyMap } from '../../utils/ObjMap';
 
-import type {
-  SDLValidationContext,
-  ValidationContext,
-} from '../ValidationContext';
+import type { SDLValidationContext } from '../ValidationContext';
 
 /**
  * @internal
  */
 export function ProvidedRequiredArgumentsOnDirectivesRule(
-  context: ValidationContext | SDLValidationContext,
+  context: SDLValidationContext,
 ): ASTVisitor {
   const requiredArgsMap: ObjMap<ObjMap<IrisArgument | ArgumentDefinitionNode>> =
     Object.create(null);

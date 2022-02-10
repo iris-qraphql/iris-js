@@ -6,50 +6,13 @@ import { specifiedDirectives } from '../../type/directives';
 import { irisError } from '../../error';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
-import type {
-  SDLValidationContext,
-  ValidationContext,
-} from '../ValidationContext';
-
-/**
- * Known argument names
- *
- * A GraphQL field is only valid if all supplied arguments are defined by
- * that field.
- *
- * See https://spec.graphql.org/draft/#sec-Argument-Names
- * See https://spec.graphql.org/draft/#sec-Directives-Are-In-Valid-Locations
- */
-export function KnownArgumentNamesRule(context: ValidationContext): ASTVisitor {
-  return {
-    // eslint-disable-next-line new-cap
-    ...KnownArgumentNamesOnDirectivesRule(context),
-    Argument(argNode) {
-      const argDef = context.getArgument();
-      const fieldDef = context.getFieldDef();
-      const parentType = context.getParentType();
-
-      if (!argDef && fieldDef && parentType) {
-        const argName = argNode.name.value;
-        const knownArgsNames = (fieldDef.args ?? []).map((arg) => arg.name);
-        const suggestions = suggestionList(argName, knownArgsNames);
-        context.reportError(
-          irisError(
-            `Unknown argument "${argName}" on field "${parentType.name}.${fieldDef.name}".` +
-              didYouMean(suggestions),
-            { node: argNode },
-          ),
-        );
-      }
-    },
-  };
-}
+import type { SDLValidationContext } from '../ValidationContext';
 
 /**
  * @internal
  */
 export function KnownArgumentNamesOnDirectivesRule(
-  context: ValidationContext | SDLValidationContext,
+  context: SDLValidationContext,
 ): ASTVisitor {
   const directiveArgs = Object.create(null);
 

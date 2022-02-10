@@ -10,10 +10,7 @@ import { specifiedDirectives } from '../../type/directives';
 import { irisError } from '../../error';
 import { inspect, invariant } from '../../utils/legacy';
 
-import type {
-  SDLValidationContext,
-  ValidationContext,
-} from '../ValidationContext';
+import type { SDLValidationContext } from '../ValidationContext';
 
 /**
  * Known directives
@@ -23,9 +20,7 @@ import type {
  *
  * See https://spec.graphql.org/draft/#sec-Directives-Are-Defined
  */
-export function KnownDirectivesRule(
-  context: ValidationContext | SDLValidationContext,
-): ASTVisitor {
+export function KnownDirectivesRule(context: SDLValidationContext): ASTVisitor {
   const locationsMap = Object.create(null);
 
   const schema = context.getSchema();
