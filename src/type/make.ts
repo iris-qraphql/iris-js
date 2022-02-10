@@ -19,9 +19,6 @@ export const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>
     variants: [],
   });
 
-export const maybe = <T extends IrisType>(ofType: T) =>
-  new IrisTypeRef('MAYBE', ofType);
-
 export const gqlList = <T extends IrisType>(ofType: T) =>
   new IrisTypeRef('LIST', ofType);
 
@@ -38,3 +35,12 @@ export const sampleTypeRef = <R extends Role>(
   const fields = query?.variantBy().fields ?? {};
   return fields.f.type as IrisType<R>;
 };
+
+export const withWrappers = (type: string): Array<string> => [
+  type,
+  `${type}?`,
+  `[${type}]`,
+  `[${type}]?`,
+  `[${type}?]`,
+  `[${type}?]?`,
+];

@@ -2,7 +2,7 @@ import { all } from 'ramda';
 
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import type { IrisArgument, IrisStrictType } from '../definition';
+import type { IrisArgument, IrisStrictType, IrisType } from '../definition';
 import {
   assertDataType,
   assertResolverType,
@@ -15,7 +15,6 @@ import {
   isResolverType,
   isType,
   isTypeRef,
-  unpackMaybe,
 } from '../definition';
 import {
   assertDirective,
@@ -24,11 +23,11 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { gqlList, maybe, sampleTypeRef } from '../make';
+import { gqlList, sampleTypeRef, withWrappers } from '../make';
 import { IrisScalars, isSpecifiedScalarType } from '../scalars';
 import { buildSchema } from '../schema';
 
-const schema = buildSchema(`
+const definitions = `
   data Scalar = Int
 
   data Enum = foo{}
@@ -38,6 +37,10 @@ const schema = buildSchema(`
   resolver Object = {}
 
   resolver Union = Object
+`;
+
+const schema = buildSchema(`
+  ${definitions}
 
   resolver Query = {
     object: Object
@@ -49,24 +52,34 @@ const schema = buildSchema(`
 const ObjectType = assertResolverType(schema.getType('Object'));
 const UnionType = assertResolverType(schema.getType('Union'));
 const EnumType = assertDataType(schema.getType('Enum'));
-const InputObjectType = assertDataType(schema.getType('InputObject'));
+
 const ScalarType = assertDataType(schema.getType('Scalar'));
 const Directive = new GraphQLDirective({
   name: 'Directive',
   locations: [DirectiveLocation.QUERY],
 });
-const IrisString = IrisScalars.String;
+
+const dataTypes = ['String', 'Enum', 'InputObject'];
+const resolverTypes = ['Object', 'Union'];
+
+const typeRef = (exp: string) => sampleTypeRef(exp, definitions);
+
+const tautology = (f: (_: IrisType) => boolean, exp: string): void =>
+  expect(f(typeRef(exp))).toEqual(true);
+
+const falsum = (f: (_: IrisType) => boolean, exp: string): void =>
+  expect(f(typeRef(exp))).toEqual(false);
 
 describe('Type predicates', () => {
   describe('isType', () => {
     it('returns true for unwrapped types', () => {
-      expect(isType(IrisString)).toEqual(true);
-      expect(isType(ObjectType)).toEqual(true);
+      tautology(isType, 'String');
+      tautology(isType, 'Object');
     });
 
     it('returns true for wrapped types', () => {
-      expect(isType(sampleTypeRef('[String]'))).toEqual(true);
-      expect(isType(sampleTypeRef('String?'))).toEqual(true);
+      tautology(isType, '[String]');
+      tautology(isType, 'String?');
     });
 
     it('returns false for random garbage', () => {
@@ -104,46 +117,33 @@ describe('Type predicates', () => {
     });
 
     it('returns false for a non-list wrapped type', () => {
-      expect(isListType(maybe(gqlList(ObjectType)))).toEqual(false);
+      expect(isListType(sampleTypeRef('[Boolean]?'))).toEqual(false);
     });
   });
 
   describe('isInputType', () => {
-    function expectInputType(type: unknown) {
-      expect(isInputType(type)).toEqual(true);
-    }
-
     it('returns true for an data  type', () => {
-      expectInputType(IrisString);
-      expectInputType(EnumType);
-      expectInputType(InputObjectType);
+      for (const type of dataTypes) {
+        tautology(isInputType, type);
+      }
     });
 
     it('returns true for a wrapped data  type', () => {
-      expectInputType(gqlList(IrisString));
-      expectInputType(gqlList(EnumType));
-      expectInputType(gqlList(InputObjectType));
-
-      expectInputType(maybe(IrisString));
-      expectInputType(maybe(EnumType));
-      expectInputType(maybe(InputObjectType));
+      for (const type of dataTypes.flatMap(withWrappers)) {
+        tautology(isInputType, type);
+      }
     });
 
-    function expectNonInputType(type: unknown) {
-      expect(isInputType(type)).toEqual(false);
-    }
-
     it('returns false for an output type', () => {
-      expectNonInputType(ObjectType);
-      expectNonInputType(UnionType);
+      for (const type of resolverTypes) {
+        falsum(isInputType, type);
+      }
     });
 
     it('returns false for a wrapped output type', () => {
-      expectNonInputType(gqlList(ObjectType));
-      expectNonInputType(gqlList(UnionType));
-
-      expectNonInputType(maybe(ObjectType));
-      expectNonInputType(maybe(UnionType));
+      for (const type of resolverTypes.flatMap(withWrappers)) {
+        falsum(isInputType, type);
+      }
     });
   });
 
@@ -167,7 +167,7 @@ describe('Type predicates', () => {
   });
 
   describe('isCompositeType', () => {
-    it('returns true for object, interface, and union types', () => {
+    it('returns true for resolver types', () => {
       expect(isResolverType(ObjectType)).toEqual(true);
       expect(isResolverType(UnionType)).toEqual(true);
     });
@@ -177,35 +177,22 @@ describe('Type predicates', () => {
     });
 
     it('returns false for non-composite type', () => {
-      expect(isResolverType(InputObjectType)).toEqual(false);
+      falsum(isResolverType, 'InputObject');
     });
 
     it('returns false for wrapped non-composite type', () => {
-      expect(isResolverType(gqlList(InputObjectType))).toEqual(false);
+      falsum(isResolverType, '[InputObject]');
     });
   });
 
   describe('isWrappingType', () => {
     it('returns true for list and maybe types', () => {
-      expect(isTypeRef(gqlList(ObjectType))).toEqual(true);
-      expect(isTypeRef(maybe(ObjectType))).toEqual(true);
+      tautology(isTypeRef, '[Object]');
+      tautology(isTypeRef, 'Object?');
     });
 
     it('returns false for unwrapped types', () => {
       expect(isTypeRef(ObjectType)).toEqual(false);
-    });
-  });
-
-  describe('unpackMaybe', () => {
-    it('returns undefined for no type', () => {
-      expect(unpackMaybe(undefined)).toEqual(undefined);
-      expect(unpackMaybe(null)).toEqual(undefined);
-    });
-
-    it('unwraps maybe type', () => {
-      expect(unpackMaybe(maybe(ObjectType))).toEqual(ObjectType);
-      const listOfObj = gqlList(ObjectType);
-      expect(unpackMaybe(maybe(listOfObj))).toEqual(listOfObj);
     });
   });
 
@@ -246,31 +233,30 @@ describe('Type predicates', () => {
 
     it('returns true for required arguments', () => {
       const requiredArg = buildArg({
-        type: IrisString,
+        type: sampleTypeRef('String'),
       });
       expect(isRequiredArgument(requiredArg)).toEqual(true);
     });
 
     it('returns false for optional arguments', () => {
-      const maybeString = maybe(IrisString);
       const optArg1 = buildArg({
-        type: maybeString,
+        type: sampleTypeRef<'data'>('String?'),
       });
       expect(isRequiredArgument(optArg1)).toEqual(false);
 
       const optArg2 = buildArg({
-        type: maybeString,
+        type: sampleTypeRef<'data'>('String?'),
         defaultValue: null,
       });
       expect(isRequiredArgument(optArg2)).toEqual(false);
 
       const optArg3 = buildArg({
-        type: maybe(gqlList(maybeString)),
+        type: sampleTypeRef<'data'>('[String]?'),
       });
       expect(isRequiredArgument(optArg3)).toEqual(false);
 
       const optArg4 = buildArg({
-        type: IrisString,
+        type: sampleTypeRef<'data'>('String?'),
         defaultValue: 'default',
       });
       expect(isRequiredArgument(optArg4)).toEqual(false);

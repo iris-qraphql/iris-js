@@ -2,6 +2,7 @@ import { irisError } from '../../error';
 import { inspect } from '../../utils/legacy';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 
+import { withWrappers } from '../make';
 import type { IrisSchema } from '../schema';
 import { buildSchema } from '../schema';
 import { validateSchema } from '../validate';
@@ -23,15 +24,6 @@ const resolverField = (name: string): IrisSchema =>
       f: BadObject
     }
 `);
-
-const withWrappers = (type: string): Array<string> => [
-  type,
-  `${type}?`,
-  `[${type}]`,
-  `[${type}]?`,
-  `[${type}?]`,
-  `[${type}?]?`,
-];
 
 function schemaWithFieldType(
   kind: 'data' | 'resolver',
