@@ -2,12 +2,7 @@ import { OperationTypeNode } from 'graphql';
 
 import type { ASTNode, DirectiveNode } from '../language/ast';
 
-import type { IrisError } from '../error';
-import { irisNodeError } from '../error';
-import { inspect } from '../utils/legacy';
-import type { Maybe } from '../utils/type-level';
-
-import type { IrisField, IrisTypeDefinition, IrisVariant } from './definition';
+import type { IrisField, IrisTypeDefinition, IrisVariant } from '../type/definition';
 import {
   isDataType,
   isInputType,
@@ -16,9 +11,14 @@ import {
   isResolverType,
   isType,
   isTypeRef,
-} from './definition';
-import { GraphQLDeprecatedDirective, isDirective } from './directives';
-import type { IrisSchema } from './schema';
+} from '../type/definition';
+import { GraphQLDeprecatedDirective, isDirective } from '../type/directives';
+import type { IrisSchema } from '../type/schema';
+
+import type { IrisError } from '../error';
+import { irisNodeError } from '../error';
+import { inspect } from '../utils/legacy';
+import type { Maybe } from '../utils/type-level';
 
 /**
  * Implements the "Type Validation" sub-sections of the specification's

@@ -4,7 +4,6 @@ import { assertDataType, assertResolverType, IrisScalars } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { printSchema } from '../printSchema';
 import { buildSchema } from '../schema';
-import { validateSchema } from '../validate';
 
 /**
  * This function does a full cycle of going from a string with the contents of
@@ -249,18 +248,6 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
-  it("can't build recursive Union", () => {
-    const schema = buildSchema(`
-      resolver Hello = Hello
-
-      resolver Query = {
-        hello: Hello
-      }
-    `);
-    const errors = validateSchema(schema);
-    expect(errors.length).toBeGreaterThan(0);
-  });
-
   it('Custom Scalar', () => {
     const sdl = dedent`
       data CustomScalar = Int
@@ -402,13 +389,6 @@ describe('Schema Builder', () => {
         deprecationReason: 'Why not?',
       }),
     );
-  });
-
-  it('can build invalid schema', () => {
-    // Invalid schema, because it is missing query root type
-    const schema = buildSchema('resolver Mutation');
-    const errors = validateSchema(schema);
-    expect(errors.length).toBeGreaterThan(0);
   });
 
   it('Do not override standard types', () => {

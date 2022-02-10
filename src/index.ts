@@ -10,7 +10,8 @@ import { graphql } from 'graphql';
 import type { ExecutionResult } from 'graphql/execution';
 
 import type { IrisSchema } from './type/schema';
-import { validateSchema } from './type/validate';
+
+import { validateSchema } from './validation/validate-schema';
 
 import { toGQLSchema } from './transpile/toGQLSchema';
 
