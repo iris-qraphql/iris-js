@@ -1,3 +1,4 @@
+import { IncludeOnlyVariantTypes } from './rules/IncludeOnlyVariantTypes';
 import { KnownArgumentNamesOnDirectivesRule } from './rules/KnownArgumentNamesRule';
 import { KnownDirectivesRule } from './rules/KnownDirectivesRule';
 import { KnownTypeNamesRule } from './rules/KnownTypeNamesRule';
@@ -27,4 +28,6 @@ export const specifiedSDLRules: ReadonlyArray<SDLValidationRule> =
     UniqueArgumentNamesRule,
     UniqueInputFieldNamesRule,
     ProvidedRequiredArgumentsOnDirectivesRule,
+    // IRIS
+    IncludeOnlyVariantTypes,
   ]);

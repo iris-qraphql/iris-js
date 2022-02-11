@@ -46,18 +46,6 @@ const snapshot = (schema: IrisSchema) =>
   expect(toJSONDeep(validateSchema(schema))).toMatchSnapshot();
 
 describe('basic Cases', () => {
-  it("can't build recursive Union", () => {
-    const schema = buildSchema(`
-      resolver Hello = Hello
-
-      resolver Query = {
-        hello: Hello
-      }
-    `);
-    const errors = validateSchema(schema);
-    expect(errors.length).toBeGreaterThan(0);
-  });
-
   it('can build invalid schema', () => {
     // Invalid schema, because it is missing query root type
     const schema = buildSchema('resolver Mutation');
@@ -193,43 +181,7 @@ describe('Type System: Fields args must be properly named', () => {
     `);
       expectJSONEqual(schema, []);
     });
-
-    it('rejects a Union type with non-Object members types', () => {
-      const schema = buildSchema(`
-      resolver Query = {
-        test: BadUnion
-      }
-
-      resolver TypeA = {
-        field: String
-      }
-
-      resolver TypeB = {
-        field: String
-      }
-
-      resolver BadUnion
-        = TypeA
-        | String
-        | TypeB
-        | Int
-    `);
-
-      expectJSONEqual(schema, [
-        {
-          message:
-            'Union type BadUnion can only include Object types, it cannot include String.',
-          locations: [{ line: 16, column: 11 }],
-        },
-        {
-          message:
-            'Union type BadUnion can only include Object types, it cannot include Int.',
-          locations: [{ line: 18, column: 11 }],
-        },
-      ]);
-    });
   });
-
   describe('Type System: Input Objects must have fields', () => {
     it('accepts an Input Object type with fields', () => {
       const schema = buildSchema(`

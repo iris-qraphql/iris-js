@@ -5,12 +5,7 @@ import type {
   IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
-import {
-  isInputType,
-  isRequiredArgument,
-  isType,
-  isTypeRef,
-} from '../type/definition';
+import { isInputType, isRequiredArgument, isType } from '../type/definition';
 import { GraphQLDeprecatedDirective, isDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
 
@@ -171,7 +166,6 @@ const validateResolverType = (
       Object.values(variants[0]?.fields ?? {}),
     );
   }
-  return validateUnionMembers(type.name, context, variants);
 };
 
 function validateFields(
@@ -216,41 +210,6 @@ function validateFields(
       }
     }
   }
-}
-
-function validateUnionMembers(
-  typeName: string,
-  context: SchemaValidationContext,
-  variants: ReadonlyArray<IrisVariant<'resolver'>>,
-): void {
-  const listedMembers: Record<string, boolean> = {};
-
-  variants.forEach(({ name, astNode, type }) => {
-    if (listedMembers[name]) {
-      return context.reportError(
-        `Union type ${typeName} can only include type ${name} once.`,
-        astNode?.name,
-      );
-    }
-
-    if (!type) {
-      // variants are valid records
-      return;
-    }
-
-    listedMembers[name] = true;
-    if (
-      !type?.isVariantType?.() ||
-      type.role !== 'resolver' ||
-      isTypeRef(type)
-    ) {
-      context.reportError(
-        `Union type ${typeName} can only include Object types, ` +
-          `it cannot include ${inspect(type)}.`,
-        astNode?.name,
-      );
-    }
-  });
 }
 
 const validateDataType = (

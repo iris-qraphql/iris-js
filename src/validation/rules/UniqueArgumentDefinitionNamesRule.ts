@@ -4,7 +4,6 @@ import type {
   ArgumentDefinitionNode,
   FieldDefinitionNode,
   NameNode,
-  Role,
 } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
@@ -31,7 +30,7 @@ export function UniqueArgumentDefinitionNamesRule(
 
   function checkArgUniquenessPerField(typeNode: {
     readonly name: NameNode;
-    readonly fields?: ReadonlyArray<FieldDefinitionNode<Role>>;
+    readonly fields?: ReadonlyArray<FieldDefinitionNode>;
   }) {
     const typeName = typeNode.name.value;
     const fieldNodes = typeNode.fields ?? [];

@@ -45,11 +45,11 @@ export type ASTNode =
   | DirectiveNode
   | NamedTypeNode
   | ListTypeNode
-  | FieldDefinitionNode<Role>
+  | FieldDefinitionNode
   | ArgumentDefinitionNode
   | TypeDefinitionNode
   | DirectiveDefinitionNode
-  | VariantDefinitionNode<Role>
+  | VariantDefinitionNode
   | MaybeTypeNode;
 
 /**
@@ -181,7 +181,7 @@ export type ArgumentsDefinitionNode<R extends Role> = R extends 'resolver'
   ? ReadonlyArray<ArgumentDefinitionNode>
   : undefined;
 
-export type FieldDefinitionNode<R extends Role> = {
+export type FieldDefinitionNode<R extends Role = Role> = {
   readonly kind: IrisKind.FIELD_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
@@ -191,7 +191,7 @@ export type FieldDefinitionNode<R extends Role> = {
   readonly arguments?: ArgumentsDefinitionNode<R>;
 };
 
-export type VariantDefinitionNode<R extends Role> = {
+export type VariantDefinitionNode<R extends Role = Role> = {
   readonly kind: IrisKind.VARIANT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
