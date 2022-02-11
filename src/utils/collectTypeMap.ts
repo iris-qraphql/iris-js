@@ -1,9 +1,13 @@
-import type { ObjMap } from '../utils/ObjMap';
+import type {
+  IrisType,
+  IrisTypeDefinition,
+  IrisVariant,
+} from '../type/definition';
+import { unwrapType } from '../type/definition';
+import type { GraphQLDirective } from '../type/directives';
+import { isDirective } from '../type/directives';
 
-import type { IrisType, IrisTypeDefinition, IrisVariant } from './definition';
-import { unwrapType } from './definition';
-import type { GraphQLDirective } from './directives';
-import { isDirective } from './directives';
+import type { ObjMap } from './ObjMap';
 
 const collectAllReferencedTypes = (
   types: ReadonlyArray<IrisTypeDefinition>,
@@ -68,7 +72,7 @@ const exploreVariant = (
 
 export type TypeMap = ObjMap<IrisTypeDefinition>;
 
-export const buildTypeMap = (
+export const collectTypeMap = (
   types: ReadonlyArray<IrisTypeDefinition>,
   directives: ReadonlyArray<GraphQLDirective>,
 ) => {

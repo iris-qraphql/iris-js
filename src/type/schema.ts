@@ -19,11 +19,11 @@ import { validateSDL } from '../validation/validate';
 import { valueFromAST } from '../conversion/valueFromAST';
 import { getDirectiveValues } from '../conversion/values';
 import type { IrisError } from '../error';
+import type { TypeMap } from '../utils/collectTypeMap';
+import { collectTypeMap } from '../utils/collectTypeMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
 
-import type { TypeMap } from './collectAllReferencedTypes';
-import { buildTypeMap } from './collectAllReferencedTypes';
 import type {
   IrisArgument,
   IrisField,
@@ -66,7 +66,7 @@ class IrisSchema {
       ...specifiedDirectives,
     ]);
 
-    this.typeMap = buildTypeMap(
+    this.typeMap = collectTypeMap(
       [query, mutation, subscription, ...types].filter(notNill),
       this.directives,
     );
