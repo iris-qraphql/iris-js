@@ -3,8 +3,8 @@ import { identity } from 'ramda';
 import { parseValue } from '../../language/parser';
 
 import type { IrisType } from '../../type/definition';
-import { gqlScalar, sampleTypeRef } from '../../type/make';
 
+import { gqlScalar, sampleTypeRef } from '../../utils/generators';
 import type { ObjMap } from '../../utils/ObjMap';
 
 import { valueFromAST } from '../valueFromAST';

@@ -2,6 +2,8 @@ import { all } from 'ramda';
 
 import { DirectiveLocation } from '../../language/directiveLocation';
 
+import { sampleTypeRef, withWrappers } from '../../utils/generators';
+
 import type { IrisArgument, IrisType, IrisTypeDefinition } from '../definition';
 import {
   IrisScalars,
@@ -18,7 +20,6 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { sampleTypeRef, withWrappers } from '../make';
 import { buildSchema } from '../schema';
 
 const definitions = `

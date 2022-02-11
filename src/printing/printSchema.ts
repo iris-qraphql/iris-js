@@ -17,20 +17,10 @@ import type { Maybe } from '../utils/type-level';
 import { print } from './printer';
 
 export function printSchema(schema: IrisSchema): string {
-  return printFilteredSchema(
-    schema,
-    (n) => !isSpecifiedDirective(n),
+  const directives = schema.directives.filter((n) => !isSpecifiedDirective(n));
+  const types = Object.values(schema.typeMap).filter(
     (t) => !isSpecifiedScalarType(t),
   );
-}
-
-function printFilteredSchema(
-  schema: IrisSchema,
-  directiveFilter: (type: GraphQLDirective) => boolean,
-  typeFilter: (type: IrisTypeDefinition) => boolean,
-): string {
-  const directives = schema.directives.filter(directiveFilter);
-  const types = Object.values(schema.typeMap).filter(typeFilter);
 
   return [
     ...directives.map((directive) => printDirective(directive)),
@@ -40,7 +30,7 @@ function printFilteredSchema(
     .join('\n\n');
 }
 
-export function printType(type: IrisTypeDefinition): string {
+function printType(type: IrisTypeDefinition): string {
   const variants = type.variants();
   const start = printDescription(type) + `${type.role} ${type.name}`;
 

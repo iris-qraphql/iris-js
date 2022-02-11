@@ -1,6 +1,7 @@
 import type { IrisType, IrisTypeDefinition } from '../../type/definition';
-import { sampleTypeRef } from '../../type/make';
 import { buildSchema } from '../../type/schema';
+
+import { sampleTypeRef } from '../../utils/generators';
 
 import { serializeValue } from '../serialize';
 

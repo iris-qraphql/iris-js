@@ -1,5 +1,5 @@
 import type { ParseOptions, Source } from 'graphql';
-import { uniqBy } from 'ramda';
+import { prop, uniqBy } from 'ramda';
 
 import type {
   ArgumentDefinitionNode,
@@ -19,11 +19,11 @@ import { validateSDL } from '../validation/validate';
 import { valueFromAST } from '../conversion/valueFromAST';
 import { getDirectiveValues } from '../conversion/values';
 import type { IrisError } from '../error';
-import type { ObjMap } from '../utils/ObjMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
 
-import { collectAllReferencedTypes } from './collectAllReferencedTypes';
+import type { TypeMap } from './collectAllReferencedTypes';
+import { buildTypeMap } from './collectAllReferencedTypes';
 import type {
   IrisArgument,
   IrisField,
@@ -49,44 +49,27 @@ class IrisSchema {
   // Used as a cache for validateSchema().
   __validationErrors: Maybe<ReadonlyArray<IrisError>>;
 
-  constructor(config: Readonly<IrisSchemaConfig>) {
-    this.description = config.description;
-    this.query = config.query ?? undefined;
-    this.mutation = config.mutation ?? undefined;
-    this.subscription = config.subscription ?? undefined;
-    this.directives = uniqBy(
-      ({ name }) => name,
-      [...(config.directives ?? []), ...specifiedDirectives],
+  constructor({
+    description,
+    query,
+    mutation,
+    subscription,
+    types = [],
+    directives = [],
+  }: Readonly<IrisSchemaConfig>) {
+    this.description = description;
+    this.query = query;
+    this.mutation = mutation;
+    this.subscription = subscription;
+    this.directives = uniqBy(prop('name'), [
+      ...directives,
+      ...specifiedDirectives,
+    ]);
+
+    this.typeMap = buildTypeMap(
+      [query, mutation, subscription, ...types].filter(notNill),
+      this.directives,
     );
-
-    const types: Array<IrisTypeDefinition> = [
-      this.query,
-      this.mutation,
-      this.subscription,
-      ...(config.types ?? []),
-    ].filter(notNill);
-
-    const typeMap: TypeMap = {};
-
-    collectAllReferencedTypes(types, this.directives).forEach((namedType) => {
-      const { name } = namedType;
-
-      if (!name) {
-        throw new Error(
-          'One of the provided types for building the Schema is missing a name.',
-        );
-      }
-
-      if (typeMap[name] !== undefined) {
-        throw new Error(
-          `Iris Schema must contain uniquely named types but contains multiple types named "${name}".`,
-        );
-      }
-
-      typeMap[name] = namedType;
-    });
-
-    this.typeMap = typeMap;
   }
 
   get [Symbol.toStringTag]() {
@@ -99,15 +82,13 @@ class IrisSchema {
     this.directives.find((directive) => directive.name === name);
 }
 
-type TypeMap = ObjMap<IrisTypeDefinition>;
-
 export interface IrisSchemaConfig {
   description?: Maybe<string>;
-  query?: Maybe<IrisTypeDefinition<'resolver'>>;
-  mutation?: Maybe<IrisTypeDefinition<'resolver'>>;
-  subscription?: Maybe<IrisTypeDefinition<'resolver'>>;
-  types?: Maybe<ReadonlyArray<IrisTypeDefinition>>;
-  directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
+  query?: IrisTypeDefinition<'resolver'>;
+  mutation?: IrisTypeDefinition<'resolver'>;
+  subscription?: IrisTypeDefinition<'resolver'>;
+  types?: ReadonlyArray<IrisTypeDefinition>;
+  directives?: ReadonlyArray<GraphQLDirective>;
 }
 
 export function buildSchema(

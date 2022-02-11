@@ -1,9 +1,11 @@
+import type { ObjMap } from '../utils/ObjMap';
+
 import type { IrisType, IrisTypeDefinition, IrisVariant } from './definition';
 import { unwrapType } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective } from './directives';
 
-export const collectAllReferencedTypes = (
+const collectAllReferencedTypes = (
   types: ReadonlyArray<IrisTypeDefinition>,
   directives: ReadonlyArray<GraphQLDirective>,
 ): Set<IrisTypeDefinition> => {
@@ -62,4 +64,33 @@ const exploreVariant = (
       field.args?.forEach?.((arg) => collectReferencedTypes(arg.type, typeSet));
     }
   });
+};
+
+export type TypeMap = ObjMap<IrisTypeDefinition>;
+
+export const buildTypeMap = (
+  types: ReadonlyArray<IrisTypeDefinition>,
+  directives: ReadonlyArray<GraphQLDirective>,
+) => {
+  const typeMap: TypeMap = {};
+
+  collectAllReferencedTypes(types, directives).forEach((namedType) => {
+    const { name } = namedType;
+
+    if (!name) {
+      throw new Error(
+        'One of the provided types for building the Schema is missing a name.',
+      );
+    }
+
+    if (typeMap[name] !== undefined) {
+      throw new Error(
+        `Iris Schema must contain uniquely named types but contains multiple types named "${name}".`,
+      );
+    }
+
+    typeMap[name] = namedType;
+  });
+
+  return typeMap;
 };
