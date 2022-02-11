@@ -123,8 +123,6 @@ function validateDirectives(context: SchemaValidationContext): void {
   }
 }
 
-
-
 function validateTypes(ctx: SchemaValidationContext): void {
   Object.values(ctx.schema.typeMap).forEach((type) => {
     switch (type.role) {
