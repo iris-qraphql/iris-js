@@ -16,17 +16,8 @@ import { validateSchema } from './validation/validate-schema';
 import { toGQLSchema } from './transpile/toGQLSchema';
 
 export { version, versionInfo } from './version';
-
-export {
-  parse,
-  parseConstValue,
-  parseType,
-  // Print
-  print,
-  // Visit
-  visit,
-  visitInParallel,
-} from './language/index';
+export { parse } from './language/parser';
+export { print } from './printing/printer';
 
 export type IrisArgs = Omit<GraphQLArgs, 'schema'> & {
   schema: IrisSchema;
