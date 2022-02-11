@@ -13,7 +13,7 @@ import type { IrisSchema } from './type/schema';
 
 import { validateSchema } from './validation/validate-schema';
 
-import { toGQLSchema } from './transpile/toGQLSchema';
+import { toGQLSchema } from './transpiling/toGQLSchema';
 
 export { version, versionInfo } from './version';
 export { parse } from './language/parser';
