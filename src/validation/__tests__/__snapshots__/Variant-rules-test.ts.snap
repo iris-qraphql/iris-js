@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`VariantType Rules can't build recursive Union 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 22,
+        "line": 2,
+      },
+    ],
+    "message": "resolver Hello can only include resolver variantTypes, it cannot include resolver Hello.",
+  },
+]
+`;
+
+exports[`VariantType Rules rejects a Union type with non-Object members types 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 11,
+        "line": 16,
+      },
+    ],
+    "message": "resolver BadUnion can only include resolver variantTypes, it cannot include data String.",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 11,
+        "line": 18,
+      },
+    ],
+    "message": "resolver BadUnion can only include resolver variantTypes, it cannot include data Int.",
+  },
+]
+`;

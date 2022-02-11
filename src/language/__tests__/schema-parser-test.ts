@@ -152,4 +152,29 @@ describe('Schema Parser', () => {
       locations: [{ line: 3, column: 14 }],
     });
   });
+
+  describe('reject reserved names', () => {
+    it('rejects an Enum type with incorrectly named values', () => {
+      expectSyntaxError(`
+        data SomeEnum 
+          = __badName {}
+        `).toMatchSnapshot();
+    });
+
+    it('rejects field arg with invalid names', () => {
+      expectSyntaxError(`
+        resolver SomeObject = {
+          badField(__badName: String): String
+        }
+      `).toMatchSnapshot();
+    });
+
+    it('rejects an Object type with incorrectly named fields', () => {
+      expectSyntaxError(`
+        resolver SomeObject = {
+          __badName: String
+        }
+      `).toMatchSnapshot();
+    });
+  });
 });

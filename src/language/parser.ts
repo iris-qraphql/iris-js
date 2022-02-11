@@ -143,6 +143,15 @@ export class Parser {
    */
   parseName(): NameNode {
     const token = this.expectToken(TokenKind.NAME);
+
+    if (token.value.startsWith('__')) {
+      throw syntaxError(
+        this._lexer.source,
+        this._lexer.token.start,
+        `Name "${token.value}" must not begin with "__", which is reserved by GraphQL introspection.`,
+      );
+    }
+
     return this.node<NameNode>(token, {
       kind: Kind.NAME,
       value: token.value,

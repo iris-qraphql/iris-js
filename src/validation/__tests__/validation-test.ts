@@ -42,22 +42,7 @@ function schemaWithFieldType(
 const expectJSONEqual = (schema: IrisSchema, value: unknown) =>
   expect(toJSONDeep(validateSchema(schema))).toEqual(value);
 
-const snapshot = (schema: IrisSchema) =>
-  expect(toJSONDeep(validateSchema(schema))).toMatchSnapshot();
-
 describe('basic Cases', () => {
-  it("can't build recursive Union", () => {
-    const schema = buildSchema(`
-      resolver Hello = Hello
-
-      resolver Query = {
-        hello: Hello
-      }
-    `);
-    const errors = validateSchema(schema);
-    expect(errors.length).toBeGreaterThan(0);
-  });
-
   it('can build invalid schema', () => {
     // Invalid schema, because it is missing query root type
     const schema = buildSchema('resolver Mutation');
@@ -144,12 +129,6 @@ describe('Type System: Objects must have fields', () => {
     `);
     expectJSONEqual(schema, []);
   });
-
-  it('rejects an Object type with incorrectly named fields', () => {
-    snapshot(
-      schemaWithFieldType('resolver', 'SomeObject', '{ __badName: String}'),
-    );
-  });
 });
 
 describe('Type System: Fields args must be properly named', () => {
@@ -160,16 +139,6 @@ describe('Type System: Fields args must be properly named', () => {
       '{ goodField(goodArg: String): String }',
     );
     expectJSONEqual(schema, []);
-  });
-
-  it('rejects field arg with invalid names', () => {
-    snapshot(
-      schemaWithFieldType(
-        'resolver',
-        'SomeObject',
-        '{ badField(__badName: String): String}',
-      ),
-    );
   });
 
   describe('Type System: Union types must be valid', () => {
@@ -193,43 +162,7 @@ describe('Type System: Fields args must be properly named', () => {
     `);
       expectJSONEqual(schema, []);
     });
-
-    it('rejects a Union type with non-Object members types', () => {
-      const schema = buildSchema(`
-      resolver Query = {
-        test: BadUnion
-      }
-
-      resolver TypeA = {
-        field: String
-      }
-
-      resolver TypeB = {
-        field: String
-      }
-
-      resolver BadUnion
-        = TypeA
-        | String
-        | TypeB
-        | Int
-    `);
-
-      expectJSONEqual(schema, [
-        {
-          message:
-            'Union type BadUnion can only include Object types, it cannot include String.',
-          locations: [{ line: 16, column: 11 }],
-        },
-        {
-          message:
-            'Union type BadUnion can only include Object types, it cannot include Int.',
-          locations: [{ line: 18, column: 11 }],
-        },
-      ]);
-    });
   });
-
   describe('Type System: Input Objects must have fields', () => {
     it('accepts an Input Object type with fields', () => {
       const schema = buildSchema(`
@@ -322,12 +255,6 @@ describe('Type System: Fields args must be properly named', () => {
           locations: [{ line: 14, column: 19 }],
         },
       ]);
-    });
-  });
-
-  describe('Type System: Enum types must be well defined', () => {
-    it('rejects an Enum type with incorrectly named values', () => {
-      snapshot(schemaWithFieldType('data', 'SomeEnum', '__badName {}'));
     });
   });
 

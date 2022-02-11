@@ -230,10 +230,7 @@ export function buildSchema(
 }
 
 const getDeprecationReason = (
-  node:
-    | FieldDefinitionNode<Role>
-    | ArgumentDefinitionNode
-    | VariantDefinitionNode<Role>,
+  node: FieldDefinitionNode | ArgumentDefinitionNode | VariantDefinitionNode,
 ): Maybe<string> =>
   getDirectiveValues(GraphQLDeprecatedDirective, node)?.reason as string;
 
