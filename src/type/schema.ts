@@ -30,11 +30,7 @@ import type {
   IrisType,
   IrisVariant,
 } from './definition';
-import {
-  IrisScalars,
-  IrisTypeDefinition,
-  IrisTypeRef,
-} from './definition';
+import { IrisScalars, IrisTypeDefinition, IrisTypeRef } from './definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,

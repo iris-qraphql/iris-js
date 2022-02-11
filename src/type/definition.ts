@@ -33,9 +33,7 @@ export type IrisType<R extends Role = Role> =
   | IrisTypeDefinition<R>
   | IrisTypeRef<IrisType<R>>;
 
-export type IrisStrictType = IrisType<'data'>;
-
-export const isInputType = (type: unknown): type is IrisStrictType =>
+export const isInputType = (type: unknown): type is IrisType<'data'> =>
   (isTypeDefinition(type) && type.role === 'data') ||
   (isTypeRef(type) && isInputType(type.ofType));
 
@@ -94,7 +92,9 @@ export const unpackMaybe = (type: Maybe<IrisType>): IrisType | undefined => {
 };
 
 export function getNamedType(type: undefined | null): void;
-export function getNamedType(type: IrisStrictType): IrisTypeDefinition<'data'>;
+export function getNamedType(
+  type: IrisType<'data'>,
+): IrisTypeDefinition<'data'>;
 export function getNamedType(type: IrisType): IrisTypeDefinition;
 export function getNamedType(
   type: Maybe<IrisType>,
@@ -127,7 +127,7 @@ export const resolveThunk = <T>(thunk: Thunk<T>): T =>
   isThunk(thunk) ? thunk() : thunk;
 
 export type IrisArgument = IrisEntity & {
-  type: IrisStrictType;
+  type: IrisType<'data'>;
   defaultValue?: unknown;
   astNode?: ArgumentDefinitionNode;
 };
@@ -148,7 +148,7 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   type?: IrisTypeDefinition<R>;
 };
 
-export type IrisTypeConfig<R extends Role> = {
+type IrisTypeConfig<R extends Role> = {
   role: R;
   name: string;
   description?: Maybe<string>;

@@ -2,12 +2,7 @@ import { all } from 'ramda';
 
 import { DirectiveLocation } from '../../language/directiveLocation';
 
-import type {
-  IrisArgument,
-  IrisStrictType,
-  IrisType,
-  IrisTypeDefinition,
-} from '../definition';
+import type { IrisArgument, IrisType, IrisTypeDefinition } from '../definition';
 import {
   IrisScalars,
   isInputType,
@@ -139,7 +134,7 @@ describe('Type predicates', () => {
 
   describe('isRequiredArgument', () => {
     function buildArg(config: {
-      type: IrisStrictType;
+      type: IrisType<'data'>;
       defaultValue?: unknown;
     }): IrisArgument {
       return {

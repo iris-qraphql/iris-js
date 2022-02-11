@@ -2,7 +2,7 @@ import { isNil } from 'ramda';
 
 import type {
   IrisField,
-  IrisStrictType,
+  IrisType,
   IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
@@ -20,7 +20,7 @@ type JSON = unknown;
 
 type Serializer<T> = (value: unknown, type: T) => Maybe<JSON>;
 
-export const serializeValue: Serializer<IrisStrictType> = (value, type) => {
+export const serializeValue: Serializer<IrisType<'data'>> = (value, type) => {
   if (isTypeRef(type)) {
     switch (type.kind) {
       case 'MAYBE':
@@ -34,7 +34,7 @@ export const serializeValue: Serializer<IrisStrictType> = (value, type) => {
   return parseDataType(value, type);
 };
 
-const serializeList: Serializer<IrisStrictType> = (value, type) => {
+const serializeList: Serializer<IrisType<'data'>> = (value, type) => {
   if (!isIterableObject(value)) {
     throw cannotRepresent(value, `[${type}]`);
   }

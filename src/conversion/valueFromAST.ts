@@ -2,7 +2,7 @@ import { Kind } from 'graphql';
 
 import type { ObjectValueNode, ValueNode } from '../language/ast';
 
-import type { IrisStrictType, IrisVariant } from '../type/definition';
+import type { IrisType, IrisVariant } from '../type/definition';
 import { isMaybeType, isTypeRef } from '../type/definition';
 
 import type { ObjMap } from '../utils/ObjMap';
@@ -31,7 +31,7 @@ import type { Maybe } from '../utils/type-level';
  */
 export function valueFromAST(
   valueNode: Maybe<ValueNode>,
-  type: IrisStrictType,
+  type: IrisType<'data'>,
   variables?: Maybe<ObjMap<unknown>>,
 ): unknown {
   if (!valueNode) {
