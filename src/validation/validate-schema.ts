@@ -2,7 +2,6 @@ import type { ASTNode, DirectiveNode } from '../language/ast';
 
 import type {
   IrisField,
-  IrisNamedType,
   IrisTypeDefinition,
   IrisVariant,
 } from '../type/definition';
@@ -150,9 +149,12 @@ function validateTypes(ctx: SchemaValidationContext): void {
   Object.values(ctx.schema.typeMap).forEach((type) => {
     switch (type.role) {
       case 'resolver':
-        return validateResolverType(ctx, type as IrisNamedType<'resolver'>);
+        return validateResolverType(
+          ctx,
+          type as IrisTypeDefinition<'resolver'>,
+        );
       case 'data':
-        return validateDataType(ctx, type as IrisNamedType<'data'>);
+        return validateDataType(ctx, type as IrisTypeDefinition<'data'>);
     }
   });
 }

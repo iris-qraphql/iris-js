@@ -27,11 +27,14 @@ import { collectAllReferencedTypes } from './collectAllReferencedTypes';
 import type {
   IrisArgument,
   IrisField,
-  IrisNamedType,
   IrisType,
   IrisVariant,
 } from './definition';
-import { IrisScalars, IrisTypeDefinition, IrisTypeRef } from './definition';
+import {
+  IrisScalars,
+  IrisTypeDefinition,
+  IrisTypeRef,
+} from './definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,
@@ -60,7 +63,7 @@ class IrisSchema {
       [...(config.directives ?? []), ...specifiedDirectives],
     );
 
-    const types: Array<IrisNamedType> = [
+    const types: Array<IrisTypeDefinition> = [
       this.query,
       this.mutation,
       this.subscription,
@@ -94,20 +97,20 @@ class IrisSchema {
     return 'IrisSchema';
   }
 
-  getType = (name: string): IrisMaybe<IrisNamedType> => this.typeMap[name];
+  getType = (name: string): IrisMaybe<IrisTypeDefinition> => this.typeMap[name];
 
   getDirective = (name: string): Maybe<GraphQLDirective> =>
     this.directives.find((directive) => directive.name === name);
 }
 
-type TypeMap = ObjMap<IrisNamedType>;
+type TypeMap = ObjMap<IrisTypeDefinition>;
 
 export interface IrisSchemaConfig {
   description?: Maybe<string>;
   query?: Maybe<IrisTypeDefinition<'resolver'>>;
   mutation?: Maybe<IrisTypeDefinition<'resolver'>>;
   subscription?: Maybe<IrisTypeDefinition<'resolver'>>;
-  types?: Maybe<ReadonlyArray<IrisNamedType>>;
+  types?: Maybe<ReadonlyArray<IrisTypeDefinition>>;
   directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
 }
 
@@ -123,11 +126,11 @@ export function buildSchema(
   }
 
   const directiveDefs: Array<DirectiveDefinitionNode> = [];
-  const typeMap: Record<string, IrisNamedType> = {};
+  const typeMap: Record<string, IrisTypeDefinition> = {};
 
   function getNamedType<R extends Role>(
     node: NamedTypeNode | VariantDefinitionNode<R>,
-  ): IrisNamedType<R> {
+  ): IrisTypeDefinition<R> {
     const name = node.name.value;
     const type = IrisScalars[name] ?? typeMap[name];
 
@@ -135,7 +138,7 @@ export function buildSchema(
       throw new Error(`Unknown type: "${name}".`);
     }
 
-    return type as IrisNamedType<R>;
+    return type as IrisTypeDefinition<R>;
   }
 
   function getWrappedType(node: TypeNode): IrisType {

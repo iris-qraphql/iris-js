@@ -26,13 +26,11 @@ export const stdScalars = keyMap(specifiedScalarTypes, ({ name }) => name);
 
 export const scalarNames = Object.keys(stdScalars);
 
-export const isSpecifiedScalarType = (type: IrisNamedType): boolean =>
+export const isSpecifiedScalarType = (type: IrisTypeDefinition): boolean =>
   Boolean(stdScalars[type.name]);
 
-export type IrisNamedType<R extends Role = Role> = IrisTypeDefinition<R>;
-
 export type IrisType<R extends Role = Role> =
-  | IrisNamedType<R>
+  | IrisTypeDefinition<R>
   | IrisTypeRef<IrisType<R>>;
 
 export type IrisStrictType = IrisType<'data'>;
@@ -44,7 +42,7 @@ export const isInputType = (type: unknown): type is IrisStrictType =>
 export const isType = (type: unknown): type is IrisType =>
   isTypeDefinition(type) || isTypeRef(type);
 
-const isTypeDefinition = (type: unknown): type is IrisTypeDefinition<Role> =>
+const isTypeDefinition = (type: unknown): type is IrisTypeDefinition =>
   instanceOf(type, IrisTypeDefinition);
 
 export class IrisTypeRef<T extends IrisType> {
@@ -83,7 +81,7 @@ export const isTypeRef = <T extends IrisType>(
 
 export const isMaybeType = (
   type: unknown,
-): type is IrisTypeRef<IrisNamedType> =>
+): type is IrisTypeRef<IrisTypeDefinition> =>
   isTypeRef(type) && type.kind === 'MAYBE';
 
 export const isListType = (type: unknown): type is IrisTypeRef<IrisType> =>
@@ -97,9 +95,13 @@ export const unpackMaybe = (type: Maybe<IrisType>): IrisType | undefined => {
 
 export function getNamedType(type: undefined | null): void;
 export function getNamedType(type: IrisStrictType): IrisTypeDefinition<'data'>;
-export function getNamedType(type: IrisType): IrisNamedType;
-export function getNamedType(type: Maybe<IrisType>): IrisNamedType | undefined;
-export function getNamedType(type: Maybe<IrisType>): IrisNamedType | undefined {
+export function getNamedType(type: IrisType): IrisTypeDefinition;
+export function getNamedType(
+  type: Maybe<IrisType>,
+): IrisTypeDefinition | undefined;
+export function getNamedType(
+  type: Maybe<IrisType>,
+): IrisTypeDefinition | undefined {
   if (type) {
     let unwrappedType = type;
     while (isTypeRef(unwrappedType)) {
@@ -143,7 +145,7 @@ export type IrisVariant<R extends Role> = IrisEntity & {
   astNode?: VariantDefinitionNode<R>;
   toJSON?: () => string;
   fields?: ObjMap<IrisField<R>>;
-  type?: IrisNamedType<R>;
+  type?: IrisTypeDefinition<R>;
 };
 
 export type IrisTypeConfig<R extends Role> = {
@@ -155,7 +157,7 @@ export type IrisTypeConfig<R extends Role> = {
   scalar?: R extends 'data' ? GraphQLScalarType<any, any> : undefined;
 };
 
-export class IrisTypeDefinition<R extends Role> {
+export class IrisTypeDefinition<R extends Role = Role> {
   name: string;
   description: Maybe<string>;
   astNode: Maybe<TypeDefinitionNode<R>>;

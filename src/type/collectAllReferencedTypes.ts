@@ -1,15 +1,15 @@
 import type { Role } from '../language/ast';
 
-import type { IrisNamedType, IrisType, IrisVariant } from './definition';
+import type { IrisType, IrisTypeDefinition, IrisVariant } from './definition';
 import { getNamedType } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective } from './directives';
 
 export const collectAllReferencedTypes = (
-  types: ReadonlyArray<IrisNamedType>,
+  types: ReadonlyArray<IrisTypeDefinition>,
   directives: ReadonlyArray<GraphQLDirective>,
-): Set<IrisNamedType> => {
-  const allReferencedTypes: Set<IrisNamedType> = new Set(types);
+): Set<IrisTypeDefinition> => {
+  const allReferencedTypes: Set<IrisTypeDefinition> = new Set(types);
 
   types.forEach((type) => {
     allReferencedTypes.delete(type);
@@ -22,7 +22,7 @@ export const collectAllReferencedTypes = (
 
 const collectDirectiveTypes = (
   directives: ReadonlyArray<GraphQLDirective>,
-  allReferencedTypes: Set<IrisNamedType>,
+  allReferencedTypes: Set<IrisTypeDefinition>,
 ) => {
   for (const directive of directives) {
     // Directives are not validated until validateSchema() is called.
@@ -36,7 +36,7 @@ const collectDirectiveTypes = (
 
 function collectReferencedTypes(
   type: IrisType,
-  typeSet: Set<IrisNamedType>,
+  typeSet: Set<IrisTypeDefinition>,
 ): void {
   const namedType = getNamedType(type);
 
@@ -52,7 +52,7 @@ function collectReferencedTypes(
 
 const exploreVariant = (
   variant: IrisVariant<Role>,
-  typeSet: Set<IrisNamedType>,
+  typeSet: Set<IrisTypeDefinition>,
 ) => {
   if (variant.type) {
     collectReferencedTypes(variant.type, typeSet);

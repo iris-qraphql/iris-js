@@ -4,9 +4,9 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 
 import type {
   IrisArgument,
-  IrisNamedType,
   IrisStrictType,
   IrisType,
+  IrisTypeDefinition,
 } from '../definition';
 import {
   IrisScalars,
@@ -93,7 +93,7 @@ describe('Type predicates', () => {
 
     it('returns false for custom scalar', () => {
       expect(
-        isSpecifiedScalarType(ScalarType as IrisNamedType<'data'>),
+        isSpecifiedScalarType(ScalarType as IrisTypeDefinition<'data'>),
       ).toEqual(false);
     });
   });
