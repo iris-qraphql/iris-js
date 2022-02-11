@@ -26,7 +26,6 @@ export {
   // Visit
   visit,
   visitInParallel,
-  DirectiveLocation,
 } from './language/index';
 
 export type IrisArgs = Omit<GraphQLArgs, 'schema'> & {

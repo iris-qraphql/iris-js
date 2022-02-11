@@ -1,8 +1,5 @@
 import { Kind } from 'graphql';
 import { isPrintableAsBlockString } from 'graphql/language/blockString';
-import { pluck } from 'ramda';
-
-import { print } from '../language/printer';
 
 import type {
   IrisArgument,
@@ -16,6 +13,8 @@ import { isSpecifiedDirective } from '../type/directives';
 import type { IrisSchema } from '../type/schema';
 
 import type { Maybe } from '../utils/type-level';
+
+import { print } from './printer';
 
 export function printSchema(schema: IrisSchema): string {
   return printFilteredSchema(
@@ -42,25 +41,17 @@ function printFilteredSchema(
 }
 
 export function printType(type: IrisTypeDefinition): string {
-  switch (type.role) {
-    case 'resolver':
-      return printResolver(type as IrisTypeDefinition<'resolver'>);
-    case 'data':
-      return printDATA(type as IrisTypeDefinition<'data'>);
-  }
-}
-
-function printResolver(type: IrisTypeDefinition<'resolver'>): string {
   const variants = type.variants();
-  const start = printDescription(type) + `resolver ${type.name}`;
+  const start = printDescription(type) + `${type.role} ${type.name}`;
 
   if (variants.length === 0) {
     return start;
   }
 
   if (type.isVariantType()) {
-    const variant = variants[0];
+    const [variant] = variants;
     const fields = Object.values(variant.fields ?? {});
+
     if (fields.length === 0 && variant.name === type.name) {
       return start;
     }
@@ -68,63 +59,28 @@ function printResolver(type: IrisTypeDefinition<'resolver'>): string {
     return start + ' =' + printFields(fields);
   }
 
-  return start + ' = ' + pluck('name', variants).join(' | ');
+  return start + ' = ' + variants.map(printVariant).join(' | ');
 }
 
-function printDATA(type: IrisTypeDefinition<'data'>): string {
-  const variants = type.variants();
-  const start = printDescription(type) + `data ${type.name}`;
-
-  if (variants.length === 0) {
-    return start;
-  }
-
-  if (type.isVariantType()) {
-    const variant = variants[0];
-    const fields = Object.values(variant.fields ?? {});
-
-    if (fields.length === 0 && variant.name === type.name) {
-      return start;
-    }
-
-    return start + ' =' + printDataFields(fields);
-  }
-
-  return start + ' = ' + variants.map(printDataVariant).join(' | ');
-}
-
-const printDataVariant = (variant: IrisVariant<'data'>): string =>
+const printVariant = (variant: IrisVariant): string =>
   printDescription(variant) +
   variant.name +
   printDeprecated(variant.deprecationReason) +
-  (variant.fields ? ' ' + printDataFields(Object.values(variant.fields)) : '');
+  (variant.fields ? ' ' + printFields(Object.values(variant.fields)) : '');
 
-const printDataFields = (fields: ReadonlyArray<IrisField<'data'>>): string =>
+const printFields = (fields: ReadonlyArray<IrisField>): string =>
   printBlock(
     fields.map(
       (f, i) =>
         printDescription(f, '  ', !i) +
         '  ' +
         f.name +
+        printArgs(f.args ?? [], '  ') +
         ': ' +
         String(f.type) +
         printDeprecated(f.deprecationReason),
     ),
   );
-
-const printFields = (fs: ReadonlyArray<IrisField<'resolver'>>): string => {
-  const fields = fs.map(
-    (f, i) =>
-      printDescription(f, '  ', !i) +
-      '  ' +
-      f.name +
-      printArgs(f.args ?? [], '  ') +
-      ': ' +
-      String(f.type) +
-      printDeprecated(f.deprecationReason),
-  );
-  return printBlock(fields);
-};
 
 const printBlock = (items: ReadonlyArray<string>): string =>
   items.length !== 0 ? ' {\n' + items.join('\n') + '\n}' : '{}';

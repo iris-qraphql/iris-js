@@ -109,13 +109,13 @@ export type IrisArgument = IrisNode & {
 export const isRequiredArgument = (arg: IrisArgument): boolean =>
   !isMaybeType(arg.type) && arg.defaultValue === undefined;
 
-export type IrisField<R extends Role> = IrisNode & {
+export type IrisField<R extends Role = Role> = IrisNode & {
   astNode?: FieldDefinitionNode<R>;
   type: R extends 'data' ? IrisType<'data'> : IrisType;
   args?: R extends 'data' ? never : ReadonlyArray<IrisArgument>;
 };
 
-export type IrisVariant<R extends Role> = IrisNode & {
+export type IrisVariant<R extends Role = Role> = IrisNode & {
   astNode?: VariantDefinitionNode<R>;
   toJSON?: () => string;
   fields?: ObjMap<IrisField<R>>;

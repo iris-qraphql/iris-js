@@ -12,22 +12,9 @@ export enum DirectiveLocation {
   INLINE_FRAGMENT = 'INLINE_FRAGMENT',
   VARIABLE_DEFINITION = 'VARIABLE_DEFINITION',
   /** Type System Definitions */
-  SCHEMA = 'SCHEMA',
-  SCALAR = 'SCALAR',
-  OBJECT = 'OBJECT',
+  DATA_DEFINITION = 'DATA_DEFINITION',
+  RESOLVER_DEFINITION = 'RESOLVER_DEFINITION',
+  VARIANT_DEFINITION = 'VARIANT_DEFINITION',
   FIELD_DEFINITION = 'FIELD_DEFINITION',
   ARGUMENT_DEFINITION = 'ARGUMENT_DEFINITION',
-  INTERFACE = 'INTERFACE',
-  UNION = 'UNION',
-  ENUM = 'DATA',
-  ENUM_VALUE = 'ENUM_VALUE',
-  INPUT_OBJECT = 'DATA',
-  INPUT_FIELD_DEFINITION = 'INPUT_FIELD_DEFINITION',
 }
-
-/**
- * The Enum type representing the directive location values.
- *
- * @deprecated Please use `DirectiveLocation`. Will be remove in v17.
- */
-export type DirectiveLocationEnum = typeof DirectiveLocation;

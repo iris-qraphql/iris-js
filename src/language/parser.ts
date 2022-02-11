@@ -564,9 +564,6 @@ export class Parser {
    *   `INLINE_FRAGMENT`
    *
    * TypeSystemDirectiveLocation : one of
-   *   `SCHEMA`
-   *   `SCALAR`
-   *   `OBJECT`
    *   `FIELD_DEFINITION`
    *   `ARGUMENT_DEFINITION`
    *   `UNION`
@@ -578,6 +575,7 @@ export class Parser {
   parseDirectiveLocation(): NameNode {
     const start = this._lexer.token;
     const name = this.parseName();
+
     if (Object.prototype.hasOwnProperty.call(DirectiveLocation, name.value)) {
       return name;
     }

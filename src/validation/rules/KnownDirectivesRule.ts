@@ -71,7 +71,9 @@ function getDirectiveLocationForASTPath(
     case IrisKind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
     case IrisKind.TYPE_DEFINITION:
-      return DirectiveLocation.UNION;
+      return appliedTo.role === 'resolver'
+        ? DirectiveLocation.RESOLVER_DEFINITION
+        : DirectiveLocation.DATA_DEFINITION;
     case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
@@ -80,7 +82,7 @@ function getDirectiveLocationForASTPath(
         IrisKind.VARIANT_DEFINITION,
       ];
       return kinds.includes(parentNode.kind)
-        ? DirectiveLocation.INPUT_FIELD_DEFINITION
+        ? DirectiveLocation.FIELD_DEFINITION
         : DirectiveLocation.ARGUMENT_DEFINITION;
     }
     default:

@@ -1,5 +1,3 @@
-import type { Role } from '../language/ast';
-
 import type { IrisType, IrisTypeDefinition, IrisVariant } from './definition';
 import { unwrapType } from './definition';
 import type { GraphQLDirective } from './directives';
@@ -51,7 +49,7 @@ function collectReferencedTypes(
 }
 
 const exploreVariant = (
-  variant: IrisVariant<Role>,
+  variant: IrisVariant,
   typeSet: Set<IrisTypeDefinition>,
 ) => {
   if (variant.type) {

@@ -76,10 +76,9 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     name: 'deprecated',
     description: 'Marks an element of a GraphQL schema as no longer supported.',
     locations: [
+      DirectiveLocation.VARIABLE_DEFINITION,
       DirectiveLocation.FIELD_DEFINITION,
       DirectiveLocation.ARGUMENT_DEFINITION,
-      DirectiveLocation.INPUT_FIELD_DEFINITION,
-      DirectiveLocation.ENUM_VALUE,
     ],
     args: [
       {

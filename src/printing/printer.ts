@@ -1,11 +1,11 @@
 import { printBlockString } from 'graphql/language/blockString';
 import { printString } from 'graphql/language/printString';
 
-import type { Maybe } from '../utils/type-level';
+import type { ASTNode } from '../language/ast';
+import type { ASTReducer } from '../language/visitor';
+import { visit } from '../language/visitor';
 
-import type { ASTNode } from './ast';
-import type { ASTReducer } from './visitor';
-import { visit } from './visitor';
+import type { Maybe } from '../utils/type-level';
 
 /**
  * Converts an AST into a string, using one set of reasonable

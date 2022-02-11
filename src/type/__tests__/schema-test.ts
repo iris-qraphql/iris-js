@@ -50,7 +50,7 @@ describe('Type System: Schema', () => {
       const schema = buildSchema(`
        data Foo 
        data Bar
-       directive @Foo(arg: Foo, argList: [Bar] ) on OBJECT
+       directive @Foo(arg: Foo, argList: [Bar] ) on RESOLVER_DEFINITION
        resolver Query = {}
       `);
 

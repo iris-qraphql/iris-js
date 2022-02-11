@@ -1,5 +1,5 @@
 import type { IrisType, IrisTypeDefinition } from '../../type/definition';
-import { gqlScalar, sampleTypeRef } from '../../type/make';
+import { sampleTypeRef } from '../../type/make';
 import { buildSchema } from '../../type/schema';
 
 import { serializeValue } from '../serialize';
@@ -94,33 +94,6 @@ describe('serializeValue', () => {
     expect(() => serializeWith(false, 'ID')).toThrowErrorMatchingSnapshot();
     expect(() => serializeWith(undefined, 'ID')).toThrowErrorMatchingSnapshot();
     expect(() => serializeWith(null, 'ID')).toThrowErrorMatchingSnapshot();
-  });
-
-  it('converts using serialize from a custom scalar type', () => {
-    const passthroughScalar = gqlScalar({
-      name: 'PassthroughScalar',
-      serialize(value) {
-        return value;
-      },
-    });
-
-    expect(serializeWith('value', passthroughScalar)).toEqual('value');
-
-    expect(() =>
-      serializeWith(NaN, passthroughScalar),
-    ).toThrowErrorMatchingSnapshot();
-    expect(() =>
-      serializeWith(Infinity, passthroughScalar),
-    ).toThrowErrorMatchingSnapshot();
-
-    const returnNullScalar = gqlScalar({
-      name: 'ReturnNullScalar',
-      serialize() {
-        return null;
-      },
-    });
-
-    expect(serializeWith('value', returnNullScalar)).toEqual(null);
   });
 
   it('does not converts NonNull values to NullValue', () => {
