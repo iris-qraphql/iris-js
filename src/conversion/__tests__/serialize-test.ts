@@ -1,7 +1,7 @@
-import type { IrisType } from '../../type/definition';
-import { assertDataType } from '../../type/definition';
-import { gqlList, gqlScalar, sampleTypeRef } from '../../type/make';
+import type { IrisType, IrisTypeDefinition } from '../../type/definition';
 import { buildSchema } from '../../type/schema';
+
+import { sampleTypeRef } from '../../utils/generators';
 
 import { serializeValue } from '../serialize';
 
@@ -97,38 +97,11 @@ describe('serializeValue', () => {
     expect(() => serializeWith(null, 'ID')).toThrowErrorMatchingSnapshot();
   });
 
-  it('converts using serialize from a custom scalar type', () => {
-    const passthroughScalar = gqlScalar({
-      name: 'PassthroughScalar',
-      serialize(value) {
-        return value;
-      },
-    });
-
-    expect(serializeWith('value', passthroughScalar)).toEqual('value');
-
-    expect(() =>
-      serializeWith(NaN, passthroughScalar),
-    ).toThrowErrorMatchingSnapshot();
-    expect(() =>
-      serializeWith(Infinity, passthroughScalar),
-    ).toThrowErrorMatchingSnapshot();
-
-    const returnNullScalar = gqlScalar({
-      name: 'ReturnNullScalar',
-      serialize() {
-        return null;
-      },
-    });
-
-    expect(serializeWith('value', returnNullScalar)).toEqual(null);
-  });
-
   it('does not converts NonNull values to NullValue', () => {
     expect(() => serializeWith(null, 'Boolean')).toThrowErrorMatchingSnapshot();
   });
 
-  const schema = buildSchema(`
+  const definitions = `
     data MyEnum 
       = HELLO {} 
       | GOODBYE {}
@@ -137,36 +110,31 @@ describe('serializeValue', () => {
       foo: Float?
       bar: MyEnum?
     }
+  `;
 
-    resolver Query = {
-      f: MyInputObj
-    }
-  `);
-
-  const myEnum = assertDataType(schema.getType('MyEnum'));
-  const inputObj = assertDataType(schema.getType('MyInputObj'));
+  const type = (t: string) => sampleTypeRef<'data'>(t, definitions);
 
   it('converts string values to Enum ASTs if possible', () => {
-    expect(serializeWith('HELLO', myEnum)).toEqual('HELLO');
+    expect(serializeWith('HELLO', type('MyEnum'))).toEqual('HELLO');
 
     // Note: case sensitive
-    expect(() => serializeWith('hello', myEnum)).toThrow(
+    expect(() => serializeWith('hello', type('MyEnum'))).toThrow(
       'Data "MyEnum" cannot represent value: "hello"',
     );
 
     // Note: Not a valid enum value
-    expect(() => serializeWith('UNKNOWN_VALUE', myEnum)).toThrow(
+    expect(() => serializeWith('UNKNOWN_VALUE', type('MyEnum'))).toThrow(
       'Data "MyEnum" cannot represent value: "UNKNOWN_VALUE"',
     );
   });
 
   it('converts array values to List ASTs', () => {
-    expect(serializeWith(['FOO', 'BAR'], sampleTypeRef('[String]'))).toEqual([
+    expect(serializeWith(['FOO', 'BAR'], type('[String]'))).toEqual([
       'FOO',
       'BAR',
     ]);
 
-    expect(serializeWith(['HELLO', 'GOODBYE'], gqlList(myEnum))).toEqual([
+    expect(serializeWith(['HELLO', 'GOODBYE'], type('[MyEnum]'))).toEqual([
       'HELLO',
       'GOODBYE',
     ]);
@@ -193,18 +161,20 @@ describe('serializeValue', () => {
 
   it('converts data objects', () => {
     const object = { foo: 3, bar: 'HELLO' };
-    expect(serializeWith(object, inputObj)).toEqual(object);
+    expect(serializeWith(object, type('MyInputObj'))).toEqual(object);
   });
 
   it('converts input objects with explicit nulls', () => {
-    expect(serializeWith({ foo: null }, inputObj)).toEqual({
+    expect(serializeWith({ foo: null }, type('MyInputObj'))).toEqual({
       foo: null,
       bar: null,
     });
   });
 
   it('does not converts non-object values as input objects', () => {
-    expect(() => serializeWith(5, inputObj)).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      serializeWith(5, type('MyInputObj')),
+    ).toThrowErrorMatchingSnapshot();
   });
 });
 
@@ -221,8 +191,8 @@ describe('parse simple data variants', () => {
   });
   const leaf = (name: string) => ({ __typename: 'Leaf', name });
 
-  const nodeType = assertDataType(schema.getType('NodeType'));
-  const parseNode = (n: unknown) => serializeWith(n, nodeType);
+  const parseNode = (n: unknown) =>
+    serializeWith(n, schema.getType('NodeType') as IrisTypeDefinition<'data'>);
 
   it("don't accept non data values", () => {
     expect(() => parseNode(['Leaf'])).toThrowErrorMatchingSnapshot();
@@ -294,8 +264,9 @@ describe('circular data types', () => {
   });
   const leaf = (name?: string) => ({ __typename: 'Leaf', name });
 
-  const nodeType = assertDataType(schema.getType('NodeType'));
-  const parseNode = (n: unknown) => serializeWith(n, nodeType);
+  const nodeType = schema.getType('NodeType');
+  const parseNode = (n: unknown) =>
+    serializeWith(n, nodeType as IrisTypeDefinition<'data'>);
 
   it('ignore optional fields variants', () => {
     expect(parseNode('Leaf')).toEqual('Leaf');

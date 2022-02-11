@@ -1,11 +1,7 @@
-import { DirectiveLocation } from '../../language/directiveLocation';
-
+import { printSchema } from '../../printing/printSchema';
 import { dedent } from '../../utils/dedent';
 
-import { GraphQLDirective } from '../directives';
-import { emptyDataType, gqlList } from '../make';
-import { printSchema } from '../printSchema';
-import { buildSchema, IrisSchema } from '../schema';
+import { buildSchema } from '../schema';
 
 const cycle = (src: string) =>
   expect(printSchema(buildSchema(src))).toEqual(dedent([src]));
@@ -51,19 +47,12 @@ describe('Type System: Schema', () => {
 
   describe('Type Map', () => {
     it('includes data types only used in directives', () => {
-      const directive = new GraphQLDirective({
-        name: 'dir',
-        locations: [DirectiveLocation.OBJECT],
-        args: {
-          arg: {
-            type: emptyDataType('Foo'),
-          },
-          argList: {
-            type: gqlList(emptyDataType('Bar')),
-          },
-        },
-      });
-      const schema = new IrisSchema({ directives: [directive] });
+      const schema = buildSchema(`
+       data Foo 
+       data Bar
+       directive @Foo(arg: Foo, argList: [Bar] ) on RESOLVER_DEFINITION
+       resolver Query = {}
+      `);
 
       expect(Object.keys(schema.typeMap)).toEqual(
         expect.arrayContaining(['Foo', 'Bar']),
@@ -72,7 +61,9 @@ describe('Type System: Schema', () => {
   });
 
   it('can be Object.toStringified', () => {
-    const schema = new IrisSchema({});
+    const schema = buildSchema(`
+      resolver Query = {}
+    `);
 
     expect(Object.prototype.toString.call(schema)).toEqual(
       '[object IrisSchema]',
@@ -80,16 +71,6 @@ describe('Type System: Schema', () => {
   });
 
   describe('Validity', () => {
-    describe('when not assumed valid', () => {
-      it('configures the schema to still needing validation', () => {
-        expect(
-          new IrisSchema({
-            assumeValid: false,
-          }).__validationErrors,
-        ).toEqual(undefined);
-      });
-    });
-
     describe('A Schema must contain uniquely named types', () => {
       // TODO:
       // it('rejects a Schema which redefines a built-in type', () => {
@@ -112,16 +93,6 @@ describe('Type System: Schema', () => {
             resolver SameName
           `),
         ).toThrowErrorMatchingSnapshot();
-      });
-    });
-
-    describe('when assumed valid', () => {
-      it('configures the schema to have no errors', () => {
-        expect(
-          new IrisSchema({
-            assumeValid: true,
-          }).__validationErrors,
-        ).toEqual([]);
       });
     });
   });

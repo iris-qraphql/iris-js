@@ -1,10 +1,12 @@
+import type { IrisSchema } from '../../type/schema';
+import { buildSchema } from '../../type/schema';
+
 import { irisError } from '../../error';
+import { withWrappers } from '../../utils/generators';
 import { inspect } from '../../utils/legacy';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 
-import type { IrisSchema } from '../schema';
-import { buildSchema } from '../schema';
-import { validateSchema } from '../validate';
+import { validateSchema } from '../validate-schema';
 
 const resolverField = (name: string): IrisSchema =>
   buildSchema(`
@@ -24,15 +26,6 @@ const resolverField = (name: string): IrisSchema =>
     }
 `);
 
-const withWrappers = (type: string): Array<string> => [
-  type,
-  `${type}?`,
-  `[${type}]`,
-  `[${type}]?`,
-  `[${type}?]`,
-  `[${type}?]?`,
-];
-
 function schemaWithFieldType(
   kind: 'data' | 'resolver',
   name: string,
@@ -51,6 +44,27 @@ const expectJSONEqual = (schema: IrisSchema, value: unknown) =>
 
 const snapshot = (schema: IrisSchema) =>
   expect(toJSONDeep(validateSchema(schema))).toMatchSnapshot();
+
+describe('basic Cases', () => {
+  it("can't build recursive Union", () => {
+    const schema = buildSchema(`
+      resolver Hello = Hello
+
+      resolver Query = {
+        hello: Hello
+      }
+    `);
+    const errors = validateSchema(schema);
+    expect(errors.length).toBeGreaterThan(0);
+  });
+
+  it('can build invalid schema', () => {
+    // Invalid schema, because it is missing query root type
+    const schema = buildSchema('resolver Mutation');
+    const errors = validateSchema(schema);
+    expect(errors.length).toBeGreaterThan(0);
+  });
+});
 
 describe('Type System: A Schema must have Object root types', () => {
   it('rejects a Schema whose query root resolver is not an Object', () => {

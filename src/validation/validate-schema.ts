@@ -1,25 +1,23 @@
-import { OperationTypeNode } from 'graphql';
-
 import type { ASTNode, DirectiveNode } from '../language/ast';
+
+import type {
+  IrisField,
+  IrisTypeDefinition,
+  IrisVariant,
+} from '../type/definition';
+import {
+  isInputType,
+  isRequiredArgument,
+  isType,
+  isTypeRef,
+} from '../type/definition';
+import { GraphQLDeprecatedDirective, isDirective } from '../type/directives';
+import type { IrisSchema } from '../type/schema';
 
 import type { IrisError } from '../error';
 import { irisNodeError } from '../error';
 import { inspect } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
-
-import type { IrisField, IrisTypeDefinition, IrisVariant } from './definition';
-import {
-  isDataType,
-  isInputType,
-  isObjectType,
-  isRequiredArgument,
-  isResolverType,
-  isType,
-  isTypeRef,
-} from './definition';
-import { GraphQLDeprecatedDirective, isDirective } from './directives';
-import type { IrisSchema } from './schema';
-import { assertSchema } from './schema';
 
 /**
  * Implements the "Type Validation" sub-sections of the specification's
@@ -29,9 +27,6 @@ import { assertSchema } from './schema';
  * an empty array if no errors were encountered and the Schema is valid.
  */
 export function validateSchema(schema: IrisSchema): ReadonlyArray<IrisError> {
-  // First check to ensure the provided value is in fact a IrisSchema.
-  assertSchema(schema);
-
   // If this Schema has already been validated, return the previous results.
   if (schema.__validationErrors) {
     return schema.__validationErrors;
@@ -76,45 +71,27 @@ class SchemaValidationContext {
 
 function validateRootTypes(context: SchemaValidationContext): void {
   const schema = context.schema;
-  const queryType = schema.query;
-  if (!queryType) {
+
+  if (!schema.query) {
     context.reportError('Query root type must be provided.');
-  } else if (!isObjectType(queryType)) {
-    context.reportError(
-      `Query root type must be Object type, it cannot be ${inspect(
-        queryType,
-      )}.`,
-      getOperationTypeNode(schema, OperationTypeNode.QUERY) ??
-        (queryType as any).astNode,
-    );
   }
 
-  const mutationType = schema.mutation;
-  if (mutationType && !isObjectType(mutationType)) {
-    context.reportError(
-      'Mutation root type must be Object type if provided, it cannot be ' +
-        `${inspect(mutationType)}.`,
-      getOperationTypeNode(schema, OperationTypeNode.MUTATION) ??
-        (mutationType as any).astNode,
-    );
-  }
+  const roots = {
+    Query: schema.query,
+    Mutation: schema.mutation,
+    Subscription: schema.subscription,
+  };
 
-  const subscriptionType = schema.subscription;
-  if (subscriptionType && !isObjectType(subscriptionType)) {
-    context.reportError(
-      'Subscription root type must be Object type if provided, it cannot be ' +
-        `${inspect(subscriptionType)}.`,
-      getOperationTypeNode(schema, OperationTypeNode.SUBSCRIPTION) ??
-        (subscriptionType as any).astNode,
-    );
+  for (const [operation, type] of Object.entries(roots)) {
+    if (type && !(type.role === 'resolver' && type.isVariantType())) {
+      context.reportError(
+        `${operation} root type must be Object type${
+          operation === 'Query' ? '' : ' if provided'
+        }, it cannot be ${inspect(type)}.`,
+        type.astNode,
+      );
+    }
   }
-}
-
-function getOperationTypeNode(
-  _schema: IrisSchema,
-  _operation: OperationTypeNode,
-): Maybe<ASTNode> {
-  return undefined;
 }
 
 function validateDirectives(context: SchemaValidationContext): void {
@@ -170,17 +147,15 @@ function validateName(
 
 function validateTypes(ctx: SchemaValidationContext): void {
   Object.values(ctx.schema.typeMap).forEach((type) => {
-    if (isResolverType(type)) {
-      return validateResolverType(ctx, type);
+    switch (type.role) {
+      case 'resolver':
+        return validateResolverType(
+          ctx,
+          type as IrisTypeDefinition<'resolver'>,
+        );
+      case 'data':
+        return validateDataType(ctx, type as IrisTypeDefinition<'data'>);
     }
-    if (isDataType(type)) {
-      return validateDataType(ctx, type);
-    }
-
-    return ctx.reportError(
-      `Expected GraphQL named type but got: ${inspect(type)}.`,
-      (type as any).astNode,
-    );
   });
 }
 
@@ -218,7 +193,7 @@ function validateFields(
     }
 
     // Ensure the arguments are valid
-    for (const arg of field.args) {
+    for (const arg of field.args ?? []) {
       const argName = arg.name;
 
       // Ensure they are named correctly.
@@ -264,7 +239,11 @@ function validateUnionMembers(
     }
 
     listedMembers[name] = true;
-    if (!type?.isVariantType?.() || isDataType(type) || isTypeRef(type)) {
+    if (
+      !type?.isVariantType?.() ||
+      type.role !== 'resolver' ||
+      isTypeRef(type)
+    ) {
       context.reportError(
         `Union type ${typeName} can only include Object types, ` +
           `it cannot include ${inspect(type)}.`,

@@ -1,13 +1,13 @@
 import { Kind } from 'graphql';
 
 import type { DirectiveNode } from '../language/ast';
-import { print } from '../language/printer';
 
 import type { IrisField } from '../type/definition';
 import { isMaybeType } from '../type/definition';
 import type { GraphQLDirective } from '../type/directives';
 
 import { irisError } from '../error';
+import { print } from '../printing/printer';
 import { inspect } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap } from '../utils/ObjMap';
@@ -26,7 +26,7 @@ function getArgumentValues(
   const argumentNodes = node.arguments ?? [];
   const argNodeMap = keyMap(argumentNodes, (arg) => arg.name.value);
 
-  for (const argDef of def.args) {
+  for (const argDef of def.args ?? []) {
     const name = argDef.name;
     const argType = argDef.type;
     const argumentNode = argNodeMap[name];

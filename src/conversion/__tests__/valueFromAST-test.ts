@@ -2,9 +2,9 @@ import { identity } from 'ramda';
 
 import { parseValue } from '../../language/parser';
 
-import type { IrisStrictType } from '../../type/definition';
-import { gqlScalar, sampleTypeRef } from '../../type/make';
+import type { IrisType } from '../../type/definition';
 
+import { gqlScalar, sampleTypeRef } from '../../utils/generators';
 import type { ObjMap } from '../../utils/ObjMap';
 
 import { valueFromAST } from '../valueFromAST';
@@ -16,7 +16,7 @@ const maybeListOfBool = sampleTypeRef<'data'>('[Boolean]?');
 
 const expectValueFrom = (
   valueText: string,
-  typeRef: IrisStrictType | string,
+  typeRef: IrisType<'data'> | string,
   variables?: ObjMap<unknown>,
 ) => {
   const type =

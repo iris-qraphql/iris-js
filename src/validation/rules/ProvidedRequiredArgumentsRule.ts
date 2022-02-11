@@ -1,6 +1,5 @@
 import type { ArgumentDefinitionNode } from '../../language/ast';
 import { IrisKind } from '../../language/kinds';
-import { print } from '../../language/printer';
 import type { ASTVisitor } from '../../language/visitor';
 
 import type { IrisArgument } from '../../type/definition';
@@ -8,20 +7,18 @@ import { isRequiredArgument, isType } from '../../type/definition';
 import { specifiedDirectives } from '../../type/directives';
 
 import { irisError } from '../../error';
+import { print } from '../../printing/printer';
 import { inspect } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 import { keyMap } from '../../utils/ObjMap';
 
-import type {
-  SDLValidationContext,
-  ValidationContext,
-} from '../ValidationContext';
+import type { SDLValidationContext } from '../ValidationContext';
 
 /**
  * @internal
  */
 export function ProvidedRequiredArgumentsOnDirectivesRule(
-  context: ValidationContext | SDLValidationContext,
+  context: SDLValidationContext,
 ): ASTVisitor {
   const requiredArgsMap: ObjMap<ObjMap<IrisArgument | ArgumentDefinitionNode>> =
     Object.create(null);

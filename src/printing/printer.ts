@@ -1,19 +1,16 @@
 import { printBlockString } from 'graphql/language/blockString';
 import { printString } from 'graphql/language/printString';
 
-import type { Maybe } from '../utils/type-level';
+import type { ASTNode } from '../language/ast';
+import type { ASTReducer } from '../language/visitor';
+import { visit } from '../language/visitor';
 
-import type { ASTNode } from './ast';
-import type { ASTReducer } from './visitor';
-import { visit } from './visitor';
+import type { Maybe } from '../utils/type-level';
 
 /**
  * Converts an AST into a string, using one set of reasonable
  * formatting rules.
  */
-export function print(ast: ASTNode): string {
-  return visit(ast, printDocASTReducer);
-}
 
 const printDocASTReducer: ASTReducer<string> = {
   Name: { leave: (node) => node.value },
@@ -137,3 +134,5 @@ function hasMultilineItems(maybeArray: Maybe<ReadonlyArray<string>>): boolean {
   /* c8 ignore next */
   return maybeArray?.some((str) => str.includes('\n')) ?? false;
 }
+
+export const print = (ast: ASTNode): string => visit(ast, printDocASTReducer);

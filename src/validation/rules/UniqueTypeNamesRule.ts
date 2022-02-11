@@ -12,7 +12,6 @@ import type { SDLValidationContext } from '../ValidationContext';
  */
 export function UniqueTypeNamesRule(context: SDLValidationContext): ASTVisitor {
   const knownTypeNames = Object.create(null);
-  const schema = context.getSchema();
 
   return {
     TypeDefinition: checkTypeName,
@@ -20,16 +19,6 @@ export function UniqueTypeNamesRule(context: SDLValidationContext): ASTVisitor {
 
   function checkTypeName(node: TypeDefinitionNode) {
     const typeName = node.name.value;
-
-    if (schema?.getType(typeName)) {
-      context.reportError(
-        irisNodeError(
-          `Type "${typeName}" already exists in the schema. It cannot also be defined in this type definition.`,
-          node.name,
-        ),
-      );
-      return;
-    }
 
     if (knownTypeNames[typeName]) {
       context.reportError(

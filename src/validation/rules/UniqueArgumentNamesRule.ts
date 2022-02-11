@@ -5,7 +5,7 @@ import type { ASTVisitor } from '../../language/visitor';
 
 import { irisError } from '../../error';
 
-import type { ASTValidationContext } from '../ValidationContext';
+import type { SDLValidationContext } from '../ValidationContext';
 
 /**
  * Unique argument names
@@ -16,7 +16,7 @@ import type { ASTValidationContext } from '../ValidationContext';
  * See https://spec.graphql.org/draft/#sec-Argument-Names
  */
 export function UniqueArgumentNamesRule(
-  context: ASTValidationContext,
+  context: SDLValidationContext,
 ): ASTVisitor {
   return {
     Directive: checkArgUniqueness,

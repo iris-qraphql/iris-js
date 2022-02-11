@@ -628,10 +628,6 @@ exports[`serializeValue converts String values to String ASTs 1`] = `"type Strin
 
 exports[`serializeValue converts String values to String ASTs 2`] = `"type String cannot represent value: null."`;
 
-exports[`serializeValue converts using serialize from a custom scalar type 1`] = `"type PassthroughScalar cannot represent value: NaN."`;
-
-exports[`serializeValue converts using serialize from a custom scalar type 2`] = `"type PassthroughScalar cannot represent value: Infinity."`;
-
 exports[`serializeValue does not converts NonNull values to NullValue 1`] = `"type Boolean cannot represent value: null."`;
 
 exports[`serializeValue does not converts non-object values as input objects 1`] = `"type MyInputObj cannot represent value: 5."`;

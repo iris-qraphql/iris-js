@@ -1,13 +1,11 @@
-import { IrisKind } from '../../language/kinds';
-
+import { printSchema } from '../../printing/printSchema';
 import { dedent } from '../../utils/dedent';
+import type { ObjMap } from '../../utils/ObjMap';
 
-import { assertDataType, assertResolverType } from '../definition';
+import type { IrisField } from '../definition';
+import { IrisScalars } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
-import { printSchema } from '../printSchema';
-import { IrisScalars } from '../scalars';
-import { buildASTSchema, buildSchema, IrisSchema } from '../schema';
-import { validateSchema } from '../validate';
+import { buildSchema } from '../schema';
 
 /**
  * This function does a full cycle of going from a string with the contents of
@@ -19,19 +17,6 @@ function cycleSDL(sdl: string): string {
 }
 
 describe('Schema Builder', () => {
-  it('Match order of default types and directives', () => {
-    const schema = new IrisSchema({});
-    const sdlSchema = buildASTSchema({
-      kind: IrisKind.DOCUMENT,
-      definitions: [],
-    });
-
-    expect(sdlSchema.directives).toEqual(schema.directives);
-
-    expect(sdlSchema.typeMap).toEqual(schema.typeMap);
-    expect(Object.keys(sdlSchema.typeMap)).toEqual(Object.keys(schema.typeMap));
-  });
-
   it('Empty type', () => {
     const sdl = dedent`
       resolver EmptyType
@@ -265,18 +250,6 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
-  it("can't build recursive Union", () => {
-    const schema = buildSchema(`
-      resolver Hello = Hello
-
-      resolver Query = {
-        hello: Hello
-      }
-    `);
-    const errors = validateSchema(schema);
-    expect(errors.length).toBeGreaterThan(0);
-  });
-
   it('Custom Scalar', () => {
     const sdl = dedent`
       data CustomScalar = Int
@@ -381,29 +354,20 @@ describe('Schema Builder', () => {
 
     const schema = buildSchema(sdl);
 
-    const myEnum = assertDataType(schema.getType('MyEnum'));
-
-    const value = myEnum.variantBy('VALUE');
-    expect(value).toEqual(
-      expect.objectContaining({ deprecationReason: undefined }),
-    );
-
-    const oldValue = myEnum.variantBy('OLD_VALUE');
-    expect(oldValue).toEqual(
-      expect.objectContaining({
-        deprecationReason: '',
-      }),
-    );
-
-    const otherValue = myEnum.variantBy('OTHER_VALUE');
-    expect(otherValue).toEqual(
-      expect.objectContaining({
-        deprecationReason: 'Terrible reasons',
-      }),
-    );
+    expect(
+      schema
+        .getType('MyEnum')
+        ?.variants()
+        .map(({ name, deprecationReason }) => ({ name, deprecationReason })),
+    ).toEqual([
+      { name: 'VALUE', deprecationReason: undefined },
+      { name: 'OLD_VALUE', deprecationReason: '' },
+      { name: 'OTHER_VALUE', deprecationReason: 'Terrible reasons' },
+    ]);
 
     const rootFields =
-      assertResolverType(schema.getType('Query')).variantBy().fields ?? {};
+      schema.getType('Query')?.variantBy().fields ??
+      ({} as ObjMap<IrisField<'resolver'>>);
 
     expect(rootFields.field1).toEqual(
       expect.objectContaining({
@@ -416,26 +380,19 @@ describe('Schema Builder', () => {
       }),
     );
 
-    const field3OldArg = rootFields.field3.args[0];
+    const field3OldArg = rootFields.field3.args?.[0];
     expect(field3OldArg).toEqual(
       expect.objectContaining({
         deprecationReason: '',
       }),
     );
 
-    const field4OldArg = rootFields.field4.args[0];
+    const field4OldArg = rootFields.field4.args?.[0];
     expect(field4OldArg).toEqual(
       expect.objectContaining({
         deprecationReason: 'Why not?',
       }),
     );
-  });
-
-  it('can build invalid schema', () => {
-    // Invalid schema, because it is missing query root type
-    const schema = buildSchema('resolver Mutation');
-    const errors = validateSchema(schema);
-    expect(errors.length).toBeGreaterThan(0);
   });
 
   it('Do not override standard types', () => {
@@ -456,26 +413,5 @@ describe('Schema Builder', () => {
       }
     `;
     expect(() => buildSchema(sdl)).toThrow('Unknown directive "@unknown".');
-  });
-
-  it('Allows to disable SDL validation', () => {
-    const sdl = `
-      resolver Query = {
-        foo: String @unknown
-      }
-    `;
-    buildSchema(sdl, { assumeValid: true });
-    buildSchema(sdl, { assumeValidSDL: true });
-  });
-
-  it('Throws on unknown types', () => {
-    const sdl = `
-      resolver Query = {
-        unknown: UnknownType
-      }
-    `;
-    expect(() => buildSchema(sdl, { assumeValidSDL: true })).toThrow(
-      'Unknown type: "UnknownType".',
-    );
   });
 });

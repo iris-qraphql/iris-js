@@ -1,6 +1,6 @@
 import type { IrisSchema } from '../../type/schema';
 
-import { getSDLValidationErrors } from '../../utils/harness';
+import { getSDLValidationErrors } from '../../utils/toJSONDeep';
 
 import { UniqueTypeNamesRule } from '../rules/UniqueTypeNamesRule';
 
@@ -13,12 +13,6 @@ function expectValidSDL(sdlStr: string, schema?: IrisSchema) {
 }
 
 describe('Validate: Unique type names', () => {
-  it('no types', () => {
-    expectValidSDL(`
-      directive @test on SCHEMA
-    `);
-  });
-
   it('one type', () => {
     expectValidSDL(`
       resolver Foo

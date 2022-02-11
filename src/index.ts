@@ -10,25 +10,14 @@ import { graphql } from 'graphql';
 import type { ExecutionResult } from 'graphql/execution';
 
 import type { IrisSchema } from './type/schema';
-import { validateSchema } from './type/validate';
 
-import { toGQLSchema } from './transpile/toGQLSchema';
+import { validateSchema } from './validation/validate-schema';
+
+import { toGQLSchema } from './transpiling/toGQLSchema';
 
 export { version, versionInfo } from './version';
-
-export {
-  parse,
-  parseConstValue,
-  parseType,
-  // Print
-  print,
-  // Visit
-  visit,
-  visitInParallel,
-  getVisitFn,
-  getEnterLeaveForKind,
-  DirectiveLocation,
-} from './language/index';
+export { parse } from './language/parser';
+export { print } from './printing/printer';
 
 export type IrisArgs = Omit<GraphQLArgs, 'schema'> & {
   schema: IrisSchema;

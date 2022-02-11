@@ -10,10 +10,7 @@ import { specifiedDirectives } from '../../type/directives';
 import { irisError } from '../../error';
 import { inspect, invariant } from '../../utils/legacy';
 
-import type {
-  SDLValidationContext,
-  ValidationContext,
-} from '../ValidationContext';
+import type { SDLValidationContext } from '../ValidationContext';
 
 /**
  * Known directives
@@ -23,9 +20,7 @@ import type {
  *
  * See https://spec.graphql.org/draft/#sec-Directives-Are-Defined
  */
-export function KnownDirectivesRule(
-  context: ValidationContext | SDLValidationContext,
-): ASTVisitor {
+export function KnownDirectivesRule(context: SDLValidationContext): ASTVisitor {
   const locationsMap = Object.create(null);
 
   const schema = context.getSchema();
@@ -76,7 +71,9 @@ function getDirectiveLocationForASTPath(
     case IrisKind.FIELD_DEFINITION:
       return DirectiveLocation.FIELD_DEFINITION;
     case IrisKind.TYPE_DEFINITION:
-      return DirectiveLocation.UNION;
+      return appliedTo.role === 'resolver'
+        ? DirectiveLocation.RESOLVER_DEFINITION
+        : DirectiveLocation.DATA_DEFINITION;
     case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
@@ -85,7 +82,7 @@ function getDirectiveLocationForASTPath(
         IrisKind.VARIANT_DEFINITION,
       ];
       return kinds.includes(parentNode.kind)
-        ? DirectiveLocation.INPUT_FIELD_DEFINITION
+        ? DirectiveLocation.FIELD_DEFINITION
         : DirectiveLocation.ARGUMENT_DEFINITION;
     }
     default:

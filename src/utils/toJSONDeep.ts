@@ -1,4 +1,12 @@
+import { parse } from '../language/parser';
+
+import type { IrisSchema } from '../type/schema';
+
+import { validateSDL } from '../validation/validate';
+import type { SDLValidationRule } from '../validation/ValidationContext';
+
 import { isObjectLike, mapValue } from './ObjMap';
+import type { Maybe } from './type-level';
 
 export function toJSONDeep(value: unknown): unknown {
   if (!isObjectLike(value)) {
@@ -23,4 +31,14 @@ export function toJSONError(fn: () => unknown) {
   } catch (error) {
     return toJSONDeep(error);
   }
+}
+
+export function getSDLValidationErrors(
+  schema: Maybe<IrisSchema>,
+  rule: SDLValidationRule,
+  sdlStr: string,
+): any {
+  const doc = parse(sdlStr);
+  const errors = validateSDL(doc, schema, [rule]);
+  return toJSONDeep(errors);
 }

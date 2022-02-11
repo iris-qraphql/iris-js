@@ -4,11 +4,10 @@ import type { DirectiveDefinitionNode } from '../language/ast';
 import { DirectiveLocation } from '../language/directiveLocation';
 
 import { inspect, instanceOf } from '../utils/legacy';
-import type { ConfigMap, Maybe } from '../utils/type-level';
+import type { Maybe } from '../utils/type-level';
 
 import type { IrisArgument } from './definition';
-import { buildArguments } from './definition';
-import { IrisScalars } from './scalars';
+import { IrisScalars } from './definition';
 
 /**
  * Test if the given value is a GraphQL directive.
@@ -44,7 +43,7 @@ export class GraphQLDirective {
     this.locations = config.locations;
     this.isRepeatable = config.isRepeatable ?? false;
     this.astNode = config.astNode;
-    this.args = buildArguments(config.args ?? {});
+    this.args = Object.values(config.args ?? {});
   }
 
   get [Symbol.toStringTag]() {
@@ -64,7 +63,7 @@ export interface GraphQLDirectiveConfig {
   name: string;
   description?: Maybe<string>;
   locations: ReadonlyArray<DirectiveLocation>;
-  args?: ConfigMap<IrisArgument>;
+  args?: ReadonlyArray<IrisArgument>;
   isRepeatable?: Maybe<boolean>;
   astNode?: Maybe<DirectiveDefinitionNode>;
 }
@@ -77,19 +76,19 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     name: 'deprecated',
     description: 'Marks an element of a GraphQL schema as no longer supported.',
     locations: [
+      DirectiveLocation.VARIABLE_DEFINITION,
       DirectiveLocation.FIELD_DEFINITION,
       DirectiveLocation.ARGUMENT_DEFINITION,
-      DirectiveLocation.INPUT_FIELD_DEFINITION,
-      DirectiveLocation.ENUM_VALUE,
     ],
-    args: {
-      reason: {
+    args: [
+      {
+        name: 'reason',
         type: IrisScalars.String,
         description:
           'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
         defaultValue: '',
       },
-    },
+    ],
   });
 
 /**

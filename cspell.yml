@@ -18,6 +18,6 @@ words:
   - instanceof
   - QLID # GraphQLID
   - Reqs
-
+  - transpiling
   # Mythology
   - Cronos

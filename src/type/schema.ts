@@ -1,10 +1,9 @@
 import type { ParseOptions, Source } from 'graphql';
-import { uniqBy } from 'ramda';
+import { prop, uniqBy } from 'ramda';
 
 import type {
   ArgumentDefinitionNode,
   DirectiveDefinitionNode,
-  DocumentNode,
   FieldDefinitionNode,
   NamedTypeNode,
   Role,
@@ -20,42 +19,25 @@ import { validateSDL } from '../validation/validate';
 import { valueFromAST } from '../conversion/valueFromAST';
 import { getDirectiveValues } from '../conversion/values';
 import type { IrisError } from '../error';
-import { inspect, instanceOf } from '../utils/legacy';
-import type { ObjMap } from '../utils/ObjMap';
-import type { ConfigMap, IrisMaybe, Maybe } from '../utils/type-level';
+import type { TypeMap } from '../utils/collectTypeMap';
+import { collectTypeMap } from '../utils/collectTypeMap';
+import type { IrisMaybe, Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
 
-import { collectAllReferencedTypes } from './collectAllReferencedTypes';
 import type {
   IrisArgument,
-  IrisFieldConfig,
-  IrisNamedType,
+  IrisField,
   IrisType,
-  IrisVariantConfig,
+  IrisVariant,
 } from './definition';
-import { IrisTypeDefinition, IrisTypeRef } from './definition';
+import { IrisScalars, IrisTypeDefinition, IrisTypeRef } from './definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,
   specifiedDirectives,
 } from './directives';
-import { IrisScalars } from './scalars';
 
-/**
- * Test if the given value is a GraphQL schema.
- */
-export function isSchema(schema: unknown): schema is IrisSchema {
-  return instanceOf(schema, IrisSchema);
-}
-
-export function assertSchema(schema: unknown): IrisSchema {
-  if (!isSchema(schema)) {
-    throw new Error(`Expected ${inspect(schema)} to be a GraphQL schema.`);
-  }
-  return schema;
-}
-
-export class IrisSchema {
+class IrisSchema {
   description: Maybe<string>;
 
   readonly query?: IrisTypeDefinition<'resolver'>;
@@ -67,99 +49,65 @@ export class IrisSchema {
   // Used as a cache for validateSchema().
   __validationErrors: Maybe<ReadonlyArray<IrisError>>;
 
-  constructor(config: Readonly<IrisSchemaConfig>) {
-    this.__validationErrors = config.assumeValid === true ? [] : undefined;
-    this.description = config.description;
-    this.query = config.query ?? undefined;
-    this.mutation = config.mutation ?? undefined;
-    this.subscription = config.subscription ?? undefined;
-    this.directives = uniqBy(
-      ({ name }) => name,
-      [...(config.directives ?? []), ...specifiedDirectives],
+  constructor({
+    description,
+    query,
+    mutation,
+    subscription,
+    types = [],
+    directives = [],
+  }: Readonly<IrisSchemaConfig>) {
+    this.description = description;
+    this.query = query;
+    this.mutation = mutation;
+    this.subscription = subscription;
+    this.directives = uniqBy(prop('name'), [
+      ...directives,
+      ...specifiedDirectives,
+    ]);
+
+    this.typeMap = collectTypeMap(
+      [query, mutation, subscription, ...types].filter(notNill),
+      this.directives,
     );
-
-    const types: Array<IrisNamedType> = [
-      this.query,
-      this.mutation,
-      this.subscription,
-      ...(config.types ?? []),
-    ].filter(notNill);
-
-    const typeMap: TypeMap = {};
-
-    collectAllReferencedTypes(types, this.directives).forEach((namedType) => {
-      const { name } = namedType;
-
-      if (!name) {
-        throw new Error(
-          'One of the provided types for building the Schema is missing a name.',
-        );
-      }
-
-      if (typeMap[name] !== undefined) {
-        throw new Error(
-          `Iris Schema must contain uniquely named types but contains multiple types named "${name}".`,
-        );
-      }
-
-      typeMap[name] = namedType;
-    });
-
-    this.typeMap = typeMap;
   }
 
   get [Symbol.toStringTag]() {
     return 'IrisSchema';
   }
 
-  getType = (name: string): IrisMaybe<IrisNamedType> => this.typeMap[name];
+  getType = (name: string): IrisMaybe<IrisTypeDefinition> => this.typeMap[name];
 
   getDirective = (name: string): Maybe<GraphQLDirective> =>
     this.directives.find((directive) => directive.name === name);
 }
 
-type TypeMap = ObjMap<IrisNamedType>;
-
-export type IrisSchemaValidationOptions = {
-  assumeValid?: boolean;
-  assumeValidSDL?: boolean;
-};
-
-export interface IrisSchemaConfig extends IrisSchemaValidationOptions {
+export interface IrisSchemaConfig {
   description?: Maybe<string>;
-  query?: Maybe<IrisTypeDefinition<'resolver'>>;
-  mutation?: Maybe<IrisTypeDefinition<'resolver'>>;
-  subscription?: Maybe<IrisTypeDefinition<'resolver'>>;
-  types?: Maybe<ReadonlyArray<IrisNamedType>>;
-  directives?: Maybe<ReadonlyArray<GraphQLDirective>>;
+  query?: IrisTypeDefinition<'resolver'>;
+  mutation?: IrisTypeDefinition<'resolver'>;
+  subscription?: IrisTypeDefinition<'resolver'>;
+  types?: ReadonlyArray<IrisTypeDefinition>;
+  directives?: ReadonlyArray<GraphQLDirective>;
 }
 
 export function buildSchema(
   source: string | Source,
-  options?: IrisSchemaValidationOptions & ParseOptions,
+  options?: ParseOptions,
 ): IrisSchema {
-  const document = parse(source, { noLocation: options?.noLocation });
+  const documentAST = parse(source, { noLocation: options?.noLocation });
+  const errors = validateSDL(documentAST);
 
-  return buildASTSchema(document, { ...options });
-}
-
-export function buildASTSchema(
-  documentAST: DocumentNode,
-  options?: IrisSchemaValidationOptions,
-): IrisSchema {
-  if (options?.assumeValid !== true && options?.assumeValidSDL !== true) {
-    const errors = validateSDL(documentAST);
-    if (errors.length !== 0) {
-      throw new Error(errors.map((error) => error.message).join('\n\n'));
-    }
+  if (errors.length !== 0) {
+    throw new Error(errors.map((error) => error.message).join('\n\n'));
   }
 
   const directiveDefs: Array<DirectiveDefinitionNode> = [];
-  const typeMap: Record<string, IrisNamedType> = {};
+  const typeMap: Record<string, IrisTypeDefinition> = {};
 
-  function getNamedType<R extends Role>(
+  function lookupType<R extends Role>(
     node: NamedTypeNode | VariantDefinitionNode<R>,
-  ): IrisNamedType<R> {
+  ): IrisTypeDefinition<R> {
     const name = node.name.value;
     const type = IrisScalars[name] ?? typeMap[name];
 
@@ -167,7 +115,7 @@ export function buildASTSchema(
       throw new Error(`Unknown type: "${name}".`);
     }
 
-    return type as IrisNamedType<R>;
+    return type as IrisTypeDefinition<R>;
   }
 
   function getWrappedType(node: TypeNode): IrisType {
@@ -177,7 +125,7 @@ export function buildASTSchema(
     if (node.kind === IrisKind.MAYBE_TYPE) {
       return new IrisTypeRef('MAYBE', getWrappedType(node.type));
     }
-    return getNamedType(node);
+    return lookupType(node);
   }
 
   function buildDirective(node: DirectiveDefinitionNode): GraphQLDirective {
@@ -186,42 +134,40 @@ export function buildASTSchema(
       description: node.description?.value,
       locations: node.locations.map(({ value }) => value as any),
       isRepeatable: node.repeatable,
-      args: buildArgumentMap(node.arguments),
+      args: node.arguments?.map(buildArgument),
       astNode: node,
     });
   }
 
-  function buildArgumentMap(
-    argsNodes: IrisMaybe<ReadonlyArray<ArgumentDefinitionNode>> = [],
-  ): ConfigMap<IrisArgument> {
-    const argConfigMap: ConfigMap<IrisArgument> = {};
-    for (const astNode of argsNodes) {
-      const type: any = getWrappedType(astNode.type);
-      argConfigMap[astNode.name.value] = {
-        type,
-        description: astNode.description?.value,
-        defaultValue: valueFromAST(astNode.defaultValue, type),
-        deprecationReason: getDeprecationReason(astNode),
-        astNode,
-      };
-    }
-    return argConfigMap;
+  function buildArgument(astNode: ArgumentDefinitionNode): IrisArgument {
+    const type: any = getWrappedType(astNode.type);
+    const name = astNode.name.value;
+    return {
+      name,
+      type,
+      description: astNode.description?.value,
+      defaultValue: valueFromAST(astNode.defaultValue, type),
+      deprecationReason: getDeprecationReason(astNode),
+      astNode,
+    };
   }
 
   const buildField = <R extends Role>(
     field: FieldDefinitionNode<R>,
-  ): IrisFieldConfig<R> =>
+  ): IrisField<R> =>
     ({
+      name: field.name.value,
       type: getWrappedType(field.type),
       description: field.description?.value,
       deprecationReason: getDeprecationReason(field),
       astNode: field,
-      args: field.arguments ? buildArgumentMap(field.arguments) : undefined,
-    } as IrisFieldConfig<R>);
+      args: field.arguments?.map(buildArgument),
+      toJSON: () => field.name.value,
+    } as IrisField<R>);
 
   const buildVariant = <R extends Role>(
     astNode: VariantDefinitionNode<R>,
-  ): IrisVariantConfig<R> => {
+  ): IrisVariant<R> => {
     const name = astNode.name.value;
     const description = astNode.description?.value;
     const deprecationReason = getDeprecationReason(astNode);
@@ -232,7 +178,7 @@ export function buildASTSchema(
         description,
         deprecationReason,
         astNode,
-        type: getNamedType(astNode),
+        type: lookupType(astNode),
       };
     }
 
@@ -280,7 +226,6 @@ export function buildASTSchema(
     mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
     subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
     directives: directiveDefs.map(buildDirective),
-    assumeValid: options?.assumeValid ?? false,
   });
 }
 
@@ -291,3 +236,5 @@ const getDeprecationReason = (
     | VariantDefinitionNode<Role>,
 ): Maybe<string> =>
   getDirectiveValues(GraphQLDeprecatedDirective, node)?.reason as string;
+
+export type { IrisSchema };

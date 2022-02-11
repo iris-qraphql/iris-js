@@ -17,10 +17,10 @@ type KindVisitor = {
     | EnterLeaveVisitor<NodeT>;
 };
 
-interface EnterLeaveVisitor<TVisitedNode extends ASTNode> {
+type EnterLeaveVisitor<TVisitedNode extends ASTNode> = {
   readonly enter?: ASTVisitFn<TVisitedNode>;
   readonly leave?: ASTVisitFn<TVisitedNode>;
-}
+};
 
 /**
  * A visitor is comprised of visit functions, which are called on each node
@@ -78,13 +78,7 @@ type ReducedField<T, R> = T extends null | undefined
   : R;
 
 /**
- * A KeyMap describes each the traversable properties of each kind of node.
- *
- * @deprecated Please inline it. Will be removed in v17
- */
-export type ASTVisitorKeyMap = {
-  [NodeT in ASTNode as NodeT['kind']]?: ReadonlyArray<keyof NodeT>;
-};
+
 
 /**
  * visit() will walk through an AST using a depth-first traversal, calling
@@ -164,20 +158,11 @@ export type ASTVisitorKeyMap = {
  * })
  * ```
  */
-export function visit<N extends ASTNode>(
-  root: N,
-  visitor: ASTVisitor,
-  visitorKeys?: ASTVisitorKeyMap,
-): N;
-export function visit<R>(
-  root: ASTNode,
-  visitor: ASTReducer<R>,
-  visitorKeys?: ASTVisitorKeyMap,
-): R;
+export function visit<N extends ASTNode>(root: N, visitor: ASTVisitor): N;
+export function visit<R>(root: ASTNode, visitor: ASTReducer<R>): R;
 export function visit(
   root: ASTNode,
   visitor: ASTVisitor | ASTReducer<any>,
-  visitorKeys: ASTVisitorKeyMap = QueryDocumentKeys,
 ): any {
   const enterLeaveMap = new Map<KIND, EnterLeaveVisitor<ASTNode>>();
   for (const kind of KINDS) {
@@ -285,7 +270,7 @@ export function visit(
     } else {
       stack = { inArray, index, keys, edits, prev: stack };
       inArray = Array.isArray(node);
-      keys = inArray ? node : (visitorKeys as any)[node.kind] ?? [];
+      keys = inArray ? node : (QueryDocumentKeys as any)[node.kind] ?? [];
       index = -1;
       edits = [];
       if (parent) {
@@ -372,7 +357,7 @@ export function visitInParallel(
 /**
  * Given a visitor instance and a node kind, return EnterLeaveVisitor for that kind.
  */
-export function getEnterLeaveForKind(
+function getEnterLeaveForKind(
   visitor: ASTVisitor,
   kind: KIND,
 ): EnterLeaveVisitor<ASTNode> {
@@ -391,20 +376,4 @@ export function getEnterLeaveForKind(
 
   // { enter() {}, leave() {} }
   return { enter: (visitor as any).enter, leave: (visitor as any).leave };
-}
-
-/**
- * Given a visitor instance, if it is leaving or not, and a node kind, return
- * the function the visitor runtime should call.
- *
- * @deprecated Please use `getEnterLeaveForKind` instead. Will be removed in v17
- */
-/* c8 ignore next 8 */
-export function getVisitFn(
-  visitor: ASTVisitor,
-  kind: KIND,
-  isLeaving: boolean,
-): ASTVisitFn<ASTNode> | undefined {
-  const { enter, leave } = getEnterLeaveForKind(visitor, kind);
-  return isLeaving ? leave : enter;
 }
