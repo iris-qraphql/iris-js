@@ -6,7 +6,6 @@ import type { IrisArgument, IrisType, IrisTypeDefinition } from '../definition';
 import {
   IrisScalars,
   isInputType,
-  isListType,
   isRequiredArgument,
   isSpecifiedScalarType,
   isType,
@@ -90,20 +89,6 @@ describe('Type predicates', () => {
       expect(
         isSpecifiedScalarType(ScalarType as IrisTypeDefinition<'data'>),
       ).toEqual(false);
-    });
-  });
-
-  describe('isListType', () => {
-    it('returns true for a list wrapped type', () => {
-      tautology(isListType, '[Object]');
-    });
-
-    it('returns false for an unwrapped type', () => {
-      check(isListType, 'Object').toBe(false);
-    });
-
-    it('returns false for a non-list wrapped type', () => {
-      expect(isListType(sampleTypeRef('[Boolean]?'))).toEqual(false);
     });
   });
 

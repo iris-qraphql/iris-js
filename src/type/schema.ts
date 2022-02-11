@@ -124,7 +124,7 @@ export function buildSchema(
   const directiveDefs: Array<DirectiveDefinitionNode> = [];
   const typeMap: Record<string, IrisTypeDefinition> = {};
 
-  function getNamedType<R extends Role>(
+  function lookupType<R extends Role>(
     node: NamedTypeNode | VariantDefinitionNode<R>,
   ): IrisTypeDefinition<R> {
     const name = node.name.value;
@@ -144,7 +144,7 @@ export function buildSchema(
     if (node.kind === IrisKind.MAYBE_TYPE) {
       return new IrisTypeRef('MAYBE', getWrappedType(node.type));
     }
-    return getNamedType(node);
+    return lookupType(node);
   }
 
   function buildDirective(node: DirectiveDefinitionNode): GraphQLDirective {
@@ -197,7 +197,7 @@ export function buildSchema(
         description,
         deprecationReason,
         astNode,
-        type: getNamedType(astNode),
+        type: lookupType(astNode),
       };
     }
 

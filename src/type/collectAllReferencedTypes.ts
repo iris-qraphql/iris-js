@@ -1,7 +1,7 @@
 import type { Role } from '../language/ast';
 
 import type { IrisType, IrisTypeDefinition, IrisVariant } from './definition';
-import { getNamedType } from './definition';
+import { unwrapType } from './definition';
 import type { GraphQLDirective } from './directives';
 import { isDirective } from './directives';
 
@@ -38,7 +38,7 @@ function collectReferencedTypes(
   type: IrisType,
   typeSet: Set<IrisTypeDefinition>,
 ): void {
-  const namedType = getNamedType(type);
+  const namedType = unwrapType(type);
 
   if (typeSet.has(namedType)) {
     return;

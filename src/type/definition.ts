@@ -82,36 +82,10 @@ export const isMaybeType = (
 ): type is IrisTypeRef<IrisTypeDefinition> =>
   isTypeRef(type) && type.kind === 'MAYBE';
 
-export const isListType = (type: unknown): type is IrisTypeRef<IrisType> =>
-  isTypeRef(type) && type.kind === 'LIST';
+export const unwrapType = (type: IrisType): IrisTypeDefinition =>
+  isTypeRef(type) ? unwrapType(type.ofType) : type;
 
-export const unpackMaybe = (type: Maybe<IrisType>): IrisType | undefined => {
-  if (type) {
-    return isTypeRef(type) && type.kind === 'MAYBE' ? type.ofType : type;
-  }
-};
-
-export function getNamedType(type: undefined | null): void;
-export function getNamedType(
-  type: IrisType<'data'>,
-): IrisTypeDefinition<'data'>;
-export function getNamedType(type: IrisType): IrisTypeDefinition;
-export function getNamedType(
-  type: Maybe<IrisType>,
-): IrisTypeDefinition | undefined;
-export function getNamedType(
-  type: Maybe<IrisType>,
-): IrisTypeDefinition | undefined {
-  if (type) {
-    let unwrappedType = type;
-    while (isTypeRef(unwrappedType)) {
-      unwrappedType = unwrappedType.ofType;
-    }
-    return unwrappedType;
-  }
-}
-
-type IrisEntity = {
+type IrisNode = {
   name: string;
   description?: Maybe<string>;
   deprecationReason?: Maybe<string>;
@@ -126,7 +100,7 @@ const isThunk = <T>(thunk: Thunk<T>): thunk is () => T =>
 export const resolveThunk = <T>(thunk: Thunk<T>): T =>
   isThunk(thunk) ? thunk() : thunk;
 
-export type IrisArgument = IrisEntity & {
+export type IrisArgument = IrisNode & {
   type: IrisType<'data'>;
   defaultValue?: unknown;
   astNode?: ArgumentDefinitionNode;
@@ -135,13 +109,13 @@ export type IrisArgument = IrisEntity & {
 export const isRequiredArgument = (arg: IrisArgument): boolean =>
   !isMaybeType(arg.type) && arg.defaultValue === undefined;
 
-export type IrisField<R extends Role> = IrisEntity & {
+export type IrisField<R extends Role> = IrisNode & {
   astNode?: FieldDefinitionNode<R>;
   type: R extends 'data' ? IrisType<'data'> : IrisType;
   args?: R extends 'data' ? never : ReadonlyArray<IrisArgument>;
 };
 
-export type IrisVariant<R extends Role> = IrisEntity & {
+export type IrisVariant<R extends Role> = IrisNode & {
   astNode?: VariantDefinitionNode<R>;
   toJSON?: () => string;
   fields?: ObjMap<IrisField<R>>;
