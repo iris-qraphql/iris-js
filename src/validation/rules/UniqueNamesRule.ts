@@ -1,50 +1,80 @@
-import type { TypeDefinitionNode } from '../../language/ast';
+import { forEachObjIndexed, groupBy } from 'ramda';
+
+import type { NameNode, TypeDefinitionNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisNodeError } from '../../error';
-import { getDuplicates } from '../../utils/duplicates';
 
 import type { SDLValidationContext } from '../ValidationContext';
 
+const checkUniquenessBy =
+  <T extends { name: NameNode }>(ctx: SDLValidationContext) =>
+  (f: (x: string) => string, argumentNodes: ReadonlyArray<T>): void => {
+    const seenArgs = groupBy((arg) => arg.name.value, argumentNodes);
+
+    forEachObjIndexed((argNodes, argName) => {
+      if (argNodes.length > 1) {
+        ctx.reportError(
+          irisNodeError(
+            `${f(argName)} can only be defined once.`,
+            argNodes.map((node) => node.name),
+          ),
+        );
+      }
+    }, seenArgs);
+  };
+
+const registerUniq = (context: SDLValidationContext) => {
+  const knownNames: Record<string, NameNode> = {};
+
+  return (node: NameNode) => {
+    const name = node.value;
+    if (knownNames[name]) {
+      return context.reportError(
+        irisNodeError(`There can be only one type named "${name}".`, [
+          knownNames[name],
+          node,
+        ]),
+      );
+    }
+
+    knownNames[name] = node;
+  };
+};
+
 export function UniqueNamesRule(context: SDLValidationContext): ASTVisitor {
-  const knownTypeNames = Object.create(null);
+  const uniqTypeName = registerUniq(context);
+  const uniq = checkUniquenessBy(context);
 
   return {
     TypeDefinition(type: TypeDefinitionNode) {
       const typeName = type.name.value;
 
-      if (knownTypeNames[typeName]) {
-        context.reportError(
-          irisNodeError(`There can be only one type named "${typeName}".`, [
-            knownTypeNames[typeName],
-            type.name,
-          ]),
-        );
-      } else {
-        knownTypeNames[typeName] = type.name;
+      uniqTypeName(type.name);
+      uniq((name) => `Variant "${typeName}.${name}"`, type.variants);
+
+      for (const variant of type.variants) {
+        const variantName = variant.name.value;
+        const fields = variant.fields ?? [];
+
+        uniq((name) => `Field "${variantName}.${name}"`, fields);
+
+        for (const field of fields) {
+          const fieldName = field.name.value;
+          const args = field.arguments ?? [];
+
+          uniq(
+            (name) => `Argument "${variantName}.${fieldName}(${name}:)"`,
+            args,
+          );
+        }
       }
-
-      getDuplicates(type.variants).forEach(([name, node]) =>
-        context.reportError(
-          irisNodeError(
-            `Variant "${type.name.value}.${node.name.value}" can only be defined once.`,
-            [name, node.name],
-          ),
-        ),
+    },
+    DirectiveDefinition(node) {
+      uniq(
+        (argName) => `Argument "@${node.name.value}(${argName}:)"`,
+        node.arguments ?? [],
       );
-
-      type.variants.forEach((variant) =>
-        getDuplicates(variant.fields ?? []).forEach(([name, node]) =>
-          context.reportError(
-            irisNodeError(
-              `Field "${variant.name.value}.${node.name.value}" can only be defined once.`,
-              [name, node.name],
-            ),
-          ),
-        ),
-      );
-
-      return false;
     },
   };
 }

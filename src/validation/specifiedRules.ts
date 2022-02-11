@@ -3,7 +3,6 @@ import { KnownArgumentNamesOnDirectivesRule } from './rules/KnownArgumentNamesRu
 import { KnownDirectivesRule } from './rules/KnownDirectivesRule';
 import { KnownTypeNamesRule } from './rules/KnownTypeNamesRule';
 import { ProvidedRequiredArgumentsOnDirectivesRule } from './rules/ProvidedRequiredArgumentsRule';
-import { UniqueArgumentDefinitionNamesRule } from './rules/UniqueArgumentDefinitionNamesRule';
 import { UniqueArgumentNamesRule } from './rules/UniqueArgumentNamesRule';
 import { UniqueDirectiveNamesRule } from './rules/UniqueDirectiveNamesRule';
 import { UniqueDirectivesPerLocationRule } from './rules/UniqueDirectivesPerLocationRule';
@@ -17,7 +16,6 @@ import type { SDLValidationRule } from './ValidationContext';
 export const specifiedSDLRules: ReadonlyArray<SDLValidationRule> =
   Object.freeze([
     UniqueNamesRule,
-    UniqueArgumentDefinitionNamesRule,
     UniqueDirectiveNamesRule,
     KnownTypeNamesRule,
     KnownDirectivesRule,

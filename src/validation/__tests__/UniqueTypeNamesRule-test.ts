@@ -8,9 +8,8 @@ function expectSDLErrors(sdlStr: string, schema?: IrisSchema) {
   return expect(getSDLValidationErrors(schema, UniqueNamesRule, sdlStr));
 }
 
-function expectValidSDL(sdlStr: string, schema?: IrisSchema) {
+const expectValidSDL = (sdlStr: string, schema?: IrisSchema) =>
   expectSDLErrors(sdlStr, schema).toEqual([]);
-}
 
 describe('Validate: Unique type names', () => {
   it('one type', () => {
@@ -32,22 +31,7 @@ describe('Validate: Unique type names', () => {
       resolver Foo
       data Foo
       data Foo
-    `).toEqual([
-      {
-        message: 'There can be only one type named "Foo".',
-        locations: [
-          { line: 2, column: 16 },
-          { line: 3, column: 12 },
-        ],
-      },
-      {
-        message: 'There can be only one type named "Foo".',
-        locations: [
-          { line: 2, column: 16 },
-          { line: 4, column: 12 },
-        ],
-      },
-    ]);
+    `).toMatchSnapshot();
   });
 });
 
@@ -98,21 +82,82 @@ describe('Validate: Unique field definition names', () => {
         bar: String
         foo: String
       }
-    `).toEqual([
-      {
-        message: 'Field "SomeObject.foo" can only be defined once.',
-        locations: [
-          { line: 3, column: 9 },
-          { line: 5, column: 9 },
-        ],
-      },
-      {
-        message: 'Field "SomeInputObject.foo" can only be defined once.',
-        locations: [
-          { line: 9, column: 9 },
-          { line: 11, column: 9 },
-        ],
-      },
-    ]);
+    `).toMatchSnapshot();
+  });
+});
+
+describe('Validate: Unique variant definition names', () => {
+  it('multiple variants', () => {
+    expectValidSDL(`
+      data SomData = A {} | B {}
+      resolver SomeResolver = A {} | B {}
+    `);
+  });
+
+  it('duplicate fields inside the same type definition', () => {
+    expectSDLErrors(`
+      data SomData 
+        = A {} 
+        | B {}
+        | A {}
+
+      resolver SomeResolver 
+        = C {} 
+        | D {}
+        | D {}
+    `).toMatchSnapshot();
+  });
+});
+
+describe('Validate: Unique argument definition names', () => {
+  it('no args', () => {
+    expectValidSDL(`
+      resolver SomeObject = {
+        someField: String
+      }
+
+      directive @someDirective on QUERY
+    `);
+  });
+
+  it('one argument', () => {
+    expectValidSDL(`
+      resolver SomeObject = { someField(foo: String): String }
+      directive @someDirective(foo: String) on QUERY
+    `);
+  });
+
+  it('multiple arguments', () => {
+    expectValidSDL(`
+      resolver SomeObject = {
+        someField(
+          foo: String
+          bar: String
+        ): String
+      }
+
+      directive @someDirective(
+        foo: String
+        bar: String
+      ) on QUERY
+    `);
+  });
+
+  it('duplicating arguments', () => {
+    expectSDLErrors(`
+      resolver SomeObject = {
+        someField(
+          foo: String
+          bar: String
+          foo: String
+        ): String
+      }
+
+      directive @someDirective(
+        foo: String
+        bar: String
+        foo: String
+      ) on QUERY
+    `).toMatchSnapshot();
   });
 });
