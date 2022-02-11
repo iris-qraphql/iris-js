@@ -100,13 +100,9 @@ function validateDirectives(context: SchemaValidationContext): void {
       continue;
     }
 
-    // Ensure they are named correctly.
-    validateName(context, directive);
-
     // Ensure the arguments are valid.
     for (const arg of directive.args) {
       // Ensure they are named correctly.
-      validateName(context, arg);
 
       // Ensure the type is an input type.
       if (!isInputType(arg.type)) {
@@ -127,18 +123,7 @@ function validateDirectives(context: SchemaValidationContext): void {
   }
 }
 
-function validateName(
-  context: SchemaValidationContext,
-  node: { readonly name: string; readonly astNode?: Maybe<ASTNode> },
-): void {
-  // Ensure names are valid, however introspection types opt out.
-  if (node.name.startsWith('__')) {
-    context.reportError(
-      `Name "${node.name}" must not begin with "__", which is reserved by GraphQL introspection.`,
-      node.astNode,
-    );
-  }
-}
+
 
 function validateTypes(ctx: SchemaValidationContext): void {
   Object.values(ctx.schema.typeMap).forEach((type) => {
@@ -174,9 +159,6 @@ function validateFields(
   fields: ReadonlyArray<IrisField<'resolver'>>,
 ): void {
   for (const field of fields) {
-    // Ensure they are named correctly.
-    validateName(context, field);
-
     // Ensure the type is an output type
     if (!isType(field.type)) {
       context.reportError(
@@ -189,10 +171,6 @@ function validateFields(
     // Ensure the arguments are valid
     for (const arg of field.args ?? []) {
       const argName = arg.name;
-
-      // Ensure they are named correctly.
-      validateName(context, arg);
-
       // Ensure the type is an input type
       if (!isInputType(arg.type)) {
         context.reportError(
@@ -216,10 +194,7 @@ const validateDataType = (
   context: SchemaValidationContext,
   type: IrisTypeDefinition<'data'>,
 ): void => {
-  type.variants().forEach((variant) => {
-    validateName(context, variant);
-    validateDataFields(context, variant);
-  });
+  type.variants().forEach((variant) => validateDataFields(context, variant));
 };
 
 function validateDataFields(
@@ -230,9 +205,6 @@ function validateDataFields(
 
   // Ensure the arguments are valid
   for (const field of fields) {
-    // Ensure they are named correctly.
-    validateName(context, field);
-
     // Ensure the type is an input type
     if (!isInputType(field.type)) {
       context.reportError(

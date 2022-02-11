@@ -1,5 +1,5 @@
 import type { GraphQLScalarType } from 'graphql';
-import { assertName, specifiedScalarTypes } from 'graphql';
+import { specifiedScalarTypes } from 'graphql';
 import { pluck } from 'ramda';
 
 import type {
@@ -142,7 +142,7 @@ export class IrisTypeDefinition<R extends Role = Role> {
   #scalar?: GraphQLScalarType;
 
   constructor(config: Readonly<IrisTypeConfig<R>>) {
-    this.name = assertName(config.name);
+    this.name = config.name;
     this.description = config.description;
     this.astNode = config.astNode;
     this.role = config.role;

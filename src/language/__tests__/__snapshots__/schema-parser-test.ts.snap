@@ -1240,3 +1240,39 @@ Object {
   },
 }
 `;
+
+exports[`Schema Parser reject reserved names rejects an Enum type with incorrectly named values 1`] = `
+Object {
+  "locations": Array [
+    Object {
+      "column": 23,
+      "line": 3,
+    },
+  ],
+  "message": "Syntax Error: Name \\"__badName\\" must not begin with \\"__\\", which is reserved by GraphQL introspection.",
+}
+`;
+
+exports[`Schema Parser reject reserved names rejects an Object type with incorrectly named fields 1`] = `
+Object {
+  "locations": Array [
+    Object {
+      "column": 20,
+      "line": 3,
+    },
+  ],
+  "message": "Syntax Error: Name \\"__badName\\" must not begin with \\"__\\", which is reserved by GraphQL introspection.",
+}
+`;
+
+exports[`Schema Parser reject reserved names rejects field arg with invalid names 1`] = `
+Object {
+  "locations": Array [
+    Object {
+      "column": 29,
+      "line": 3,
+    },
+  ],
+  "message": "Syntax Error: Name \\"__badName\\" must not begin with \\"__\\", which is reserved by GraphQL introspection.",
+}
+`;

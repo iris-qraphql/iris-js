@@ -42,9 +42,6 @@ function schemaWithFieldType(
 const expectJSONEqual = (schema: IrisSchema, value: unknown) =>
   expect(toJSONDeep(validateSchema(schema))).toEqual(value);
 
-const snapshot = (schema: IrisSchema) =>
-  expect(toJSONDeep(validateSchema(schema))).toMatchSnapshot();
-
 describe('basic Cases', () => {
   it('can build invalid schema', () => {
     // Invalid schema, because it is missing query root type
@@ -132,12 +129,6 @@ describe('Type System: Objects must have fields', () => {
     `);
     expectJSONEqual(schema, []);
   });
-
-  it('rejects an Object type with incorrectly named fields', () => {
-    snapshot(
-      schemaWithFieldType('resolver', 'SomeObject', '{ __badName: String}'),
-    );
-  });
 });
 
 describe('Type System: Fields args must be properly named', () => {
@@ -148,16 +139,6 @@ describe('Type System: Fields args must be properly named', () => {
       '{ goodField(goodArg: String): String }',
     );
     expectJSONEqual(schema, []);
-  });
-
-  it('rejects field arg with invalid names', () => {
-    snapshot(
-      schemaWithFieldType(
-        'resolver',
-        'SomeObject',
-        '{ badField(__badName: String): String}',
-      ),
-    );
   });
 
   describe('Type System: Union types must be valid', () => {
@@ -274,12 +255,6 @@ describe('Type System: Fields args must be properly named', () => {
           locations: [{ line: 14, column: 19 }],
         },
       ]);
-    });
-  });
-
-  describe('Type System: Enum types must be well defined', () => {
-    it('rejects an Enum type with incorrectly named values', () => {
-      snapshot(schemaWithFieldType('data', 'SomeEnum', '__badName {}'));
     });
   });
 
