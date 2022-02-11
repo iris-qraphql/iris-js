@@ -8,15 +8,22 @@ import { irisNodeError } from '../../error';
 import type { SDLValidationContext } from '../ValidationContext';
 
 const checkUniquenessBy =
-  <T extends { name: NameNode }>(ctx: SDLValidationContext) =>
-  (f: (x: string) => string, argumentNodes: ReadonlyArray<T>): void => {
-    const seenArgs = groupBy((arg) => arg.name.value, argumentNodes);
+  (ctx: SDLValidationContext, kind?: string) =>
+  (
+    nodes: ReadonlyArray<{ name: NameNode }>,
+    f?: (x: string) => string,
+  ): void => {
+    const seenArgs = groupBy((arg) => arg.name.value, nodes);
+    const message = (name: string) =>
+      f
+        ? `${f(name)} can only be defined once.`
+        : `There can be only one ${kind} named "${name}".`;
 
     forEachObjIndexed((argNodes, argName) => {
       if (argNodes.length > 1) {
         ctx.reportError(
           irisNodeError(
-            `${f(argName)} can only be defined once.`,
+            message(argName),
             argNodes.map((node) => node.name),
           ),
         );
@@ -24,14 +31,14 @@ const checkUniquenessBy =
     }, seenArgs);
   };
 
-const registerUniq = (context: SDLValidationContext) => {
+const registerUniq = (context: SDLValidationContext, kind: string) => {
   const knownNames: Record<string, NameNode> = {};
 
   return (node: NameNode) => {
     const name = node.value;
     if (knownNames[name]) {
       return context.reportError(
-        irisNodeError(`There can be only one type named "${name}".`, [
+        irisNodeError(`There can be only one ${kind} named "${name}".`, [
           knownNames[name],
           node,
         ]),
@@ -43,38 +50,43 @@ const registerUniq = (context: SDLValidationContext) => {
 };
 
 export function UniqueNamesRule(context: SDLValidationContext): ASTVisitor {
-  const uniqTypeName = registerUniq(context);
   const uniq = checkUniquenessBy(context);
+  const registerType = registerUniq(context, 'type');
+  const registerDirective = registerUniq(context, 'directive');
 
   return {
     TypeDefinition(type: TypeDefinitionNode) {
       const typeName = type.name.value;
 
-      uniqTypeName(type.name);
-      uniq((name) => `Variant "${typeName}.${name}"`, type.variants);
+      registerType(type.name);
+      uniq(type.variants, (name) => `Variant "${typeName}.${name}"`);
 
       for (const variant of type.variants) {
         const variantName = variant.name.value;
         const fields = variant.fields ?? [];
 
-        uniq((name) => `Field "${variantName}.${name}"`, fields);
+        uniq(fields, (name) => `Field "${variantName}.${name}"`);
 
         for (const field of fields) {
           const fieldName = field.name.value;
           const args = field.arguments ?? [];
 
           uniq(
-            (name) => `Argument "${variantName}.${fieldName}(${name}:)"`,
             args,
+            (name) => `Argument "${variantName}.${fieldName}(${name}:)"`,
           );
         }
       }
     },
     DirectiveDefinition(node) {
-      uniq(
-        (argName) => `Argument "@${node.name.value}(${argName}:)"`,
-        node.arguments ?? [],
-      );
+      const directiveName = node.name.value;
+      const args = node.arguments ?? [];
+
+      registerDirective(node.name);
+      uniq(args, (name) => `Argument "@${directiveName}(${name}:)"`);
+    },
+    Directive(node) {
+      checkUniquenessBy(context, 'argument')(node.arguments ?? []);
     },
   };
 }
