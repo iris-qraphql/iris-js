@@ -6,11 +6,24 @@ import { getDuplicates } from '../../utils/duplicates';
 
 import type { SDLValidationContext } from '../ValidationContext';
 
-export function UniqueVariantAndFieldDefinitionNamesRule(
-  context: SDLValidationContext,
-): ASTVisitor {
+export function UniqueNamesRule(context: SDLValidationContext): ASTVisitor {
+  const knownTypeNames = Object.create(null);
+
   return {
-    TypeDefinition: (type: TypeDefinitionNode) => {
+    TypeDefinition(type: TypeDefinitionNode) {
+      const typeName = type.name.value;
+
+      if (knownTypeNames[typeName]) {
+        context.reportError(
+          irisNodeError(`There can be only one type named "${typeName}".`, [
+            knownTypeNames[typeName],
+            type.name,
+          ]),
+        );
+      } else {
+        knownTypeNames[typeName] = type.name;
+      }
+
       getDuplicates(type.variants).forEach(([name, node]) =>
         context.reportError(
           irisNodeError(

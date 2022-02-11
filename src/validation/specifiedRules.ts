@@ -8,8 +8,7 @@ import { UniqueArgumentNamesRule } from './rules/UniqueArgumentNamesRule';
 import { UniqueDirectiveNamesRule } from './rules/UniqueDirectiveNamesRule';
 import { UniqueDirectivesPerLocationRule } from './rules/UniqueDirectivesPerLocationRule';
 import { UniqueInputFieldNamesRule } from './rules/UniqueInputFieldNamesRule';
-import { UniqueTypeNamesRule } from './rules/UniqueTypeNamesRule';
-import { UniqueVariantAndFieldDefinitionNamesRule } from './rules/UniqueVariantAndFieldDefinitionNamesRule';
+import { UniqueNamesRule } from './rules/UniqueNamesRule';
 import type { SDLValidationRule } from './ValidationContext';
 
 /**
@@ -17,8 +16,7 @@ import type { SDLValidationRule } from './ValidationContext';
  */
 export const specifiedSDLRules: ReadonlyArray<SDLValidationRule> =
   Object.freeze([
-    UniqueTypeNamesRule,
-    UniqueVariantAndFieldDefinitionNamesRule,
+    UniqueNamesRule,
     UniqueArgumentDefinitionNamesRule,
     UniqueDirectiveNamesRule,
     KnownTypeNamesRule,
