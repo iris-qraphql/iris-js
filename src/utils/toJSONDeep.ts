@@ -1,8 +1,7 @@
-import { parse } from '../language/parser';
-
 import { validateSDL } from '../validation/validate';
 import type { SDLValidationRule } from '../validation/ValidationContext';
 
+import { parse } from '../parsing/parser';
 import type { IrisSchema } from '../types/schema';
 
 import { isObjectLike, mapValue } from './ObjMap';

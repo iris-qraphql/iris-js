@@ -15,7 +15,7 @@ import { toGQLSchema } from './transpiling/toGQLSchema';
 import type { IrisSchema } from './types/schema';
 
 export { version, versionInfo } from './version';
-export { parse } from './language/parser';
+export { parse } from './parsing/parser';
 export { print } from './printing/printer';
 
 export type IrisArgs = Omit<GraphQLArgs, 'schema'> & {

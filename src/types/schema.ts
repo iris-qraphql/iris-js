@@ -1,12 +1,11 @@
 import type { DirectiveNode, ParseOptions, Source } from 'graphql';
 import { prop, uniqBy } from 'ramda';
 
-import { parse } from '../language/parser';
-
 import { validateSDL } from '../validation/validate';
 
 import { valueFromAST } from '../conversion/valueFromAST';
 import type { IrisError } from '../error';
+import { parse } from '../parsing/parser';
 import type { TypeMap } from '../utils/collectTypeMap';
 import { collectTypeMap } from '../utils/collectTypeMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
