@@ -2,15 +2,6 @@ import type { GraphQLScalarType } from 'graphql';
 import { specifiedScalarTypes } from 'graphql';
 import { pluck } from 'ramda';
 
-import type {
-  ArgumentDefinitionNode,
-  FieldDefinitionNode,
-  Role,
-  TypeDefinitionNode,
-  VariantDefinitionNode,
-  WrapperKind,
-} from '../language/ast';
-
 import { irisError } from '../error';
 import {
   didYouMean,
@@ -21,6 +12,15 @@ import {
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
+
+import type {
+  ArgumentDefinitionNode,
+  FieldDefinitionNode,
+  Role,
+  TypeDefinitionNode,
+  VariantDefinitionNode,
+  WrapperKind,
+} from './ast';
 
 export const stdScalars = keyMap(specifiedScalarTypes, ({ name }) => name);
 

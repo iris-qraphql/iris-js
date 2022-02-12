@@ -1,10 +1,10 @@
 import { printBlockString } from 'graphql/language/blockString';
 import { printString } from 'graphql/language/printString';
 
-import type { ASTNode } from '../language/ast';
 import type { ASTReducer } from '../language/visitor';
 import { visit } from '../language/visitor';
 
+import type { ASTNode } from '../types/ast';
 import type { Maybe } from '../utils/type-level';
 
 /**

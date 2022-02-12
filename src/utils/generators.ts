@@ -1,8 +1,7 @@
 import type { GraphQLScalarTypeConfig } from 'graphql';
 import { GraphQLScalarType } from 'graphql';
 
-import type { Role } from '../language/ast';
-
+import type { Role } from '../types/ast';
 import type { IrisType } from '../types/definition';
 import { IrisTypeDefinition } from '../types/definition';
 import { buildSchema } from '../types/schema';

@@ -2,7 +2,7 @@ import type { ASTNode as Node, Source } from 'graphql';
 import { GraphQLError } from 'graphql';
 import type { GraphQLErrorArgs } from 'graphql/error/GraphQLError';
 
-import type { ASTNode } from './language/ast';
+import type { ASTNode } from './types/ast';
 
 export type IrisError = GraphQLError;
 

@@ -1,7 +1,6 @@
 import { Kind } from 'graphql';
 
-import type { ObjectValueNode, ValueNode } from '../language/ast';
-
+import type { ObjectValueNode, ValueNode } from '../types/ast';
 import type { IrisType, IrisVariant } from '../types/definition';
 import { isMaybeType, isTypeRef } from '../types/definition';
 import type { ObjMap } from '../utils/ObjMap';

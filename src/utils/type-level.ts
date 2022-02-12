@@ -1,6 +1,6 @@
 import { Kind } from 'graphql';
 
-import type { ObjectFieldNode } from '../language/ast';
+import type { ObjectFieldNode } from '../types/ast';
 
 import type { ObjMap } from './ObjMap';
 

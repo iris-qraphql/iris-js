@@ -1,9 +1,9 @@
 import { forEachObjIndexed, groupBy } from 'ramda';
 
-import type { NameNode, TypeDefinitionNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisNodeError } from '../../error';
+import type { NameNode, TypeDefinitionNode } from '../../types/ast';
 
 import type { SDLValidationContext } from '../ValidationContext';
 

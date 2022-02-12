@@ -1,4 +1,3 @@
-import type { ASTNode } from '../../language/ast';
 import {
   isTypeDefinitionNode,
   isTypeSystemDefinitionNode,
@@ -6,6 +5,7 @@ import {
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisNodeError } from '../../error';
+import type { ASTNode } from '../../types/ast';
 import { scalarNames } from '../../types/definition';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 

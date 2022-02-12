@@ -23,7 +23,7 @@ import type {
   VariableNode,
 } from 'graphql';
 
-import type { IrisKind } from '../types/kinds';
+import type { IrisKind } from './kinds';
 
 /**
  * The list of all possible AST node types.

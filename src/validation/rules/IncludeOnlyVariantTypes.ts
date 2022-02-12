@@ -1,12 +1,12 @@
 import { Kind } from 'graphql';
 
-import type {
-  TypeDefinitionNode,
-  VariantDefinitionNode,
-} from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisNodeError } from '../../error';
+import type {
+  TypeDefinitionNode,
+  VariantDefinitionNode,
+} from '../../types/ast';
 import { scalarNames } from '../../types/definition';
 import { IrisKind } from '../../types/kinds';
 

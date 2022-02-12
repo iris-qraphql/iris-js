@@ -1,16 +1,6 @@
 import type { DirectiveNode, ParseOptions, Source } from 'graphql';
 import { prop, uniqBy } from 'ramda';
 
-import type {
-  ArgumentDefinitionNode,
-  DirectiveDefinitionNode,
-  FieldDefinitionNode,
-  NamedTypeNode,
-  Role,
-  TypeDefinitionNode,
-  TypeNode,
-  VariantDefinitionNode,
-} from '../language/ast';
 import { parse } from '../language/parser';
 
 import { validateSDL } from '../validation/validate';
@@ -22,6 +12,16 @@ import { collectTypeMap } from '../utils/collectTypeMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
 
+import type {
+  ArgumentDefinitionNode,
+  DirectiveDefinitionNode,
+  FieldDefinitionNode,
+  NamedTypeNode,
+  Role,
+  TypeDefinitionNode,
+  TypeNode,
+  VariantDefinitionNode,
+} from './ast';
 import type {
   IrisArgument,
   IrisField,

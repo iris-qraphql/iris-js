@@ -1,8 +1,8 @@
-import type { ArgumentDefinitionNode } from '../../language/ast';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisError } from '../../error';
 import { print } from '../../printing/printer';
+import type { ArgumentDefinitionNode } from '../../types/ast';
 import type { IrisArgument } from '../../types/definition';
 import { isRequiredArgument, isType } from '../../types/definition';
 import { specifiedDirectives } from '../../types/directives';

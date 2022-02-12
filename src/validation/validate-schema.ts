@@ -1,7 +1,6 @@
-import type { ASTNode, DirectiveNode } from '../language/ast';
-
 import type { IrisError } from '../error';
 import { irisNodeError } from '../error';
+import type { ASTNode, DirectiveNode } from '../types/ast';
 import type {
   IrisField,
   IrisTypeDefinition,

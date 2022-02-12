@@ -3,10 +3,6 @@ import { Kind, Location, Source } from 'graphql';
 
 import type { IrisError } from '../error';
 import { syntaxError } from '../error';
-import { IrisKind, TokenKind } from '../types/kinds';
-import { instanceOf } from '../utils/legacy';
-import type { Maybe } from '../utils/type-level';
-
 import type {
   ArgumentDefinitionNode,
   ArgumentNode,
@@ -37,7 +33,11 @@ import type {
   TypeNode,
   ValueNode,
   VariableNode,
-} from './ast';
+} from '../types/ast';
+import { IrisKind, TokenKind } from '../types/kinds';
+import { instanceOf } from '../utils/legacy';
+import type { Maybe } from '../utils/type-level';
+
 import { parseDefinitions } from './definitions';
 import { DirectiveLocation } from './directiveLocation';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
