@@ -1,12 +1,12 @@
 import { IrisScalars } from '../definition';
-import { DirectiveLocation } from '../directiveLocation';
+import { IrisDirectiveLocation } from '../directiveLocation';
 import { GraphQLDirective } from '../directives';
 
 describe('Type System: Directive', () => {
   it('defines a directive with no args', () => {
     const directive = new GraphQLDirective({
       name: 'Foo',
-      locations: [DirectiveLocation.QUERY],
+      locations: [IrisDirectiveLocation.QUERY],
     });
 
     expect({ ...directive }).toMatchSnapshot();
@@ -19,7 +19,7 @@ describe('Type System: Directive', () => {
         { name: 'foo', type: IrisScalars.String },
         { name: 'bar', type: IrisScalars.Int },
       ],
-      locations: [DirectiveLocation.QUERY],
+      locations: [IrisDirectiveLocation.QUERY],
     });
 
     expect({ ...directive }).toMatchSnapshot();
@@ -29,7 +29,7 @@ describe('Type System: Directive', () => {
     const directive = new GraphQLDirective({
       name: 'Foo',
       isRepeatable: true,
-      locations: [DirectiveLocation.QUERY],
+      locations: [IrisDirectiveLocation.QUERY],
     });
 
     expect({ ...directive }).toMatchSnapshot();
@@ -38,7 +38,7 @@ describe('Type System: Directive', () => {
   it('can be stringified, JSON.stringified and Object.toStringified', () => {
     const directive = new GraphQLDirective({
       name: 'Foo',
-      locations: [DirectiveLocation.QUERY],
+      locations: [IrisDirectiveLocation.QUERY],
     });
 
     expect(String(directive)).toEqual('@Foo');
@@ -53,7 +53,7 @@ describe('Type System: Directive', () => {
       () =>
         new GraphQLDirective({
           name: 'bad-name',
-          locations: [DirectiveLocation.QUERY],
+          locations: [IrisDirectiveLocation.QUERY],
         }),
     ).toThrow('Names must only contain [_a-zA-Z0-9] but "bad-name" does not.');
   });

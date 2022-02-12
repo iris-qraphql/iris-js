@@ -1,8 +1,10 @@
-import { TokenKind } from 'graphql';
+import type { ParseOptions, Source } from 'graphql';
+import { syntaxError, TokenKind } from 'graphql';
 
 import type {
   ArgumentsDefinitionNode,
   DefinitionNode,
+  DocumentNode,
   FieldDefinitionNode,
   NameNode,
   Role,
@@ -11,7 +13,49 @@ import type {
 } from '../types/ast';
 import { IrisKind } from '../types/kinds';
 
-import type { Parser } from './parser';
+import { Parser } from './parser';
+
+type FParser<T> = (parser: Parser) => T;
+
+export const parse = (
+  source: string | Source,
+  options?: ParseOptions,
+): DocumentNode => parseDocument(new Parser(source, options));
+
+export const parseDocument: FParser<DocumentNode> = (parser) =>
+  parser.node<DocumentNode>(parser._lexer.token, {
+    kind: IrisKind.DOCUMENT,
+    definitions: parser.many(
+      TokenKind.SOF,
+      () => parseDefinition(parser),
+      TokenKind.EOF,
+    ),
+  });
+
+export const parseDefinition: FParser<DefinitionNode> = (parser) => {
+  // Many definitions begin with a description and require a lookahead.
+  const hasDescription = parser.peekDescription();
+  const keywordToken = hasDescription
+    ? parser._lexer.lookahead()
+    : parser._lexer.token;
+
+  if (keywordToken.kind === TokenKind.NAME) {
+    const x = parseDefinitions(parser, keywordToken.value);
+    if (x) {
+      return x;
+    }
+
+    if (hasDescription) {
+      throw syntaxError(
+        parser._lexer.source,
+        parser._lexer.token.start,
+        'Unexpected description, descriptions are supported only on type definitions.',
+      );
+    }
+  }
+
+  throw parser.unexpected(keywordToken);
+};
 
 export const parseDefinitions = (
   parser: Parser,
@@ -29,7 +73,7 @@ export const parseDefinitions = (
   return undefined;
 };
 
-export const parseTypeDefinition = <R extends Role>(
+const parseTypeDefinition = <R extends Role>(
   role: R,
   parser: Parser,
 ): TypeDefinitionNode<R> => {
@@ -50,7 +94,7 @@ export const parseTypeDefinition = <R extends Role>(
   });
 };
 
-export const parseVariantsDefinition = <R extends Role>(
+const parseVariantsDefinition = <R extends Role>(
   role: R,
   name: NameNode,
   parser: Parser,

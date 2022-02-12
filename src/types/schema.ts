@@ -1,11 +1,11 @@
 import type { DirectiveNode, ParseOptions, Source } from 'graphql';
 import { prop, uniqBy } from 'ramda';
 
+import { typeCheckASTValue } from '../validation/typeCheckASTValue';
 import { validateSDL } from '../validation/validate';
-import { valueFromAST } from '../validation/valueFromAST';
 
 import type { IrisError } from '../error';
-import { parse } from '../parsing/parser';
+import { parse } from '../parsing';
 import type { TypeMap } from '../utils/collectTypeMap';
 import { collectTypeMap } from '../utils/collectTypeMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
@@ -144,7 +144,7 @@ export function buildSchema(
       name,
       type,
       description: astNode.description?.value,
-      defaultValue: valueFromAST(astNode.defaultValue, type),
+      defaultValue: typeCheckASTValue(astNode.defaultValue, type),
       deprecationReason: getDeprecationReason(astNode),
       astNode,
     };
@@ -242,6 +242,6 @@ function getDeprecationReason(node: {
     (arg) => arg.name.value === 'reason',
   )?.value;
 
-  return (valueFromAST(reason, IrisScalars.String) as string) ?? '';
+  return (typeCheckASTValue(reason, IrisScalars.String) as string) ?? '';
 }
 export type { IrisSchema };

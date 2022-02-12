@@ -13,10 +13,8 @@ import type {
   ConstObjectFieldNode,
   ConstObjectValueNode,
   ConstValueNode,
-  DefinitionNode,
   DirectiveDefinitionNode,
   DirectiveNode,
-  DocumentNode,
   EnumValueNode,
   FloatValueNode,
   IntValueNode,
@@ -34,25 +32,17 @@ import type {
   ValueNode,
   VariableNode,
 } from '../types/ast';
-import { DirectiveLocation } from '../types/directiveLocation';
+import { IrisDirectiveLocation } from '../types/directiveLocation';
 import { IrisKind, TokenKind } from '../types/kinds';
 import { instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
-import { parseDefinitions } from './definitions';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 
 /**
  * Given a GraphQL source, parses it into a Document.
  * Throws IrisError if a syntax error is encountered.
  */
-export function parse(
-  source: string | Source,
-  options?: ParseOptions,
-): DocumentNode {
-  const parser = new Parser(source, options);
-  return parser.parseDocument();
-}
 
 /**
  * Given a string containing a GraphQL value (ex. `[42]`), parse the AST for
@@ -125,8 +115,9 @@ export function isSource(source: unknown): source is Source {
  * @internal
  */
 export class Parser {
+  _lexer: Lexer;
+
   protected _options: Maybe<ParseOptions>;
-  protected _lexer: Lexer;
 
   constructor(source: string | Source, options?: ParseOptions) {
     const sourceObj = isSource(source) ? source : new Source(source);
@@ -156,45 +147,6 @@ export class Parser {
   }
 
   // Implements the parsing rules in the Document section.
-
-  /**
-   * Document : Definition+
-   */
-  parseDocument(): DocumentNode {
-    return this.node<DocumentNode>(this._lexer.token, {
-      kind: IrisKind.DOCUMENT,
-      definitions: this.many(
-        TokenKind.SOF,
-        this.parseDefinition,
-        TokenKind.EOF,
-      ),
-    });
-  }
-
-  parseDefinition(): DefinitionNode {
-    // Many definitions begin with a description and require a lookahead.
-    const hasDescription = this.peekDescription();
-    const keywordToken = hasDescription
-      ? this._lexer.lookahead()
-      : this._lexer.token;
-
-    if (keywordToken.kind === TokenKind.NAME) {
-      const x = parseDefinitions(this, keywordToken.value);
-      if (x) {
-        return x;
-      }
-
-      if (hasDescription) {
-        throw syntaxError(
-          this._lexer.source,
-          this._lexer.token.start,
-          'Unexpected description, descriptions are supported only on type definitions.',
-        );
-      }
-    }
-
-    throw this.unexpected(keywordToken);
-  }
 
   invalidToken(message: string) {
     throw syntaxError(
@@ -582,7 +534,9 @@ export class Parser {
     const start = this._lexer.token;
     const name = this.parseName();
 
-    if (Object.prototype.hasOwnProperty.call(DirectiveLocation, name.value)) {
+    if (
+      Object.prototype.hasOwnProperty.call(IrisDirectiveLocation, name.value)
+    ) {
       return name;
     }
     throw this.unexpected(start);

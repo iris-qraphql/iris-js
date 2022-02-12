@@ -11,7 +11,7 @@ import {
   isType,
   isTypeRef,
 } from '../definition';
-import { DirectiveLocation } from '../directiveLocation';
+import { IrisDirectiveLocation } from '../directiveLocation';
 import {
   assertDirective,
   GraphQLDeprecatedDirective,
@@ -49,7 +49,7 @@ const EnumType = schema.getType('Enum');
 const ScalarType = schema.getType('Scalar');
 const Directive = new GraphQLDirective({
   name: 'Directive',
-  locations: [DirectiveLocation.QUERY],
+  locations: [IrisDirectiveLocation.QUERY],
 });
 
 const dataTypes = ['String', 'Enum', 'InputObject'];

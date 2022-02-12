@@ -2,7 +2,7 @@ import type { Kind } from 'graphql';
 
 import { irisError } from '../../error';
 import type { ASTNode } from '../../types/ast';
-import { DirectiveLocation } from '../../types/directiveLocation';
+import { IrisDirectiveLocation } from '../../types/directiveLocation';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
@@ -61,17 +61,17 @@ export function KnownDirectivesRule(context: SDLValidationContext): ASTVisitor {
 
 function getDirectiveLocationForASTPath(
   ancestors: ReadonlyArray<ASTNode | ReadonlyArray<ASTNode>>,
-): DirectiveLocation | undefined {
+): IrisDirectiveLocation | undefined {
   const appliedTo = ancestors[ancestors.length - 1];
   invariant('kind' in appliedTo);
 
   switch (appliedTo.kind) {
     case IrisKind.FIELD_DEFINITION:
-      return DirectiveLocation.FIELD_DEFINITION;
+      return IrisDirectiveLocation.FIELD_DEFINITION;
     case IrisKind.TYPE_DEFINITION:
       return appliedTo.role === 'resolver'
-        ? DirectiveLocation.RESOLVER_DEFINITION
-        : DirectiveLocation.DATA_DEFINITION;
+        ? IrisDirectiveLocation.RESOLVER_DEFINITION
+        : IrisDirectiveLocation.DATA_DEFINITION;
     case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
@@ -80,8 +80,8 @@ function getDirectiveLocationForASTPath(
         IrisKind.VARIANT_DEFINITION,
       ];
       return kinds.includes(parentNode.kind)
-        ? DirectiveLocation.FIELD_DEFINITION
-        : DirectiveLocation.ARGUMENT_DEFINITION;
+        ? IrisDirectiveLocation.FIELD_DEFINITION
+        : IrisDirectiveLocation.ARGUMENT_DEFINITION;
     }
     default:
       invariant(false, 'Unexpected kind: ' + inspect(appliedTo.kind));

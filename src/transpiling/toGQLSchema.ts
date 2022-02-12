@@ -17,7 +17,7 @@ import {
   specifiedScalarTypes,
 } from 'graphql';
 
-import { serializeValue } from '../validation/typeCheck';
+import { typeCheckValue } from '../validation/typeCheckValue';
 
 import { irisError } from '../error';
 import type {
@@ -75,13 +75,13 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     type: IrisTypeDefinition<'data'>,
   ): GraphQLScalarType => {
     const { name } = type;
-    const typeCheck = (value: unknown) => serializeValue(value, type);
+    const check = (value: unknown) => typeCheckValue(value, type);
     return register(
       name,
       new GraphQLScalarType({
         name,
-        serialize: typeCheck,
-        parseValue: typeCheck,
+        serialize: check,
+        parseValue: check,
         parseLiteral: () => {
           throw irisError('literals are not supported');
         },

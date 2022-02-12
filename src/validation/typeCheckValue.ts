@@ -19,11 +19,11 @@ type JSON = unknown;
 
 type Serializer<T> = (value: unknown, type: T) => Maybe<JSON>;
 
-export const serializeValue: Serializer<IrisType<'data'>> = (value, type) => {
+export const typeCheckValue: Serializer<IrisType<'data'>> = (value, type) => {
   if (isTypeRef(type)) {
     switch (type.kind) {
       case 'MAYBE':
-        return isNil(value) ? null : serializeValue(value, type.ofType);
+        return isNil(value) ? null : typeCheckValue(value, type.ofType);
       case 'LIST': {
         return serializeList(value, type.ofType);
       }
@@ -40,7 +40,7 @@ const serializeList: Serializer<IrisType<'data'>> = (value, type) => {
 
   const valuesNodes = [];
   for (const item of value) {
-    valuesNodes.push(serializeValue(item, type));
+    valuesNodes.push(typeCheckValue(item, type));
   }
 
   return valuesNodes;
@@ -118,7 +118,7 @@ const parseVariantValue = (
   const fieldNodes: Record<string, JSON> = __typename ? { __typename } : {};
 
   for (const { name, type } of variantFields) {
-    fieldNodes[name] = serializeValue(fields[name], type);
+    fieldNodes[name] = typeCheckValue(fields[name], type);
   }
 
   return fieldNodes;

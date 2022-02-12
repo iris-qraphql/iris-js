@@ -5,7 +5,7 @@ import type { IrisType } from '../../types/definition';
 import { gqlScalar, sampleTypeRef } from '../../utils/generators';
 import type { ObjMap } from '../../utils/ObjMap';
 
-import { valueFromAST } from '../valueFromAST';
+import { typeCheckASTValue } from '../typeCheckASTValue';
 
 const maybeListOfMaybeBool = sampleTypeRef<'data'>('[Boolean?]?');
 const ListOfMaybeBool = sampleTypeRef<'data'>('[Boolean?]');
@@ -20,13 +20,15 @@ const expectValueFrom = (
   const type =
     typeof typeRef === 'string' ? sampleTypeRef<'data'>(typeRef) : typeRef;
   const ast = parseValue(valueText);
-  const value = valueFromAST(ast, type, variables);
+  const value = typeCheckASTValue(ast, type, variables);
   return expect(value);
 };
 
 describe('valueFromAST', () => {
   it('rejects empty input', () => {
-    expect(valueFromAST(null, sampleTypeRef('Boolean?'))).toEqual(undefined);
+    expect(typeCheckASTValue(null, sampleTypeRef('Boolean?'))).toEqual(
+      undefined,
+    );
   });
 
   it('converts according to input coercion rules', () => {

@@ -1,8 +1,5 @@
-/**
- * The set of allowed directive location values.
- */
-export enum DirectiveLocation {
-  /** Request Definitions */
+export enum IrisDirectiveLocation {
+  // LEGACY
   QUERY = 'QUERY',
   MUTATION = 'MUTATION',
   SUBSCRIPTION = 'SUBSCRIPTION',
@@ -11,7 +8,7 @@ export enum DirectiveLocation {
   FRAGMENT_SPREAD = 'FRAGMENT_SPREAD',
   INLINE_FRAGMENT = 'INLINE_FRAGMENT',
   VARIABLE_DEFINITION = 'VARIABLE_DEFINITION',
-  /** Type System Definitions */
+  // IRIS
   DATA_DEFINITION = 'DATA_DEFINITION',
   RESOLVER_DEFINITION = 'RESOLVER_DEFINITION',
   VARIANT_DEFINITION = 'VARIANT_DEFINITION',
