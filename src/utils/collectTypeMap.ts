@@ -2,10 +2,10 @@ import type {
   IrisType,
   IrisTypeDefinition,
   IrisVariant,
-} from '../type/definition';
-import { unwrapType } from '../type/definition';
-import type { GraphQLDirective } from '../type/directives';
-import { isDirective } from '../type/directives';
+} from '../types/definition';
+import { unwrapType } from '../types/definition';
+import type { GraphQLDirective } from '../types/directives';
+import { isDirective } from '../types/directives';
 
 import type { ObjMap } from './ObjMap';
 

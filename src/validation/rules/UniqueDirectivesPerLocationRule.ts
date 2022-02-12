@@ -2,9 +2,8 @@ import { IrisKind } from '../../language/kinds';
 import { isTypeDefinitionNode } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { specifiedDirectives } from '../../type/directives';
-
 import { irisError } from '../../error';
+import { specifiedDirectives } from '../../types/directives';
 
 import type { SDLValidationContext } from '../ValidationContext';
 

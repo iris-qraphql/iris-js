@@ -3,9 +3,9 @@ import { GraphQLScalarType } from 'graphql';
 
 import type { Role } from '../language/ast';
 
-import type { IrisType } from '../type/definition';
-import { IrisTypeDefinition } from '../type/definition';
-import { buildSchema } from '../type/schema';
+import type { IrisType } from '../types/definition';
+import { IrisTypeDefinition } from '../types/definition';
+import { buildSchema } from '../types/schema';
 
 export const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>
   new IrisTypeDefinition({

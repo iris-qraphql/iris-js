@@ -1,9 +1,8 @@
 import type { DocumentNode } from '../language/ast';
 import type { ASTVisitor } from '../language/visitor';
 
-import type { IrisSchema } from '../type/schema';
-
 import type { IrisError } from '../error';
+import type { IrisSchema } from '../types/schema';
 import type { Maybe } from '../utils/type-level';
 
 export class SDLValidationContext {

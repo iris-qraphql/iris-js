@@ -5,9 +5,8 @@ import { DirectiveLocation } from '../../language/directiveLocation';
 import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { specifiedDirectives } from '../../type/directives';
-
 import { irisError } from '../../error';
+import { specifiedDirectives } from '../../types/directives';
 import { inspect, invariant } from '../../utils/legacy';
 
 import type { SDLValidationContext } from '../ValidationContext';

@@ -6,12 +6,11 @@ import type {
   IrisField,
   IrisTypeDefinition,
   IrisVariant,
-} from '../type/definition';
-import { isSpecifiedScalarType } from '../type/definition';
-import type { GraphQLDirective } from '../type/directives';
-import { isSpecifiedDirective } from '../type/directives';
-import type { IrisSchema } from '../type/schema';
-
+} from '../types/definition';
+import { isSpecifiedScalarType } from '../types/definition';
+import type { GraphQLDirective } from '../types/directives';
+import { isSpecifiedDirective } from '../types/directives';
+import type { IrisSchema } from '../types/schema';
 import type { Maybe } from '../utils/type-level';
 
 import { print } from './printer';

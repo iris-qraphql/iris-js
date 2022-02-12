@@ -2,8 +2,7 @@ import { identity } from 'ramda';
 
 import { parseValue } from '../../language/parser';
 
-import type { IrisType } from '../../type/definition';
-
+import type { IrisType } from '../../types/definition';
 import { gqlScalar, sampleTypeRef } from '../../utils/generators';
 import type { ObjMap } from '../../utils/ObjMap';
 

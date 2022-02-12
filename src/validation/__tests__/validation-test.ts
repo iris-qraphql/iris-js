@@ -1,7 +1,6 @@
-import type { IrisSchema } from '../../type/schema';
-import { buildSchema } from '../../type/schema';
-
 import { irisError } from '../../error';
+import type { IrisSchema } from '../../types/schema';
+import { buildSchema } from '../../types/schema';
 import { withWrappers } from '../../utils/generators';
 import { inspect } from '../../utils/legacy';
 import { toJSONDeep } from '../../utils/toJSONDeep';

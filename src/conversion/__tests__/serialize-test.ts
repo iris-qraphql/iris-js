@@ -1,6 +1,5 @@
-import type { IrisType, IrisTypeDefinition } from '../../type/definition';
-import { buildSchema } from '../../type/schema';
-
+import type { IrisType, IrisTypeDefinition } from '../../types/definition';
+import { buildSchema } from '../../types/schema';
 import { sampleTypeRef } from '../../utils/generators';
 
 import { serializeValue } from '../serialize';

@@ -5,9 +5,8 @@ import {
 } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { scalarNames } from '../../type/definition';
-
 import { irisNodeError } from '../../error';
+import { scalarNames } from '../../types/definition';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type { SDLValidationContext } from '../ValidationContext';

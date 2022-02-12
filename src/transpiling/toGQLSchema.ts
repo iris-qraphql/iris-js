@@ -17,17 +17,16 @@ import {
   specifiedScalarTypes,
 } from 'graphql';
 
+import { serializeValue } from '../conversion/serialize';
+import { irisError } from '../error';
 import type {
   IrisField,
   IrisType,
   IrisTypeDefinition,
   IrisVariant,
-} from '../type/definition';
-import { isSpecifiedScalarType, isTypeRef } from '../type/definition';
-import type { IrisSchema } from '../type/schema';
-
-import { serializeValue } from '../conversion/serialize';
-import { irisError } from '../error';
+} from '../types/definition';
+import { isSpecifiedScalarType, isTypeRef } from '../types/definition';
+import type { IrisSchema } from '../types/schema';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';
 

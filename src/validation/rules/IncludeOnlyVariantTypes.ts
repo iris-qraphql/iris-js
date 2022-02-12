@@ -7,9 +7,8 @@ import type {
 import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
-import { scalarNames } from '../../type/definition';
-
 import { irisNodeError } from '../../error';
+import { scalarNames } from '../../types/definition';
 
 import type { SDLValidationContext } from '../ValidationContext';
 

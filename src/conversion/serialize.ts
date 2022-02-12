@@ -1,14 +1,13 @@
 import { isNil } from 'ramda';
 
+import { irisError } from '../error';
 import type {
   IrisField,
   IrisType,
   IrisTypeDefinition,
   IrisVariant,
-} from '../type/definition';
-import { isMaybeType, isTypeRef } from '../type/definition';
-
-import { irisError } from '../error';
+} from '../types/definition';
+import { isMaybeType, isTypeRef } from '../types/definition';
 import { inspect } from '../utils/legacy';
 import { isIterableObject, isObjectLike } from '../utils/ObjMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';

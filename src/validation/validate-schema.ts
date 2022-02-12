@@ -1,16 +1,15 @@
 import type { ASTNode, DirectiveNode } from '../language/ast';
 
+import type { IrisError } from '../error';
+import { irisNodeError } from '../error';
 import type {
   IrisField,
   IrisTypeDefinition,
   IrisVariant,
-} from '../type/definition';
-import { isInputType, isRequiredArgument, isType } from '../type/definition';
-import { GraphQLDeprecatedDirective, isDirective } from '../type/directives';
-import type { IrisSchema } from '../type/schema';
-
-import type { IrisError } from '../error';
-import { irisNodeError } from '../error';
+} from '../types/definition';
+import { isInputType, isRequiredArgument, isType } from '../types/definition';
+import { GraphQLDeprecatedDirective, isDirective } from '../types/directives';
+import type { IrisSchema } from '../types/schema';
 import { inspect } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
