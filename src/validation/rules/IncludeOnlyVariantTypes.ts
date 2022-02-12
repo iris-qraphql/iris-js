@@ -5,6 +5,7 @@ import type {
   TypeDefinitionNode,
   VariantDefinitionNode,
 } from '../../types/ast';
+import { isTypeVariantNode } from '../../types/ast';
 import { scalarNames } from '../../types/definition';
 import { IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
@@ -61,20 +62,3 @@ export function IncludeOnlyVariantTypes(
     return false;
   }
 }
-
-const isTypeVariantNode = (type: TypeDefinitionNode) => {
-  const { variants } = type;
-
-  if (variants.length === 0) {
-    return true;
-  }
-
-  const [variant] = variants;
-  const typeName = type.name.value;
-
-  return (
-    variants.length === 1 &&
-    variant.name.value === typeName &&
-    variant.fields !== undefined
-  );
-};

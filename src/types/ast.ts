@@ -228,3 +228,18 @@ export const isTypeSystemDefinitionNode = (
 export const isTypeDefinitionNode = (
   node: ASTNode,
 ): node is TypeDefinitionNode => node.kind === IrisKind.TYPE_DEFINITION;
+
+export const isTypeVariantNode = ({ name, variants }: TypeDefinitionNode) => {
+  const typeName = name.value;
+  const [variant] = variants;
+
+  if (variants.length === 0) {
+    return true;
+  }
+
+  return (
+    variants.length === 1 &&
+    variant.name.value === typeName &&
+    variant.fields !== undefined
+  );
+};

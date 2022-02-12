@@ -37,7 +37,7 @@ function printType(type: IrisTypeDefinition): string {
     return start;
   }
 
-  if (type.isVariantType()) {
+  if (type.isVariantType) {
     const [variant] = variants;
     const fields = Object.values(variant.fields ?? {});
 

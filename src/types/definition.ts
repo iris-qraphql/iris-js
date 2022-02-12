@@ -21,6 +21,7 @@ import type {
   VariantDefinitionNode,
   WrapperKind,
 } from './ast';
+import { isTypeVariantNode } from './ast';
 
 export const stdScalars = keyMap(specifiedScalarTypes, ({ name }) => name);
 
@@ -136,6 +137,7 @@ export class IrisTypeDefinition<R extends Role = Role> {
   description: Maybe<string>;
   astNode: Maybe<TypeDefinitionNode<R>>;
   role: R;
+  isVariantType: boolean;
 
   #thunkVariants: () => ReadonlyArray<IrisVariant<R>>;
   #resolvedVariants?: ReadonlyArray<IrisVariant<R>>;
@@ -148,6 +150,9 @@ export class IrisTypeDefinition<R extends Role = Role> {
     this.role = config.role;
     this.#thunkVariants = () => resolveThunk(config.variants);
     this.#scalar = config.scalar;
+    this.isVariantType = config.astNode
+      ? isTypeVariantNode(config.astNode)
+      : false;
   }
 
   get [Symbol.toStringTag]() {
@@ -162,16 +167,6 @@ export class IrisTypeDefinition<R extends Role = Role> {
     const [variant] = this.variants();
     return stdScalars[variant?.name];
   }
-
-  isVariantType = (): boolean => {
-    const variants = this.variants();
-    return (
-      variants.length === 0 ||
-      (variants.length === 1 &&
-        variants[0]?.name === this.name &&
-        variants[0]?.fields !== undefined)
-    );
-  };
 
   variants = (): ReadonlyArray<IrisVariant<R>> => {
     if (this.#resolvedVariants) {

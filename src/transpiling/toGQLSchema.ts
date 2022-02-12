@@ -95,7 +95,7 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     const { name, description } = type;
     const variants = type.variants();
 
-    if (type.isVariantType()) {
+    if (type.isVariantType) {
       return transpileVariant(variants[0]);
     }
 
