@@ -39,9 +39,8 @@ import type {
 } from './ast';
 import { parseDefinitions } from './definitions';
 import { DirectiveLocation } from './directiveLocation';
-import { IrisKind } from './kinds';
+import { IrisKind, TokenKind } from './kinds';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
-import { TokenKind } from './tokenKind';
 
 /**
  * Given a GraphQL source, parses it into a Document.

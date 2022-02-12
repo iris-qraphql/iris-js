@@ -1,9 +1,15 @@
-import { BREAK } from 'graphql';
+import { BREAK, Kind } from 'graphql';
 
 import type { ASTNode } from './ast';
 import { isNode, QueryDocumentKeys } from './ast';
-import type { KIND } from './kinds';
-import { KINDS } from './kinds';
+import { IrisKind } from './kinds';
+
+type KIND = Kind | IrisKind;
+
+const KINDS: ReadonlyArray<KIND> = Object.values({
+  ...Kind,
+  ...IrisKind,
+});
 
 /**
  * A visitor is provided to visit, it contains the collection of

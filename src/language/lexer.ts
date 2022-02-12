@@ -6,7 +6,7 @@ import { dedentBlockStringLines } from 'graphql/language/blockString';
 import type { Maybe } from '../utils/type-level';
 
 import { isDigit, isNameContinue, isNameStart } from './characterClasses';
-import { TokenKind } from './tokenKind';
+import { TokenKind } from './kinds';
 
 /**
  * Given a Source object, creates a Lexer for that source.
