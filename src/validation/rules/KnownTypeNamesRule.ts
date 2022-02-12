@@ -1,5 +1,3 @@
-import type { ASTVisitor } from '../../language/visitor';
-
 import { irisNodeError } from '../../error';
 import type { ASTNode } from '../../types/ast';
 import {
@@ -7,6 +5,7 @@ import {
   isTypeSystemDefinitionNode,
 } from '../../types/ast';
 import { scalarNames } from '../../types/definition';
+import type { ASTVisitor } from '../../types/visitor';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type { SDLValidationContext } from '../ValidationContext';

@@ -1,8 +1,7 @@
-import { visit, visitInParallel } from '../language/visitor';
-
 import type { IrisError } from '../error';
 import type { DocumentNode } from '../types/ast';
 import type { IrisSchema } from '../types/schema';
+import { visit, visitInParallel } from '../types/visitor';
 import type { Maybe } from '../utils/type-level';
 
 import { specifiedSDLRules } from './specifiedRules';

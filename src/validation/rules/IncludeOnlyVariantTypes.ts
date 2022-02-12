@@ -1,7 +1,5 @@
 import { Kind } from 'graphql';
 
-import type { ASTVisitor } from '../../language/visitor';
-
 import { irisNodeError } from '../../error';
 import type {
   TypeDefinitionNode,
@@ -9,6 +7,7 @@ import type {
 } from '../../types/ast';
 import { scalarNames } from '../../types/definition';
 import { IrisKind } from '../../types/kinds';
+import type { ASTVisitor } from '../../types/visitor';
 
 import type { SDLValidationContext } from '../ValidationContext';
 

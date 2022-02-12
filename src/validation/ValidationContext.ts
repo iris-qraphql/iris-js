@@ -1,8 +1,7 @@
-import type { ASTVisitor } from '../language/visitor';
-
 import type { IrisError } from '../error';
 import type { DocumentNode } from '../types/ast';
 import type { IrisSchema } from '../types/schema';
+import type { ASTVisitor } from '../types/visitor';
 import type { Maybe } from '../utils/type-level';
 
 export class SDLValidationContext {

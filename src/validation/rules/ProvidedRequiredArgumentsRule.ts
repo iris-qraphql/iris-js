@@ -1,5 +1,3 @@
-import type { ASTVisitor } from '../../language/visitor';
-
 import { irisError } from '../../error';
 import { print } from '../../printing/printer';
 import type { ArgumentDefinitionNode } from '../../types/ast';
@@ -7,6 +5,7 @@ import type { IrisArgument } from '../../types/definition';
 import { isRequiredArgument, isType } from '../../types/definition';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
+import type { ASTVisitor } from '../../types/visitor';
 import { inspect } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 import { keyMap } from '../../utils/ObjMap';
