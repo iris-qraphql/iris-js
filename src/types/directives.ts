@@ -1,13 +1,12 @@
 import { assertName } from 'graphql';
 
-import { DirectiveLocation } from '../language/directiveLocation';
-
 import { inspect, instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
 import type { DirectiveDefinitionNode } from './ast';
 import type { IrisArgument } from './definition';
 import { IrisScalars } from './definition';
+import { DirectiveLocation } from './directiveLocation';
 
 /**
  * Test if the given value is a GraphQL directive.

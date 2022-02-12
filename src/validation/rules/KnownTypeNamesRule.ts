@@ -1,11 +1,11 @@
-import {
-  isTypeDefinitionNode,
-  isTypeSystemDefinitionNode,
-} from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisNodeError } from '../../error';
 import type { ASTNode } from '../../types/ast';
+import {
+  isTypeDefinitionNode,
+  isTypeSystemDefinitionNode,
+} from '../../types/ast';
 import { scalarNames } from '../../types/definition';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 

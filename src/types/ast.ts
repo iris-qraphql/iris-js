@@ -23,7 +23,7 @@ import type {
   VariableNode,
 } from 'graphql';
 
-import type { IrisKind } from './kinds';
+import { IrisKind } from './kinds';
 
 /**
  * The list of all possible AST node types.
@@ -219,3 +219,12 @@ export interface DirectiveDefinitionNode {
   readonly repeatable: boolean;
   readonly locations: ReadonlyArray<NameNode>;
 }
+
+export const isTypeSystemDefinitionNode = (
+  node: ASTNode,
+): node is DefinitionNode =>
+  isTypeDefinitionNode(node) || node.kind === IrisKind.DIRECTIVE_DEFINITION;
+
+export const isTypeDefinitionNode = (
+  node: ASTNode,
+): node is TypeDefinitionNode => node.kind === IrisKind.TYPE_DEFINITION;

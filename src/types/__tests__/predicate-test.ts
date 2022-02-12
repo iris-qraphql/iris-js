@@ -1,7 +1,5 @@
 import { all } from 'ramda';
 
-import { DirectiveLocation } from '../../language/directiveLocation';
-
 import { sampleTypeRef, withWrappers } from '../../utils/generators';
 
 import type { IrisArgument, IrisType, IrisTypeDefinition } from '../definition';
@@ -13,6 +11,7 @@ import {
   isType,
   isTypeRef,
 } from '../definition';
+import { DirectiveLocation } from '../directiveLocation';
 import {
   assertDirective,
   GraphQLDeprecatedDirective,

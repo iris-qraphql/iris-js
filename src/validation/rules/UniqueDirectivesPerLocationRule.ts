@@ -1,7 +1,7 @@
-import { isTypeDefinitionNode } from '../../language/predicates';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisError } from '../../error';
+import { isTypeDefinitionNode } from '../../types/ast';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
 

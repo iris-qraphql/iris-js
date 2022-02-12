@@ -1,6 +1,5 @@
-import { DirectiveLocation } from '../../language/directiveLocation';
-
 import { IrisScalars } from '../definition';
+import { DirectiveLocation } from '../directiveLocation';
 import { GraphQLDirective } from '../directives';
 
 describe('Type System: Directive', () => {

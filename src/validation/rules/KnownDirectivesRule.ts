@@ -1,10 +1,10 @@
 import type { Kind } from 'graphql';
 
-import { DirectiveLocation } from '../../language/directiveLocation';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisError } from '../../error';
 import type { ASTNode } from '../../types/ast';
+import { DirectiveLocation } from '../../types/directiveLocation';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
 import { inspect, invariant } from '../../utils/legacy';

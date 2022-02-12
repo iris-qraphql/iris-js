@@ -34,12 +34,12 @@ import type {
   ValueNode,
   VariableNode,
 } from '../types/ast';
+import { DirectiveLocation } from '../types/directiveLocation';
 import { IrisKind, TokenKind } from '../types/kinds';
 import { instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
 import { parseDefinitions } from './definitions';
-import { DirectiveLocation } from './directiveLocation';
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 
 /**
