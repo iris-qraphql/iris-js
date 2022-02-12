@@ -1,4 +1,4 @@
-import type { ParseOptions, Source } from 'graphql';
+import type { DirectiveNode, ParseOptions, Source } from 'graphql';
 import { prop, uniqBy } from 'ramda';
 
 import type {
@@ -17,7 +17,6 @@ import { parse } from '../language/parser';
 import { validateSDL } from '../validation/validate';
 
 import { valueFromAST } from '../conversion/valueFromAST';
-import { getDirectiveValues } from '../conversion/values';
 import type { IrisError } from '../error';
 import type { TypeMap } from '../utils/collectTypeMap';
 import { collectTypeMap } from '../utils/collectTypeMap';
@@ -229,9 +228,21 @@ export function buildSchema(
   });
 }
 
-const getDeprecationReason = (
-  node: FieldDefinitionNode | ArgumentDefinitionNode | VariantDefinitionNode,
-): Maybe<string> =>
-  getDirectiveValues(GraphQLDeprecatedDirective, node)?.reason as string;
+function getDeprecationReason(node: {
+  readonly directives?: ReadonlyArray<DirectiveNode>;
+}): IrisMaybe<string> {
+  const directiveNode = node.directives?.find(
+    (directive) => directive.name.value === GraphQLDeprecatedDirective.name,
+  );
 
+  if (directiveNode === undefined) {
+    return undefined;
+  }
+
+  const reason = directiveNode?.arguments?.find(
+    (arg) => arg.name.value === 'reason',
+  )?.value;
+
+  return (valueFromAST(reason, IrisScalars.String) as string) ?? '';
+}
 export type { IrisSchema };
