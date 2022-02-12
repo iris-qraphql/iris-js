@@ -2,11 +2,11 @@ import type { Kind } from 'graphql';
 
 import type { ASTNode } from '../../language/ast';
 import { DirectiveLocation } from '../../language/directiveLocation';
-import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisError } from '../../error';
 import { specifiedDirectives } from '../../types/directives';
+import { IrisKind } from '../../types/kinds';
 import { inspect, invariant } from '../../utils/legacy';
 
 import type { SDLValidationContext } from '../ValidationContext';

@@ -11,7 +11,6 @@ import type {
   TypeNode,
   VariantDefinitionNode,
 } from '../language/ast';
-import { IrisKind } from '../language/kinds';
 import { parse } from '../language/parser';
 
 import { validateSDL } from '../validation/validate';
@@ -35,6 +34,7 @@ import {
   GraphQLDirective,
   specifiedDirectives,
 } from './directives';
+import { IrisKind } from './kinds';
 
 class IrisSchema {
   description: Maybe<string>;

@@ -1,5 +1,7 @@
 import { TokenKind } from 'graphql';
 
+import { IrisKind } from '../types/kinds';
+
 import type {
   ArgumentsDefinitionNode,
   DefinitionNode,
@@ -9,7 +11,6 @@ import type {
   TypeDefinitionNode,
   VariantDefinitionNode,
 } from './ast';
-import { IrisKind } from './kinds';
 import type { Parser } from './parser';
 
 export const parseDefinitions = (

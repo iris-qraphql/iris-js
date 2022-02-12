@@ -1,8 +1,9 @@
 import { BREAK, Kind } from 'graphql';
 
+import { IrisKind } from '../types/kinds';
+
 import type { ASTNode } from './ast';
 import { isNode, QueryDocumentKeys } from './ast';
-import { IrisKind } from './kinds';
 
 type KIND = Kind | IrisKind;
 

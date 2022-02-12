@@ -4,11 +4,11 @@ import type {
   TypeDefinitionNode,
   VariantDefinitionNode,
 } from '../../language/ast';
-import { IrisKind } from '../../language/kinds';
 import type { ASTVisitor } from '../../language/visitor';
 
 import { irisNodeError } from '../../error';
 import { scalarNames } from '../../types/definition';
+import { IrisKind } from '../../types/kinds';
 
 import type { SDLValidationContext } from '../ValidationContext';
 

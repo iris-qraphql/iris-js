@@ -1,10 +1,11 @@
+import { IrisKind } from '../types/kinds';
+
 import type {
   ASTNode,
   DefinitionNode,
   TypeDefinitionNode,
   TypeNode,
 } from './ast';
-import { IrisKind } from './kinds';
 
 export const isTypeNode = (node: ASTNode): node is TypeNode =>
   node.kind === IrisKind.NAMED_TYPE ||
