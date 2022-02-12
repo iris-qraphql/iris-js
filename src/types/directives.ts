@@ -1,13 +1,12 @@
 import { assertName } from 'graphql';
 
-import type { DirectiveDefinitionNode } from '../language/ast';
-import { DirectiveLocation } from '../language/directiveLocation';
-
 import { inspect, instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
+import type { DirectiveDefinitionNode } from './ast';
 import type { IrisArgument } from './definition';
 import { IrisScalars } from './definition';
+import { IrisDirectiveLocation } from './directiveLocation';
 
 /**
  * Test if the given value is a GraphQL directive.
@@ -32,7 +31,7 @@ export function assertDirective(directive: unknown): GraphQLDirective {
 export class GraphQLDirective {
   name: string;
   description: Maybe<string>;
-  locations: ReadonlyArray<DirectiveLocation>;
+  locations: ReadonlyArray<IrisDirectiveLocation>;
   args: ReadonlyArray<IrisArgument>;
   isRepeatable: boolean;
   astNode: Maybe<DirectiveDefinitionNode>;
@@ -62,7 +61,7 @@ export class GraphQLDirective {
 export interface GraphQLDirectiveConfig {
   name: string;
   description?: Maybe<string>;
-  locations: ReadonlyArray<DirectiveLocation>;
+  locations: ReadonlyArray<IrisDirectiveLocation>;
   args?: ReadonlyArray<IrisArgument>;
   isRepeatable?: Maybe<boolean>;
   astNode?: Maybe<DirectiveDefinitionNode>;
@@ -76,9 +75,9 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     name: 'deprecated',
     description: 'Marks an element of a GraphQL schema as no longer supported.',
     locations: [
-      DirectiveLocation.VARIABLE_DEFINITION,
-      DirectiveLocation.FIELD_DEFINITION,
-      DirectiveLocation.ARGUMENT_DEFINITION,
+      IrisDirectiveLocation.VARIABLE_DEFINITION,
+      IrisDirectiveLocation.FIELD_DEFINITION,
+      IrisDirectiveLocation.ARGUMENT_DEFINITION,
     ],
     args: [
       {

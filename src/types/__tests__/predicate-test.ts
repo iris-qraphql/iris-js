@@ -1,7 +1,5 @@
 import { all } from 'ramda';
 
-import { DirectiveLocation } from '../../language/directiveLocation';
-
 import { sampleTypeRef, withWrappers } from '../../utils/generators';
 
 import type { IrisArgument, IrisType, IrisTypeDefinition } from '../definition';
@@ -13,6 +11,7 @@ import {
   isType,
   isTypeRef,
 } from '../definition';
+import { IrisDirectiveLocation } from '../directiveLocation';
 import {
   assertDirective,
   GraphQLDeprecatedDirective,
@@ -50,7 +49,7 @@ const EnumType = schema.getType('Enum');
 const ScalarType = schema.getType('Scalar');
 const Directive = new GraphQLDirective({
   name: 'Directive',
-  locations: [DirectiveLocation.QUERY],
+  locations: [IrisDirectiveLocation.QUERY],
 });
 
 const dataTypes = ['String', 'Enum', 'InputObject'];

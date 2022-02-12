@@ -3,10 +3,10 @@ import { Token } from 'graphql';
 import { syntaxError } from 'graphql/error/syntaxError';
 import { dedentBlockStringLines } from 'graphql/language/blockString';
 
+import { TokenKind } from '../types/kinds';
 import type { Maybe } from '../utils/type-level';
 
 import { isDigit, isNameContinue, isNameStart } from './characterClasses';
-import { TokenKind } from './kinds';
 
 /**
  * Given a Source object, creates a Lexer for that source.

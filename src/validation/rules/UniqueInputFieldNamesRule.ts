@@ -1,7 +1,6 @@
-import type { NameNode } from '../../language/ast';
-import type { ASTVisitor } from '../../language/visitor';
-
 import { irisError } from '../../error';
+import type { NameNode } from '../../types/ast';
+import type { ASTVisitor } from '../../types/visitor';
 import { invariant } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 

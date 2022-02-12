@@ -1,13 +1,11 @@
-import type { ASTNode } from '../../language/ast';
+import { irisNodeError } from '../../error';
+import type { ASTNode } from '../../types/ast';
 import {
   isTypeDefinitionNode,
   isTypeSystemDefinitionNode,
-} from '../../language/predicates';
-import type { ASTVisitor } from '../../language/visitor';
-
-import { scalarNames } from '../../type/definition';
-
-import { irisNodeError } from '../../error';
+} from '../../types/ast';
+import { scalarNames } from '../../types/definition';
+import type { ASTVisitor } from '../../types/visitor';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
 import type { SDLValidationContext } from '../ValidationContext';

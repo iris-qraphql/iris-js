@@ -1,14 +1,13 @@
-import type { IrisType, IrisTypeDefinition } from '../../type/definition';
-import { buildSchema } from '../../type/schema';
-
+import type { IrisType, IrisTypeDefinition } from '../../types/definition';
+import { buildSchema } from '../../types/schema';
 import { sampleTypeRef } from '../../utils/generators';
 
-import { serializeValue } from '../serialize';
+import { typeCheckValue } from '../typeCheckValue';
 
 const serializeWith = (value: unknown, typeRef: string | IrisType<'data'>) => {
   const type =
     typeof typeRef === 'string' ? sampleTypeRef<'data'>(typeRef) : typeRef;
-  return serializeValue(value, type);
+  return typeCheckValue(value, type);
 };
 
 describe('serializeValue', () => {

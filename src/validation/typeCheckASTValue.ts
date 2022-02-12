@@ -1,35 +1,13 @@
 import { Kind } from 'graphql';
 
-import type { ObjectValueNode, ValueNode } from '../language/ast';
-
-import type { IrisType, IrisVariant } from '../type/definition';
-import { isMaybeType, isTypeRef } from '../type/definition';
-
+import type { ObjectValueNode, ValueNode } from '../types/ast';
+import type { IrisType, IrisVariant } from '../types/definition';
+import { isMaybeType, isTypeRef } from '../types/definition';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
 
-/**
- * Produces a JavaScript value given a GraphQL Value AST.
- *
- * A GraphQL type must be provided, which will be used to interpret different
- * GraphQL Value literals.
- *
- * Returns `undefined` when the value could not be validly coerced according to
- * the provided type.
- *
- * | GraphQL Value        | JSON Value    |
- * | -------------------- | ------------- |
- * | Input Object         | Object        |
- * | List                 | Array         |
- * | Boolean              | Boolean       |
- * | String               | String        |
- * | Int / Float          | Number        |
- * | Enum Value           | Unknown       |
- * | NullValue            | null          |
- *
- */
-export function valueFromAST(
+export function typeCheckASTValue(
   valueNode: Maybe<ValueNode>,
   type: IrisType<'data'>,
   variables?: Maybe<ObjMap<unknown>>,
@@ -63,7 +41,7 @@ export function valueFromAST(
           // This is explicitly returning the value null.
           return null;
         }
-        return valueFromAST(valueNode, type.ofType, variables);
+        return typeCheckASTValue(valueNode, type.ofType, variables);
       }
 
       case 'LIST': {
@@ -82,7 +60,11 @@ export function valueFromAST(
               }
               coercedValues.push(null);
             } else {
-              const itemValue = valueFromAST(itemNode, itemType, variables);
+              const itemValue = typeCheckASTValue(
+                itemNode,
+                itemType,
+                variables,
+              );
               if (itemValue === undefined) {
                 return; // Invalid: intentionally return no value.
               }
@@ -92,7 +74,7 @@ export function valueFromAST(
           return coercedValues;
         }
 
-        const coercedValue = valueFromAST(valueNode, itemType, variables);
+        const coercedValue = typeCheckASTValue(valueNode, itemType, variables);
         if (coercedValue === undefined) {
           return; // Invalid: intentionally return no value.
         }
@@ -161,7 +143,11 @@ const parseVariantValue = (
       }
       continue;
     }
-    const fieldValue = valueFromAST(fieldNode.value, field.type, variables);
+    const fieldValue = typeCheckASTValue(
+      fieldNode.value,
+      field.type,
+      variables,
+    );
     if (fieldValue === undefined) {
       return; // Invalid: intentionally return no value.
     }

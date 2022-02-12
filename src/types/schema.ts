@@ -1,5 +1,15 @@
-import type { ParseOptions, Source } from 'graphql';
+import type { DirectiveNode, ParseOptions, Source } from 'graphql';
 import { prop, uniqBy } from 'ramda';
+
+import { typeCheckASTValue } from '../validation/typeCheckASTValue';
+import { validateSDL } from '../validation/validate';
+
+import type { IrisError } from '../error';
+import { parse } from '../parsing';
+import type { TypeMap } from '../utils/collectTypeMap';
+import { collectTypeMap } from '../utils/collectTypeMap';
+import type { IrisMaybe, Maybe } from '../utils/type-level';
+import { notNill } from '../utils/type-level';
 
 import type {
   ArgumentDefinitionNode,
@@ -10,20 +20,7 @@ import type {
   TypeDefinitionNode,
   TypeNode,
   VariantDefinitionNode,
-} from '../language/ast';
-import { IrisKind } from '../language/kinds';
-import { parse } from '../language/parser';
-
-import { validateSDL } from '../validation/validate';
-
-import { valueFromAST } from '../conversion/valueFromAST';
-import { getDirectiveValues } from '../conversion/values';
-import type { IrisError } from '../error';
-import type { TypeMap } from '../utils/collectTypeMap';
-import { collectTypeMap } from '../utils/collectTypeMap';
-import type { IrisMaybe, Maybe } from '../utils/type-level';
-import { notNill } from '../utils/type-level';
-
+} from './ast';
 import type {
   IrisArgument,
   IrisField,
@@ -36,6 +33,7 @@ import {
   GraphQLDirective,
   specifiedDirectives,
 } from './directives';
+import { IrisKind } from './kinds';
 
 class IrisSchema {
   description: Maybe<string>;
@@ -146,7 +144,7 @@ export function buildSchema(
       name,
       type,
       description: astNode.description?.value,
-      defaultValue: valueFromAST(astNode.defaultValue, type),
+      defaultValue: typeCheckASTValue(astNode.defaultValue, type),
       deprecationReason: getDeprecationReason(astNode),
       astNode,
     };
@@ -229,9 +227,21 @@ export function buildSchema(
   });
 }
 
-const getDeprecationReason = (
-  node: FieldDefinitionNode | ArgumentDefinitionNode | VariantDefinitionNode,
-): Maybe<string> =>
-  getDirectiveValues(GraphQLDeprecatedDirective, node)?.reason as string;
+function getDeprecationReason(node: {
+  readonly directives?: ReadonlyArray<DirectiveNode>;
+}): IrisMaybe<string> {
+  const directiveNode = node.directives?.find(
+    (directive) => directive.name.value === GraphQLDeprecatedDirective.name,
+  );
 
+  if (directiveNode === undefined) {
+    return undefined;
+  }
+
+  const reason = directiveNode?.arguments?.find(
+    (arg) => arg.name.value === 'reason',
+  )?.value;
+
+  return (typeCheckASTValue(reason, IrisScalars.String) as string) ?? '';
+}
 export type { IrisSchema };

@@ -1,9 +1,8 @@
-import { parse } from '../language/parser';
-
-import type { IrisSchema } from '../type/schema';
-
 import { validateSDL } from '../validation/validate';
 import type { SDLValidationRule } from '../validation/ValidationContext';
+
+import { parse } from '../parsing';
+import type { IrisSchema } from '../types/schema';
 
 import { isObjectLike, mapValue } from './ObjMap';
 import type { Maybe } from './type-level';

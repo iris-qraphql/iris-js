@@ -1,15 +1,14 @@
 import { Kind } from 'graphql';
 
+import { irisNodeError } from '../../error';
 import type {
   TypeDefinitionNode,
   VariantDefinitionNode,
-} from '../../language/ast';
-import { IrisKind } from '../../language/kinds';
-import type { ASTVisitor } from '../../language/visitor';
-
-import { scalarNames } from '../../type/definition';
-
-import { irisNodeError } from '../../error';
+} from '../../types/ast';
+import { isTypeVariantNode } from '../../types/ast';
+import { scalarNames } from '../../types/definition';
+import { IrisKind } from '../../types/kinds';
+import type { ASTVisitor } from '../../types/visitor';
 
 import type { SDLValidationContext } from '../ValidationContext';
 
@@ -63,20 +62,3 @@ export function IncludeOnlyVariantTypes(
     return false;
   }
 }
-
-const isTypeVariantNode = (type: TypeDefinitionNode) => {
-  const { variants } = type;
-
-  if (variants.length === 0) {
-    return true;
-  }
-
-  const [variant] = variants;
-  const typeName = type.name.value;
-
-  return (
-    variants.length === 1 &&
-    variant.name.value === typeName &&
-    variant.fields !== undefined
-  );
-};

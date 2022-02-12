@@ -9,15 +9,12 @@ import type { GraphQLArgs } from 'graphql';
 import { graphql } from 'graphql';
 import type { ExecutionResult } from 'graphql/execution';
 
-import type { IrisSchema } from './type/schema';
-
 import { validateSchema } from './validation/validate-schema';
 
 import { toGQLSchema } from './transpiling/toGQLSchema';
+import type { IrisSchema } from './types/schema';
 
 export { version, versionInfo } from './version';
-export { parse } from './language/parser';
-export { print } from './printing/printer';
 
 export type IrisArgs = Omit<GraphQLArgs, 'schema'> & {
   schema: IrisSchema;

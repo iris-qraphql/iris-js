@@ -17,17 +17,17 @@ import {
   specifiedScalarTypes,
 } from 'graphql';
 
+import { typeCheckValue } from '../validation/typeCheckValue';
+
+import { irisError } from '../error';
 import type {
   IrisField,
   IrisType,
   IrisTypeDefinition,
   IrisVariant,
-} from '../type/definition';
-import { isSpecifiedScalarType, isTypeRef } from '../type/definition';
-import type { IrisSchema } from '../type/schema';
-
-import { serializeValue } from '../conversion/serialize';
-import { irisError } from '../error';
+} from '../types/definition';
+import { isSpecifiedScalarType, isTypeRef } from '../types/definition';
+import type { IrisSchema } from '../types/schema';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';
 
@@ -75,13 +75,13 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     type: IrisTypeDefinition<'data'>,
   ): GraphQLScalarType => {
     const { name } = type;
-    const typeCheck = (value: unknown) => serializeValue(value, type);
+    const check = (value: unknown) => typeCheckValue(value, type);
     return register(
       name,
       new GraphQLScalarType({
         name,
-        serialize: typeCheck,
-        parseValue: typeCheck,
+        serialize: check,
+        parseValue: check,
         parseLiteral: () => {
           throw irisError('literals are not supported');
         },
@@ -95,7 +95,7 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     const { name, description } = type;
     const variants = type.variants();
 
-    if (type.isVariantType()) {
+    if (type.isVariantType) {
       return transpileVariant(variants[0]);
     }
 

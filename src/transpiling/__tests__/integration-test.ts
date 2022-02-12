@@ -1,6 +1,5 @@
-import { buildSchema } from '../../type/schema';
-
 import { iris } from '../../index';
+import { buildSchema } from '../../types/schema';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 
 describe('Simple Integration', () => {
