@@ -2,7 +2,7 @@ import type { IrisType, IrisTypeDefinition } from '../../types/definition';
 import { buildSchema } from '../../types/schema';
 import { sampleTypeRef } from '../../utils/generators';
 
-import { serializeValue } from '../serialize';
+import { serializeValue } from '../typeCheck';
 
 const serializeWith = (value: unknown, typeRef: string | IrisType<'data'>) => {
   const type =

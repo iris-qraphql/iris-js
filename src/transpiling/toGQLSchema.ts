@@ -17,7 +17,8 @@ import {
   specifiedScalarTypes,
 } from 'graphql';
 
-import { serializeValue } from '../conversion/serialize';
+import { serializeValue } from '../validation/typeCheck';
+
 import { irisError } from '../error';
 import type {
   IrisField,
