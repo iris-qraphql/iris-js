@@ -5,9 +5,11 @@ import { typeCheckASTValue } from '../validation/typeCheckASTValue';
 import { validateSDL } from '../validation/validate';
 
 import type { IrisError } from '../error';
+import { irisNodeError } from '../error';
 import { parse } from '../parsing';
 import type { TypeMap } from '../utils/collectTypeMap';
 import { collectTypeMap } from '../utils/collectTypeMap';
+import { inspect } from '../utils/legacy';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
 import { notNill } from '../utils/type-level';
 
@@ -217,12 +219,27 @@ export function buildSchema(
     }
   });
 
+  const assertRoot = (
+    operation: string,
+    type: IrisTypeDefinition,
+  ): IrisTypeDefinition<'resolver'> => {
+    if (type && !(type.role === 'resolver' && type.isVariantType)) {
+      throw irisNodeError(
+        `${operation} root type must be Object type${
+          operation === 'Query' ? '' : ' if provided'
+        }, it cannot be ${inspect(type)}.`,
+        type.astNode,
+      );
+    }
+    return type as IrisTypeDefinition<'resolver'>;
+  };
+
   return new IrisSchema({
     description: undefined,
     types: Object.values(typeMap),
-    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
-    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
-    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
+    query: assertRoot('query', typeMap.Query),
+    mutation: assertRoot('mutation', typeMap.Mutation),
+    subscription: assertRoot('subscription', typeMap.Subscription),
     directives: directiveDefs.map(buildDirective),
   });
 }
@@ -244,4 +261,5 @@ function getDeprecationReason(node: {
 
   return (typeCheckASTValue(reason, IrisScalars.String) as string) ?? '';
 }
+
 export type { IrisSchema };
