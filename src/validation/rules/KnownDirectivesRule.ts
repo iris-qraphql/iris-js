@@ -21,9 +21,7 @@ import type { SDLValidationContext } from '../ValidationContext';
 export function KnownDirectivesRule(context: SDLValidationContext): ASTVisitor {
   const locationsMap = Object.create(null);
 
-  const schema = context.getSchema();
-  const definedDirectives = schema ? schema.directives : specifiedDirectives;
-  for (const directive of definedDirectives) {
+  for (const directive of specifiedDirectives) {
     locationsMap[directive.name] = directive.locations;
   }
 

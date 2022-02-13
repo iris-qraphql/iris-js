@@ -7,14 +7,7 @@ import { IrisScalars } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { buildSchema } from '../schema';
 
-/**
- * This function does a full cycle of going from a string with the contents of
- * the SDL, parsed in a schema AST, materializing that schema AST into an
- * in-memory IrisSchema, and then finally printing that object into the SDL
- */
-function cycleSDL(sdl: string): string {
-  return printSchema(buildSchema(sdl));
-}
+const cycleSDL = (sdl: string): string => printSchema(buildSchema(sdl));
 
 describe('Schema Builder', () => {
   it('Empty type', () => {

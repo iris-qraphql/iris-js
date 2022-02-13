@@ -19,9 +19,7 @@ export function UniqueDirectivesPerLocationRule(
 ): ASTVisitor {
   const uniqueDirectiveMap = Object.create(null);
 
-  const schema = context.getSchema();
-  const definedDirectives = schema ? schema.directives : specifiedDirectives;
-  for (const directive of definedDirectives) {
+  for (const directive of specifiedDirectives) {
     uniqueDirectiveMap[directive.name] = !directive.isRepeatable;
   }
 

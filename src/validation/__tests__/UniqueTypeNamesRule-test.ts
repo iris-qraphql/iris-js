@@ -1,14 +1,12 @@
-import type { IrisSchema } from '../../types/schema';
 import { getSDLValidationErrors } from '../../utils/toJSONDeep';
 
 import { UniqueNamesRule } from '../rules/UniqueNamesRule';
 
-function expectSDLErrors(sdlStr: string, schema?: IrisSchema) {
-  return expect(getSDLValidationErrors(schema, UniqueNamesRule, sdlStr));
+function expectSDLErrors(sdlStr: string) {
+  return expect(getSDLValidationErrors(UniqueNamesRule, sdlStr));
 }
 
-const expectValidSDL = (sdlStr: string, schema?: IrisSchema) =>
-  expectSDLErrors(sdlStr, schema).toEqual([]);
+const expectValidSDL = (sdlStr: string) => expectSDLErrors(sdlStr).toEqual([]);
 
 describe('Validate: Unique type names', () => {
   it('one type', () => {

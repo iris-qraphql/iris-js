@@ -14,8 +14,7 @@ export function KnownArgumentNamesOnDirectivesRule(
 ): ASTVisitor {
   const directiveArgs = Object.create(null);
 
-  const schema = context.getSchema();
-  const definedDirectives = schema ? schema.directives : specifiedDirectives;
+  const definedDirectives = specifiedDirectives;
   for (const directive of definedDirectives) {
     directiveArgs[directive.name] = directive.args.map((arg) => arg.name);
   }

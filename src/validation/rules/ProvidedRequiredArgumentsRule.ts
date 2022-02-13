@@ -19,11 +19,9 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
   context: SDLValidationContext,
 ): ASTVisitor {
   const requiredArgsMap: ObjMap<ObjMap<IrisArgument | ArgumentDefinitionNode>> =
-    Object.create(null);
+    {};
 
-  const schema = context.getSchema();
-  const definedDirectives = schema?.directives ?? specifiedDirectives;
-  for (const directive of definedDirectives) {
+  for (const directive of specifiedDirectives) {
     requiredArgsMap[directive.name] = keyMap(
       directive.args.filter(isRequiredArgument),
       (arg) => arg.name,

@@ -60,7 +60,7 @@ describe('Type System: Schema', () => {
     });
   });
 
-  it('can be Object.toStringified', () => {
+  it('can be Object.toString', () => {
     const schema = buildSchema(`
       resolver Query = {}
     `);

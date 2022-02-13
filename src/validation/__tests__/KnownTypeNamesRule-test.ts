@@ -1,14 +1,13 @@
-import type { IrisSchema } from '../../types/schema';
 import { getSDLValidationErrors } from '../../utils/toJSONDeep';
 
 import { KnownTypeNamesRule } from '../rules/KnownTypeNamesRule';
 
-function getSDLErrors(sdlStr: string, schema?: IrisSchema) {
-  return getSDLValidationErrors(schema, KnownTypeNamesRule, sdlStr);
+function getSDLErrors(sdlStr: string) {
+  return getSDLValidationErrors(KnownTypeNamesRule, sdlStr);
 }
 
-function expectValidSDL(sdlStr: string, schema?: IrisSchema) {
-  expect(getSDLErrors(sdlStr, schema)).toEqual([]);
+function expectValidSDL(sdlStr: string) {
+  expect(getSDLErrors(sdlStr)).toEqual([]);
 }
 
 describe('Validate: Known type names', () => {

@@ -1,13 +1,9 @@
-import type { IrisSchema } from '../../types/schema';
 import { getSDLValidationErrors } from '../../utils/toJSONDeep';
 
 import { IncludeOnlyVariantTypes } from '../rules/IncludeOnlyVariantTypes';
 
-function expectSDLErrors(sdlStr: string, schema?: IrisSchema) {
-  return expect(
-    getSDLValidationErrors(schema, IncludeOnlyVariantTypes, sdlStr),
-  );
-}
+const expectSDLErrors = (sdlStr: string) =>
+  expect(getSDLValidationErrors(IncludeOnlyVariantTypes, sdlStr));
 
 describe('VariantType Rules', () => {
   it('rejects a Union type with non-Object members types', () => {

@@ -19,9 +19,6 @@ import type { SDLValidationContext } from '../ValidationContext';
  * See https://spec.graphql.org/draft/#sec-Fragment-Spread-Type-Existence
  */
 export function KnownTypeNamesRule(context: SDLValidationContext): ASTVisitor {
-  const schema = context.getSchema();
-  const existingTypesMap = schema ? schema.typeMap : Object.create(null);
-
   const definedTypes = Object.create(null);
   for (const def of context.getDocument().definitions) {
     if (isTypeDefinitionNode(def)) {
@@ -29,15 +26,12 @@ export function KnownTypeNamesRule(context: SDLValidationContext): ASTVisitor {
     }
   }
 
-  const typeNames = [
-    ...Object.keys(existingTypesMap),
-    ...Object.keys(definedTypes),
-  ];
+  const typeNames = [...Object.keys(definedTypes)];
 
   return {
     NamedType(node, _1, parent, _2, ancestors) {
       const typeName = node.name.value;
-      if (!existingTypesMap[typeName] && !definedTypes[typeName]) {
+      if (!definedTypes[typeName]) {
         const definitionNode = ancestors[2] ?? parent;
         const isSDL = definitionNode != null && isSDLNode(definitionNode);
         if (isSDL && scalarNames.includes(typeName)) {
@@ -62,7 +56,7 @@ export function KnownTypeNamesRule(context: SDLValidationContext): ASTVisitor {
       }
 
       const typeName = node.name.value;
-      if (!existingTypesMap[typeName] && !definedTypes[typeName]) {
+      if (!definedTypes[typeName]) {
         const definitionNode = ancestors[2] ?? parent;
         const isSDL = definitionNode != null && isSDLNode(definitionNode);
         if (isSDL && scalarNames.includes(typeName)) {
