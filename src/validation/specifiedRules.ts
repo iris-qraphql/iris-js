@@ -6,6 +6,7 @@ import { ProvidedRequiredArgumentsOnDirectivesRule } from './rules/ProvidedRequi
 import { UniqueDirectivesPerLocationRule } from './rules/UniqueDirectivesPerLocationRule';
 import { UniqueInputFieldNamesRule } from './rules/UniqueInputFieldNamesRule';
 import { UniqueNamesRule } from './rules/UniqueNamesRule';
+import { ValidateField } from './rules/ValidateField';
 import type { SDLValidationRule } from './ValidationContext';
 
 /**
@@ -22,4 +23,5 @@ export const specifiedSDLRules: ReadonlyArray<SDLValidationRule> =
     ProvidedRequiredArgumentsOnDirectivesRule,
     // IRIS
     IncludeOnlyVariantTypes,
+    ValidateField,
   ]);

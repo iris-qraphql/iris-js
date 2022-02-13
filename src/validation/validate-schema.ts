@@ -1,8 +1,7 @@
 import type { IrisError } from '../error';
 import { irisNodeError } from '../error';
-import type { ASTNode, DirectiveNode, Role } from '../types/ast';
-import type { IrisField } from '../types/definition';
-import { isInputType, isRequiredArgument, isType } from '../types/definition';
+import type { ASTNode, DirectiveNode } from '../types/ast';
+import { isInputType, isRequiredArgument } from '../types/definition';
 import { GraphQLDeprecatedDirective, isDirective } from '../types/directives';
 import type { IrisSchema } from '../types/schema';
 import { inspect } from '../utils/legacy';
@@ -18,7 +17,6 @@ export function validateSchema(schema: IrisSchema): ReadonlyArray<IrisError> {
   const context = new SchemaValidationContext(schema);
   validateRootTypes(context);
   validateDirectives(context);
-  validateTypes(context);
 
   // Persist the results of validation before returning to ensure validation
   // does not run multiple times for this schema.
@@ -109,62 +107,6 @@ function validateDirectives(context: SchemaValidationContext): void {
     }
   }
 }
-
-function validateTypes(ctx: SchemaValidationContext): void {
-  Object.values(ctx.schema.typeMap).forEach((type) =>
-    type
-      .variants()
-      .forEach((variant) =>
-        Object.values(variant?.fields ?? {}).forEach(
-          validateField(type.role, variant.name, ctx),
-        ),
-      ),
-  );
-}
-
-const validateField =
-  (role: Role, variantName: string, ctx: SchemaValidationContext) =>
-  (field: IrisField): void => {
-    if (role === 'data') {
-      if (!isInputType(field.type)) {
-        ctx.reportError(
-          `The type of ${variantName}.${field.name} must be Input Type ` +
-            `but got: ${inspect(field.type)}.`,
-          field.astNode?.type,
-        );
-      }
-      return;
-    }
-
-    // Ensure the type is an output type
-    if (!isType(field.type)) {
-      ctx.reportError(
-        `The type of ${variantName}.${field.name} must be Output Type ` +
-          `but got: ${inspect(field.type)}.`,
-        field.astNode?.type,
-      );
-    }
-
-    // Ensure the arguments are valid
-    for (const arg of field.args ?? []) {
-      const argName = arg.name;
-      // Ensure the type is an input type
-      if (!isInputType(arg.type)) {
-        ctx.reportError(
-          `The type of ${variantName}.${field.name}(${argName}:) must be Input ` +
-            `Type but got: ${inspect(arg.type)}.`,
-          arg.astNode?.type,
-        );
-      }
-
-      if (isRequiredArgument(arg) && arg.deprecationReason != null) {
-        ctx.reportError(
-          `Required argument ${variantName}.${field.name}(${argName}:) cannot be deprecated.`,
-          [getDeprecatedDirectiveNode(arg.astNode), arg.astNode?.type],
-        );
-      }
-    }
-  };
 
 function getDeprecatedDirectiveNode(
   definitionNode: Maybe<{ readonly directives?: ReadonlyArray<DirectiveNode> }>,

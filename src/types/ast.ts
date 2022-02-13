@@ -243,3 +243,14 @@ export const isTypeVariantNode = ({ name, variants }: TypeDefinitionNode) => {
     variant.fields !== undefined
   );
 };
+
+export const getRefTypeName = (node: TypeNode): NameNode => {
+  switch (node.kind) {
+    case IrisKind.NAMED_TYPE:
+      return node.name;
+    case IrisKind.LIST_TYPE:
+      return getRefTypeName(node.type);
+    case IrisKind.MAYBE_TYPE:
+      return getRefTypeName(node.type);
+  }
+};
