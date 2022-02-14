@@ -18,7 +18,9 @@ import type { IrisValidationContext } from '../ValidationContext';
  *
  * See https://spec.graphql.org/draft/#sec-Directives-Are-Defined
  */
-export function KnownDirectivesRule(context: IrisValidationContext): ASTVisitor {
+export function KnownDirectivesRule(
+  context: IrisValidationContext,
+): ASTVisitor {
   const locationsMap = Object.create(null);
 
   for (const directive of specifiedDirectives) {

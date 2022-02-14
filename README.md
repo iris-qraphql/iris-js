@@ -14,7 +14,7 @@ With npm:
 npm install --save iris
 ```
 
-iris.js enables to build GraphQL extended schema by iris syntaxt. scalar types in this GraphQL schema have specific validation logic.  
+iris.js enables to build GraphQL extended schema by iris syntaxt. scalar types in this GraphQL schema have specific validation logic.
 
 ```js
 import { irisScema } from 'iris';

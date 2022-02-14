@@ -3,9 +3,8 @@ import type { DocumentNode } from '../types/ast';
 import type { ASTVisitor } from '../types/visitor';
 
 export class IrisValidationContext {
-  errors: Array<IrisError> = []
+  errors: Array<IrisError> = [];
   private _ast: DocumentNode;
-  
 
   constructor(ast: DocumentNode) {
     this._ast = ast;

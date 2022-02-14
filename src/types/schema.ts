@@ -4,7 +4,6 @@ import { prop, uniqBy } from 'ramda';
 import { typeCheckASTValue } from '../validation/typeCheckASTValue';
 import { validateSDL } from '../validation/validate';
 
-import type { IrisError } from '../error';
 import { parse } from '../parsing';
 import type { TypeMap } from '../utils/collectTypeMap';
 import { collectTypeMap } from '../utils/collectTypeMap';
@@ -43,9 +42,6 @@ class IrisSchema {
   readonly subscription?: IrisTypeDefinition<'resolver'>;
   readonly directives: ReadonlyArray<GraphQLDirective>;
   readonly typeMap: TypeMap;
-
-  // Used as a cache for validateSchema().
-  __validationErrors: Maybe<ReadonlyArray<IrisError>>;
 
   constructor({
     description,
