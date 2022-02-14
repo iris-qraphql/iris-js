@@ -34,15 +34,8 @@ export type IrisType<R extends Role = Role> =
   | IrisTypeDefinition<R>
   | IrisTypeRef<IrisType<R>>;
 
-export const isInputType = (type: unknown): type is IrisType<'data'> =>
-  (isTypeDefinition(type) && type.role === 'data') ||
-  (isTypeRef(type) && isInputType(type.ofType));
-
 export const isType = (type: unknown): type is IrisType =>
-  isTypeDefinition(type) || isTypeRef(type);
-
-const isTypeDefinition = (type: unknown): type is IrisTypeDefinition =>
-  instanceOf(type, IrisTypeDefinition);
+  instanceOf(type, IrisTypeDefinition) || isTypeRef(type);
 
 export class IrisTypeRef<T extends IrisType> {
   readonly ofType: T;

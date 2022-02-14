@@ -4,7 +4,7 @@ import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
 
-import type { SDLValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 /**
  * Unique directive names per location
@@ -15,7 +15,7 @@ import type { SDLValidationContext } from '../ValidationContext';
  * See https://spec.graphql.org/draft/#sec-Directives-Are-Unique-Per-Location
  */
 export function UniqueDirectivesPerLocationRule(
-  context: SDLValidationContext,
+  context: IrisValidationContext,
 ): ASTVisitor {
   const uniqueDirectiveMap = Object.create(null);
 

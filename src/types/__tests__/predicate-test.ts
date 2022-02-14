@@ -1,11 +1,10 @@
 import { all } from 'ramda';
 
-import { sampleTypeRef, withWrappers } from '../../utils/generators';
+import { sampleTypeRef } from '../../utils/generators';
 
 import type { IrisArgument, IrisType, IrisTypeDefinition } from '../definition';
 import {
   IrisScalars,
-  isInputType,
   isRequiredArgument,
   isSpecifiedScalarType,
   isType,
@@ -52,13 +51,7 @@ const Directive = new GraphQLDirective({
   locations: [IrisDirectiveLocation.QUERY],
 });
 
-const dataTypes = ['String', 'Enum', 'InputObject'];
-const resolverTypes = ['Object', 'Union'];
-
 const typeRef = (exp: string) => sampleTypeRef(exp, definitions);
-
-const check = (f: (_: IrisType) => boolean, exp: string) =>
-  expect(f(typeRef(exp)));
 
 const tautology = (f: (_: IrisType) => boolean, exp: string): void =>
   expect(f(typeRef(exp))).toEqual(true);
@@ -89,20 +82,6 @@ describe('Type predicates', () => {
       expect(
         isSpecifiedScalarType(ScalarType as IrisTypeDefinition<'data'>),
       ).toEqual(false);
-    });
-  });
-
-  describe('isInputType', () => {
-    it('returns true for an data  type', () => {
-      for (const type of dataTypes.flatMap(withWrappers)) {
-        tautology(isInputType, type);
-      }
-    });
-
-    it('returns false for an output type', () => {
-      for (const type of resolverTypes.flatMap(withWrappers)) {
-        check(isInputType, type).toBe(false);
-      }
     });
   });
 

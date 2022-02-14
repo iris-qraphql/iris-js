@@ -4,10 +4,10 @@ import { irisNodeError } from '../../error';
 import type { NameNode, TypeDefinitionNode } from '../../types/ast';
 import type { ASTVisitor } from '../../types/visitor';
 
-import type { SDLValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 const checkUniquenessBy =
-  (ctx: SDLValidationContext, kind?: string) =>
+  (ctx: IrisValidationContext, kind?: string) =>
   (
     nodes: ReadonlyArray<{ name: NameNode }>,
     f?: (x: string) => string,
@@ -30,7 +30,7 @@ const checkUniquenessBy =
     }, seenArgs);
   };
 
-const registerUniq = (context: SDLValidationContext, kind: string) => {
+const registerUniq = (context: IrisValidationContext, kind: string) => {
   const knownNames: Record<string, NameNode> = {};
 
   return (node: NameNode) => {
@@ -48,7 +48,7 @@ const registerUniq = (context: SDLValidationContext, kind: string) => {
   };
 };
 
-export function UniqueNamesRule(context: SDLValidationContext): ASTVisitor {
+export function UniqueNamesRule(context: IrisValidationContext): ASTVisitor {
   const uniq = checkUniquenessBy(context);
   const registerType = registerUniq(context, 'type');
   const registerDirective = registerUniq(context, 'directive');

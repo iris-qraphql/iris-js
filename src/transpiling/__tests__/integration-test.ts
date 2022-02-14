@@ -1,9 +1,8 @@
-import { iris } from '../../index';
-import { buildSchema } from '../../types/schema';
+import { iris, irisSchema } from '../../index';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 
 describe('Simple Integration', () => {
-  const schema = buildSchema(`
+  const schema = irisSchema(`
   resolver Query = {
     hello: String
   }
@@ -25,7 +24,7 @@ describe('Simple Integration', () => {
 });
 
 describe('Sophisticated Integration:', () => {
-  const schema = buildSchema(`
+  const schema = irisSchema(`
   data Lifespan
     = Immortal {}
     | Limited { max: Int? }

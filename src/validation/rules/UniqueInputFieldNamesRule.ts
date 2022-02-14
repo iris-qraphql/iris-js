@@ -4,7 +4,7 @@ import type { ASTVisitor } from '../../types/visitor';
 import { invariant } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 
-import type { SDLValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 /**
  * Unique input field names
@@ -15,7 +15,7 @@ import type { SDLValidationContext } from '../ValidationContext';
  * See https://spec.graphql.org/draft/#sec-Input-Object-Field-Uniqueness
  */
 export function UniqueInputFieldNamesRule(
-  context: SDLValidationContext,
+  context: IrisValidationContext,
 ): ASTVisitor {
   const knownNameStack: Array<ObjMap<NameNode>> = [];
   let knownNames: ObjMap<NameNode> = Object.create(null);
