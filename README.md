@@ -6,7 +6,7 @@ The JavaScript implementation for Iris
 
 ### Using Iris.js
 
-Install Iris.js from npm
+Install Iris.js
 
 With npm:
 
@@ -14,21 +14,12 @@ With npm:
 npm install --save iris
 ```
 
-or using yarn:
-
-```sh
-yarn add iris
-```
-
-iris.js provides two important capabilities: building a type schema and
-serving queries against that type schema.
-
-First, build a Iris type schema which maps to your codebase.
+iris.js enables to build GraphQL extended schema by iris syntaxt. scalar types in this GraphQL schema have specific validation logic.  
 
 ```js
-import { iris, buildSchema } from 'iris';
+import { irisGQLScema } from 'iris';
 
-const schema = buildSchema(`
+const schema = irisGQLScema(`
   data Lifespan
     = Immortal {}
     | Limited { max: Int? }
@@ -48,9 +39,7 @@ const schema = buildSchema(`
 `);
 ```
 
-This defines a simple schema, with one type and one field, that resolves
-to a fixed value. The `resolve` function can return a value, a promise,
-Then, serve the result of a query against that type schema.
+schema defined above can be used by regular graphql.
 
 ```js
 var source = `
@@ -67,7 +56,7 @@ var source = `
     }
   `;
 
-iris({ schema, source }).then((result) => {
+graphql({ schema, source }).then((result) => {
   // Prints
   // {
   //   data: { hello: "world" }
