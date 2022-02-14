@@ -2,9 +2,9 @@ import { irisNodeError } from '../../error';
 import { getRefTypeName, isTypeDefinitionNode } from '../../types/ast';
 import type { ASTVisitor } from '../../types/visitor';
 
-import type { SDLValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
-export function ValidateField(ctx: SDLValidationContext): ASTVisitor {
+export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
   const doc = ctx.getDocument().definitions;
 
   return {

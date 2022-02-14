@@ -4,13 +4,13 @@ import { IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
-import type { SDLValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 /**
  * @internal
  */
 export function KnownArgumentNamesOnDirectivesRule(
-  context: SDLValidationContext,
+  context: IrisValidationContext,
 ): ASTVisitor {
   const directiveArgs = Object.create(null);
 

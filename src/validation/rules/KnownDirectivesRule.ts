@@ -8,7 +8,7 @@ import { IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
 import { inspect, invariant } from '../../utils/legacy';
 
-import type { SDLValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 /**
  * Known directives
@@ -18,7 +18,7 @@ import type { SDLValidationContext } from '../ValidationContext';
  *
  * See https://spec.graphql.org/draft/#sec-Directives-Are-Defined
  */
-export function KnownDirectivesRule(context: SDLValidationContext): ASTVisitor {
+export function KnownDirectivesRule(context: IrisValidationContext): ASTVisitor {
   const locationsMap = Object.create(null);
 
   for (const directive of specifiedDirectives) {

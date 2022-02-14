@@ -10,7 +10,7 @@ import { scalarNames } from '../../types/definition';
 import { IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
 
-import type { SDLValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 const makeScalar = (name: string): TypeDefinitionNode => ({
   kind: IrisKind.TYPE_DEFINITION,
@@ -24,7 +24,7 @@ const defaultTypes: Record<string, TypeDefinitionNode> = Object.fromEntries(
 );
 
 export function IncludeOnlyVariantTypes(
-  context: SDLValidationContext,
+  context: IrisValidationContext,
 ): ASTVisitor {
   const doc = context.getDocument().definitions;
 

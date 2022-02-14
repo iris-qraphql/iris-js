@@ -8,7 +8,7 @@ import { scalarNames } from '../../types/definition';
 import type { ASTVisitor } from '../../types/visitor';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 
-import type { SDLValidationContext } from '../ValidationContext';
+import type { IrisValidationContext } from '../ValidationContext';
 
 /**
  * Known type names
@@ -18,7 +18,7 @@ import type { SDLValidationContext } from '../ValidationContext';
  *
  * See https://spec.graphql.org/draft/#sec-Fragment-Spread-Type-Existence
  */
-export function KnownTypeNamesRule(context: SDLValidationContext): ASTVisitor {
+export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
   const definedTypes = Object.create(null);
   for (const def of context.getDocument().definitions) {
     if (isTypeDefinitionNode(def)) {
