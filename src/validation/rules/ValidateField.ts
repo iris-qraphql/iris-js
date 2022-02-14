@@ -23,7 +23,7 @@ export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
             ctx.reportError(
               irisNodeError(
                 `The type of ${fieldPath} must be data Type but got: ${refTypeName}.`,
-                field,
+                field.type,
               ),
             );
           }
@@ -41,7 +41,7 @@ export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
               ctx.reportError(
                 irisNodeError(
                   `The type of ${fieldPath}(${argName}:) must be Input Type but got: ${argTypeName}.`,
-                  arg,
+                  arg.type,
                 ),
               );
             }

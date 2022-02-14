@@ -224,37 +224,7 @@ describe('Type System: Fields args must be properly named', () => {
       expectJSONEqual(schema, []);
     });
 
-    it('rejects an Input Object type with incorrectly typed fields', () => {
-      const schema = buildSchema(`
-      resolver Query = {
-        field(arg: SomeInputObject): String
-      }
 
-      resolver SomeObject = {
-        field: String
-      }
-
-      resolver SomeUnion = SomeObject
-
-      data SomeInputObject = {
-        badObject: SomeObject
-        badUnion: SomeUnion
-        goodInputObject: SomeInputObject
-      }
-    `);
-      expectJSONEqual(schema, [
-        {
-          message:
-            'The type of SomeInputObject.badObject must be Input Type but got: SomeObject.',
-          locations: [{ line: 13, column: 20 }],
-        },
-        {
-          message:
-            'The type of SomeInputObject.badUnion must be Input Type but got: SomeUnion.',
-          locations: [{ line: 14, column: 19 }],
-        },
-      ]);
-    });
   });
 
   describe('Type System: Object fields must have output types', () => {
