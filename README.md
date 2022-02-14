@@ -14,12 +14,12 @@ With npm:
 npm install --save iris
 ```
 
-iris.js enables to build GraphQL extended schema by iris syntaxt. scalar types in this GraphQL schema have specific validation logic.
+iris.js enables to build enhanced GraphQL schema by iris syntax
 
 ```js
-import { irisScema } from 'iris';
+import { irisSchema } from 'iris';
 
-const schema = irisScema(`
+const schema = irisSchema(`
   data Lifespan
     = Immortal {}
     | Limited { max: Int? }
