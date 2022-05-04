@@ -1,5 +1,5 @@
 import type { IrisType, IrisTypeDefinition } from '../../types/definition';
-import { buildSchema } from '../../types/schema';
+import { buildSchema, getType } from '../../types/schema';
 import { sampleTypeRef } from '../../utils/generators';
 
 import { typeCheckValue } from '../typeCheckValue';
@@ -191,7 +191,7 @@ describe('parse simple data variants', () => {
   const leaf = (name: string) => ({ __typename: 'Leaf', name });
 
   const parseNode = (n: unknown) =>
-    serializeWith(n, schema.getType('NodeType') as IrisTypeDefinition<'data'>);
+    serializeWith(n, getType(schema, 'NodeType') as IrisTypeDefinition<'data'>);
 
   it("don't accept non data values", () => {
     expect(() => parseNode(['Leaf'])).toThrowErrorMatchingSnapshot();
@@ -263,7 +263,7 @@ describe('circular data types', () => {
   });
   const leaf = (name?: string) => ({ __typename: 'Leaf', name });
 
-  const nodeType = schema.getType('NodeType');
+  const nodeType = getType(schema, 'NodeType');
   const parseNode = (n: unknown) =>
     serializeWith(n, nodeType as IrisTypeDefinition<'data'>);
 

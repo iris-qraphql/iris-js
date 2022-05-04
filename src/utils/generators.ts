@@ -19,13 +19,13 @@ export const sampleTypeRef = <R extends Role>(
   ref: string,
   defs: string = '',
 ): IrisType<R> => {
-  const { query } = buildSchema(`
+  const { types } = buildSchema(`
     ${defs}
     resolver Query = {
       f: ${ref}
     }
   `);
-  const fields = query?.variantBy().fields ?? {};
+  const fields = types.Query?.variantBy().fields ?? {};
   return fields.f.type as IrisType<R>;
 };
 

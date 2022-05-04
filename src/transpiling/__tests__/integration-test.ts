@@ -1,4 +1,4 @@
-import { iris, irisSchema } from '../../index';
+import { graphql, irisSchema } from '../../index';
 import { toJSONDeep } from '../../utils/toJSONDeep';
 
 describe('Simple Integration', () => {
@@ -13,7 +13,7 @@ describe('Simple Integration', () => {
   };
 
   it('hello world App', async () => {
-    const result = await iris({ schema, rootValue, source: '{ hello }' });
+    const result = await graphql({ schema, rootValue, source: '{ hello }' });
 
     expect(toJSONDeep(result)).toEqual({
       data: {
@@ -56,7 +56,7 @@ describe('Sophisticated Integration:', () => {
   ];
 
   const api = (deities: () => Array<unknown>, query: string) =>
-    iris({ schema, rootValue: { deities }, source: query });
+    graphql({ schema, rootValue: { deities }, source: query });
 
   it('union type names', async () => {
     const result = await api(validDeities, '{ deities { __typename } }');

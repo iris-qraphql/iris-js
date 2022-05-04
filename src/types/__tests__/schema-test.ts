@@ -54,20 +54,10 @@ describe('Type System: Schema', () => {
        resolver Query = {}
       `);
 
-      expect(Object.keys(schema.typeMap)).toEqual(
+      expect(Object.keys(schema.types)).toEqual(
         expect.arrayContaining(['Foo', 'Bar']),
       );
     });
-  });
-
-  it('can be Object.toString', () => {
-    const schema = buildSchema(`
-      resolver Query = {}
-    `);
-
-    expect(Object.prototype.toString.call(schema)).toEqual(
-      '[object IrisSchema]',
-    );
   });
 
   describe('Validity', () => {

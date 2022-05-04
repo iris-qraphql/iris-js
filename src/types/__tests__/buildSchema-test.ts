@@ -5,7 +5,7 @@ import type { ObjMap } from '../../utils/ObjMap';
 import type { IrisField } from '../definition';
 import { IrisScalars } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
-import { buildSchema } from '../schema';
+import { buildSchema, getDirective, getType } from '../schema';
 
 const cycleSDL = (sdl: string): string => printSchema(buildSchema(sdl));
 
@@ -34,7 +34,7 @@ describe('Schema Builder', () => {
     const scalars = Object.keys(IrisScalars);
 
     for (const name of scalars) {
-      expect(schema.getType(name)).toEqual(IrisScalars[name]);
+      expect(getType(schema, name)).toEqual(IrisScalars[name]);
     }
   });
 
@@ -42,9 +42,9 @@ describe('Schema Builder', () => {
     const schema = buildSchema('resolver Query');
 
     // String and Boolean are always included through introspection types
-    expect(schema.getType('Int')).toEqual(undefined);
-    expect(schema.getType('Float')).toEqual(undefined);
-    expect(schema.getType('ID')).toEqual(undefined);
+    expect(getType(schema, 'Int')).toEqual(undefined);
+    expect(getType(schema, 'Float')).toEqual(undefined);
+    expect(getType(schema, 'ID')).toEqual(undefined);
   });
 
   it('With directives', () => {
@@ -97,7 +97,7 @@ describe('Schema Builder', () => {
     `);
 
     expect(schema.directives).toHaveLength(4);
-    expect(schema.getDirective('deprecated')).not.toEqual(
+    expect(getDirective(schema, 'deprecated')).not.toEqual(
       GraphQLDeprecatedDirective,
     );
   });
@@ -348,8 +348,7 @@ describe('Schema Builder', () => {
     const schema = buildSchema(sdl);
 
     expect(
-      schema
-        .getType('MyEnum')
+      getType(schema, 'MyEnum')
         ?.variants()
         .map(({ name, deprecationReason }) => ({ name, deprecationReason })),
     ).toEqual([
@@ -359,7 +358,7 @@ describe('Schema Builder', () => {
     ]);
 
     const rootFields =
-      schema.getType('Query')?.variantBy().fields ??
+      getType(schema, 'Query')?.variantBy().fields ??
       ({} as ObjMap<IrisField<'resolver'>>);
 
     expect(rootFields.field1).toEqual(
@@ -396,7 +395,7 @@ describe('Schema Builder', () => {
       data ID = String
     `);
 
-    expect(schema.getType('ID')).toEqual(IrisScalars.ID);
+    expect(getType(schema, 'ID')).toEqual(IrisScalars.ID);
   });
 
   it('Rejects invalid SDL', () => {

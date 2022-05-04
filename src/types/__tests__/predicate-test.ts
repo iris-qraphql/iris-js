@@ -18,7 +18,7 @@ import {
   isDirective,
   isSpecifiedDirective,
 } from '../directives';
-import { buildSchema } from '../schema';
+import { buildSchema, getType } from '../schema';
 
 const definitions = `
   data Scalar = Int
@@ -42,10 +42,10 @@ const schema = buildSchema(`
   }
 `);
 
-const ObjectType = schema.getType('Object');
-const EnumType = schema.getType('Enum');
+const ObjectType = getType(schema, 'Object');
+const EnumType = getType(schema, 'Enum');
 
-const ScalarType = schema.getType('Scalar');
+const ScalarType = getType(schema, 'Scalar');
 const Directive = new GraphQLDirective({
   name: 'Directive',
   locations: [IrisDirectiveLocation.QUERY],

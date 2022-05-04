@@ -6,13 +6,6 @@
   "private": true,
   "main": "index",
   "module": "index.mjs",
-  "typesVersions": {
-    ">=4.1.0": {
-      "*": [
-        "*"
-      ]
-    }
-  },
   "sideEffects": false,
   "homepage": "https://github.com/iris-ql/iris-js",
   "bugs": {

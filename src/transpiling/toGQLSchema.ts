@@ -165,16 +165,21 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     return withMaybe(lookup(type.name));
   };
 
-  const types = Object.values(schema.typeMap)
+  const types = Object.values(schema.types)
     .filter((t) => !isSpecifiedScalarType(t))
     .filter((t) => !['Query', 'Mutation', 'Subscription'].includes(t.name))
     .map(transpileTypeDefinition);
 
   const config: GraphQLSchemaConfig = {
-    description: schema.description,
-    query: transpileRootTypeDefinition(schema.query),
-    mutation: transpileRootTypeDefinition(schema.mutation),
-    subscription: transpileRootTypeDefinition(schema.subscription),
+    query: transpileRootTypeDefinition(
+      schema.types.Query as IrisTypeDefinition<'resolver'>,
+    ),
+    mutation: transpileRootTypeDefinition(
+      schema.types.Mutation as IrisTypeDefinition<'resolver'>,
+    ),
+    subscription: transpileRootTypeDefinition(
+      schema.types.Subscription as IrisTypeDefinition<'resolver'>,
+    ),
     types,
     directives: [],
   };

@@ -34,56 +34,21 @@ import {
 } from './directives';
 import { IrisKind } from './kinds';
 
-class IrisSchema {
-  description: Maybe<string>;
+export const getType = (
+  schema: IrisSchema,
+  name: string,
+): IrisMaybe<IrisTypeDefinition> => schema.types[name];
 
-  readonly query?: IrisTypeDefinition<'resolver'>;
-  readonly mutation?: IrisTypeDefinition<'resolver'>;
-  readonly subscription?: IrisTypeDefinition<'resolver'>;
+export const getDirective = (
+  schema: IrisSchema,
+  name: string,
+): Maybe<GraphQLDirective> =>
+  schema.directives.find((directive) => directive.name === name);
+
+type IrisSchema = {
   readonly directives: ReadonlyArray<GraphQLDirective>;
-  readonly typeMap: TypeMap;
-
-  constructor({
-    description,
-    query,
-    mutation,
-    subscription,
-    types = [],
-    directives = [],
-  }: Readonly<IrisSchemaConfig>) {
-    this.description = description;
-    this.query = query;
-    this.mutation = mutation;
-    this.subscription = subscription;
-    this.directives = uniqBy(prop('name'), [
-      ...directives,
-      ...specifiedDirectives,
-    ]);
-
-    this.typeMap = collectTypeMap(
-      [query, mutation, subscription, ...types].filter(notNill),
-      this.directives,
-    );
-  }
-
-  get [Symbol.toStringTag]() {
-    return 'IrisSchema';
-  }
-
-  getType = (name: string): IrisMaybe<IrisTypeDefinition> => this.typeMap[name];
-
-  getDirective = (name: string): Maybe<GraphQLDirective> =>
-    this.directives.find((directive) => directive.name === name);
-}
-
-export interface IrisSchemaConfig {
-  description?: Maybe<string>;
-  query?: IrisTypeDefinition<'resolver'>;
-  mutation?: IrisTypeDefinition<'resolver'>;
-  subscription?: IrisTypeDefinition<'resolver'>;
-  types?: ReadonlyArray<IrisTypeDefinition>;
-  directives?: ReadonlyArray<GraphQLDirective>;
-}
+  readonly types: TypeMap;
+};
 
 export function buildSchema(
   source: string | Source,
@@ -213,14 +178,23 @@ export function buildSchema(
     }
   });
 
-  return new IrisSchema({
-    description: undefined,
-    types: Object.values(typeMap),
-    query: typeMap.Query as IrisTypeDefinition<'resolver'>,
-    mutation: typeMap.Mutation as IrisTypeDefinition<'resolver'>,
-    subscription: typeMap.Subscription as IrisTypeDefinition<'resolver'>,
-    directives: directiveDefs.map(buildDirective),
-  });
+  const directives = uniqBy(prop('name'), [
+    ...directiveDefs.map(buildDirective),
+    ...specifiedDirectives,
+  ]);
+
+  return {
+    types: collectTypeMap(
+      [
+        typeMap.Query,
+        typeMap.Mutation,
+        typeMap.Subscription,
+        ...Object.values(typeMap),
+      ].filter(notNill),
+      directives,
+    ),
+    directives,
+  };
 }
 
 function getDeprecationReason(node: {

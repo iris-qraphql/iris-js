@@ -17,7 +17,7 @@ import { print } from './printer';
 
 export function printSchema(schema: IrisSchema): string {
   const directives = schema.directives.filter((n) => !isSpecifiedDirective(n));
-  const types = Object.values(schema.typeMap).filter(
+  const types = Object.values(schema.types).filter(
     (t) => !isSpecifiedScalarType(t),
   );
 
