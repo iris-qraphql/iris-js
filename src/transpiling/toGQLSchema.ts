@@ -20,6 +20,7 @@ import {
 import { typeCheckValue } from '../validation/typeCheckValue';
 
 import { irisError } from '../error';
+import { toJSODoc } from '../printing/jsDoc';
 import type {
   IrisField,
   IrisType,
@@ -80,7 +81,7 @@ export const toGQLSchema = (
   ): GraphQLScalarType => {
     const { name, description } = type;
     const check = (value: unknown) => typeCheckValue(value, type);
-    const jsDoc = 'TODO: JSDOC';
+    const jsDoc = toJSODoc(type);
 
     return register(
       name,

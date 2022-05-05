@@ -12,13 +12,23 @@ data Lifespan
   = Immortal {}
   | Limited { max: Int? }
 
+"""
+Third and fourth generation of the deity in Greek mythology, 
+also called Olympians.
+"""
 resolver God = {
     name: String
     lifespan: Lifespan
   }
 
+"""
+A supernatural being considered divine and sacred
+"""
 resolver Deity
   = God
+  """
+  second generation of the deity in Greek mythology
+  """
   | Titan { name: String }
 
 resolver Query = {
