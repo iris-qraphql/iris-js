@@ -2,6 +2,25 @@
 
 The JavaScript implementation for Iris
 
+## What is Iris?
+
+## Why Iris ?
+
+problems with GraphQL.
+
+- GraphQL is not good much for server to server applications where you need no selectivity such as RPC like scenarios.
+- Graphql is can't sufficiently handle recursive data types
+- does not support input unions
+- we are forced to define input/output types and have multiple entities with complex rules for defining ADT like types.
+- default values GraphQL inputs are  risky on recursive data types.
+
+Iris solutions.
+
+- default values in iris are only allowed on arguments
+- iris uses only 3 entities `wrapping`, `data` and `resolver` types. where `data` and `resolver` are represented with identical `ADT` syntax.
+- Iris can handle recursive data types with `data` entity, which can also be used as input unions.
+- in Iris you can use `data` types with query definition to achieve RPC like api definitions, where selectivity is not the key demand.
+
 ## Getting Started
 
 ### Using Iris.js
@@ -89,7 +108,7 @@ server
   .then(({ url }) => console.log(`🚀  Server ready at ${url}`));
 ```
 
-GraphQL server is running on: http://localhost:4000.
+GraphQL server is running on: <http://localhost:4000>.
 
 where client will see following GraphQL schema definition.
 
