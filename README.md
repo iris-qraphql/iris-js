@@ -124,7 +124,10 @@ type Query {
 }
 ```
 
-following query:
+as we can see type `Lifespan` is represented as scalar. however their values will be validated accordingly to iris type definition. in addition client libraries can use its description in `JSDoc`
+to generate corresponding types.
+
+in this server, following query:
 
 ```gql
 query GetDeities {

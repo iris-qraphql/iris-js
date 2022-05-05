@@ -1,5 +1,6 @@
 import type {
   GraphQLFieldConfig,
+  GraphQLFieldConfigArgumentMap,
   GraphQLNamedOutputType,
   GraphQLNamedType,
   GraphQLOutputType,
@@ -22,6 +23,7 @@ import { typeCheckValue } from '../validation/typeCheckValue';
 import { irisError } from '../error';
 import { toJSODoc } from '../printing/jsDoc';
 import type {
+  IrisArgument,
   IrisField,
   IrisType,
   IrisTypeDefinition,
@@ -150,15 +152,22 @@ export const toGQLSchema = (
     );
   };
 
+  const transpileArguments = (
+    _args: ReadonlyArray<IrisArgument>,
+  ): GraphQLFieldConfigArgumentMap => {
+    return {};
+  };
+
   const transpileField =
     (resolvers: any) =>
     (
-      { description, type }: IrisField<'resolver'>,
+      { description, type, args }: IrisField<'resolver'>,
       name: string,
     ): GraphQLFieldConfig<any, any> => ({
       description,
       type: transpileType(type),
       resolve: resolvers[name],
+      args: args ? transpileArguments(args) : undefined,
     });
 
   const transpileType = (
