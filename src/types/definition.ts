@@ -32,16 +32,16 @@ export const isSpecifiedScalarType = (type: IrisTypeDefinition): boolean =>
 
 export type IrisType<R extends Role = Role> =
   | IrisTypeDefinition<R>
-  | IrisTypeRef<IrisType<R>>;
+  | IrisTypeRef<R>;
 
 export const isType = (type: unknown): type is IrisType =>
   instanceOf(type, IrisTypeDefinition) || isTypeRef(type);
 
-export class IrisTypeRef<T extends IrisType> {
-  readonly ofType: T;
+export class IrisTypeRef<R extends Role> {
+  readonly ofType: IrisType<R>;
   readonly kind: WrapperKind;
 
-  constructor(kind: WrapperKind, ofType: T) {
+  constructor(kind: WrapperKind, ofType: IrisType<R>) {
     this.kind = kind;
     this.ofType = ofType;
   }
@@ -51,14 +51,14 @@ export class IrisTypeRef<T extends IrisType> {
   }
 
   toString(): string {
-    const name = this.ofType.toString();
+    const type = this.ofType.toString();
     switch (this.kind) {
       case 'LIST':
-        return '[' + name + ']';
+        return '[' + type + ']';
       case 'MAYBE':
-        return name + '?';
+        return type + '?';
       default:
-        return name;
+        return type;
     }
   }
 
@@ -67,17 +67,12 @@ export class IrisTypeRef<T extends IrisType> {
   }
 }
 
-export const isTypeRef = <T extends IrisType>(
+export const isTypeRef = <R extends Role>(
   type: unknown,
-): type is IrisTypeRef<T> => instanceOf(type, IrisTypeRef);
+): type is IrisTypeRef<R> => instanceOf(type, IrisTypeRef);
 
-export const isMaybeType = (
-  type: unknown,
-): type is IrisTypeRef<IrisTypeDefinition> =>
+export const isMaybeType = (type: unknown): type is IrisTypeRef<Role> =>
   isTypeRef(type) && type.kind === 'MAYBE';
-
-export const unwrapType = (type: IrisType): IrisTypeDefinition =>
-  isTypeRef(type) ? unwrapType(type.ofType) : type;
 
 type IrisNode = {
   name: string;

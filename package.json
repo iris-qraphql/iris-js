@@ -1,7 +1,7 @@
 {
   "name": "iris",
   "version": "0.1.0",
-  "description": "A Query Language and Runtime which can target any service.",
+  "description": "A Type system alternative for GraphQL",
   "license": "MIT",
   "private": true,
   "main": "index",

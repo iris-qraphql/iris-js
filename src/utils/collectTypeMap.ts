@@ -3,11 +3,14 @@ import type {
   IrisTypeDefinition,
   IrisVariant,
 } from '../types/definition';
-import { unwrapType } from '../types/definition';
+import { isTypeRef } from '../types/definition';
 import type { GraphQLDirective } from '../types/directives';
 import { isDirective } from '../types/directives';
 
 import type { ObjMap } from './ObjMap';
+
+export const unwrapType = (type: IrisType): IrisTypeDefinition =>
+  isTypeRef(type) ? unwrapType(type.ofType) : type;
 
 const collectAllReferencedTypes = (
   types: ReadonlyArray<IrisTypeDefinition>,
