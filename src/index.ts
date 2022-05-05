@@ -10,5 +10,10 @@ import { buildSchema } from './types/schema';
 export { graphql } from 'graphql';
 export { version, versionInfo } from './version';
 
-export const irisSchema = (src: string, resolvers?: ResolverMap) =>
-  toGQLSchema(buildSchema(src), resolvers);
+type Config = {
+  typeDefs: string;
+  resolvers?: ResolverMap;
+};
+
+export const irisSchema = ({ typeDefs, resolvers }: Config) =>
+  toGQLSchema(buildSchema(typeDefs), resolvers);

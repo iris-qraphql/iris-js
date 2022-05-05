@@ -26,10 +26,10 @@ A supernatural being considered divine and sacred
 """
 resolver Deity
   = God
-  """
-  second generation of the deity in Greek mythology
-  """
-  | Titan { name: String }
+  | """
+    second generation of the deity in Greek mythology
+    """
+    Titan { name: String }
 
 resolver Query = {
     deities(lifespan: Lifespan?): [Deity]
@@ -51,9 +51,12 @@ const resolvers = {
     ],
   },
   God: {
-    lifespan: () => ({ __typename: 'Limited', max: 200 }),
+    lifespan: () => ({
+      __typename: 'Limited',
+      max: 200,
+    }),
   },
 };
-
-const server = new ApolloServer({ schema: irisSchema(typeDefs, resolvers) });
+const schema = irisSchema({ typeDefs, resolvers });
+const server = new ApolloServer({ schema });
 server.listen().then(({ url }) => console.log(`🚀  Server ready at ${url}`));

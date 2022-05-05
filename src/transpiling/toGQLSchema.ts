@@ -104,7 +104,7 @@ export const toGQLSchema = (
     const variants = type.variants();
 
     if (type.isVariantType) {
-      return transpileVariant(variants[0]);
+      return transpileVariant({ ...variants[0], description });
     }
 
     return register(
