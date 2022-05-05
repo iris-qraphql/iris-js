@@ -32,8 +32,12 @@ import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';
 
 const stdTypeMap = keyMap([...specifiedScalarTypes], (type) => type.name);
+export type ResolverMap = Record<string, unknown>;
 
-export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
+export const toGQLSchema = (
+  schema: IrisSchema,
+  resolverMap: ResolverMap = {},
+): GraphQLSchema => {
   const typeMap: ObjMap<GraphQLNamedOutputType> = stdTypeMap;
 
   const register = <T extends GraphQLNamedOutputType>(
@@ -115,6 +119,8 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
   ): GraphQLObjectType => {
     const { name, description } = variant;
 
+    const typeResolver = resolverMap[name] ?? {};
+
     const empty: ObjMap<GraphQLFieldConfig<any, any>> = {
       _: { type: GraphQLBoolean },
     };
@@ -124,7 +130,9 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     }
 
     const fields: ThunkObjMap<GraphQLFieldConfig<any, any>> = () =>
-      variant.fields ? mapValue(variant.fields, transpileField) : empty;
+      variant.fields
+        ? mapValue(variant.fields, transpileField(typeResolver))
+        : empty;
 
     const variantTypeName = namespace ? `${namespace}_${name}` : name;
 
@@ -138,13 +146,16 @@ export const toGQLSchema = (schema: IrisSchema): GraphQLSchema => {
     );
   };
 
-  const transpileField = ({
-    description,
-    type,
-  }: IrisField<'resolver'>): GraphQLFieldConfig<any, any> => ({
-    description,
-    type: transpileType(type),
-  });
+  const transpileField =
+    (resolvers: any) =>
+    (
+      { description, type }: IrisField<'resolver'>,
+      name: string,
+    ): GraphQLFieldConfig<any, any> => ({
+      description,
+      type: transpileType(type),
+      resolve: resolvers[name],
+    });
 
   const transpileType = (
     type: IrisType,

@@ -33,7 +33,7 @@
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "build:npm": "node scripts/build-npm.js"
+    "server": "tsc --pretty & node server.js"
   },
   "devDependencies": {
     "@babel/core": "7.16.5",
@@ -64,8 +64,9 @@
     "tag": "latest"
   },
   "dependencies": {
-    "ramda": "^0.27.2",
-    "graphql": "^v16.3.0"
+    "apollo-server": "^3.6.7",
+    "graphql": "^16.4.0",
+    "ramda": "^0.27.2"
   },
   "jest": {
     "preset": "ts-jest",
