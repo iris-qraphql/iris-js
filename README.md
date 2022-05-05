@@ -36,7 +36,7 @@ npm install --save iris
 iris.js enables to build enhanced GraphQL schema by iris syntax
 
 ```js
-import { ApolloServer } from 'apollo-server'
+import { ApolloServer } from 'apollo-server';
 import { irisSchema } from 'iris';
 
 const typeDefs = `
@@ -93,19 +93,15 @@ const resolvers = {
   },
 };
 
-
-
 const schema = irisSchema(typeDefs, resolvers);
-````
+```
 
 schema defined above can be used by regular GraphQL server (for example we use apollo server).
 
 ```ts
 const server = new ApolloServer({ schema });
 
-server
-  .listen()
-  .then(({ url }) => console.log(`🚀  Server ready at ${url}`));
+server.listen().then(({ url }) => console.log(`🚀  Server ready at ${url}`));
 ```
 
 GraphQL server is running on: <http://localhost:4000>.
@@ -122,7 +118,7 @@ lifespan of deity
 scalar Lifespan
 
 """
-Third and fourth generation of the deity in Greek mythology, 
+Third and fourth generation of the deity in Greek mythology,
 also called Olympians.
 """
 type God {
@@ -130,10 +126,14 @@ type God {
   lifespan: Lifespan!
 }
 
-"""A supernatural being considered divine and sacred"""
+"""
+A supernatural being considered divine and sacred
+"""
 union Deity = God | Deity_Titan
 
-"""second generation of the deity in Greek mythology"""
+"""
+second generation of the deity in Greek mythology
+"""
 type Deity_Titan {
   name: String!
 }
@@ -151,11 +151,11 @@ in this server, following query:
 ```gql
 query GetDeities {
   deities {
-    ... on God{
+    ... on God {
       name
       lifespan
     }
-    ... on Deity_Titan{
+    ... on Deity_Titan {
       name
     }
   }
