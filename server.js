@@ -57,6 +57,6 @@ const resolvers = {
     }),
   },
 };
-const schema = irisSchema({ typeDefs, resolvers });
-const server = new ApolloServer({ schema });
+
+const server = new ApolloServer({ schema: irisSchema(typeDefs, resolvers) });
 server.listen().then(({ url }) => console.log(`🚀  Server ready at ${url}`));

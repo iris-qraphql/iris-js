@@ -17,50 +17,146 @@ npm install --save iris
 iris.js enables to build enhanced GraphQL schema by iris syntax
 
 ```js
+import { ApolloServer } from 'apollo-server'
 import { irisSchema } from 'iris';
 
-const schema = irisSchema(`
-  data Lifespan
-    = Immortal {}
-    | Limited { max: Int? }
+const typeDefs = `
+"""
+lifespan of deity
+"""
+data Lifespan
+  = Immortal {}
+  | Limited { max: Int? }
 
-  resolver God = {
+"""
+Third and fourth generation of the deity in Greek mythology, 
+also called Olympians.
+"""
+resolver God = {
     name: String
     lifespan: Lifespan
   }
 
-  resolver Deity
-    = God
-    | Titan { name: String }
+"""
+A supernatural being considered divine and sacred
+"""
+resolver Deity
+  = God
+  | """
+    second generation of the deity in Greek mythology
+    """
+    Titan { name: String }
 
-  resolver Query = {
+resolver Query = {
     deities(lifespan: Lifespan?): [Deity]
   }
-`);
+`;
+
+const resolvers = {
+  Query: {
+    deities: () => [
+      {
+        name: 'Iris',
+        age: 12,
+        __typename: 'God',
+      },
+      {
+        name: 'Zeus',
+        __typename: 'Deity_Titan',
+      },
+    ],
+  },
+  God: {
+    lifespan: () => ({
+      __typename: 'Limited',
+      max: 200,
+    }),
+  },
+};
+
+
+
+const schema = irisSchema(typeDefs, resolvers);
+````
+
+schema defined above can be used by regular GraphQL server (for example we use apollo server).
+
+```ts
+const server = new ApolloServer({ schema });
+
+server
+  .listen()
+  .then(({ url }) => console.log(`🚀  Server ready at ${url}`));
 ```
 
-schema defined above can be used by regular graphql.
+GraphQL server is running on: http://localhost:4000.
 
-```js
-var source = `
-    { deities { 
-        __typename
-        ... on God {
-          name
-          lifespan
-        }
-        ... on Deity_Titan {
-          name
-        }
-      } 
+where client will see following GraphQL schema definition.
+
+```graphql
+"""
+lifespan of deity
+
+@typedef {{ __typename: "Limited", max: ?Int }} Lifespan_Limited
+@type {("Immortal" | Lifespan_Limited)}
+"""
+scalar Lifespan
+
+"""
+Third and fourth generation of the deity in Greek mythology, 
+also called Olympians.
+"""
+type God {
+  name: String!
+  lifespan: Lifespan!
+}
+
+"""A supernatural being considered divine and sacred"""
+union Deity = God | Deity_Titan
+
+"""second generation of the deity in Greek mythology"""
+type Deity_Titan {
+  name: String!
+}
+
+type Query {
+  deities: [Deity!]!
+}
+```
+
+following query:
+
+```gql
+query GetDeities {
+  deities {
+    ... on God{
+      name
+      lifespan
     }
-  `;
+    ... on Deity_Titan{
+      name
+    }
+  }
+}
+```
 
-graphql({ schema, source }).then((result) => {
-  // Prints
-  // {
-  //   data: { hello: "world" }
-  // }
-  console.log(result);
-});
+will return:
+
+```json
+{
+  "data": {
+    "deities": [
+      {
+        "name": "Iris",
+        "lifespan": {
+          "__typename": "Limited",
+          "max": 200
+        }
+      },
+      {
+        "name": "Zeus"
+      }
+    ]
+  }
+}
 ```
