@@ -13,7 +13,7 @@ plugins:
 settings:
   node:
     tryExtensions: ['.js', '.json', '.node', '.ts', '.d.ts']
-ignorePatterns: ['dist/**/*', '**/vendor/*.js']
+ignorePatterns: ['dist/**/*', 'example/**/*']
 rules:
   ##############################################################################
   # `eslint-plugin-node` rule list based on `v11.1.x`

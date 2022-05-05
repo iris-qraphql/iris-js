@@ -2,7 +2,7 @@
 const { ApolloServer } = require('apollo-server');
 
 // eslint-disable-next-line node/no-unpublished-require
-const { irisSchema } = require('./dist/index.js');
+const { irisSchema } = require('../dist/index.js');
 
 const typeDefs = `
 """
