@@ -89,7 +89,7 @@ export const toGQLSchema = (
     return register(
       name,
       new GraphQLScalarType({
-        description: `${description}\n\n${jsDoc}`,
+        description: description ? `${description}\n\n${jsDoc}` : jsDoc,
         name,
         serialize: check,
         parseValue: check,

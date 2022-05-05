@@ -2,7 +2,7 @@
 const { ApolloServer } = require('apollo-server');
 
 // eslint-disable-next-line node/no-unpublished-require
-const { irisSchema } = require('./dist/index.js');
+const { irisSchema } = require('../dist/index.js');
 
 const typeDefs = `
 """
@@ -59,4 +59,7 @@ const resolvers = {
 };
 
 const server = new ApolloServer({ schema: irisSchema(typeDefs, resolvers) });
-server.listen().then(({ url }) => console.log(`🚀  Server ready at ${url}`));
+server.listen().then(({ url }) =>
+  // eslint-disable-next-line no-console
+  console.log(`🚀  Server ready at ${url}`),
+);

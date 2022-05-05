@@ -7,7 +7,11 @@ exports[`toGQLSchema hello world App 1`] = `
 `;
 
 exports[`toGQLSchema hello world App 2`] = `
-"scalar Lifespan
+"\\"\\"\\"
+@typedef {{ __typename: \\"Limited\\", max: ?Int }} Lifespan_Limited
+@type {(\\"Immortal\\" | Lifespan_Limited)}
+\\"\\"\\"
+scalar Lifespan
 
 type God {
   name: String!
@@ -21,6 +25,6 @@ type Deity_Titan {
 }
 
 type Query {
-  deities: [Deity!]!
+  deities(lifespan: Lifespan): [Deity!]!
 }"
 `;

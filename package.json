@@ -33,7 +33,7 @@
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "server": "tsc --pretty && node server.js"
+    "server": "tsc --pretty --noEmit false && node example/server.js"
   },
   "devDependencies": {
     "@babel/core": "7.16.5",

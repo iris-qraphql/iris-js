@@ -1,5 +1,5 @@
 name: CI
-on: [push, pull_request]
+on: [pull_request]
 env:
   NODE_VERSION_USED_FOR_DEVELOPMENT: 17
 jobs:
@@ -52,32 +52,32 @@ jobs:
             exit 1
           fi
 
-  checkPackageLock:
-    name: Check health of package-lock.json file
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-        with:
-          persist-credentials: false
+  # checkPackageLock:
+  #   name: Check health of package-lock.json file
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v2
+  #       with:
+  #         persist-credentials: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          cache: npm
-          node-version: ${{ env.NODE_VERSION_USED_FOR_DEVELOPMENT }}
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v2
+  #       with:
+  #         cache: npm
+  #         node-version: ${{ env.NODE_VERSION_USED_FOR_DEVELOPMENT }}
 
-      - name: Install Dependencies
-        run: npm ci --ignore-scripts
+  #     - name: Install Dependencies
+  #       run: npm ci --ignore-scripts
 
-      - name: Check that package-lock.json doesn't have conflicts
-        run: npm ls --depth 999
+  #     - name: Check that package-lock.json doesn't have conflicts
+  #       run: npm ls --depth 999
 
-      - name: Run npm install
-        run: npm install --force --package-lock-only --ignore-scripts --engine-strict --strict-peer-deps
+  #     - name: Run npm install
+  #       run: npm install --force --package-lock-only --ignore-scripts --engine-strict --strict-peer-deps
 
-      - name: Check that package-lock.json is in sync with package.json
-        run: git diff --exit-code package-lock.json
+  #     - name: Check that package-lock.json is in sync with package.json
+  #       run: git diff --exit-code package-lock.json
 
   test:
     name: Run tests on Node v${{ matrix.node_version_to_setup }}
