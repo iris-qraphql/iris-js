@@ -1,6 +1,7 @@
 import type {
+  GraphQLArgumentConfig,
   GraphQLFieldConfig,
-  GraphQLFieldConfigArgumentMap,
+  GraphQLInputType,
   GraphQLNamedOutputType,
   GraphQLNamedType,
   GraphQLOutputType,
@@ -152,11 +153,21 @@ export const toGQLSchema = (
     );
   };
 
-  const transpileArguments = (
-    _args: ReadonlyArray<IrisArgument>,
-  ): GraphQLFieldConfigArgumentMap => {
-    return {};
-  };
+  const transpileArgument = ({
+    description,
+    name,
+    deprecationReason,
+    defaultValue,
+    type,
+  }: IrisArgument): [string, GraphQLArgumentConfig] => [
+    name,
+    {
+      description,
+      type: transpileType(type) as GraphQLInputType,
+      defaultValue,
+      deprecationReason,
+    },
+  ];
 
   const transpileField =
     (resolvers: any) =>
@@ -167,7 +178,7 @@ export const toGQLSchema = (
       description,
       type: transpileType(type),
       resolve: resolvers[name],
-      args: args ? transpileArguments(args) : undefined,
+      args: args ? Object.fromEntries(args.map(transpileArgument)) : undefined,
     });
 
   const transpileType = (

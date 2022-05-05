@@ -120,7 +120,7 @@ type Deity_Titan {
 }
 
 type Query {
-  deities: [Deity!]!
+  deities(lifespan: Lifespan): [Deity!]!
 }
 ```
 
