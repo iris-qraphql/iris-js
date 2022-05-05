@@ -78,11 +78,14 @@ export const toGQLSchema = (
   const transpileDataDefinition = (
     type: IrisTypeDefinition<'data'>,
   ): GraphQLScalarType => {
-    const { name } = type;
+    const { name, description } = type;
     const check = (value: unknown) => typeCheckValue(value, type);
+    const jsDoc = 'TODO: JSDOC';
+
     return register(
       name,
       new GraphQLScalarType({
+        description: `${description}\n\n${jsDoc}`,
         name,
         serialize: check,
         parseValue: check,

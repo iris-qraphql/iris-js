@@ -5,6 +5,9 @@ const { ApolloServer } = require('apollo-server');
 const { irisSchema } = require('./dist/index.js');
 
 const typeDefs = `
+"""
+lifespan of deity
+"""
 data Lifespan
   = Immortal {}
   | Limited { max: Int? }
