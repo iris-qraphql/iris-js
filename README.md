@@ -93,7 +93,7 @@ const resolvers = {
   },
 };
 
-const schema = irisSchema(typeDefs, resolvers);
+const schema = irisSchema(typeDefs, { resolvers });
 ```
 
 schema defined above can be used by regular GraphQL server (for example we use apollo server).

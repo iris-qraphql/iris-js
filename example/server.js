@@ -58,7 +58,8 @@ const resolvers = {
   },
 };
 
-const server = new ApolloServer({ schema: irisSchema(typeDefs, resolvers) });
+const schema = irisSchema(typeDefs, { resolvers });
+const server = new ApolloServer({ schema });
 server.listen().then(({ url }) =>
   // eslint-disable-next-line no-console
   console.log(`🚀  Server ready at ${url}`),
