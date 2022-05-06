@@ -1,19 +1,19 @@
 {
   "name": "iris",
   "version": "0.1.0",
-  "description": "A Type system alternative for GraphQL",
+  "description": "An alternative type system for GraphQL",
   "license": "MIT",
   "private": true,
   "main": "index",
   "module": "index.mjs",
   "sideEffects": false,
-  "homepage": "https://github.com/iris-ql/iris-js",
+  "homepage": "https://github.com/iris-qraphql/iris-js",
   "bugs": {
-    "url": "https://github.com/iris-ql/iris-js/issues"
+    "url": "https://github.com/iris-qraphql/iris-js/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/iris-ql/iris-js.git"
+    "url": "https://github.com/iris-qraphql/iris-js.git"
   },
   "keywords": [
     "iris",
@@ -23,8 +23,7 @@
     "node": "^12.22.0 || ^14.16.0 || >=16.0.0"
   },
   "scripts": {
-    "version": "node scripts/gen-version.js && npm test && git add src/version.ts",
-    "changelog": "node scripts/gen-changelog.js",
+    "version": "ts-node scripts/gen-version.ts && npm test && git add src/version.ts",
     "test": "npm run lint && npm run check && npm run testonly && npm run prettier:check && npm run check:spelling",
     "lint": "eslint --cache --max-warnings 0 .",
     "check": "tsc --pretty",
@@ -33,14 +32,9 @@
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "server": "tsc --pretty --noEmit false && node example/server.js"
+    "demo": "ts-node scripts/demo.ts"
   },
   "devDependencies": {
-    "@babel/core": "7.16.5",
-    "@babel/plugin-syntax-typescript": "7.16.5",
-    "@babel/plugin-transform-typescript": "7.16.1",
-    "@babel/preset-env": "7.16.5",
-    "@babel/register": "7.16.5",
     "@types/jest": "^27.4.0",
     "@types/node": "17.0.5",
     "@types/ramda": "^0.27.63",
@@ -58,6 +52,7 @@
     "jest-matcher-utils": "24.9.0",
     "prettier": "2.5.1",
     "ts-jest": "24.3.0",
+    "ts-node": "^10.7.0",
     "typescript": "4.5.4"
   },
   "publishConfig": {

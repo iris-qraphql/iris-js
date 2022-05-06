@@ -1,8 +1,6 @@
-// eslint-disable-next-line strict
-const { ApolloServer } = require('apollo-server');
+import { ApolloServer } from 'apollo-server';
 
-// eslint-disable-next-line node/no-unpublished-require
-const { irisSchema } = require('../dist/index.js');
+import { irisSchema } from '../src';
 
 const typeDefs = `
 """
@@ -58,8 +56,10 @@ const resolvers = {
   },
 };
 
-const server = new ApolloServer({ schema: irisSchema(typeDefs, resolvers) });
-server.listen().then(({ url }) =>
-  // eslint-disable-next-line no-console
-  console.log(`🚀  Server ready at ${url}`),
-);
+const schema = irisSchema(typeDefs, { resolvers });
+const server = new ApolloServer({ schema });
+
+server
+  .listen()
+  .then(({ url }) => console.log(`🚀  Server ready at ${url}`))
+  .catch(console.log);

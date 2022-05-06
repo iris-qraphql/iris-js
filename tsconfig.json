@@ -1,6 +1,6 @@
 {
   "testEnvironment": "node",
-  "include": ["src/**/*", "tsconfig.base.json"],
+  "include": ["src/**/*", "scripts/**/*"],
   "compilerOptions": {
     "types": ["node", "jest"],
     "module": "commonjs",
@@ -12,6 +12,8 @@
     "isolatedModules": true,
     "importsNotUsedAsValues": "error",
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   }
 }
