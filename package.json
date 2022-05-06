@@ -1,7 +1,7 @@
 {
   "name": "iris",
   "version": "0.1.0",
-  "description": "A Type system alternative for GraphQL",
+  "description": "An alternative type system for GraphQL",
   "license": "MIT",
   "private": true,
   "main": "index",
@@ -24,7 +24,6 @@
   },
   "scripts": {
     "version": "node scripts/gen-version.js && npm test && git add src/version.ts",
-    "changelog": "node scripts/gen-changelog.js",
     "test": "npm run lint && npm run check && npm run testonly && npm run prettier:check && npm run check:spelling",
     "lint": "eslint --cache --max-warnings 0 .",
     "check": "tsc --pretty",
