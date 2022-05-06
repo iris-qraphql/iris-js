@@ -1,4 +1,5 @@
 import { ApolloServer } from 'apollo-server';
+
 import { irisSchema } from '../src';
 
 const typeDefs = `
@@ -57,4 +58,8 @@ const resolvers = {
 
 const schema = irisSchema(typeDefs, { resolvers });
 const server = new ApolloServer({ schema });
-server.listen().then(({ url }) => console.log(`🚀  Server ready at ${url}`));
+
+server
+  .listen()
+  .then(({ url }) => console.log(`🚀  Server ready at ${url}`))
+  .catch(console.log);

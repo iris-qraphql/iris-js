@@ -25,14 +25,14 @@
   "scripts": {
     "version": "ts-node scripts/gen-version.ts && npm test && git add src/version.ts",
     "test": "npm run lint && npm run check && npm run testonly && npm run prettier:check && npm run check:spelling",
-    "lint": "eslint --cache --max-warnings 0 . --fix",
+    "lint": "eslint --cache --max-warnings 0 .",
     "check": "tsc --pretty",
     "testonly": "jest",
     "testonly:cover": "c8 npm run testonly",
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "server": "ts-node example/server.ts"
+    "demo": "ts-node scripts/demo.ts"
   },
   "devDependencies": {
     "@babel/core": "7.16.5",
