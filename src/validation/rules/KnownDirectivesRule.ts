@@ -41,7 +41,7 @@ export function KnownDirectivesRule(
 
       if (!locations) {
         context.reportError(
-          irisError(`Unknown directive "@${name}".`, { node }),
+          irisError(`Unknown directive "@${name}".`, { nodes: node }),
         );
         return;
       }
@@ -51,7 +51,7 @@ export function KnownDirectivesRule(
         context.reportError(
           irisError(
             `Directive "@${name}" may not be used on ${candidateLocation}.`,
-            { node },
+            { nodes: node },
           ),
         );
       }

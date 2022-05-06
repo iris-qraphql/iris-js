@@ -1,4 +1,4 @@
-import { irisNodeError } from '../../error';
+import { irisError } from '../../error';
 import type { ASTNode } from '../../types/ast';
 import {
   isTypeDefinitionNode,
@@ -43,9 +43,9 @@ export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
           isSDL ? scalarNames.concat(typeNames) : typeNames,
         );
         context.reportError(
-          irisNodeError(
+          irisError(
             `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
-            node,
+            { nodes: node },
           ),
         );
       }
@@ -68,9 +68,9 @@ export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
           isSDL ? scalarNames.concat(typeNames) : typeNames,
         );
         context.reportError(
-          irisNodeError(
+          irisError(
             `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
-            node,
+            { nodes: node },
           ),
         );
       }

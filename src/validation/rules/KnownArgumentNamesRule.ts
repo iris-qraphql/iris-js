@@ -42,7 +42,7 @@ export function KnownArgumentNamesOnDirectivesRule(
               irisError(
                 `Unknown argument "${argName}" on directive "@${directiveName}".` +
                   didYouMean(suggestions),
-                { node: argNode },
+                { nodes: argNode },
               ),
             );
           }

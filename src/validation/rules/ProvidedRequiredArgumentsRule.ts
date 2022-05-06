@@ -57,7 +57,7 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
               context.reportError(
                 irisError(
                   `Directive "@${directiveName}" argument "${argName}" of type "${argType}" is required, but it was not provided.`,
-                  { node: directiveNode },
+                  { nodes: directiveNode },
                 ),
               );
             }

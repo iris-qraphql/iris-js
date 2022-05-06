@@ -37,7 +37,7 @@ export function UniqueInputFieldNamesRule(
       if (knownNames[fieldName]) {
         context.reportError(
           irisError(`There can be only one input field named "${fieldName}".`, {
-            node: [knownNames[fieldName], node.name],
+            nodes: [knownNames[fieldName], node.name],
           }),
         );
       } else {

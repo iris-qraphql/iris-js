@@ -1,4 +1,4 @@
-import { irisNodeError } from '../../error';
+import { irisError } from '../../error';
 import { getRefTypeName, isTypeDefinitionNode } from '../../types/ast';
 import type { ASTVisitor } from '../../types/visitor';
 
@@ -21,9 +21,9 @@ export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
 
           if (type.role === 'data' && fieldType.role === 'resolver') {
             ctx.reportError(
-              irisNodeError(
+              irisError(
                 `The type of ${fieldPath} must be data Type but got: ${refTypeName}.`,
-                field.type,
+                { nodes: field.type },
               ),
             );
           }
@@ -39,9 +39,9 @@ export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
 
             if (argType.role === 'resolver') {
               ctx.reportError(
-                irisNodeError(
+                irisError(
                   `The type of ${fieldPath}(${argName}:) must be Input Type but got: ${argTypeName}.`,
-                  arg.type,
+                  { nodes: arg.type },
                 ),
               );
             }
@@ -73,9 +73,9 @@ export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
 
         if (argType.role === 'resolver') {
           ctx.reportError(
-            irisNodeError(
+            irisError(
               `The type of @${directiveName}(${argName}:) must be data Type but got: ${argTypeName}.`,
-              arg,
+              { nodes: arg },
             ),
           );
         }

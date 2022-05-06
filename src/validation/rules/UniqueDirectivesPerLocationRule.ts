@@ -60,7 +60,7 @@ export function UniqueDirectivesPerLocationRule(
             context.reportError(
               irisError(
                 `The directive "@${directiveName}" can only be used once at this location.`,
-                { node: [seenDirectives[directiveName], directive] },
+                { nodes: [seenDirectives[directiveName], directive] },
               ),
             );
           } else {

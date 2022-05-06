@@ -1,4 +1,4 @@
-import { irisNodeError } from '../../error';
+import { irisError } from '../../error';
 import { isTypeVariantNode } from '../../types/ast';
 import type { ASTVisitor } from '../../types/visitor';
 
@@ -11,9 +11,9 @@ export const ObjectRootTypes = (ctx: IrisValidationContext): ASTVisitor => ({
       if (!(type.role === 'resolver' && isTypeVariantNode(type))) {
         const optionalMessage = typeName === 'Query' ? '' : ' if provided';
         ctx.reportError(
-          irisNodeError(
+          irisError(
             `${typeName} root type must be Object type${optionalMessage}, it cannot be ${typeName}.`,
-            type.name,
+            { nodes: type.name },
           ),
         );
       }

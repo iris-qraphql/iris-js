@@ -1,6 +1,6 @@
 import { forEachObjIndexed, groupBy } from 'ramda';
 
-import { irisNodeError } from '../../error';
+import { irisError } from '../../error';
 import type { NameNode, TypeDefinitionNode } from '../../types/ast';
 import type { ASTVisitor } from '../../types/visitor';
 
@@ -21,10 +21,9 @@ const checkUniquenessBy =
     forEachObjIndexed((argNodes, argName) => {
       if (argNodes.length > 1) {
         ctx.reportError(
-          irisNodeError(
-            message(argName),
-            argNodes.map((node) => node.name),
-          ),
+          irisError(message(argName), {
+            nodes: argNodes.map((node) => node.name),
+          }),
         );
       }
     }, seenArgs);
@@ -37,10 +36,9 @@ const registerUniq = (context: IrisValidationContext, kind: string) => {
     const name = node.value;
     if (knownNames[name]) {
       return context.reportError(
-        irisNodeError(`There can be only one ${kind} named "${name}".`, [
-          knownNames[name],
-          node,
-        ]),
+        irisError(`There can be only one ${kind} named "${name}".`, {
+          nodes: [knownNames[name], node],
+        }),
       );
     }
 

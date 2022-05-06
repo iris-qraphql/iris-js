@@ -1,6 +1,6 @@
 import { Kind } from 'graphql';
 
-import { irisNodeError } from '../../error';
+import { irisError } from '../../error';
 import type {
   TypeDefinitionNode,
   VariantDefinitionNode,
@@ -51,9 +51,9 @@ export function IncludeOnlyVariantTypes(
         !isTypeVariantNode(member)
       ) {
         context.reportError(
-          irisNodeError(
+          irisError(
             `${type.role} ${typeName} can only include ${type.role} variantTypes, it cannot include ${member.role} ${member.name.value}.`,
-            v,
+            { nodes: v },
           ),
         );
       }

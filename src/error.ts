@@ -1,4 +1,4 @@
-import type { ASTNode as Node, Source } from 'graphql';
+import type { Source } from 'graphql';
 import { GraphQLError } from 'graphql';
 import type { GraphQLErrorArgs } from 'graphql/error/GraphQLError';
 
@@ -6,20 +6,14 @@ import type { ASTNode } from './types/ast';
 
 export type IrisError = GraphQLError;
 
-type ErrorNode = ReadonlyArray<ASTNode> | ASTNode | null;
+type ErrorNode = ReadonlyArray<ASTNode> | ASTNode;
 
-type IrisErrorArgs = GraphQLErrorArgs & {
-  node?: ErrorNode;
+type IrisErrorArgs = Omit<GraphQLErrorArgs, 'nodes'> & {
+  nodes?: ErrorNode;
 };
 
 export const irisError = (message: string, args?: IrisErrorArgs) =>
-  new GraphQLError(message, args);
-
-export const irisNodeError = (message: string, node?: ErrorNode) =>
-  new GraphQLError(message, node as Node);
-
-export const isIrisError = (err: unknown): err is IrisError =>
-  err instanceof GraphQLError;
+  new GraphQLError(message, args as GraphQLErrorArgs);
 
 export const syntaxError = (
   source: Source,
