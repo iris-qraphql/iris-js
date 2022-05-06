@@ -1,6 +1,6 @@
 {
   "testEnvironment": "node",
-  "include": ["src/**/*","scripts/**/*"],
+  "include": ["src/**/*", "scripts/**/*"],
   "compilerOptions": {
     "types": ["node", "jest"],
     "module": "commonjs",
@@ -13,7 +13,7 @@
     "importsNotUsedAsValues": "error",
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "resolveJsonModule":true,
+    "resolveJsonModule": true,
     "skipLibCheck": true
   }
 }
