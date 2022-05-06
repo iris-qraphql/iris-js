@@ -33,7 +33,7 @@
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "server": "tsc --pretty --noEmit false && node example/server.js"
+    "server": "ts-node example/server.ts"
   },
   "devDependencies": {
     "@babel/core": "7.16.5",
@@ -58,6 +58,7 @@
     "jest-matcher-utils": "24.9.0",
     "prettier": "2.5.1",
     "ts-jest": "24.3.0",
+    "ts-node": "^10.7.0",
     "typescript": "4.5.4"
   },
   "publishConfig": {
