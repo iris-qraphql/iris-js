@@ -26,11 +26,11 @@ import { toJSODoc } from '../printing/jsDoc';
 import type {
   IrisArgument,
   IrisField,
-  IrisType,
   IrisTypeDefinition,
+  IrisTypeRef,
   IrisVariant,
 } from '../types/definition';
-import { isSpecifiedScalarType, isTypeRef } from '../types/definition';
+import { irisTypeRef, isSpecifiedScalarType } from '../types/definition';
 import type { IrisSchema } from '../types/schema';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';
@@ -83,7 +83,8 @@ export const toGQLSchema = (
     type: IrisTypeDefinition<'data'>,
   ): GraphQLScalarType => {
     const { name, description } = type;
-    const check = (value: unknown) => typeCheckValue(value, type);
+    const check = (value: unknown) =>
+      typeCheckValue(value, irisTypeRef('NAMED', type));
     const jsDoc = toJSODoc(type);
 
     return register(
@@ -163,7 +164,7 @@ export const toGQLSchema = (
     name,
     {
       description,
-      type: transpileType(type) as GraphQLInputType,
+      type: transpileTypeRef(type) as GraphQLInputType,
       defaultValue,
       deprecationReason,
     },
@@ -176,28 +177,25 @@ export const toGQLSchema = (
       name: string,
     ): GraphQLFieldConfig<any, any> => ({
       description,
-      type: transpileType(type),
+      type: transpileTypeRef(type),
       resolve: resolvers[name],
       args: args ? Object.fromEntries(args.map(transpileArgument)) : undefined,
     });
 
-  const transpileType = (
-    type: IrisType,
+  const transpileTypeRef = (
+    type: IrisTypeRef,
     isMaybe?: boolean,
   ): GraphQLOutputType => {
     const withMaybe = (t: GraphQLOutputType) =>
       isMaybe ? t : new GraphQLNonNull(t);
-
-    if (isTypeRef(type)) {
-      switch (type.kind) {
-        case 'MAYBE':
-          return transpileType(type.ofType, true);
-        case 'LIST':
-          return withMaybe(new GraphQLList(transpileType(type.ofType)));
-      }
+    switch (type.kind) {
+      case 'MAYBE':
+        return transpileTypeRef(type.ofType, true);
+      case 'LIST':
+        return withMaybe(new GraphQLList(transpileTypeRef(type.ofType)));
+      case 'NAMED':
+        return withMaybe(lookup(type.ofType.name));
     }
-
-    return withMaybe(lookup(type.name));
   };
 
   const types = Object.values(schema.types)

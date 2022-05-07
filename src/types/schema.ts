@@ -23,10 +23,15 @@ import type {
 import type {
   IrisArgument,
   IrisField,
-  IrisType,
+  IrisTypeRef,
   IrisVariant,
 } from './definition';
-import { IrisScalars, IrisTypeDefinition, IrisTypeRef } from './definition';
+import {
+  IrisScalars,
+  IrisTypeDefinition,
+  irisTypeRef,
+  liftType,
+} from './definition';
 import {
   GraphQLDeprecatedDirective,
   GraphQLDirective,
@@ -77,14 +82,15 @@ export function buildSchema(
     return type as IrisTypeDefinition<R>;
   }
 
-  function getWrappedType(node: TypeNode): IrisType {
-    if (node.kind === IrisKind.LIST_TYPE) {
-      return new IrisTypeRef('LIST', getWrappedType(node.type));
+  function getWrappedType<R extends Role>(node: TypeNode): IrisTypeRef<R> {
+    switch (node.kind) {
+      case IrisKind.LIST_TYPE:
+        return irisTypeRef('LIST', getWrappedType(node.type));
+      case IrisKind.MAYBE_TYPE:
+        return irisTypeRef('MAYBE', getWrappedType(node.type));
+      case IrisKind.NAMED_TYPE:
+        return irisTypeRef('NAMED', lookupType(node));
     }
-    if (node.kind === IrisKind.MAYBE_TYPE) {
-      return new IrisTypeRef('MAYBE', getWrappedType(node.type));
-    }
-    return lookupType(node);
   }
 
   function buildDirective(node: DirectiveDefinitionNode): GraphQLDirective {
@@ -113,16 +119,20 @@ export function buildSchema(
 
   const buildField = <R extends Role>(
     field: FieldDefinitionNode<R>,
-  ): IrisField<R> =>
-    ({
+  ): IrisField<R> => {
+    const type = getWrappedType(field.type) as IrisField<R>['type'];
+    const args = field.arguments?.map(buildArgument) as IrisField<R>['args'];
+
+    return {
       name: field.name.value,
-      type: getWrappedType(field.type),
+      type,
       description: field.description?.value,
       deprecationReason: getDeprecationReason(field),
       astNode: field,
-      args: field.arguments?.map(buildArgument),
+      args,
       toJSON: () => field.name.value,
-    } as IrisField<R>);
+    };
+  };
 
   const buildVariant = <R extends Role>(
     astNode: VariantDefinitionNode<R>,
@@ -212,7 +222,9 @@ function getDeprecationReason(node: {
     (arg) => arg.name.value === 'reason',
   )?.value;
 
-  return (typeCheckASTValue(reason, IrisScalars.String) as string) ?? '';
+  return (
+    (typeCheckASTValue(reason, liftType(IrisScalars.String)) as string) ?? ''
+  );
 }
 
 export type { IrisSchema };

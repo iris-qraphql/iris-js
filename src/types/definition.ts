@@ -30,13 +30,6 @@ export const scalarNames = Object.keys(stdScalars);
 export const isSpecifiedScalarType = (type: IrisTypeDefinition): boolean =>
   Boolean(stdScalars[type.name]);
 
-export type IrisType<R extends Role = Role> =
-  | IrisTypeDefinition<R>
-  | IrisTypeRef<R>;
-
-export const isType = (type: unknown): type is IrisType =>
-  instanceOf(type, IrisTypeDefinition) || isTypeRef(type);
-
 type Printable = {
   toString: () => string;
   toJSON: () => string;
@@ -72,7 +65,12 @@ export class IrisTypeRefImp<K extends WrapperKind, T extends Printable> {
   }
 }
 
-export type IrisTypeRef<R extends Role> =
+export const irisTypeRef = <K extends WrapperKind, T extends Printable>(
+  kind: K,
+  ofType: T,
+) => new IrisTypeRefImp(kind, ofType);
+
+export type IrisTypeRef<R extends Role = Role> =
   | IrisTypeRefImp<'LIST', IrisTypeRef<R>>
   | IrisTypeRefImp<'MAYBE', IrisTypeRef<R>>
   | IrisTypeRefImp<'NAMED', IrisTypeDefinition<R>>;
@@ -81,13 +79,17 @@ export const isTypeRef = <R extends Role>(
   type: unknown,
 ): type is IrisTypeRef<R> => instanceOf(type, IrisTypeRefImp);
 
-export const isMaybeType = (type: unknown): type is IrisTypeRef<Role> =>
+export const isMaybeType = (type: unknown): type is IrisTypeRef =>
   isTypeRef(type) && type.kind === 'MAYBE';
+
+export const liftType = <R extends Role>(t: IrisTypeDefinition<R>) =>
+  irisTypeRef<'NAMED', IrisTypeDefinition<R>>('NAMED', t);
 
 type IrisNode = {
   name: string;
   description?: Maybe<string>;
   deprecationReason?: Maybe<string>;
+  toJSON?: () => unknown;
 };
 
 export type ThunkObjMap<T> = Thunk<ObjMap<T>>;
@@ -100,7 +102,7 @@ export const resolveThunk = <T>(thunk: Thunk<T>): T =>
   isThunk(thunk) ? thunk() : thunk;
 
 export type IrisArgument = IrisNode & {
-  type: IrisType<'data'>;
+  type: IrisTypeRef<'data'>;
   defaultValue?: unknown;
   astNode?: ArgumentDefinitionNode;
 };
@@ -110,7 +112,7 @@ export const isRequiredArgument = (arg: IrisArgument): boolean =>
 
 export type IrisField<R extends Role = Role> = IrisNode & {
   astNode?: FieldDefinitionNode<R>;
-  type: R extends 'data' ? IrisType<'data'> : IrisType;
+  type: R extends 'data' ? IrisTypeRef<'data'> : IrisTypeRef<R>;
   args?: R extends 'data' ? never : ReadonlyArray<IrisArgument>;
 };
 

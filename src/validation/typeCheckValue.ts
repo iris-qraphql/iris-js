@@ -3,11 +3,11 @@ import { isNil } from 'ramda';
 import { irisError } from '../error';
 import type {
   IrisField,
-  IrisType,
   IrisTypeDefinition,
+  IrisTypeRef,
   IrisVariant,
 } from '../types/definition';
-import { isMaybeType, isTypeRef } from '../types/definition';
+import { isMaybeType } from '../types/definition';
 import { inspect } from '../utils/legacy';
 import { isIterableObject, isObjectLike } from '../utils/ObjMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
@@ -19,21 +19,22 @@ type JSON = unknown;
 
 type Serializer<T> = (value: unknown, type: T) => Maybe<JSON>;
 
-export const typeCheckValue: Serializer<IrisType<'data'>> = (value, type) => {
-  if (isTypeRef(type)) {
-    switch (type.kind) {
-      case 'MAYBE':
-        return isNil(value) ? null : typeCheckValue(value, type.ofType);
-      case 'LIST': {
-        return serializeList(value, type.ofType);
-      }
+export const typeCheckValue: Serializer<IrisTypeRef<'data'>> = (
+  value,
+  type,
+) => {
+  switch (type.kind) {
+    case 'MAYBE':
+      return isNil(value) ? null : typeCheckValue(value, type.ofType);
+    case 'LIST': {
+      return serializeList(value, type.ofType);
     }
+    case 'NAMED':
+      return parseDataType(value, type.ofType);
   }
-
-  return parseDataType(value, type);
 };
 
-const serializeList: Serializer<IrisType<'data'>> = (value, type) => {
+const serializeList: Serializer<IrisTypeRef<'data'>> = (value, type) => {
   if (!isIterableObject(value)) {
     throw cannotRepresent(value, `[${type}]`);
   }

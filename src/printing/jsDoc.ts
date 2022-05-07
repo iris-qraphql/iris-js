@@ -2,11 +2,10 @@ import { isEmpty } from 'ramda';
 
 import type {
   IrisField,
-  IrisType,
   IrisTypeDefinition,
+  IrisTypeRef,
   IrisVariant,
 } from '../types/definition';
-import { isTypeRef } from '../types/definition';
 
 const variantTypeName = (typeName: string, name: string) =>
   `${typeName}_${name}`;
@@ -28,20 +27,16 @@ const renderVariant =
 const isStandaloneVariantType = ({ type, fields }: IrisVariant<'data'>) =>
   !isEmpty(fields) && !type;
 
-const renderTypeRef = (type: IrisType<'data'>): string => {
-  if (isTypeRef(type)) {
-    const content = renderTypeRef(type.ofType);
+const renderTypeRef = (type: IrisTypeRef<'data'>): string => {
+  switch (type.kind) {
+    case 'MAYBE':
+      return `?${renderTypeRef(type.ofType)}`;
 
-    switch (type.kind) {
-      case 'MAYBE':
-        return `?${content}`;
-
-      case 'LIST':
-        return `${content}[]`;
-    }
+    case 'LIST':
+      return `${renderTypeRef(type.ofType)}[]`;
+    case 'NAMED':
+      return type.ofType.name;
   }
-
-  return type.name;
 };
 
 const renderField = (name: string, { type }: IrisField<'data'>) =>

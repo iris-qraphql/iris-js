@@ -2,7 +2,7 @@ import type { GraphQLScalarTypeConfig } from 'graphql';
 import { GraphQLScalarType } from 'graphql';
 
 import type { Role } from '../types/ast';
-import type { IrisType } from '../types/definition';
+import type { IrisTypeRef } from '../types/definition';
 import { IrisTypeDefinition } from '../types/definition';
 import { buildSchema } from '../types/schema';
 
@@ -18,7 +18,7 @@ export const gqlScalar = <I, O>(config: GraphQLScalarTypeConfig<I, O>) =>
 export const sampleTypeRef = <R extends Role>(
   ref: string,
   defs: string = '',
-): IrisType<R> => {
+): IrisTypeRef<R> => {
   const { types } = buildSchema(`
     ${defs}
     resolver Query = {
@@ -26,7 +26,7 @@ export const sampleTypeRef = <R extends Role>(
     }
   `);
   const fields = types.Query?.variantBy().fields ?? {};
-  return fields.f.type as IrisType<R>;
+  return fields.f.type as IrisTypeRef<R>;
 };
 
 export const withWrappers = (type: string): Array<string> => [

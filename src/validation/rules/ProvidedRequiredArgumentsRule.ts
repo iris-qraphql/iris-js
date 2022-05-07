@@ -2,7 +2,7 @@ import { irisError } from '../../error';
 import { print } from '../../printing/printer';
 import type { ArgumentDefinitionNode } from '../../types/ast';
 import type { IrisArgument } from '../../types/definition';
-import { isRequiredArgument, isType } from '../../types/definition';
+import { isRequiredArgument } from '../../types/definition';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
@@ -51,9 +51,7 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
           const argNodeMap = new Set(argNodes.map((arg) => arg.name.value));
           for (const [argName, argDef] of Object.entries(requiredArgs)) {
             if (!argNodeMap.has(argName)) {
-              const argType = isType(argDef.type)
-                ? inspect(argDef.type)
-                : print(argDef.type);
+              const argType = inspect(argDef.type);
               context.reportError(
                 irisError(
                   `Directive "@${directiveName}" argument "${argName}" of type "${argType}" is required, but it was not provided.`,
