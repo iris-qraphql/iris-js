@@ -139,7 +139,7 @@ export type {
 
 /** Type Reference */
 
-export type WrapperKind = 'LIST' | 'MAYBE';
+export type WrapperKind = 'LIST' | 'MAYBE' | 'NAMED';
 
 export type TypeNode = NamedTypeNode | ListTypeNode | MaybeTypeNode;
 
