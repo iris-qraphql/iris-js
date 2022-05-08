@@ -11,7 +11,6 @@ import {
   IrisScalars,
   isRequiredArgument,
   isSpecifiedScalarType,
-  isTypeRef,
 } from '../definition';
 import { IrisDirectiveLocation } from '../directiveLocation';
 import {
@@ -45,7 +44,6 @@ const schema = buildSchema(`
   }
 `);
 
-const ObjectType = getType(schema, 'Object');
 const EnumType = getType(schema, 'Enum');
 
 const ScalarType = getType(schema, 'Scalar');
@@ -53,11 +51,6 @@ const Directive = new GraphQLDirective({
   name: 'Directive',
   locations: [IrisDirectiveLocation.QUERY],
 });
-
-const typeRef = (exp: string) => sampleTypeRef(exp, definitions);
-
-const tautology = (f: (_: IrisTypeRef) => boolean, exp: string): void =>
-  expect(f(typeRef(exp))).toEqual(true);
 
 describe('Type predicates', () => {
   describe('isSpecifiedScalarType', () => {
@@ -69,17 +62,6 @@ describe('Type predicates', () => {
       expect(
         isSpecifiedScalarType(ScalarType as IrisTypeDefinition<'data'>),
       ).toEqual(false);
-    });
-  });
-
-  describe('isWrappingType', () => {
-    it('returns true for list and maybe types', () => {
-      tautology(isTypeRef, '[Object]');
-      tautology(isTypeRef, 'Object?');
-    });
-
-    it('returns false for unwrapped types', () => {
-      expect(isTypeRef(ObjectType)).toEqual(false);
     });
   });
 

@@ -3,12 +3,7 @@ import { specifiedScalarTypes } from 'graphql';
 import { pluck } from 'ramda';
 
 import { irisError } from '../error';
-import {
-  didYouMean,
-  inspect,
-  instanceOf,
-  suggestionList,
-} from '../utils/legacy';
+import { didYouMean, inspect, suggestionList } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
@@ -74,10 +69,6 @@ export type IrisTypeRef<R extends Role = Role> =
   | IrisTypeRefImp<'LIST', IrisTypeRef<R>>
   | IrisTypeRefImp<'MAYBE', IrisTypeRef<R>>
   | IrisTypeRefImp<'NAMED', IrisTypeDefinition<R>>;
-
-export const isTypeRef = <R extends Role>(
-  type: unknown,
-): type is IrisTypeRef<R> => instanceOf(type, IrisTypeRefImp);
 
 export const liftType = <R extends Role>(t: IrisTypeDefinition<R>) =>
   irisTypeRef<'NAMED', IrisTypeDefinition<R>>('NAMED', t);
