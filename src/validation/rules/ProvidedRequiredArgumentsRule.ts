@@ -1,5 +1,4 @@
 import { irisError } from '../../error';
-import { print } from '../../printing/printer';
 import type { ArgumentDefinitionNode } from '../../types/ast';
 import type { IrisArgument } from '../../types/definition';
 import { isRequiredArgument } from '../../types/definition';
