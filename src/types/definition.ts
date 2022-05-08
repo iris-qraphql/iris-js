@@ -79,9 +79,6 @@ export const isTypeRef = <R extends Role>(
   type: unknown,
 ): type is IrisTypeRef<R> => instanceOf(type, IrisTypeRefImp);
 
-export const isMaybeType = (type: unknown): type is IrisTypeRef =>
-  isTypeRef(type) && type.kind === 'MAYBE';
-
 export const liftType = <R extends Role>(t: IrisTypeDefinition<R>) =>
   irisTypeRef<'NAMED', IrisTypeDefinition<R>>('NAMED', t);
 
@@ -108,7 +105,7 @@ export type IrisArgument = IrisNode & {
 };
 
 export const isRequiredArgument = (arg: IrisArgument): boolean =>
-  !isMaybeType(arg.type) && arg.defaultValue === undefined;
+  arg.type.kind !== 'MAYBE' && arg.defaultValue === undefined;
 
 export type IrisField<R extends Role = Role> = IrisNode & {
   astNode?: FieldDefinitionNode<R>;

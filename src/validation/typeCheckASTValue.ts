@@ -6,7 +6,6 @@ import type {
   IrisTypeRef,
   IrisVariant,
 } from '../types/definition';
-import { isMaybeType } from '../types/definition';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
@@ -29,7 +28,7 @@ export function typeCheckASTValue(
       return;
     }
     const variableValue = variables[variableName];
-    if (variableValue === null && !isMaybeType(type)) {
+    if (variableValue === null && type.kind !== 'MAYBE') {
       return; // Invalid: intentionally return no value.
     }
     // Note: This does no further checking that this variable is correct.
@@ -69,7 +68,7 @@ function parseList(
       if (isMissingVariable(itemNode, variables)) {
         // If an array contains a missing variable, it is either coerced to
         // null or if the item type is non-null, it considered invalid.
-        if (!isMaybeType(itemType)) {
+        if (itemType.kind !== 'MAYBE') {
           return; // Invalid: intentionally return no value.
         }
         coercedValues.push(null);
@@ -151,7 +150,7 @@ const parseVariantValue = (
   for (const field of Object.values(variant.fields ?? {})) {
     const fieldNode = fieldNodes[field.name];
     if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
-      if (!isMaybeType(field.type)) {
+      if (field.type.kind !== 'MAYBE') {
         return; // Invalid: intentionally return no value.
       }
       continue;

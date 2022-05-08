@@ -7,7 +7,6 @@ import type {
   IrisTypeRef,
   IrisVariant,
 } from '../types/definition';
-import { isMaybeType } from '../types/definition';
 import { inspect } from '../utils/legacy';
 import { isIterableObject, isObjectLike } from '../utils/ObjMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
@@ -102,7 +101,7 @@ export const isEmptyVariant = (
   variantFields: Array<IrisField<'data'>>,
 ): boolean =>
   Boolean(name) &&
-  variantFields.filter(({ type }) => !isMaybeType(type)).length === 0 &&
+  variantFields.filter(({ type }) => type.kind !== 'MAYBE').length === 0 &&
   Object.values(fields).length === 0;
 
 const parseVariantValue = (
