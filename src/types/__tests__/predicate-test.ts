@@ -2,13 +2,15 @@ import { all } from 'ramda';
 
 import { sampleTypeRef } from '../../utils/generators';
 
-import type { IrisArgument, IrisType, IrisTypeDefinition } from '../definition';
+import type {
+  IrisArgument,
+  IrisTypeDefinition,
+  IrisTypeRef,
+} from '../definition';
 import {
   IrisScalars,
   isRequiredArgument,
   isSpecifiedScalarType,
-  isType,
-  isTypeRef,
 } from '../definition';
 import { IrisDirectiveLocation } from '../directiveLocation';
 import {
@@ -42,7 +44,6 @@ const schema = buildSchema(`
   }
 `);
 
-const ObjectType = getType(schema, 'Object');
 const EnumType = getType(schema, 'Enum');
 
 const ScalarType = getType(schema, 'Scalar');
@@ -51,28 +52,7 @@ const Directive = new GraphQLDirective({
   locations: [IrisDirectiveLocation.QUERY],
 });
 
-const typeRef = (exp: string) => sampleTypeRef(exp, definitions);
-
-const tautology = (f: (_: IrisType) => boolean, exp: string): void =>
-  expect(f(typeRef(exp))).toEqual(true);
-
 describe('Type predicates', () => {
-  describe('isType', () => {
-    it('returns true for unwrapped types', () => {
-      tautology(isType, 'String');
-      tautology(isType, 'Object');
-    });
-
-    it('returns true for wrapped types', () => {
-      tautology(isType, '[String]');
-      tautology(isType, 'String?');
-    });
-
-    it('returns false for random garbage', () => {
-      expect(isType({ what: 'is this' })).toEqual(false);
-    });
-  });
-
   describe('isSpecifiedScalarType', () => {
     it('returns true for specified scalars', () => {
       expect(all(isSpecifiedScalarType, Object.values(IrisScalars))).toBe(true);
@@ -85,20 +65,9 @@ describe('Type predicates', () => {
     });
   });
 
-  describe('isWrappingType', () => {
-    it('returns true for list and maybe types', () => {
-      tautology(isTypeRef, '[Object]');
-      tautology(isTypeRef, 'Object?');
-    });
-
-    it('returns false for unwrapped types', () => {
-      expect(isTypeRef(ObjectType)).toEqual(false);
-    });
-  });
-
   describe('isRequiredArgument', () => {
     function buildArg(config: {
-      type: IrisType<'data'>;
+      type: IrisTypeRef<'data'>;
       defaultValue?: unknown;
     }): IrisArgument {
       return {

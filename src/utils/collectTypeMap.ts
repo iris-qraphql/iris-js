@@ -1,16 +1,15 @@
 import type {
-  IrisType,
   IrisTypeDefinition,
+  IrisTypeRef,
   IrisVariant,
 } from '../types/definition';
-import { isTypeRef } from '../types/definition';
 import type { GraphQLDirective } from '../types/directives';
 import { isDirective } from '../types/directives';
 
 import type { ObjMap } from './ObjMap';
 
-export const unwrapType = (type: IrisType): IrisTypeDefinition =>
-  isTypeRef(type) ? unwrapType(type.ofType) : type;
+export const unwrapType = (type: IrisTypeRef): IrisTypeDefinition =>
+  type.kind === 'NAMED' ? type.ofType : unwrapType(type.ofType);
 
 const collectAllReferencedTypes = (
   types: ReadonlyArray<IrisTypeDefinition>,
@@ -35,18 +34,16 @@ const collectDirectiveTypes = (
     // Directives are not validated until validateSchema() is called.
     if (isDirective(directive)) {
       directive.args.forEach((arg) =>
-        collectReferencedTypes(arg.type, allReferencedTypes),
+        collectReferencedTypes(unwrapType(arg.type), allReferencedTypes),
       );
     }
   }
 };
 
 function collectReferencedTypes(
-  type: IrisType,
+  namedType: IrisTypeDefinition,
   typeSet: Set<IrisTypeDefinition>,
 ): void {
-  const namedType = unwrapType(type);
-
   if (typeSet.has(namedType)) {
     return;
   }
@@ -66,9 +63,11 @@ const exploreVariant = (
   }
 
   Object.values(variant.fields ?? {}).forEach((field) => {
-    collectReferencedTypes(field.type, typeSet);
+    collectReferencedTypes(unwrapType(field.type), typeSet);
     if ('args' in field) {
-      field.args?.forEach?.((arg) => collectReferencedTypes(arg.type, typeSet));
+      field.args?.forEach?.((arg) =>
+        collectReferencedTypes(unwrapType(arg.type), typeSet),
+      );
     }
   });
 };

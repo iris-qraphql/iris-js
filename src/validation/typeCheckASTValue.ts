@@ -1,15 +1,18 @@
 import { Kind } from 'graphql';
 
 import type { ObjectValueNode, ValueNode } from '../types/ast';
-import type { IrisType, IrisVariant } from '../types/definition';
-import { isMaybeType, isTypeRef } from '../types/definition';
+import type {
+  IrisTypeDefinition,
+  IrisTypeRef,
+  IrisVariant,
+} from '../types/definition';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
 
 export function typeCheckASTValue(
   valueNode: Maybe<ValueNode>,
-  type: IrisType<'data'>,
+  type: IrisTypeRef<'data'>,
   variables?: Maybe<ObjMap<unknown>>,
 ): unknown {
   if (!valueNode) {
@@ -25,7 +28,7 @@ export function typeCheckASTValue(
       return;
     }
     const variableValue = variables[variableName];
-    if (variableValue === null && !isMaybeType(type)) {
+    if (variableValue === null && type.kind !== 'MAYBE') {
       return; // Invalid: intentionally return no value.
     }
     // Note: This does no further checking that this variable is correct.
@@ -34,56 +37,65 @@ export function typeCheckASTValue(
     return variableValue;
   }
 
-  if (isTypeRef(type)) {
-    switch (type.kind) {
-      case 'MAYBE': {
-        if (valueNode.kind === Kind.NULL) {
-          // This is explicitly returning the value null.
-          return null;
-        }
-        return typeCheckASTValue(valueNode, type.ofType, variables);
+  switch (type.kind) {
+    case 'MAYBE': {
+      if (valueNode.kind === Kind.NULL) {
+        // This is explicitly returning the value null.
+        return null;
       }
-
-      case 'LIST': {
-        if (valueNode.kind === Kind.NULL) {
-          return;
-        }
-        const itemType = type.ofType;
-        if (valueNode.kind === Kind.LIST) {
-          const coercedValues = [];
-          for (const itemNode of valueNode.values) {
-            if (isMissingVariable(itemNode, variables)) {
-              // If an array contains a missing variable, it is either coerced to
-              // null or if the item type is non-null, it considered invalid.
-              if (!isMaybeType(itemType)) {
-                return; // Invalid: intentionally return no value.
-              }
-              coercedValues.push(null);
-            } else {
-              const itemValue = typeCheckASTValue(
-                itemNode,
-                itemType,
-                variables,
-              );
-              if (itemValue === undefined) {
-                return; // Invalid: intentionally return no value.
-              }
-              coercedValues.push(itemValue);
-            }
-          }
-          return coercedValues;
-        }
-
-        const coercedValue = typeCheckASTValue(valueNode, itemType, variables);
-        if (coercedValue === undefined) {
-          return; // Invalid: intentionally return no value.
-        }
-
-        return [coercedValue];
-      }
+      return typeCheckASTValue(valueNode, type.ofType, variables);
     }
+
+    case 'LIST':
+      return parseList(valueNode, type.ofType, variables);
+    case 'NAMED':
+      return parseTypeDefinition(valueNode, type.ofType, variables);
+  }
+}
+
+function parseList(
+  valueNode: ValueNode,
+  itemType: IrisTypeRef<'data'>,
+  variables?: Maybe<ObjMap<unknown>>,
+) {
+  if (valueNode.kind === Kind.NULL) {
+    return;
   }
 
+  if (valueNode.kind === Kind.LIST) {
+    const coercedValues = [];
+    for (const itemNode of valueNode.values) {
+      if (isMissingVariable(itemNode, variables)) {
+        // If an array contains a missing variable, it is either coerced to
+        // null or if the item type is non-null, it considered invalid.
+        if (itemType.kind !== 'MAYBE') {
+          return; // Invalid: intentionally return no value.
+        }
+        coercedValues.push(null);
+      } else {
+        const itemValue = typeCheckASTValue(itemNode, itemType, variables);
+        if (itemValue === undefined) {
+          return; // Invalid: intentionally return no value.
+        }
+        coercedValues.push(itemValue);
+      }
+    }
+    return coercedValues;
+  }
+
+  const coercedValue = typeCheckASTValue(valueNode, itemType, variables);
+  if (coercedValue === undefined) {
+    return; // Invalid: intentionally return no value.
+  }
+
+  return [coercedValue];
+}
+
+function parseTypeDefinition(
+  valueNode: ValueNode,
+  type: IrisTypeDefinition<'data'>,
+  variables?: Maybe<ObjMap<unknown>>,
+): unknown {
   if (valueNode.kind === Kind.NULL) {
     return;
   }
@@ -138,7 +150,7 @@ const parseVariantValue = (
   for (const field of Object.values(variant.fields ?? {})) {
     const fieldNode = fieldNodes[field.name];
     if (!fieldNode || isMissingVariable(fieldNode.value, variables)) {
-      if (!isMaybeType(field.type)) {
+      if (field.type.kind !== 'MAYBE') {
         return; // Invalid: intentionally return no value.
       }
       continue;

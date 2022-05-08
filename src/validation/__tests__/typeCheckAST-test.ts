@@ -1,7 +1,8 @@
 import { identity } from 'ramda';
 
 import { parseValue } from '../../parsing/parser';
-import type { IrisType } from '../../types/definition';
+import type { IrisTypeRef } from '../../types/definition';
+import { liftType } from '../../types/definition';
 import { gqlScalar, sampleTypeRef } from '../../utils/generators';
 import type { ObjMap } from '../../utils/ObjMap';
 
@@ -14,7 +15,7 @@ const maybeListOfBool = sampleTypeRef<'data'>('[Boolean]?');
 
 const expectValueFrom = (
   valueText: string,
-  typeRef: IrisType<'data'> | string,
+  typeRef: IrisTypeRef<'data'> | string,
   variables?: ObjMap<unknown>,
 ) => {
   const type =
@@ -64,7 +65,7 @@ describe('valueFromAST', () => {
       parseValue: identity,
     });
 
-    expectValueFrom('"value"', passthroughScalar).toEqual('value');
+    expectValueFrom('"value"', liftType(passthroughScalar)).toEqual('value');
 
     const throwScalar = gqlScalar({
       name: 'ThrowScalar',
@@ -74,7 +75,7 @@ describe('valueFromAST', () => {
       parseValue: identity,
     });
 
-    expectValueFrom('value', throwScalar).toEqual(undefined);
+    expectValueFrom('value', liftType(throwScalar)).toEqual(undefined);
 
     const returnUndefinedScalar = gqlScalar({
       name: 'ReturnUndefinedScalar',
@@ -84,7 +85,9 @@ describe('valueFromAST', () => {
       parseValue: identity,
     });
 
-    expectValueFrom('value', returnUndefinedScalar).toEqual(undefined);
+    expectValueFrom('value', liftType(returnUndefinedScalar)).toEqual(
+      undefined,
+    );
   });
 
   it('coerces to null unless non-null', () => {

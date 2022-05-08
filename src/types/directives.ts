@@ -5,7 +5,7 @@ import type { Maybe } from '../utils/type-level';
 
 import type { DirectiveDefinitionNode } from './ast';
 import type { IrisArgument } from './definition';
-import { IrisScalars } from './definition';
+import { IrisScalars, liftType } from './definition';
 import { IrisDirectiveLocation } from './directiveLocation';
 
 /**
@@ -82,7 +82,7 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     args: [
       {
         name: 'reason',
-        type: IrisScalars.String,
+        type: liftType(IrisScalars.String),
         description:
           'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
         defaultValue: '',

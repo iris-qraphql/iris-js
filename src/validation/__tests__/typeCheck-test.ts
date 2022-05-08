@@ -1,11 +1,15 @@
-import type { IrisType, IrisTypeDefinition } from '../../types/definition';
+import type { IrisTypeDefinition, IrisTypeRef } from '../../types/definition';
+import { liftType } from '../../types/definition';
 import { buildSchema, getType } from '../../types/schema';
 import { sampleTypeRef } from '../../utils/generators';
 
 import { typeCheckValue } from '../typeCheckValue';
 
-const serializeWith = (value: unknown, typeRef: string | IrisType<'data'>) => {
-  const type =
+const serializeWith = (
+  value: unknown,
+  typeRef: string | IrisTypeRef<'data'>,
+) => {
+  const type: IrisTypeRef<'data'> =
     typeof typeRef === 'string' ? sampleTypeRef<'data'>(typeRef) : typeRef;
   return typeCheckValue(value, type);
 };
@@ -191,7 +195,10 @@ describe('parse simple data variants', () => {
   const leaf = (name: string) => ({ __typename: 'Leaf', name });
 
   const parseNode = (n: unknown) =>
-    serializeWith(n, getType(schema, 'NodeType') as IrisTypeDefinition<'data'>);
+    serializeWith(
+      n,
+      liftType(getType(schema, 'NodeType') as IrisTypeDefinition<'data'>),
+    );
 
   it("don't accept non data values", () => {
     expect(() => parseNode(['Leaf'])).toThrowErrorMatchingSnapshot();
@@ -263,9 +270,10 @@ describe('circular data types', () => {
   });
   const leaf = (name?: string) => ({ __typename: 'Leaf', name });
 
-  const nodeType = getType(schema, 'NodeType');
-  const parseNode = (n: unknown) =>
-    serializeWith(n, nodeType as IrisTypeDefinition<'data'>);
+  const nodeType = liftType(
+    getType(schema, 'NodeType') as IrisTypeDefinition<'data'>,
+  );
+  const parseNode = (n: unknown) => serializeWith(n, nodeType);
 
   it('ignore optional fields variants', () => {
     expect(parseNode('Leaf')).toEqual('Leaf');

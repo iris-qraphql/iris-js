@@ -3,12 +3,7 @@ import { specifiedScalarTypes } from 'graphql';
 import { pluck } from 'ramda';
 
 import { irisError } from '../error';
-import {
-  didYouMean,
-  inspect,
-  instanceOf,
-  suggestionList,
-} from '../utils/legacy';
+import { didYouMean, inspect, suggestionList } from '../utils/legacy';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';
 import type { Maybe } from '../utils/type-level';
@@ -22,6 +17,8 @@ import type {
   WrapperKind,
 } from './ast';
 import { isTypeVariantNode } from './ast';
+import type { Printable } from './base';
+import { IrisTypeRefImp } from './type-ref';
 
 export const stdScalars = keyMap(specifiedScalarTypes, ({ name }) => name);
 
@@ -30,54 +27,24 @@ export const scalarNames = Object.keys(stdScalars);
 export const isSpecifiedScalarType = (type: IrisTypeDefinition): boolean =>
   Boolean(stdScalars[type.name]);
 
-export type IrisType<R extends Role = Role> =
-  | IrisTypeDefinition<R>
-  | IrisTypeRef<R>;
+export const irisTypeRef = <K extends WrapperKind, T extends Printable>(
+  kind: K,
+  ofType: T,
+) => new IrisTypeRefImp(kind, ofType);
 
-export const isType = (type: unknown): type is IrisType =>
-  instanceOf(type, IrisTypeDefinition) || isTypeRef(type);
+export type IrisTypeRef<R extends Role = Role> =
+  | IrisTypeRefImp<'LIST', IrisTypeRef<R>>
+  | IrisTypeRefImp<'MAYBE', IrisTypeRef<R>>
+  | IrisTypeRefImp<'NAMED', IrisTypeDefinition<R>>;
 
-export class IrisTypeRef<R extends Role> {
-  readonly ofType: IrisType<R>;
-  readonly kind: WrapperKind;
-
-  constructor(kind: WrapperKind, ofType: IrisType<R>) {
-    this.kind = kind;
-    this.ofType = ofType;
-  }
-
-  get [Symbol.toStringTag]() {
-    return 'IrisTypeRef';
-  }
-
-  toString(): string {
-    const type = this.ofType.toString();
-    switch (this.kind) {
-      case 'LIST':
-        return '[' + type + ']';
-      case 'MAYBE':
-        return type + '?';
-      default:
-        return type;
-    }
-  }
-
-  toJSON(): string {
-    return this.toString();
-  }
-}
-
-export const isTypeRef = <R extends Role>(
-  type: unknown,
-): type is IrisTypeRef<R> => instanceOf(type, IrisTypeRef);
-
-export const isMaybeType = (type: unknown): type is IrisTypeRef<Role> =>
-  isTypeRef(type) && type.kind === 'MAYBE';
+export const liftType = <R extends Role>(t: IrisTypeDefinition<R>) =>
+  irisTypeRef<'NAMED', IrisTypeDefinition<R>>('NAMED', t);
 
 type IrisNode = {
   name: string;
   description?: Maybe<string>;
   deprecationReason?: Maybe<string>;
+  toJSON?: () => unknown;
 };
 
 export type ThunkObjMap<T> = Thunk<ObjMap<T>>;
@@ -90,17 +57,17 @@ export const resolveThunk = <T>(thunk: Thunk<T>): T =>
   isThunk(thunk) ? thunk() : thunk;
 
 export type IrisArgument = IrisNode & {
-  type: IrisType<'data'>;
+  type: IrisTypeRef<'data'>;
   defaultValue?: unknown;
   astNode?: ArgumentDefinitionNode;
 };
 
 export const isRequiredArgument = (arg: IrisArgument): boolean =>
-  !isMaybeType(arg.type) && arg.defaultValue === undefined;
+  arg.type.kind !== 'MAYBE' && arg.defaultValue === undefined;
 
 export type IrisField<R extends Role = Role> = IrisNode & {
   astNode?: FieldDefinitionNode<R>;
-  type: R extends 'data' ? IrisType<'data'> : IrisType;
+  type: R extends 'data' ? IrisTypeRef<'data'> : IrisTypeRef<R>;
   args?: R extends 'data' ? never : ReadonlyArray<IrisArgument>;
 };
 
