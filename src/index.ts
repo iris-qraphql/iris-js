@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 import type { ResolverMap } from './transpiling/toTSDefinitions';
-import { toGQLSchema } from './transpiling/toTSDefinitions';
+import { toTSDefinitions } from './transpiling/toTSDefinitions';
 import { buildSchema } from './types/schema';
 
 export { graphql } from 'graphql';
@@ -15,4 +15,4 @@ type Options = {
 };
 
 export const irisSchema = (src: string, { resolvers }: Options = {}) =>
-  toGQLSchema(buildSchema(src), resolvers);
+  toTSDefinitions(buildSchema(src), resolvers);
