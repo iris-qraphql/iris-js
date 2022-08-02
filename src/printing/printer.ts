@@ -1,7 +1,7 @@
 import { printBlockString } from 'graphql/language/blockString';
 import { printString } from 'graphql/language/printString';
 
-import type { ASTNode } from '../types/ast';
+import type { IrisSchema } from '../types/schema';
 import type { ASTReducer } from '../types/visitor';
 import { visit } from '../types/visitor';
 import type { Maybe } from '../utils/type-level';
@@ -136,4 +136,4 @@ function hasMultilineItems(maybeArray: Maybe<ReadonlyArray<string>>): boolean {
   return maybeArray?.some((str) => str.includes('\n')) ?? false;
 }
 
-export const print = (ast: ASTNode): string => visit(ast, printDocASTReducer);
+export const print = (ast: IrisSchema): string => visit(ast.document, printDocASTReducer);

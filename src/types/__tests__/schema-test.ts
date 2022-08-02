@@ -4,7 +4,7 @@ import { dedent } from '../../utils/dedent';
 import { buildSchema } from '../schema';
 
 const cycle = (src: string) =>
-  expect(print(parseSchema(src))).toEqual(dedent([src]));
+  expect(print(buildSchema(src))).toEqual(dedent([src]));
 
 describe('Type System: Schema', () => {
   it('Define sample schema', () => {

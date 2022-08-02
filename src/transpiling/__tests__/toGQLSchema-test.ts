@@ -2,7 +2,7 @@ import { printSchema } from 'graphql';
 
 import { buildSchema } from '../../types/schema';
 
-import { toGQLSchema } from '../toGQLSchema';
+import { toGQLSchema } from '../toTSDefinitions';
 
 const matchGQLSnapshot = (src: string) =>
   expect(printSchema(toGQLSchema(buildSchema(src)))).toMatchSnapshot();

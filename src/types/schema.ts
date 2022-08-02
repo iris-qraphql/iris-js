@@ -1,61 +1,52 @@
-import { DirectiveNode, isTypeDefinitionNode, ParseOptions, Source } from 'graphql';
-import { prop, uniqBy } from 'ramda';
-
-
 import { validateSDL } from '../validation/validate';
-
 import { parse } from '../parsing';
-import type { IrisMaybe, Maybe } from '../utils/type-level';
-
 
 import {
-  ArgumentDefinitionNode,
   DirectiveDefinitionNode,
-  FieldDefinitionNode,
+  DocumentNode,
   isDirectiveDefinitionNode,
-  NamedTypeNode,
+  isTypeDefinitionNode,
   TypeDefinitionNode,
-  TypeNode,
-  VariantDefinitionNode,
 } from './ast';
-import {
-  GraphQLDeprecatedDirective,
-  GraphQLDirective,
-  specifiedDirectives,
-} from './directives';
-import { IrisKind } from './kinds';
 import type { ObjMap } from 'graphql/jsutils/ObjMap';
+import { keyMap } from '../utils/ObjMap';
 
 type IrisSchema = {
   readonly types: ObjMap<TypeDefinitionNode>;
   readonly directives: ObjMap<DirectiveDefinitionNode>;
+  readonly document: DocumentNode;
 };
 
-export function buildSchema(
-  source: string | Source,
+type ParseOptions = {
+  noLocation?: boolean;
+};
+
+export const buildSchema = (
+  source: string,
   options?: ParseOptions,
-): IrisSchema {
-  const documentAST = parse(source, { noLocation: options?.noLocation });
-  const errors = validateSDL(documentAST);
+): IrisSchema => {
+  const document = parse(source, { noLocation: options?.noLocation });
+  const errors = validateSDL(document);
 
   if (errors.length !== 0) {
     throw new Error(errors.map((error) => error.message).join('\n\n'));
   }
 
+  const types = keyMap(
+    document.definitions.filter(isTypeDefinitionNode),
+    (x) => x.name.value,
+  );
 
-  const {definitions} = documentAST;
-
-
-  const types = uniqBy(prop('name'), definitions.filter(isTypeDefinitionNode));
-
-  const directives = uniqBy(prop('name'), definitions.filter(isDirectiveDefinitionNode));
+  const directives = keyMap(
+    document.definitions.filter(isDirectiveDefinitionNode),
+    (x) => x.name.value,
+  );
 
   return {
+    document,
     directives,
     types,
   };
-}
-
-
+};
 
 export type { IrisSchema };

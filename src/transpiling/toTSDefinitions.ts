@@ -22,15 +22,6 @@ import {
 import { typeCheckValue } from '../validation/typeCheckValue';
 
 import { irisError } from '../error';
-import { toJSODoc } from '../printing/jsDoc';
-import type {
-  IrisArgument,
-  IrisField,
-  IrisTypeDefinition,
-  IrisTypeRef,
-  IrisVariant,
-} from '../types/definition';
-import { irisTypeRef, isSpecifiedScalarType } from '../types/definition';
 import type { IrisSchema } from '../types/schema';
 import type { ObjMap } from '../utils/ObjMap';
 import { keyMap, mapValue } from '../utils/ObjMap';

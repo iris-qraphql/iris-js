@@ -3,8 +3,8 @@
  *
  * @packageDocumentation
  */
-import type { ResolverMap } from './transpiling/toGQLSchema';
-import { toGQLSchema } from './transpiling/toGQLSchema';
+import type { ResolverMap } from './transpiling/toTSDefinitions';
+import { toGQLSchema } from './transpiling/toTSDefinitions';
 import { buildSchema } from './types/schema';
 
 export { graphql } from 'graphql';
