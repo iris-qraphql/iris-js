@@ -49,12 +49,9 @@ const printDocASTReducer: ASTReducer<string> = {
   // Type System Definitions
 
   FieldDefinition: {
-    leave: ({ description, name, arguments: args, type, directives }) =>
+    leave: ({ description, name, type, directives }) =>
       wrap('', description, '\n') +
       name +
-      (hasMultilineItems(args)
-        ? wrap('(\n', indent(join(args, '\n')), '\n)')
-        : wrap('(', join(args, ', '), ')')) +
       ': ' +
       type +
       wrap(' ', join(directives, ' ')),
@@ -70,10 +67,15 @@ const printDocASTReducer: ASTReducer<string> = {
   },
 
   TypeDefinition: {
-    leave: ({ role, description, name, directives, variants }) =>
+    leave: ({ description, name, directives, variants }) =>
       wrap('', description, '\n') +
       join(
-        [role, name, join(directives, ' '), wrap('= ', join(variants, ' | '))],
+        [
+          'data',
+          name,
+          join(directives, ' '),
+          wrap('= ', join(variants, ' | ')),
+        ],
         ' ',
       ),
   },

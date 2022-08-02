@@ -1,4 +1,4 @@
-import { printSchema } from '../../printing/printSchema';
+import { print } from '../../printing/printer';
 import { dedent } from '../../utils/dedent';
 import type { ObjMap } from '../../utils/ObjMap';
 
@@ -7,7 +7,7 @@ import { IrisScalars } from '../definition';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { buildSchema, getDirective, getType } from '../schema';
 
-const cycleSDL = (sdl: string): string => printSchema(buildSchema(sdl));
+const cycleSDL = (sdl: string): string => print(buildSchema(sdl));
 
 describe('Schema Builder', () => {
   it('Empty type', () => {

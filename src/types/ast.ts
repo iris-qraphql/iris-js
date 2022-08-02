@@ -25,9 +25,6 @@ import type {
 
 import { IrisKind } from './kinds';
 
-/**
- * The list of all possible AST node types.
- */
 export type ASTNode =
   | NameNode
   | DocumentNode
@@ -75,7 +72,7 @@ export const QueryDocumentKeys: {
   NamedType: ['name'],
   ListType: ['type'],
   MaybeType: ['type'],
-  FieldDefinition: ['description', 'name', 'arguments', 'type', 'directives'],
+  FieldDefinition: ['description', 'name', 'type', 'directives'],
   InputValueDefinition: [
     'description',
     'name',
@@ -165,8 +162,6 @@ export type MaybeTypeNode = {
 
 export type DefinitionNode = TypeDefinitionNode | DirectiveDefinitionNode;
 
-export type Role = 'resolver' | 'data';
-
 export type ArgumentDefinitionNode = {
   readonly kind: IrisKind.ARGUMENT_DEFINITION;
   readonly loc?: Location;
@@ -177,37 +172,31 @@ export type ArgumentDefinitionNode = {
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
 };
 
-export type ArgumentsDefinitionNode<R extends Role> = R extends 'resolver'
-  ? ReadonlyArray<ArgumentDefinitionNode>
-  : undefined;
-
-export type FieldDefinitionNode<R extends Role = Role> = {
+export type FieldDefinitionNode = {
   readonly kind: IrisKind.FIELD_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly type: TypeNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly arguments?: ArgumentsDefinitionNode<R>;
 };
 
-export type VariantDefinitionNode<R extends Role = Role> = {
+export type VariantDefinitionNode = {
   readonly kind: IrisKind.VARIANT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly name: NameNode;
-  readonly fields?: ReadonlyArray<FieldDefinitionNode<R>>;
+  readonly fields?: ReadonlyArray<FieldDefinitionNode>;
 };
 
-export type TypeDefinitionNode<R extends Role = Role> = {
+export type TypeDefinitionNode = {
   readonly kind: IrisKind.TYPE_DEFINITION;
-  readonly role: R;
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
-  readonly variants: ReadonlyArray<VariantDefinitionNode<R>>;
+  readonly variants: ReadonlyArray<VariantDefinitionNode>;
 };
 
 export interface DirectiveDefinitionNode {
@@ -220,10 +209,10 @@ export interface DirectiveDefinitionNode {
   readonly locations: ReadonlyArray<NameNode>;
 }
 
-export const isTypeSystemDefinitionNode = (
+export const isDirectiveDefinitionNode = (
   node: ASTNode,
-): node is DefinitionNode =>
-  isTypeDefinitionNode(node) || node.kind === IrisKind.DIRECTIVE_DEFINITION;
+): node is DirectiveDefinitionNode =>
+  node.kind === IrisKind.DIRECTIVE_DEFINITION;
 
 export const isTypeDefinitionNode = (
   node: ASTNode,

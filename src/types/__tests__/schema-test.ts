@@ -1,10 +1,10 @@
-import { printSchema } from '../../printing/printSchema';
+import { print } from '../../printing/printer';
 import { dedent } from '../../utils/dedent';
 
 import { buildSchema } from '../schema';
 
 const cycle = (src: string) =>
-  expect(printSchema(buildSchema(src))).toEqual(dedent([src]));
+  expect(print(parseSchema(src))).toEqual(dedent([src]));
 
 describe('Type System: Schema', () => {
   it('Define sample schema', () => {
@@ -50,7 +50,6 @@ describe('Type System: Schema', () => {
       const schema = buildSchema(`
        data Foo 
        data Bar
-       directive @Foo(arg: Foo, argList: [Bar] ) on RESOLVER_DEFINITION
        resolver Query = {}
       `);
 

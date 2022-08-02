@@ -4,8 +4,6 @@ import { inspect, instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
 import type { DirectiveDefinitionNode } from './ast';
-import type { IrisArgument } from './definition';
-import { IrisScalars, liftType } from './definition';
 import { IrisDirectiveLocation } from './directiveLocation';
 
 /**
@@ -32,7 +30,7 @@ export class GraphQLDirective {
   name: string;
   description: Maybe<string>;
   locations: ReadonlyArray<IrisDirectiveLocation>;
-  args: ReadonlyArray<IrisArgument>;
+  // args: ReadonlyArray<IrisArgument>;
   isRepeatable: boolean;
   astNode: Maybe<DirectiveDefinitionNode>;
 
@@ -42,7 +40,7 @@ export class GraphQLDirective {
     this.locations = config.locations;
     this.isRepeatable = config.isRepeatable ?? false;
     this.astNode = config.astNode;
-    this.args = Object.values(config.args ?? {});
+    // this.args = Object.values(config.args ?? {});
   }
 
   get [Symbol.toStringTag]() {
@@ -62,7 +60,7 @@ export interface GraphQLDirectiveConfig {
   name: string;
   description?: Maybe<string>;
   locations: ReadonlyArray<IrisDirectiveLocation>;
-  args?: ReadonlyArray<IrisArgument>;
+  // args?: ReadonlyArray<IrisArgument>;
   isRepeatable?: Maybe<boolean>;
   astNode?: Maybe<DirectiveDefinitionNode>;
 }
@@ -75,19 +73,17 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     name: 'deprecated',
     description: 'Marks an element of a GraphQL schema as no longer supported.',
     locations: [
-      IrisDirectiveLocation.VARIABLE_DEFINITION,
       IrisDirectiveLocation.FIELD_DEFINITION,
       IrisDirectiveLocation.ARGUMENT_DEFINITION,
     ],
-    args: [
-      {
-        name: 'reason',
-        type: liftType(IrisScalars.String),
-        description:
-          'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
-        defaultValue: '',
-      },
-    ],
+    // args: [
+    //   {
+    //     name: 'reason',
+    //     type: { },
+    //     description: 'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
+    //     defaultValue: '',
+    //   },
+    // ],
   });
 
 /**

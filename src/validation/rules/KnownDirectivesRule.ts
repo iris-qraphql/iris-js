@@ -69,9 +69,7 @@ function getDirectiveLocationForASTPath(
     case IrisKind.FIELD_DEFINITION:
       return IrisDirectiveLocation.FIELD_DEFINITION;
     case IrisKind.TYPE_DEFINITION:
-      return appliedTo.role === 'resolver'
-        ? IrisDirectiveLocation.RESOLVER_DEFINITION
-        : IrisDirectiveLocation.DATA_DEFINITION;
+      return IrisDirectiveLocation.DATA_DEFINITION;
     case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
