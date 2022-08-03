@@ -1,20 +1,16 @@
 import { Kind } from 'graphql';
 
-import { irisError } from '../../error';
 import type {
   TypeDefinitionNode,
   VariantDefinitionNode,
 } from '../../types/ast';
-import { isTypeVariantNode } from '../../types/ast';
-import { scalarNames } from '../../types/definition';
-import { IrisKind } from '../../types/kinds';
+import { IrisKind,scalarNames } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 
 const makeScalar = (name: string): TypeDefinitionNode => ({
   kind: IrisKind.TYPE_DEFINITION,
-  role: 'data',
   name: { kind: Kind.NAME, value: name },
   variants: [],
 });
@@ -33,7 +29,6 @@ export function IncludeOnlyVariantTypes(
   };
 
   function checkVariantUniqueness(type: TypeDefinitionNode) {
-    const typeName = type.name.value;
 
     type.variants.forEach((v: VariantDefinitionNode) => {
       const name = v.name.value;
@@ -43,19 +38,6 @@ export function IncludeOnlyVariantTypes(
 
       if (!member) {
         return undefined;
-      }
-
-      if (
-        member.kind !== IrisKind.TYPE_DEFINITION ||
-        member.role !== type.role ||
-        !isTypeVariantNode(member)
-      ) {
-        context.reportError(
-          irisError(
-            `${type.role} ${typeName} can only include ${type.role} variantTypes, it cannot include ${member.role} ${member.name.value}.`,
-            { nodes: v },
-          ),
-        );
       }
     });
 

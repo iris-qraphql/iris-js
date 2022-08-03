@@ -6,7 +6,6 @@ import { IncludeOnlyVariantTypes } from './rules/IncludeOnlyVariantTypes';
 import { KnownArgumentNamesOnDirectivesRule } from './rules/KnownArgumentNamesRule';
 import { KnownDirectivesRule } from './rules/KnownDirectivesRule';
 import { KnownTypeNamesRule } from './rules/KnownTypeNamesRule';
-import { ObjectRootTypes } from './rules/ObjectRootTypes';
 import { ProvidedRequiredArgumentsOnDirectivesRule } from './rules/ProvidedRequiredArgumentsRule';
 import { UniqueDirectivesPerLocationRule } from './rules/UniqueDirectivesPerLocationRule';
 import { UniqueInputFieldNamesRule } from './rules/UniqueInputFieldNamesRule';
@@ -27,7 +26,6 @@ export const specifiedSDLRules: ReadonlyArray<SDLValidationRule> =
     // IRIS
     IncludeOnlyVariantTypes,
     ValidateField,
-    ObjectRootTypes,
   ]);
 
 /**

@@ -1,7 +1,5 @@
 import { irisError } from '../../error';
 import type { ArgumentDefinitionNode } from '../../types/ast';
-import type { IrisArgument } from '../../types/definition';
-import { isRequiredArgument } from '../../types/definition';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
@@ -17,7 +15,7 @@ import type { IrisValidationContext } from '../ValidationContext';
 export function ProvidedRequiredArgumentsOnDirectivesRule(
   context: IrisValidationContext,
 ): ASTVisitor {
-  const requiredArgsMap: ObjMap<ObjMap<IrisArgument | ArgumentDefinitionNode>> =
+  const requiredArgsMap: ObjMap<ObjMap<ArgumentDefinitionNode>> =
     {};
 
   for (const directive of specifiedDirectives) {

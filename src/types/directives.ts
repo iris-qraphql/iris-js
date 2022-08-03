@@ -3,7 +3,7 @@ import { assertName } from 'graphql';
 import { inspect, instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
-import type { DirectiveDefinitionNode } from './ast';
+import type { ArgumentDefinitionNode, DirectiveDefinitionNode } from './ast';
 import { IrisDirectiveLocation } from './directiveLocation';
 
 /**
@@ -60,7 +60,7 @@ export interface GraphQLDirectiveConfig {
   name: string;
   description?: Maybe<string>;
   locations: ReadonlyArray<IrisDirectiveLocation>;
-  // args?: ReadonlyArray<IrisArgument>;
+  args?: ReadonlyArray<ArgumentDefinitionNode>;
   isRepeatable?: Maybe<boolean>;
   astNode?: Maybe<DirectiveDefinitionNode>;
 }

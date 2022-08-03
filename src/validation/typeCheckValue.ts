@@ -1,12 +1,14 @@
+
 import { isNil } from 'ramda';
 
 import { irisError } from '../error';
 import type {
-  IrisField,
-  IrisTypeDefinition,
-  IrisTypeRef,
-  IrisVariant,
-} from '../types/definition';
+  FieldDefinitionNode,
+  TypeDefinitionNode,
+  TypeNode,
+  VariantDefinitionNode,
+} from '../types/ast';
+import { IrisKind } from '../types/kinds';
 import { inspect } from '../utils/legacy';
 import { isIterableObject, isObjectLike } from '../utils/ObjMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
@@ -18,22 +20,22 @@ type JSON = unknown;
 
 type Serializer<T> = (value: unknown, type: T) => Maybe<JSON>;
 
-export const typeCheckValue: Serializer<IrisTypeRef<'data'>> = (
+export const typeCheckValue: Serializer<TypeNode> = (
   value,
   type,
 ) => {
   switch (type.kind) {
-    case 'MAYBE':
-      return isNil(value) ? null : typeCheckValue(value, type.ofType);
-    case 'LIST': {
-      return serializeList(value, type.ofType);
+    case IrisKind.MAYBE_TYPE:
+      return isNil(value) ? null : typeCheckValue(value, type.type);
+    case IrisKind.LIST_TYPE : {
+      return serializeList(value, type.type);
     }
-    case 'NAMED':
-      return parseDataType(value, type.ofType);
+    case IrisKind.NAMED_TYPE:
+      return parseDataType(value, type.name);
   }
 };
 
-const serializeList: Serializer<IrisTypeRef<'data'>> = (value, type) => {
+const serializeList: Serializer<TypeNode> = (value, type) => {
   if (!isIterableObject(value)) {
     throw cannotRepresent(value, `[${type}]`);
   }
@@ -51,30 +53,30 @@ export type IrisVariantValue = {
   fields: Record<string, unknown>;
 };
 
-const parseDataType: Serializer<IrisTypeDefinition<'data'>> = (value, type) => {
+const parseDataType: Serializer<TypeDefinitionNode> = (value, type) => {
   if (isNil(value)) {
     throw cannotRepresent(value, type);
   }
 
-  if (type.boxedScalar) {
-    const serialized = type.boxedScalar.serialize(value);
+  // if (type.boxedScalar) {
+  //   const serialized = type.boxedScalar.serialize(value);
 
-    if (typeof serialized === 'number' && !Number.isFinite(serialized)) {
-      throw cannotRepresent(value, type);
-    }
+  //   if (typeof serialized === 'number' && !Number.isFinite(serialized)) {
+  //     throw cannotRepresent(value, type);
+  //   }
 
-    return serialized;
-  }
+  //   return serialized;
+  // }
 
   return parseVariantWith(parseVariantValue, value, type);
 };
 
 export const parseVariantWith = <T>(
-  f: (o: IrisVariantValue, v: IrisVariant<'data'>) => T,
+  f: (o: IrisVariantValue, v: VariantDefinitionNode) => T,
   value: unknown,
-  type: IrisTypeDefinition<'data'>,
+  type: TypeDefinitionNode,
 ): T => {
-  const object = toVariantObject(value, type.name);
+  const object = toVariantObject(value, type.name.value);
   const variant = type.variantBy(object.name);
   const variantType = variant.type ? variant.type.variantBy() : variant;
   return f(object, variantType);
@@ -98,15 +100,15 @@ const toVariantObject = (
 
 export const isEmptyVariant = (
   { name, fields }: IrisVariantValue,
-  variantFields: Array<IrisField<'data'>>,
+  variantFields: Array<FieldDefinitionNode>,
 ): boolean =>
   Boolean(name) &&
-  variantFields.filter(({ type }) => type.kind !== 'MAYBE').length === 0 &&
+  variantFields.filter(({ type }) => type.kind !== IrisKind.MAYBE_TYPE).length === 0 &&
   Object.values(fields).length === 0;
 
 const parseVariantValue = (
   object: IrisVariantValue,
-  variant: IrisVariant<'data'>,
+  variant: VariantDefinitionNode,
 ): IrisMaybe<JSON> => {
   const { name: __typename, fields } = object;
   const variantFields = Object.values(variant.fields ?? {});
@@ -118,7 +120,7 @@ const parseVariantValue = (
   const fieldNodes: Record<string, JSON> = __typename ? { __typename } : {};
 
   for (const { name, type } of variantFields) {
-    fieldNodes[name] = typeCheckValue(fields[name], type);
+    fieldNodes[name.value] = typeCheckValue(fields[name.value], type);
   }
 
   return fieldNodes;

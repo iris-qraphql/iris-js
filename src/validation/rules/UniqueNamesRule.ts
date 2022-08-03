@@ -63,16 +63,6 @@ export function UniqueNamesRule(context: IrisValidationContext): ASTVisitor {
         const fields = variant.fields ?? [];
 
         uniq(fields, (name) => `Field "${variantName}.${name}"`);
-
-        for (const field of fields) {
-          const fieldName = field.name.value;
-          const args = field.arguments ?? [];
-
-          uniq(
-            args,
-            (name) => `Argument "${variantName}.${fieldName}(${name}:)"`,
-          );
-        }
       }
     },
     DirectiveDefinition(node) {

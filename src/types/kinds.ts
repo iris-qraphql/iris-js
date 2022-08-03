@@ -35,3 +35,5 @@ export enum TokenKind {
   QUESTION_MARK = '?',
   BANG = '!',
 }
+
+export const scalarNames = ['String'] 

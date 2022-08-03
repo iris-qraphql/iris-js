@@ -1,15 +1,18 @@
-import { validateSDL } from '../validation/validate';
-import { parse } from '../parsing';
+import type { ObjMap } from 'graphql/jsutils/ObjMap';
 
-import {
+import { validateSDL } from '../validation/validate';
+
+import { parse } from '../parsing';
+import { keyMap } from '../utils/ObjMap';
+
+import type {
   DirectiveDefinitionNode,
   DocumentNode,
+  TypeDefinitionNode} from './ast';
+import {
   isDirectiveDefinitionNode,
-  isTypeDefinitionNode,
-  TypeDefinitionNode,
+  isTypeDefinitionNode
 } from './ast';
-import type { ObjMap } from 'graphql/jsutils/ObjMap';
-import { keyMap } from '../utils/ObjMap';
 
 type IrisSchema = {
   readonly types: ObjMap<TypeDefinitionNode>;

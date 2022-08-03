@@ -1,8 +1,7 @@
+import type { TypeNode } from 'graphql';
 import { identity } from 'ramda';
 
 import { parseValue } from '../../parsing/parser';
-import type { IrisTypeRef } from '../../types/definition';
-import { liftType } from '../../types/definition';
 import { gqlScalar, sampleTypeRef } from '../../utils/generators';
 import type { ObjMap } from '../../utils/ObjMap';
 
@@ -15,7 +14,7 @@ const maybeListOfBool = sampleTypeRef<'data'>('[Boolean]?');
 
 const expectValueFrom = (
   valueText: string,
-  typeRef: IrisTypeRef<'data'> | string,
+  typeRef: TypeNode | string,
   variables?: ObjMap<unknown>,
 ) => {
   const type =

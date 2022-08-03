@@ -1,4 +1,3 @@
-import { IrisScalars, liftType } from '../definition';
 import { IrisDirectiveLocation } from '../directiveLocation';
 import { GraphQLDirective } from '../directives';
 
@@ -6,19 +5,6 @@ describe('Type System: Directive', () => {
   it('defines a directive with no args', () => {
     const directive = new GraphQLDirective({
       name: 'Foo',
-      locations: [IrisDirectiveLocation.QUERY],
-    });
-
-    expect({ ...directive }).toMatchSnapshot();
-  });
-
-  it('defines a directive with multiple args', () => {
-    const directive = new GraphQLDirective({
-      name: 'Foo',
-      args: [
-        { name: 'foo', type: liftType(IrisScalars.String) },
-        { name: 'bar', type: liftType(IrisScalars.Int) },
-      ],
       locations: [IrisDirectiveLocation.QUERY],
     });
 
