@@ -1,9 +1,11 @@
+import { Kind } from 'graphql';
 
 import { inspect, instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
 import type { ArgumentDefinitionNode, DirectiveDefinitionNode } from './ast';
 import { IrisDirectiveLocation } from './directiveLocation';
+import { IrisKind } from './kinds';
 
 /**
  * Test if the given value is a GraphQL directive.
@@ -75,14 +77,22 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
       IrisDirectiveLocation.FIELD_DEFINITION,
       IrisDirectiveLocation.ARGUMENT_DEFINITION,
     ],
-    // args: [
-    //   {
-    //     name: 'reason',
-    //     type: { },
-    //     description: 'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
-    //     defaultValue: '',
-    //   },
-    // ],
+    args: [
+      {
+        kind: IrisKind.ARGUMENT_DEFINITION,
+        name: { value: 'reason', kind: Kind.NAME },
+        description: {
+          kind: Kind.STRING,
+          value:
+            'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
+        },
+        defaultValue: { value: '', kind: Kind.STRING },
+        type: {
+          kind: IrisKind.NAMED_TYPE,
+          name: { value: 'string', kind: Kind.NAME },
+        },
+      },
+    ],
   });
 
 /**

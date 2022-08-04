@@ -1,8 +1,16 @@
-import { withWrappers } from '../../utils/generators';
 import { inspect } from '../../utils/legacy';
 import { getSDLValidationErrors } from '../../utils/toJSONDeep';
 
 import { ValidateField } from '../rules/ValidateField';
+
+const withWrappers = (type: string): Array<string> => [
+  type,
+  `${type}?`,
+  `[${type}]`,
+  `[${type}]?`,
+  `[${type}?]`,
+  `[${type}?]?`,
+];
 
 const expectSDLErrors = (sdlStr: string) =>
   expect(getSDLValidationErrors(ValidateField, sdlStr));

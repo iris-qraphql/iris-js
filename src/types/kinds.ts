@@ -1,5 +1,3 @@
-import type { TypeDefinitionNode } from './ast';
-
 export enum IrisKind {
   ARGUMENT_DEFINITION = 'InputValueDefinition',
   NAMED_TYPE = 'NamedType',
@@ -38,12 +36,4 @@ export enum TokenKind {
   BANG = '!',
 }
 
-export const scalars = {
-  String: {} as TypeDefinitionNode,
-  Int: {} as TypeDefinitionNode,
-  Float: {} as TypeDefinitionNode,
-  ID: {} as TypeDefinitionNode,
-  Boolean: {} as TypeDefinitionNode
-};
-
-export const scalarNames = Object.keys(scalars);
+export const scalarNames = ['String', 'Int', 'Float', 'ID', 'Boolean'];

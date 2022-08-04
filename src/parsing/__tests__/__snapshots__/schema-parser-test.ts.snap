@@ -24,6 +24,7 @@ Object {
           "description": undefined,
           "directives": Array [],
           "fields": Array [],
+          "isTypeVariantNode": false,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 18,
@@ -42,6 +43,7 @@ Object {
           "description": undefined,
           "directives": Array [],
           "fields": Array [],
+          "isTypeVariantNode": false,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 27,
@@ -91,6 +93,7 @@ Object {
           "description": undefined,
           "directives": Array [],
           "fields": undefined,
+          "isTypeVariantNode": false,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 19,
@@ -173,6 +176,7 @@ Object {
               },
             },
           ],
+          "isTypeVariantNode": true,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 32,
@@ -255,6 +259,7 @@ Object {
               },
             },
           ],
+          "isTypeVariantNode": true,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 45,
@@ -337,6 +342,7 @@ Object {
               },
             },
           ],
+          "isTypeVariantNode": true,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 32,
@@ -386,6 +392,7 @@ Object {
           "description": undefined,
           "directives": Array [],
           "fields": undefined,
+          "isTypeVariantNode": false,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 18,
@@ -435,6 +442,7 @@ Object {
           "description": undefined,
           "directives": Array [],
           "fields": Array [],
+          "isTypeVariantNode": false,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 21,
@@ -532,6 +540,7 @@ Object {
           "description": undefined,
           "directives": Array [],
           "fields": undefined,
+          "isTypeVariantNode": false,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 15,
@@ -550,6 +559,7 @@ Object {
           "description": undefined,
           "directives": Array [],
           "fields": undefined,
+          "isTypeVariantNode": false,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 21,
@@ -640,6 +650,7 @@ Object {
               },
             },
           ],
+          "isTypeVariantNode": true,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 86,
@@ -730,6 +741,7 @@ Object {
               },
             },
           ],
+          "isTypeVariantNode": true,
           "kind": "VariantDefinition",
           "loc": Object {
             "end": 46,

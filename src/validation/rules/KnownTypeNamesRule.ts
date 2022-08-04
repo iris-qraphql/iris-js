@@ -49,6 +49,7 @@ export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
           ),
         );
       }
+      return undefined;
     },
     VariantDefinition(node, _1, parent, _2, ancestors) {
       if (node.fields) {
@@ -67,13 +68,16 @@ export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
           typeName,
           isSDL ? scalarNames.concat(typeNames) : typeNames,
         );
+
         context.reportError(
           irisError(
             `Unknown type "${typeName}".` + didYouMean(suggestedTypes),
             { nodes: node },
           ),
         );
+
       }
+      return undefined;
     },
   };
 }

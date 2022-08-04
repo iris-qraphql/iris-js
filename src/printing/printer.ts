@@ -81,7 +81,12 @@ const printDocASTReducer: ASTReducer<string> = {
       ),
   },
 
-  VariantDefinition: { leave: ({ name , fields}) => fields === undefined ? name : name + ' ' + block(fields)  },
+  VariantDefinition: {
+    leave: ({ name, fields, isTypeVariantNode }) =>
+      fields === undefined
+        ? name
+        : (isTypeVariantNode ? '' : name + ' ') + block(fields),
+  },
 
   DirectiveDefinition: {
     leave: ({ description, name, arguments: args, repeatable, locations }) =>
@@ -111,9 +116,8 @@ function join(
 /**
  * Given array, print each item on its own line, wrapped in an indented `{ }` block.
  */
-function block(array: Maybe<ReadonlyArray<string | undefined>>): string {
-  return wrap('{\n', indent(join(array, '\n')), '\n}');
-}
+const block = (array: ReadonlyArray<string | undefined>) =>
+  array.length > 0 ? `{\n${indent(join(array, '\n'))}\n}` : '{}';
 
 /**
  * If maybeString is not null or empty, then wrap with start and end, otherwise print an empty string.
@@ -137,6 +141,8 @@ function hasMultilineItems(maybeArray: Maybe<ReadonlyArray<string>>): boolean {
   return maybeArray?.some((str) => str.includes('\n')) ?? false;
 }
 
-export const print = (ast: IrisSchema): string => visit(ast.document, printDocASTReducer);
+export const print = (ast: IrisSchema): string =>
+  visit(ast.document, printDocASTReducer);
 
-export const printNode = (ast: ASTNode): string => visit(ast, printDocASTReducer);
+export const printNode = (ast: ASTNode): string =>
+  visit(ast, printDocASTReducer);

@@ -1,11 +1,8 @@
-import { keys } from 'ramda';
-
 import { print } from '../../printing/printer';
 import { dedent } from '../../utils/dedent';
 
 import { getField,getVariant} from '../ast';
 import { GraphQLDeprecatedDirective } from '../directives';
-import { scalars } from '../kinds';
 import { buildSchema, getDirective, getType } from '../schema';
 
 const cycleSDL = (sdl: string): string => print(buildSchema(sdl));
@@ -20,7 +17,7 @@ describe('Schema Builder', () => {
 
   it('Simple type', () => {
     const sdl = dedent`
-      data Query = {
+      data Type = Type {
         str: String
         int: Int
         float: Float
@@ -29,14 +26,6 @@ describe('Schema Builder', () => {
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
-
-    const schema = buildSchema(sdl);
-
-
-
-    for (const name of keys(scalars)) {
-      expect(getType(schema, name)).toEqual(scalars[name]);
-    }
   });
 
   it('include standard type only if it is used', () => {
@@ -65,11 +54,8 @@ describe('Schema Builder', () => {
         arg: Int
       ) on FIELD
 
-      """Who knows what inside this scalar?"""
-      data MysteryScalar = Int
-
-      """This is a data  object type"""
-      data FooInput = {
+      """This is a data type"""
+      data Foo = Foo {
         """It has a field"""
         field: Int
       }
@@ -79,12 +65,6 @@ describe('Schema Builder', () => {
 
       """With an Enum"""
       data Color = RED {} | GREEN {} | BLUE {}
-
-      """What a great type"""
-      data Query = {
-        """And a field to boot"""
-        str: String
-      }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
@@ -97,7 +77,7 @@ describe('Schema Builder', () => {
       directive @specifiedBy on FIELD_DEFINITION
     `);
 
-    expect(schema.directives).toHaveLength(4);
+    expect(Object.values(schema.directives)).toHaveLength(4);
     expect(getDirective(schema, 'deprecated')).not.toEqual(
       GraphQLDeprecatedDirective,
     );
@@ -105,7 +85,7 @@ describe('Schema Builder', () => {
 
   it('Type modifiers', () => {
     const sdl = dedent`
-      data Query = {
+      data Type = Type {
         nonNullStr: String?
         listOfStrings: [String]
         listOfNonNullStrings: [String?]
@@ -118,9 +98,9 @@ describe('Schema Builder', () => {
 
   it('Recursive type', () => {
     const sdl = dedent`
-      data Query = {
+      data Type = Type {
         str: String
-        recurse: Query
+        recurse: Type
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
@@ -128,14 +108,14 @@ describe('Schema Builder', () => {
 
   it('Two types circular', () => {
     const sdl = dedent`
-      data TypeOne = {
+      data One = One {
         str: String
-        typeTwo: TypeTwo?
+        typeTwo: Two?
       }
 
-      data TypeTwo = {
+      data Two = Two {
         str: String?
-        typeOne: TypeOne
+        typeOne: One
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
@@ -171,15 +151,11 @@ describe('Schema Builder', () => {
 
   it('Simple Union', () => {
     const sdl = dedent`
-      data Hello = World
-
-      data Query = {
-        hello: Hello
-      }
-
       data World = {
         str: String
       }
+
+      data Hello = World
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
@@ -188,27 +164,12 @@ describe('Schema Builder', () => {
     const sdl = dedent`
       data Hello = WorldOne | WorldTwo
 
-      data Query = {
-        hello: Hello
-      }
-
       data WorldOne = {
         str: String
       }
 
       data WorldTwo = {
         str: String
-      }
-    `;
-    expect(cycleSDL(sdl)).toEqual(sdl);
-  });
-
-  it('Custom Scalar', () => {
-    const sdl = dedent`
-      data CustomScalar = Int
-
-      data Query = {
-        customScalar: CustomScalar
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
@@ -291,16 +252,6 @@ describe('Schema Builder', () => {
     );
   });
 
-  it('Do not override standard types', () => {
-    // NOTE: not sure it's desired behavior to just silently ignore override
-    // attempts so just documenting it here.
-
-    const schema = buildSchema(`
-      data ID = String
-    `);
-
-    expect(getType(schema, 'ID')).toEqual(scalars.ID);
-  });
 
   it('Rejects invalid SDL', () => {
     const sdl = `

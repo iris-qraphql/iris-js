@@ -188,6 +188,7 @@ export type VariantDefinitionNode = {
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly isTypeVariantNode: boolean;
   readonly name: NameNode;
   readonly fields?: ReadonlyArray<FieldDefinitionNode>;
   readonly deprecation?: string;
@@ -255,11 +256,6 @@ export const getVariant = (
 
 export const getField = (name: string, v: Maybe<VariantDefinitionNode>) =>
   v?.fields?.find((f) => f.name.value === name);
-
-export const liftType = (t: TypeDefinitionNode): TypeNode => ({
-  kind: IrisKind.NAMED_TYPE,
-  name: t.name,
-});
 
 export const isRequiredArgument = (arg: ArgumentDefinitionNode) =>
   arg.type.kind !== IrisKind.MAYBE_TYPE;

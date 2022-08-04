@@ -9,8 +9,8 @@ const cycle = (src: string) =>
 describe('Type System: Schema', () => {
   it('Define sample schema', () => {
     cycle(`
-      data Query = {
-        article(id: String): Article
+      data Root = {
+        article: Article
         feed: [Article]
       }
 
@@ -25,7 +25,7 @@ describe('Type System: Schema', () => {
       data Author = {
         id: String
         name: String
-        pic(width: Int, height: Int): Image
+        pic: Image
         recentArticle: Article
       }
 
@@ -33,14 +33,6 @@ describe('Type System: Schema', () => {
         url: String
         width: Int
         height: Int
-      }
-
-      data Mutation = {
-        writeArticle: Article
-      }
-
-      data Subscription = {
-        articleSubscribe(id: String): Article
       }
     `);
   });
@@ -61,19 +53,19 @@ describe('Type System: Schema', () => {
 
   describe('Validity', () => {
     describe('A Schema must contain uniquely named types', () => {
-      // TODO:
-      // it('rejects a Schema which redefines a built-in type', () => {
-      //   const schema = buildSchema(`
-      //       data String
-      //       data Query = {
-      //         fakeString: String
-      //       }
-      //   `);
 
-      //   expect(schema).toEqual(
-      //     'Schema must contain uniquely named types but contains multiple types named "String".',
-      //   );
-      // });
+      it('rejects a Schema which redefines a built-in type', () => {
+        const schema = buildSchema(`
+            data String
+            data Query = {
+              fakeString: String
+            }
+        `);
+
+        expect(schema).toEqual(
+          'Schema must contain uniquely named types but contains multiple types named "String".',
+        );
+      });
 
       it('rejects a Schema which defines an object type twice', () => {
         expect(() =>

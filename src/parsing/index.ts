@@ -123,6 +123,7 @@ const parseVariantDefinition = (
     name,
     directives,
     fields,
+    isTypeVariantNode: Boolean(typeName)
   });
 };
 

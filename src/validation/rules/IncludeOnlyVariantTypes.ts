@@ -43,7 +43,7 @@ export function IncludeOnlyVariantTypes(
 
       if (
         member.kind !== IrisKind.TYPE_DEFINITION ||
-        isTypeVariantNode(member) ||
+        !isTypeVariantNode(member) ||
         defaultTypes[name]
       ) {
         context.reportError(
