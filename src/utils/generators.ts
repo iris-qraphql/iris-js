@@ -1,4 +1,4 @@
-import type { GraphQLScalarTypeConfig} from 'graphql';
+import type { GraphQLScalarTypeConfig } from 'graphql';
 import { Kind } from 'graphql';
 
 import type { TypeDefinitionNode, TypeNode } from '../types/ast';

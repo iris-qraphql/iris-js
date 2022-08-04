@@ -1,4 +1,3 @@
-import { assertName } from 'graphql';
 
 import { inspect, instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
@@ -30,17 +29,17 @@ export class GraphQLDirective {
   name: string;
   description: Maybe<string>;
   locations: ReadonlyArray<IrisDirectiveLocation>;
-  // args: ReadonlyArray<IrisArgument>;
+  args: ReadonlyArray<ArgumentDefinitionNode>;
   isRepeatable: boolean;
   astNode: Maybe<DirectiveDefinitionNode>;
 
   constructor(config: Readonly<GraphQLDirectiveConfig>) {
-    this.name = assertName(config.name);
+    this.name = config.name;
     this.description = config.description;
     this.locations = config.locations;
     this.isRepeatable = config.isRepeatable ?? false;
     this.astNode = config.astNode;
-    // this.args = Object.values(config.args ?? {});
+    this.args = Object.values(config.args ?? {});
   }
 
   get [Symbol.toStringTag]() {

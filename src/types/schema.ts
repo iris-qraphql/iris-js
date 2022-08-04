@@ -1,3 +1,4 @@
+import type { Maybe } from 'graphql/jsutils/Maybe';
 import type { ObjMap } from 'graphql/jsutils/ObjMap';
 
 import { validateSDL } from '../validation/validate';
@@ -8,11 +9,9 @@ import { keyMap } from '../utils/ObjMap';
 import type {
   DirectiveDefinitionNode,
   DocumentNode,
-  TypeDefinitionNode} from './ast';
-import {
-  isDirectiveDefinitionNode,
-  isTypeDefinitionNode
+  TypeDefinitionNode,
 } from './ast';
+import { isDirectiveDefinitionNode, isTypeDefinitionNode } from './ast';
 
 type IrisSchema = {
   readonly types: ObjMap<TypeDefinitionNode>;
@@ -51,5 +50,15 @@ export const buildSchema = (
     types,
   };
 };
+
+export const getDirective = (
+  schema: IrisSchema,
+  name: string,
+): Maybe<DirectiveDefinitionNode> => schema.directives[name];
+
+export const getType = (
+  schema: IrisSchema,
+  name: string,
+): Maybe<TypeDefinitionNode> => schema.types[name];
 
 export type { IrisSchema };

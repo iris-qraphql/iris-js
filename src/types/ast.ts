@@ -251,11 +251,13 @@ export const getVariant = (
   throw new Error('implement me');
 };
 
+export const getField = ({ fields }: VariantDefinitionNode, name: string) =>
+  fields?.find((f) => f.name.value === name);
 
+export const liftType = (t: TypeDefinitionNode): TypeNode => ({
+  kind: IrisKind.NAMED_TYPE,
+  name: t.name,
+});
 
-export const liftType = (t: TypeDefinitionNode): TypeNode => 
-  ({
-    kind: IrisKind.NAMED_TYPE,
-    name: t.name,
-  });
-
+export const isRequiredArgument = (arg: ArgumentDefinitionNode) =>
+  arg.type.kind !== IrisKind.MAYBE_TYPE;

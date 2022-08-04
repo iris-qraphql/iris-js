@@ -6,11 +6,9 @@ import { sampleTypeRef } from '../../utils/generators';
 import { typeCheckValue } from '../typeCheckValue';
 
 const serializeWith = (value: unknown, typeRef: string | TypeNode) => {
-  const schema = undefined;
-
   const type: TypeNode =
     typeof typeRef === 'string' ? sampleTypeRef(typeRef) : typeRef;
-  return typeCheckValue(schema, value, type);
+  return typeCheckValue(buildSchema(''), value, type);
 };
 
 describe('serializeValue', () => {

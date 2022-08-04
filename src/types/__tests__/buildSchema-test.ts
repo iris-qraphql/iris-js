@@ -1,10 +1,11 @@
+import { keys } from 'ramda';
+
 import { print } from '../../printing/printer';
 import { dedent } from '../../utils/dedent';
-import type { ObjMap } from '../../utils/ObjMap';
 
-import type { FieldDefinitionNode} from '../ast';
-import {getVariant } from '../ast';
+import { getField,getVariant} from '../ast';
 import { GraphQLDeprecatedDirective } from '../directives';
+import { scalars } from '../kinds';
 import { buildSchema, getDirective, getType } from '../schema';
 
 const cycleSDL = (sdl: string): string => print(buildSchema(sdl));
@@ -12,7 +13,7 @@ const cycleSDL = (sdl: string): string => print(buildSchema(sdl));
 describe('Schema Builder', () => {
   it('Empty type', () => {
     const sdl = dedent`
-      resolver EmptyType
+      data EmptyType
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
@@ -31,10 +32,10 @@ describe('Schema Builder', () => {
 
     const schema = buildSchema(sdl);
 
-    const scalars = Object.keys(IrisScalars);
 
-    for (const name of scalars) {
-      expect(getType(schema, name)).toEqual(IrisScalars[name]);
+
+    for (const name of keys(scalars)) {
+      expect(getType(schema, name)).toEqual(scalars[name]);
     }
   });
 
@@ -348,9 +349,7 @@ describe('Schema Builder', () => {
     const schema = buildSchema(sdl);
 
     expect(
-      getType(schema, 'MyEnum')
-        ?.variants()
-        .map(({ name, deprecationReason }) => ({ name, deprecationReason })),
+      getType(schema, 'MyEnum')?.variants.map(({ name, deprecationReason }) => ({ name, deprecationReason })),
     ).toEqual([
       { name: 'VALUE', deprecationReason: undefined },
       { name: 'OLD_VALUE', deprecationReason: '' },
@@ -358,30 +357,17 @@ describe('Schema Builder', () => {
     ]);
 
     const rootType = getType(schema, 'Query');
-    const rootFields = rootType ? getVariant(rootType).fields ?? ({} as ObjMap<FieldDefinitionNode>) : {};
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const variant = getVariant(rootType!);
 
-    expect(rootFields.field1).toEqual(
+    expect(getField(variant, 'field1')).toEqual(
       expect.objectContaining({
         deprecationReason: '',
       }),
     );
-    expect(rootFields.field2).toEqual(
+    expect(getField(variant,'field2')).toEqual(
       expect.objectContaining({
         deprecationReason: 'Because I said so',
-      }),
-    );
-
-    const field3OldArg = rootFields.field3.args?.[0];
-    expect(field3OldArg).toEqual(
-      expect.objectContaining({
-        deprecationReason: '',
-      }),
-    );
-
-    const field4OldArg = rootFields.field4.args?.[0];
-    expect(field4OldArg).toEqual(
-      expect.objectContaining({
-        deprecationReason: 'Why not?',
       }),
     );
   });
@@ -394,7 +380,7 @@ describe('Schema Builder', () => {
       data ID = String
     `);
 
-    expect(getType(schema, 'ID')).toEqual(IrisScalars.ID);
+    expect(getType(schema, 'ID')).toEqual(scalars.ID);
   });
 
   it('Rejects invalid SDL', () => {
