@@ -1,5 +1,4 @@
-import { keys } from "ramda";
-import type { TypeDefinitionNode } from "./ast";
+import type { TypeDefinitionNode } from './ast';
 
 export enum IrisKind {
   ARGUMENT_DEFINITION = 'InputValueDefinition',

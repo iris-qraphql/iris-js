@@ -188,6 +188,7 @@ export type VariantDefinitionNode = {
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly name: NameNode;
   readonly fields?: ReadonlyArray<FieldDefinitionNode>;
+  readonly deprecation?: string
 };
 
 export type TypeDefinitionNode = {

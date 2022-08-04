@@ -349,11 +349,11 @@ describe('Schema Builder', () => {
     const schema = buildSchema(sdl);
 
     expect(
-      getType(schema, 'MyEnum')?.variants.map(({ name, deprecationReason }) => ({ name, deprecationReason })),
+      getType(schema, 'MyEnum')?.variants.map(({ name, deprecation }) => ({ name, deprecation })),
     ).toEqual([
-      { name: 'VALUE', deprecationReason: undefined },
-      { name: 'OLD_VALUE', deprecationReason: '' },
-      { name: 'OTHER_VALUE', deprecationReason: 'Terrible reasons' },
+      { name: 'VALUE', deprecation: undefined },
+      { name: 'OLD_VALUE', deprecation: '' },
+      { name: 'OTHER_VALUE', deprecation: 'Terrible reasons' },
     ]);
 
     const rootType = getType(schema, 'Query');
