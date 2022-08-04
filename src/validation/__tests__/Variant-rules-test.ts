@@ -7,34 +7,19 @@ const expectSDLErrors = (sdlStr: string) =>
 
 describe('VariantType Rules', () => {
   it('rejects a Union type with non-Object members types', () => {
+
     expectSDLErrors(`
-      data Query = {
-        test: BadUnion
-      }
-
-      data TypeA = {
+      data A = {
         field: String
       }
 
-      data TypeB = {
-        field: String
-      }
-
-      data BadUnion
-        = TypeA
-        | String
-        | TypeB
-        | Int
+      data BadUnion = A | String | Int
     `).toMatchSnapshot();
   });
 
   it("can't build recursive Union", () => {
     expectSDLErrors(`
     data Hello = Hello
-
-    data Query = {
-      hello: Hello
-    }
   `).toMatchSnapshot();
   });
 });

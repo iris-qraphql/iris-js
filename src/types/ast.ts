@@ -23,6 +23,8 @@ import type {
   VariableNode,
 } from 'graphql';
 
+import type { Maybe } from '../utils/type-level';
+
 import { IrisKind } from './kinds';
 
 export type ASTNode =
@@ -188,7 +190,7 @@ export type VariantDefinitionNode = {
   readonly directives?: ReadonlyArray<ConstDirectiveNode>;
   readonly name: NameNode;
   readonly fields?: ReadonlyArray<FieldDefinitionNode>;
-  readonly deprecation?: string
+  readonly deprecation?: string;
 };
 
 export type TypeDefinitionNode = {
@@ -246,14 +248,13 @@ export const getRefTypeName = (node: TypeNode): NameNode => {
 };
 
 export const getVariant = (
-  _type: TypeDefinitionNode,
-  _name?: string,
-): VariantDefinitionNode => {
-  throw new Error('implement me');
-};
+  { variants }: TypeDefinitionNode,
+  name?: string,
+): Maybe<VariantDefinitionNode> =>
+  name ? variants.find((v) => v.name.value === name) : variants[0];
 
-export const getField = ({ fields }: VariantDefinitionNode, name: string) =>
-  fields?.find((f) => f.name.value === name);
+export const getField = (name: string, v: Maybe<VariantDefinitionNode>) =>
+  v?.fields?.find((f) => f.name.value === name);
 
 export const liftType = (t: TypeDefinitionNode): TypeNode => ({
   kind: IrisKind.NAMED_TYPE,

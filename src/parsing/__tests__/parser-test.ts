@@ -1,6 +1,5 @@
-import { Kind, Source } from 'graphql';
+import { Kind } from 'graphql';
 
-import { dedent } from '../../utils/dedent';
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
 import { parse } from '../index';
@@ -26,22 +25,6 @@ describe('Parser', () => {
       message: 'Syntax Error: Unexpected "...".',
       locations: [{ line: 1, column: 1 }],
     });
-  });
-
-  it('parse provides useful error when using source', () => {
-    let caughtError;
-    try {
-      parse(new Source('resolver', 'MyQuery.graphql'));
-    } catch (error) {
-      caughtError = error;
-    }
-    expect(String(caughtError)).toEqual(dedent`
-      Syntax Error: Expected Name, found <EOF>.
-
-      MyQuery.graphql:1:9
-      1 | resolver
-        |         ^
-    `);
   });
 
   it('does not allow "true", "false", or "null" as Enum value', () => {

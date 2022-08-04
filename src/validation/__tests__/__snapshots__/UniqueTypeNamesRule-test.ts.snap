@@ -1,36 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Validate: Unique argument definition names duplicating arguments 1`] = `
-Array [
-  Object {
-    "locations": Array [
-      Object {
-        "column": 11,
-        "line": 4,
-      },
-      Object {
-        "column": 11,
-        "line": 6,
-      },
-    ],
-    "message": "Argument \\"SomeObject.someField(foo:)\\" can only be defined once.",
-  },
-  Object {
-    "locations": Array [
-      Object {
-        "column": 9,
-        "line": 11,
-      },
-      Object {
-        "column": 9,
-        "line": 13,
-      },
-    ],
-    "message": "Argument \\"@someDirective(foo:)\\" can only be defined once.",
-  },
-]
-`;
-
 exports[`Validate: Unique field definition names duplicate fields inside the same type definition 1`] = `
 Array [
   Object {
@@ -119,7 +88,7 @@ Array [
         "line": 10,
       },
     ],
-    "message": "Variant \\"SomeResolver.D\\" can only be defined once.",
+    "message": "Variant \\"Somedata.D\\" can only be defined once.",
   },
 ]
 `;

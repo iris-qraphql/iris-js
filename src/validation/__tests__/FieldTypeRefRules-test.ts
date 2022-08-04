@@ -26,26 +26,6 @@ const resolverField = (name: string) =>
 `);
 
 describe('Field Rules', () => {
-  it('rejects an Input Object type with incorrectly typed fields', () => {
-    expectSDLErrors(`
-    data Query = {
-      field(arg: SomeInputObject): String
-    }
-
-    data SomeObject = {
-      field: String
-    }
-
-    data SomeUnion = SomeObject
-
-    data SomeInputObject = {
-      badObject: SomeObject
-      badUnion: SomeUnion
-      goodInputObject: SomeInputObject
-    }
-  `).toMatchSnapshot();
-  });
-
   describe('Type System: Object fields must have output types', () => {
     const outputTypes = [
       'String',

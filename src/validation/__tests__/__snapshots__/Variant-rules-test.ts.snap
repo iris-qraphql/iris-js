@@ -19,20 +19,29 @@ Array [
   Object {
     "locations": Array [
       Object {
-        "column": 11,
-        "line": 16,
+        "column": 23,
+        "line": 6,
       },
     ],
-    "message": "resolver BadUnion can only include resolver variantTypes, it cannot include data String.",
+    "message": "data BadUnion can only include data variantTypes, it cannot include A.",
   },
   Object {
     "locations": Array [
       Object {
-        "column": 11,
-        "line": 18,
+        "column": 27,
+        "line": 6,
       },
     ],
-    "message": "resolver BadUnion can only include resolver variantTypes, it cannot include data Int.",
+    "message": "data BadUnion can only include data variantTypes, it cannot include String.",
+  },
+  Object {
+    "locations": Array [
+      Object {
+        "column": 36,
+        "line": 6,
+      },
+    ],
+    "message": "data BadUnion can only include data variantTypes, it cannot include Int.",
   },
 ]
 `;

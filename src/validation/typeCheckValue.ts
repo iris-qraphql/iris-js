@@ -1,6 +1,7 @@
 import { isNil } from 'ramda';
 
 import { irisError } from '../error';
+import { printNode } from '../printing/printer';
 import type {
   FieldDefinitionNode,
   TypeNode,
@@ -38,7 +39,7 @@ export const typeCheckValue: Serializer<TypeNode> = (schema, value, type) => {
 
 const serializeList: Serializer<TypeNode> = (schema, value, type) => {
   if (!isIterableObject(value)) {
-    throw cannotRepresent(value, `[${type.kind}]`);
+    throw cannotRepresent(value, `[${printNode(type)}]`);
   }
 
   const valuesNodes = [];
@@ -85,11 +86,15 @@ export const parseVariantWith = <T>(
 ): T => {
   const type = schema.types[typeName];
   const object = toVariantObject(value, type.name.value);
-  const variant = getVariant(type, object.name);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const variant = getVariant(type, object.name)!;
+
   const variantType = variant.fields
     ? variant
     : getVariant(schema.types[variant.name.value]);
-  return f(object, variantType);
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return f(object, variantType!);
 };
 
 const toVariantObject = (

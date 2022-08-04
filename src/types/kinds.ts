@@ -43,6 +43,7 @@ export const scalars = {
   Int: {} as TypeDefinitionNode,
   Float: {} as TypeDefinitionNode,
   ID: {} as TypeDefinitionNode,
+  Boolean: {} as TypeDefinitionNode
 };
 
 export const scalarNames = Object.keys(scalars);

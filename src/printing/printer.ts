@@ -1,6 +1,7 @@
 import { printBlockString } from 'graphql/language/blockString';
 import { printString } from 'graphql/language/printString';
 
+import type { ASTNode } from '../types/ast';
 import type { IrisSchema } from '../types/schema';
 import type { ASTReducer } from '../types/visitor';
 import { visit } from '../types/visitor';
@@ -137,3 +138,5 @@ function hasMultilineItems(maybeArray: Maybe<ReadonlyArray<string>>): boolean {
 }
 
 export const print = (ast: IrisSchema): string => visit(ast.document, printDocASTReducer);
+
+export const printNode = (ast: ASTNode): string => visit(ast, printDocASTReducer);

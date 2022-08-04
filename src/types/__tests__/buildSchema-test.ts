@@ -141,28 +141,6 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
-  it('Single argument field', () => {
-    const sdl = dedent`
-      data Query = {
-        str(int: Int?): String
-        floatToStr(float: Float): String
-        idToStr(id: ID?): String
-        booleanToStr(bool: Boolean?): String
-        strToStr(bool: String): String
-      }
-    `;
-    expect(cycleSDL(sdl)).toEqual(sdl);
-  });
-
-  it('Simple type with multiple arguments', () => {
-    const sdl = dedent`
-      data Query = {
-        str(int: Int, bool: Boolean): String
-      }
-    `;
-    expect(cycleSDL(sdl)).toEqual(sdl);
-  });
-
   it('Empty Enum', () => {
     const sdl = dedent`
       data EmptyEnum
@@ -176,17 +154,6 @@ describe('Schema Builder', () => {
 
       data Query = {
         hello: Hello
-      }
-    `;
-    expect(cycleSDL(sdl)).toEqual(sdl);
-  });
-
-  it('Simple Enum argument', () => {
-    const sdl = dedent`
-      data Hello = WORLD {}
-
-      data Query = {
-        str(hello: Hello): String
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
@@ -264,32 +231,8 @@ describe('Schema Builder', () => {
 
   it('Simple Input Object', () => {
     const sdl = dedent`
-      data Input = {
+      data Type = {
         int: Int
-      }
-
-      data Query = {
-        field(in: Input): String
-      }
-    `;
-    expect(cycleSDL(sdl)).toEqual(sdl);
-  });
-
-  it('Simple argument field with default', () => {
-    const sdl = dedent`
-      data Query = {
-        str(int: Int = 2): String
-      }
-    `;
-    expect(cycleSDL(sdl)).toEqual(sdl);
-  });
-
-  it('Custom int argument field with default', () => {
-    const sdl = dedent`
-      data CustomScalar = Int
-
-      data Query = {
-        str(int: CustomScalar = 2): String
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
@@ -297,14 +240,10 @@ describe('Schema Builder', () => {
 
   it('Simple type with mutation', () => {
     const sdl = dedent`
-      data Query = {
+      data Type = {
         str: String
         int: Int
         bool: Boolean
-      }
-
-      data Mutation = {
-        addHelloScalars(str: String, int: Int, bool: Boolean): Query
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
@@ -339,9 +278,7 @@ describe('Schema Builder', () => {
         field1: String @deprecated
         field2: Int @deprecated(reason: "Because I said so")
         enum: MyEnum
-        field3(oldArg: String @deprecated, arg: String): String
-        field4(oldArg: String @deprecated(reason: "Why not?"), arg: String): String
-        field5(arg: MyInput): String
+        field5: String
       }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
@@ -357,15 +294,14 @@ describe('Schema Builder', () => {
     ]);
 
     const rootType = getType(schema, 'Query');
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const variant = getVariant(rootType!);
-
-    expect(getField(variant, 'field1')).toEqual(
+    const variant = rootType ? getVariant(rootType): undefined;
+    
+    expect(getField('field1',variant)).toEqual(
       expect.objectContaining({
         deprecationReason: '',
       }),
     );
-    expect(getField(variant,'field2')).toEqual(
+    expect(getField('field2',variant)).toEqual(
       expect.objectContaining({
         deprecationReason: 'Because I said so',
       }),
