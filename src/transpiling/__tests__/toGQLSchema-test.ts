@@ -9,7 +9,7 @@ const matchGQLSnapshot = (src: string) =>
 describe('toGQLSchema', () => {
   it('hello world App', () => {
     matchGQLSnapshot(`
-    resolver Query = {
+    data  Query = {
       hello: String
     }
   `);
@@ -21,18 +21,14 @@ describe('toGQLSchema', () => {
         = Immortal {}
         | Limited { max: Int? }
 
-      resolver God = {
+      data God = {
         name: String
         lifespan: Lifespan
       }
 
-      resolver Deity
+      data Deity
         = God
         | Titan { name: String }
-
-      resolver Query = {
-        deities(lifespan: Lifespan?): [Deity]
-      }
     `);
   });
 });

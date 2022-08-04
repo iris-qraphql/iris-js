@@ -8,7 +8,7 @@ import { typeCheckValue } from '../typeCheckValue';
 const serializeWith = (value: unknown, typeRef: string | TypeNode) => {
   const type: TypeNode =
     typeof typeRef === 'string' ? sampleTypeRef(typeRef) : typeRef;
-  return typeCheckValue(buildSchema(''), value, type);
+  return typeCheckValue(buildSchema('data test = {}'), value, type);
 };
 
 describe('serializeValue', () => {
@@ -253,7 +253,7 @@ describe('circular data types', () => {
         = Leaf { name: String? } 
         | Node
 
-      resolver Query = {
+      data Query = {
         n: NodeType
       }
   `);

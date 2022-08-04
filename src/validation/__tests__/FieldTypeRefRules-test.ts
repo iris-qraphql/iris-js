@@ -10,17 +10,17 @@ const expectSDLErrors = (sdlStr: string) =>
 const resolverField = (name: string) =>
   expectSDLErrors(`
   data SomeScalar = Int
-  resolver SomeObject = { f: SomeObject }
-  resolver SomeUnion = SomeObject
+  data SomeObject = { f: SomeObject }
+  data SomeUnion = SomeObject
   data SomeEnum = ONLY {}
   data SomeInputObject = { val: String }
   directive @SomeDirective on QUERY
 
-  resolver BadObject = {
+  data BadObject = {
       badField: ${name}
   }
   
-  resolver Query = {
+  data Query = {
       f: BadObject
     }
 `);
@@ -28,15 +28,15 @@ const resolverField = (name: string) =>
 describe('Field Rules', () => {
   it('rejects an Input Object type with incorrectly typed fields', () => {
     expectSDLErrors(`
-    resolver Query = {
+    data Query = {
       field(arg: SomeInputObject): String
     }
 
-    resolver SomeObject = {
+    data SomeObject = {
       field: String
     }
 
-    resolver SomeUnion = SomeObject
+    data SomeUnion = SomeObject
 
     data SomeInputObject = {
       badObject: SomeObject
@@ -61,9 +61,9 @@ describe('Field Rules', () => {
       )}`, () => resolverField(type).toEqual([]));
     }
 
-    it('accept data as resolver field type', () => {
+    it('accept data as data field type', () => {
       expectSDLErrors(`
-      resolver Query = {
+      data Query = {
         field: [SomeInputObject]
       }
 

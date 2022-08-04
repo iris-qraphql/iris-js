@@ -20,7 +20,7 @@ describe('Schema Builder', () => {
 
   it('Simple type', () => {
     const sdl = dedent`
-      resolver Query = {
+      data Query = {
         str: String
         int: Int
         float: Float
@@ -40,7 +40,7 @@ describe('Schema Builder', () => {
   });
 
   it('include standard type only if it is used', () => {
-    const schema = buildSchema('resolver Query');
+    const schema = buildSchema('data Query');
 
     // String and Boolean are always included through introspection types
     expect(getType(schema, 'Int')).toEqual(undefined);
@@ -75,13 +75,13 @@ describe('Schema Builder', () => {
       }
 
       """There is nothing inside!"""
-      resolver BlackHole
+      data BlackHole
 
       """With an Enum"""
       data Color = RED {} | GREEN {} | BLUE {}
 
       """What a great type"""
-      resolver Query = {
+      data Query = {
         """And a field to boot"""
         str: String
       }
@@ -105,7 +105,7 @@ describe('Schema Builder', () => {
 
   it('Type modifiers', () => {
     const sdl = dedent`
-      resolver Query = {
+      data Query = {
         nonNullStr: String?
         listOfStrings: [String]
         listOfNonNullStrings: [String?]
@@ -118,7 +118,7 @@ describe('Schema Builder', () => {
 
   it('Recursive type', () => {
     const sdl = dedent`
-      resolver Query = {
+      data Query = {
         str: String
         recurse: Query
       }
@@ -128,12 +128,12 @@ describe('Schema Builder', () => {
 
   it('Two types circular', () => {
     const sdl = dedent`
-      resolver TypeOne = {
+      data TypeOne = {
         str: String
         typeTwo: TypeTwo?
       }
 
-      resolver TypeTwo = {
+      data TypeTwo = {
         str: String?
         typeOne: TypeOne
       }
@@ -143,7 +143,7 @@ describe('Schema Builder', () => {
 
   it('Single argument field', () => {
     const sdl = dedent`
-      resolver Query = {
+      data Query = {
         str(int: Int?): String
         floatToStr(float: Float): String
         idToStr(id: ID?): String
@@ -156,7 +156,7 @@ describe('Schema Builder', () => {
 
   it('Simple type with multiple arguments', () => {
     const sdl = dedent`
-      resolver Query = {
+      data Query = {
         str(int: Int, bool: Boolean): String
       }
     `;
@@ -174,7 +174,7 @@ describe('Schema Builder', () => {
     const sdl = dedent`
       data Hello = WORLD {}
 
-      resolver Query = {
+      data Query = {
         hello: Hello
       }
     `;
@@ -185,7 +185,7 @@ describe('Schema Builder', () => {
     const sdl = dedent`
       data Hello = WORLD {}
 
-      resolver Query = {
+      data Query = {
         str(hello: Hello): String
       }
     `;
@@ -196,7 +196,7 @@ describe('Schema Builder', () => {
     const sdl = dedent`
       data Hello = WO {} | RLD {}
 
-      resolver Query = {
+      data Query = {
         hello: Hello
       }
     `;
@@ -205,20 +205,20 @@ describe('Schema Builder', () => {
 
   it('Empty union', () => {
     const sdl = dedent`
-      resolver EmptyUnion
+      data EmptyUnion
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
   it('Simple Union', () => {
     const sdl = dedent`
-      resolver Hello = World
+      data Hello = World
 
-      resolver Query = {
+      data Query = {
         hello: Hello
       }
 
-      resolver World = {
+      data World = {
         str: String
       }
     `;
@@ -227,17 +227,17 @@ describe('Schema Builder', () => {
 
   it('Multiple Union', () => {
     const sdl = dedent`
-      resolver Hello = WorldOne | WorldTwo
+      data Hello = WorldOne | WorldTwo
 
-      resolver Query = {
+      data Query = {
         hello: Hello
       }
 
-      resolver WorldOne = {
+      data WorldOne = {
         str: String
       }
 
-      resolver WorldTwo = {
+      data WorldTwo = {
         str: String
       }
     `;
@@ -248,7 +248,7 @@ describe('Schema Builder', () => {
     const sdl = dedent`
       data CustomScalar = Int
 
-      resolver Query = {
+      data Query = {
         customScalar: CustomScalar
       }
     `;
@@ -268,7 +268,7 @@ describe('Schema Builder', () => {
         int: Int
       }
 
-      resolver Query = {
+      data Query = {
         field(in: Input): String
       }
     `;
@@ -277,7 +277,7 @@ describe('Schema Builder', () => {
 
   it('Simple argument field with default', () => {
     const sdl = dedent`
-      resolver Query = {
+      data Query = {
         str(int: Int = 2): String
       }
     `;
@@ -288,7 +288,7 @@ describe('Schema Builder', () => {
     const sdl = dedent`
       data CustomScalar = Int
 
-      resolver Query = {
+      data Query = {
         str(int: CustomScalar = 2): String
       }
     `;
@@ -297,13 +297,13 @@ describe('Schema Builder', () => {
 
   it('Simple type with mutation', () => {
     const sdl = dedent`
-      resolver Query = {
+      data Query = {
         str: String
         int: Int
         bool: Boolean
       }
 
-      resolver Mutation = {
+      data Mutation = {
         addHelloScalars(str: String, int: Int, bool: Boolean): Query
       }
     `;
@@ -312,15 +312,15 @@ describe('Schema Builder', () => {
 
   it('Unreferenced type implementing referenced union', () => {
     const sdl = dedent`
-      resolver Concrete = {
+      data Concrete = {
         key: String
       }
 
-      resolver Query = {
+      data Query = {
         union: Union
       }
 
-      resolver Union = Concrete
+      data Union = Concrete
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
@@ -335,7 +335,7 @@ describe('Schema Builder', () => {
         newInput: String
       }
 
-      resolver Query = {
+      data Query = {
         field1: String @deprecated
         field2: Int @deprecated(reason: "Because I said so")
         enum: MyEnum
@@ -385,7 +385,7 @@ describe('Schema Builder', () => {
 
   it('Rejects invalid SDL', () => {
     const sdl = `
-      resolver Query = {
+      data Query = {
         foo: String @unknown
       }
     `;

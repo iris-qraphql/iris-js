@@ -8,7 +8,7 @@ function validSchemaWithField(
 ): IrisSchema {
   return buildSchema(`
     ${kind} ${name} = ${body}
-    resolver Query = {
+    data Query = {
       f: ${name}
     }
   `);
@@ -20,23 +20,23 @@ const validSchema = (src: string) =>
 describe('Type System: Objects must have fields', () => {
   it('accepts an Object type with fields object', () => {
     validSchema(`
-      resolver Query = {
+      data Query = {
         field: SomeObject
       }
 
-      resolver SomeObject = {
+      data SomeObject = {
         field: String
       }
     `);
   });
 
-  it('accept an resolver with empty fields', () => {
+  it('accept an data with empty fields', () => {
     validSchema(`
-      resolver Query = {
+      data Query = {
         test: IncompleteObject
       }
 
-      resolver IncompleteObject
+      data IncompleteObject
     `);
   });
 });
@@ -53,19 +53,19 @@ describe('Type System: Fields args must be properly named', () => {
   describe('Type System: Union types must be valid', () => {
     it('accepts a Union type with member types', () => {
       validSchema(`
-      resolver Query = {
+      data Query = {
         test: GoodUnion
       }
 
-      resolver TypeA = {
+      data TypeA = {
         field: String
       }
 
-      resolver TypeB = {
+      data TypeB = {
         field: String
       }
 
-      resolver GoodUnion 
+      data GoodUnion 
         = TypeA
         | TypeB
     `);
@@ -74,7 +74,7 @@ describe('Type System: Fields args must be properly named', () => {
   describe('Type System: Input Objects must have fields', () => {
     it('accepts an Input Object type with fields', () => {
       validSchema(`
-      resolver Query = {
+      data Query = {
         field(arg: SomeInputObject): String
       }
 
@@ -86,7 +86,7 @@ describe('Type System: Fields args must be properly named', () => {
 
     it('accept empty data type', () => {
       validSchema(`
-      resolver Query = {
+      data Query = {
         field(arg: SomeInputObject): String
       }
 
@@ -96,7 +96,7 @@ describe('Type System: Fields args must be properly named', () => {
 
     it('accepts an Input Object with breakable circular reference', () => {
       validSchema(`
-      resolver Query = {
+      data Query = {
         field(arg: SomeInputObject): String
       }
 
@@ -116,7 +116,7 @@ describe('Type System: Fields args must be properly named', () => {
 
     it('accept recursive data types', () => {
       validSchema(`
-      resolver Query = {
+      data Query = {
         field(arg: SomeInputObject): String
       }
 
@@ -130,7 +130,7 @@ describe('Type System: Fields args must be properly named', () => {
   describe('assertValidSchema', () => {
     it('do not throw on valid schemas', () => {
       validSchema(`
-      resolver Query = {
+      data Query = {
         foo: String
       }
     `);
@@ -138,7 +138,7 @@ describe('Type System: Fields args must be properly named', () => {
 
     // TODO:
     // it('include multiple errors into a description', () => {
-    //   const schema = buildSchema('resolver SomeType');
+    //   const schema = buildSchema('data SomeType');
     //   expect(schema).toEqual([irisError('Query root type must be provided.')]);
     // });
   });

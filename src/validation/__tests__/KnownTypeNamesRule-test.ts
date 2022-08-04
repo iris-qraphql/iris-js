@@ -14,7 +14,7 @@ describe('Validate: Known type names', () => {
   describe('within SDL', () => {
     it('use standard types', () => {
       expectValidSDL(`
-        resolver Query = {
+        data Query = {
           string: String
           int: Int
           float: Float
@@ -26,13 +26,13 @@ describe('Validate: Known type names', () => {
 
     it('reference types defined inside the same document', () => {
       expectValidSDL(`
-        resolver SomeUnion = SomeObject | AnotherObject
+        data SomeUnion = SomeObject | AnotherObject
 
-        resolver SomeObject = {
+        data SomeObject = {
           someScalar(arg: SomeInputObject): SomeScalar
         }
 
-        resolver AnotherObject = {
+        data AnotherObject = {
           foo(arg: SomeInputObject): String
         }
 
@@ -42,7 +42,7 @@ describe('Validate: Known type names', () => {
 
         data SomeScalar = String
 
-        resolver Query = {
+        data Query = {
           someUnion: SomeUnion
           someScalar: SomeScalar
           someObject: SomeObject
@@ -53,14 +53,14 @@ describe('Validate: Known type names', () => {
     it('unknown type references', () => {
       expect(
         getSDLErrors(`
-        resolver A
-        resolver B
+        data A
+        data B
 
-        resolver SomeObject = {
+        data SomeObject = {
           e(d: D): E
         }
 
-        resolver SomeUnion = F | G
+        data SomeUnion = F | G
 
         data SomeInput = {
           j: J

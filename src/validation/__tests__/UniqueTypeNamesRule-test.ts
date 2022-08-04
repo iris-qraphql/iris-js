@@ -11,21 +11,21 @@ const expectValidSDL = (sdlStr: string) => expectSDLErrors(sdlStr).toEqual([]);
 describe('Validate: Unique type names', () => {
   it('one type', () => {
     expectValidSDL(`
-      resolver Foo
+      data Foo
     `);
   });
 
   it('many types', () => {
     expectValidSDL(`
-      resolver Foo
-      resolver Bar
-      resolver Baz
+      data Foo
+      data Bar
+      data Baz
     `);
   });
 
   it('types named the same', () => {
     expectSDLErrors(`
-      resolver Foo
+      data Foo
       data Foo
       data Foo
     `).toMatchSnapshot();
@@ -35,14 +35,14 @@ describe('Validate: Unique type names', () => {
 describe('Validate: Unique field definition names', () => {
   it('no fields', () => {
     expectValidSDL(`
-      resolver SomeObject
+      data SomeObject
       data SomeInputObject
     `);
   });
 
   it('one field', () => {
     expectValidSDL(`
-      resolver SomeObject = {
+      data SomeObject = {
         foo: String
       }
 
@@ -54,7 +54,7 @@ describe('Validate: Unique field definition names', () => {
 
   it('multiple fields', () => {
     expectValidSDL(`
-      resolver SomeObject = {
+      data SomeObject = {
         foo: String
         bar: String
       }
@@ -68,7 +68,7 @@ describe('Validate: Unique field definition names', () => {
 
   it('duplicate fields inside the same type definition', () => {
     expectSDLErrors(`
-      resolver SomeObject = {
+      data SomeObject = {
         foo: String
         bar: String
         foo: String
@@ -87,7 +87,7 @@ describe('Validate: Unique variant definition names', () => {
   it('multiple variants', () => {
     expectValidSDL(`
       data SomData = A {} | B {}
-      resolver SomeResolver = A {} | B {}
+      data Somedata = A {} | B {}
     `);
   });
 
@@ -98,7 +98,7 @@ describe('Validate: Unique variant definition names', () => {
         | B {}
         | A {}
 
-      resolver SomeResolver 
+      data Somedata 
         = C {} 
         | D {}
         | D {}
@@ -109,7 +109,7 @@ describe('Validate: Unique variant definition names', () => {
 describe('Validate: Unique argument definition names', () => {
   it('no args', () => {
     expectValidSDL(`
-      resolver SomeObject = {
+      data SomeObject = {
         someField: String
       }
 
@@ -119,14 +119,14 @@ describe('Validate: Unique argument definition names', () => {
 
   it('one argument', () => {
     expectValidSDL(`
-      resolver SomeObject = { someField(foo: String): String }
+      data SomeObject = { someField(foo: String): String }
       directive @someDirective(foo: String) on QUERY
     `);
   });
 
   it('multiple arguments', () => {
     expectValidSDL(`
-      resolver SomeObject = {
+      data SomeObject = {
         someField(
           foo: String
           bar: String
@@ -142,7 +142,7 @@ describe('Validate: Unique argument definition names', () => {
 
   it('duplicating arguments', () => {
     expectSDLErrors(`
-      resolver SomeObject = {
+      data SomeObject = {
         someField(
           foo: String
           bar: String

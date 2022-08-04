@@ -9,12 +9,12 @@ const cycle = (src: string) =>
 describe('Type System: Schema', () => {
   it('Define sample schema', () => {
     cycle(`
-      resolver Query = {
+      data Query = {
         article(id: String): Article
         feed: [Article]
       }
 
-      resolver Article = {
+      data Article = {
         id: String
         isPublished: Boolean
         author: Author
@@ -22,24 +22,24 @@ describe('Type System: Schema', () => {
         body: String
       }
 
-      resolver Author = {
+      data Author = {
         id: String
         name: String
         pic(width: Int, height: Int): Image
         recentArticle: Article
       }
 
-      resolver Image = {
+      data Image = {
         url: String
         width: Int
         height: Int
       }
 
-      resolver Mutation = {
+      data Mutation = {
         writeArticle: Article
       }
 
-      resolver Subscription = {
+      data Subscription = {
         articleSubscribe(id: String): Article
       }
     `);
@@ -50,7 +50,7 @@ describe('Type System: Schema', () => {
       const schema = buildSchema(`
        data Foo 
        data Bar
-       resolver Query = {}
+       data Query = {}
       `);
 
       expect(Object.keys(schema.types)).toEqual(
@@ -65,7 +65,7 @@ describe('Type System: Schema', () => {
       // it('rejects a Schema which redefines a built-in type', () => {
       //   const schema = buildSchema(`
       //       data String
-      //       resolver Query = {
+      //       data Query = {
       //         fakeString: String
       //       }
       //   `);
@@ -78,8 +78,8 @@ describe('Type System: Schema', () => {
       it('rejects a Schema which defines an object type twice', () => {
         expect(() =>
           buildSchema(`
-            resolver SameName
-            resolver SameName
+            data SameName
+            data SameName
           `),
         ).toThrowErrorMatchingSnapshot();
       });
