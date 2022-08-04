@@ -151,10 +151,6 @@ describe('Schema Builder', () => {
   it('Simple output Enum', () => {
     const sdl = dedent`
       data Hello = WORLD {}
-
-      data Query = {
-        hello: Hello
-      }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
@@ -162,10 +158,6 @@ describe('Schema Builder', () => {
   it('Multiple value Enum', () => {
     const sdl = dedent`
       data Hello = WO {} | RLD {}
-
-      data Query = {
-        hello: Hello
-      }
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
@@ -231,16 +223,7 @@ describe('Schema Builder', () => {
 
   it('Simple Input Object', () => {
     const sdl = dedent`
-      data Type = {
-        int: Int
-      }
-    `;
-    expect(cycleSDL(sdl)).toEqual(sdl);
-  });
-
-  it('Simple type with mutation', () => {
-    const sdl = dedent`
-      data Type = {
+      data Type = Type {
         str: String
         int: Int
         bool: Boolean

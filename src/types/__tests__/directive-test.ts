@@ -33,14 +33,4 @@ describe('Type System: Directive', () => {
       '[object GraphQLDirective]',
     );
   });
-
-  it('rejects a directive with invalid name', () => {
-    expect(
-      () =>
-        new GraphQLDirective({
-          name: 'bad-name',
-          locations: [IrisDirectiveLocation.QUERY],
-        }),
-    ).toThrow('Names must only contain [_a-zA-Z0-9] but "bad-name" does not.');
-  });
 });

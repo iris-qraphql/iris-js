@@ -29,11 +29,11 @@ describe('Validate: Known type names', () => {
         data SomeUnion = SomeObject | AnotherObject
 
         data SomeObject = {
-          someScalar(arg: SomeInputObject): SomeScalar
+          someScalar: SomeScalar
         }
 
         data AnotherObject = {
-          foo(arg: SomeInputObject): String
+          foo: String
         }
 
         data  SomeInputObject = {
@@ -57,7 +57,8 @@ describe('Validate: Known type names', () => {
         data B
 
         data SomeObject = {
-          e(d: D): E
+          d: D
+          e: E
         }
 
         data SomeUnion = F | G

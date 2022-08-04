@@ -81,7 +81,7 @@ const printDocASTReducer: ASTReducer<string> = {
       ),
   },
 
-  VariantDefinition: { leave: ({ name }) => name + block([]) },
+  VariantDefinition: { leave: ({ name , fields}) => fields === undefined ? name : name + ' ' + block(fields)  },
 
   DirectiveDefinition: {
     leave: ({ description, name, arguments: args, repeatable, locations }) =>
