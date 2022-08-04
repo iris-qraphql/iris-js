@@ -3,16 +3,11 @@
  *
  * @packageDocumentation
  */
-import type { ResolverMap } from './transpiling/toTSDefinitions';
+
 import { toTSDefinitions } from './transpiling/toTSDefinitions';
 import { buildSchema } from './types/schema';
 
 export { graphql } from 'graphql';
 export { version, versionInfo } from './version';
 
-type Options = {
-  resolvers?: ResolverMap;
-};
-
-export const irisSchema = (src: string, { resolvers }: Options = {}) =>
-  toTSDefinitions(buildSchema(src), resolvers);
+export const irisSchema = (src: string) => toTSDefinitions(buildSchema(src));

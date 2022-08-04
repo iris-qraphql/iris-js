@@ -21,7 +21,7 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
   for (const directive of specifiedDirectives) {
     requiredArgsMap[directive.name] = keyMap(
       directive.args.filter(isRequiredArgument),
-      (arg) => arg.name,
+      (arg) => arg.name.value,
     );
   }
 

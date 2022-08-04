@@ -16,7 +16,7 @@ export function KnownArgumentNamesOnDirectivesRule(
 
   const definedDirectives = specifiedDirectives;
   for (const directive of definedDirectives) {
-    directiveArgs[directive.name] = directive.args.map((arg) => arg.name);
+    directiveArgs[directive.name] = directive.args.map((arg) => arg.name.value);
   }
 
   const astDefinitions = context.getDocument().definitions;
