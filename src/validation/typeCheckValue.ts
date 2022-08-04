@@ -1,14 +1,14 @@
-
 import { isNil } from 'ramda';
 
 import { irisError } from '../error';
 import type {
   FieldDefinitionNode,
-  TypeDefinitionNode,
   TypeNode,
   VariantDefinitionNode,
 } from '../types/ast';
+import { getVariant } from '../types/ast';
 import { IrisKind } from '../types/kinds';
+import type { IrisSchema } from '../types/schema';
 import { inspect } from '../utils/legacy';
 import { isIterableObject, isObjectLike } from '../utils/ObjMap';
 import type { IrisMaybe, Maybe } from '../utils/type-level';
@@ -18,31 +18,32 @@ const cannotRepresent = <T>(value: unknown, type: T) =>
 
 type JSON = unknown;
 
-type Serializer<T> = (value: unknown, type: T) => Maybe<JSON>;
+type Serializer<T> = (
+  schema: IrisSchema,
+  value: unknown,
+  type: T,
+) => Maybe<JSON>;
 
-export const typeCheckValue: Serializer<TypeNode> = (
-  value,
-  type,
-) => {
+export const typeCheckValue: Serializer<TypeNode> = (schema, value, type) => {
   switch (type.kind) {
     case IrisKind.MAYBE_TYPE:
-      return isNil(value) ? null : typeCheckValue(value, type.type);
-    case IrisKind.LIST_TYPE : {
-      return serializeList(value, type.type);
+      return isNil(value) ? null : typeCheckValue(schema, value, type.type);
+    case IrisKind.LIST_TYPE: {
+      return serializeList(schema, value, type.type);
     }
     case IrisKind.NAMED_TYPE:
-      return parseDataType(value, type.name);
+      return parseDataType(schema, value, type.name.value);
   }
 };
 
-const serializeList: Serializer<TypeNode> = (value, type) => {
+const serializeList: Serializer<TypeNode> = (schema, value, type) => {
   if (!isIterableObject(value)) {
-    throw cannotRepresent(value, `[${type}]`);
+    throw cannotRepresent(value, `[${type.kind}]`);
   }
 
   const valuesNodes = [];
   for (const item of value) {
-    valuesNodes.push(typeCheckValue(item, type));
+    valuesNodes.push(typeCheckValue(schema, item, type));
   }
 
   return valuesNodes;
@@ -53,7 +54,7 @@ export type IrisVariantValue = {
   fields: Record<string, unknown>;
 };
 
-const parseDataType: Serializer<TypeDefinitionNode> = (value, type) => {
+const parseDataType: Serializer<string> = (schema, value, type) => {
   if (isNil(value)) {
     throw cannotRepresent(value, type);
   }
@@ -68,17 +69,26 @@ const parseDataType: Serializer<TypeDefinitionNode> = (value, type) => {
   //   return serialized;
   // }
 
-  return parseVariantWith(parseVariantValue, value, type);
+  return parseVariantWith(
+    schema,
+    (x, y) => parseVariantValue(schema, x, y),
+    value,
+    type,
+  );
 };
 
 export const parseVariantWith = <T>(
+  schema: IrisSchema,
   f: (o: IrisVariantValue, v: VariantDefinitionNode) => T,
   value: unknown,
-  type: TypeDefinitionNode,
+  typeName: string,
 ): T => {
+  const type = schema.types[typeName];
   const object = toVariantObject(value, type.name.value);
-  const variant = type.variantBy(object.name);
-  const variantType = variant.type ? variant.type.variantBy() : variant;
+  const variant = getVariant(type, object.name);
+  const variantType = variant.fields
+    ? variant
+    : getVariant(schema.types[variant.name.value]);
   return f(object, variantType);
 };
 
@@ -103,10 +113,12 @@ export const isEmptyVariant = (
   variantFields: Array<FieldDefinitionNode>,
 ): boolean =>
   Boolean(name) &&
-  variantFields.filter(({ type }) => type.kind !== IrisKind.MAYBE_TYPE).length === 0 &&
+  variantFields.filter(({ type }) => type.kind !== IrisKind.MAYBE_TYPE)
+    .length === 0 &&
   Object.values(fields).length === 0;
 
 const parseVariantValue = (
+  schema: IrisSchema,
   object: IrisVariantValue,
   variant: VariantDefinitionNode,
 ): IrisMaybe<JSON> => {
@@ -120,7 +132,7 @@ const parseVariantValue = (
   const fieldNodes: Record<string, JSON> = __typename ? { __typename } : {};
 
   for (const { name, type } of variantFields) {
-    fieldNodes[name.value] = typeCheckValue(fields[name.value], type);
+    fieldNodes[name.value] = typeCheckValue(schema, fields[name.value], type);
   }
 
   return fieldNodes;

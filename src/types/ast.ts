@@ -243,3 +243,19 @@ export const getRefTypeName = (node: TypeNode): NameNode => {
       return getRefTypeName(node.type);
   }
 };
+
+export const getVariant = (
+  _type: TypeDefinitionNode,
+  _name?: string,
+): VariantDefinitionNode => {
+  throw new Error('implement me');
+};
+
+
+
+export const liftType = (t: TypeDefinitionNode): TypeNode => 
+  ({
+    kind: IrisKind.NAMED_TYPE,
+    name: t.name,
+  });
+

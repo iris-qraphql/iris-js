@@ -1,17 +1,16 @@
-import type { IrisTypeDefinition, IrisTypeRef } from '../../types/definition';
-import { liftType } from '../../types/definition';
-import { buildSchema, getType } from '../../types/schema';
+import type { TypeNode } from '../../types/ast';
+import { liftType } from '../../types/ast';
+import { buildSchema } from '../../types/schema';
 import { sampleTypeRef } from '../../utils/generators';
 
 import { typeCheckValue } from '../typeCheckValue';
 
-const serializeWith = (
-  value: unknown,
-  typeRef: string | IrisTypeRef<'data'>,
-) => {
-  const type: IrisTypeRef<'data'> =
-    typeof typeRef === 'string' ? sampleTypeRef<'data'>(typeRef) : typeRef;
-  return typeCheckValue(value, type);
+const serializeWith = (value: unknown, typeRef: string | TypeNode) => {
+  const schema = undefined;
+
+  const type: TypeNode =
+    typeof typeRef === 'string' ? sampleTypeRef(typeRef) : typeRef;
+  return typeCheckValue(schema, value, type);
 };
 
 describe('serializeValue', () => {
@@ -115,7 +114,7 @@ describe('serializeValue', () => {
     }
   `;
 
-  const type = (t: string) => sampleTypeRef<'data'>(t, definitions);
+  const type = (t: string) => sampleTypeRef(t, definitions);
 
   it('converts string values to Enum ASTs if possible', () => {
     expect(serializeWith('HELLO', type('MyEnum'))).toEqual('HELLO');
@@ -195,10 +194,7 @@ describe('parse simple data variants', () => {
   const leaf = (name: string) => ({ __typename: 'Leaf', name });
 
   const parseNode = (n: unknown) =>
-    serializeWith(
-      n,
-      liftType(getType(schema, 'NodeType') as IrisTypeDefinition<'data'>),
-    );
+    serializeWith(n, liftType(schema.types.NodeType));
 
   it("don't accept non data values", () => {
     expect(() => parseNode(['Leaf'])).toThrowErrorMatchingSnapshot();
@@ -270,9 +266,8 @@ describe('circular data types', () => {
   });
   const leaf = (name?: string) => ({ __typename: 'Leaf', name });
 
-  const nodeType = liftType(
-    getType(schema, 'NodeType') as IrisTypeDefinition<'data'>,
-  );
+  const nodeType = liftType(schema.types.NodeType);
+
   const parseNode = (n: unknown) => serializeWith(n, nodeType);
 
   it('ignore optional fields variants', () => {

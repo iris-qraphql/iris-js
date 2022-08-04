@@ -2,8 +2,8 @@ import { print } from '../../printing/printer';
 import { dedent } from '../../utils/dedent';
 import type { ObjMap } from '../../utils/ObjMap';
 
-import type { IrisField } from '../definition';
-import { IrisScalars } from '../definition';
+import type { FieldDefinitionNode} from '../ast';
+import {getVariant } from '../ast';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { buildSchema, getDirective, getType } from '../schema';
 
@@ -357,9 +357,8 @@ describe('Schema Builder', () => {
       { name: 'OTHER_VALUE', deprecationReason: 'Terrible reasons' },
     ]);
 
-    const rootFields =
-      getType(schema, 'Query')?.variantBy().fields ??
-      ({} as ObjMap<IrisField<'resolver'>>);
+    const rootType = getType(schema, 'Query');
+    const rootFields = rootType ? getVariant(rootType).fields ?? ({} as ObjMap<FieldDefinitionNode>) : {};
 
     expect(rootFields.field1).toEqual(
       expect.objectContaining({

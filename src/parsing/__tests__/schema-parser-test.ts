@@ -11,9 +11,9 @@ const snapshot = (doc: string) =>
   expect(toJSONDeep(parse(doc))).toMatchSnapshot();
 
 describe('Schema Parser', () => {
-  it('Simple resolver', () => {
+  it('Simple data', () => {
     snapshot(dedent`
-      resolver Hello = {
+      data Hello = {
         world: String
       }
     `);
@@ -22,7 +22,7 @@ describe('Schema Parser', () => {
   it('parses resolver with description string', () => {
     snapshot(dedent`
       "Description"
-      resolver Hello = {
+      data Hello = {
         world: String
       }
     `);

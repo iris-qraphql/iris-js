@@ -1,11 +1,10 @@
-import { printSchema } from 'graphql';
 
 import { buildSchema } from '../../types/schema';
 
 import { toTSDefinitions } from '../toTSDefinitions';
 
 const matchGQLSnapshot = (src: string) =>
-  expect(printSchema(toTSDefinitions(buildSchema(src)))).toMatchSnapshot();
+  expect(toTSDefinitions(buildSchema(src))).toMatchSnapshot();
 
 describe('toGQLSchema', () => {
   it('hello world App', () => {

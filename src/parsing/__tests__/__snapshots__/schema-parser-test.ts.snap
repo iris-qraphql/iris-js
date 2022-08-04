@@ -118,6 +118,88 @@ Object {
 }
 `;
 
+exports[`Schema Parser Simple data 1`] = `
+Object {
+  "definitions": Array [
+    Object {
+      "description": undefined,
+      "directives": Array [],
+      "kind": "TypeDefinition",
+      "loc": Object {
+        "end": 32,
+        "start": 0,
+      },
+      "name": Object {
+        "kind": "Name",
+        "loc": Object {
+          "end": 10,
+          "start": 5,
+        },
+        "value": "Hello",
+      },
+      "variants": Array [
+        Object {
+          "description": undefined,
+          "directives": Array [],
+          "fields": Array [
+            Object {
+              "description": undefined,
+              "directives": Array [],
+              "kind": "FieldDefinition",
+              "loc": Object {
+                "end": 30,
+                "start": 17,
+              },
+              "name": Object {
+                "kind": "Name",
+                "loc": Object {
+                  "end": 22,
+                  "start": 17,
+                },
+                "value": "world",
+              },
+              "type": Object {
+                "kind": "NamedType",
+                "loc": Object {
+                  "end": 30,
+                  "start": 24,
+                },
+                "name": Object {
+                  "kind": "Name",
+                  "loc": Object {
+                    "end": 30,
+                    "start": 24,
+                  },
+                  "value": "String",
+                },
+              },
+            },
+          ],
+          "kind": "VariantDefinition",
+          "loc": Object {
+            "end": 32,
+            "start": 13,
+          },
+          "name": Object {
+            "kind": "Name",
+            "loc": Object {
+              "end": 10,
+              "start": 5,
+            },
+            "value": "Hello",
+          },
+        },
+      ],
+    },
+  ],
+  "kind": "Document",
+  "loc": Object {
+    "end": 32,
+    "start": 0,
+  },
+}
+`;
+
 exports[`Schema Parser Simple data object 1`] = `
 Object {
   "definitions": Array [
