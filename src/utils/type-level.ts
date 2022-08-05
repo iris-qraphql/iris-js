@@ -20,3 +20,8 @@ export const lookupObjectTypename = (
 };
 
 export const notNill = <T>(x: Maybe<T>): x is T => Boolean(x);
+
+export const omitNil = <O extends Record<string, unknown>>(o: O): O =>
+  Object.fromEntries(
+    Object.entries(o).filter(([_, v]) => v !== undefined),
+  ) as O;

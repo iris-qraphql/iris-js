@@ -1,4 +1,3 @@
-import type { ParseOptions } from 'graphql';
 import { Kind, Location, Source } from 'graphql';
 
 import type { IrisError } from '../error';
@@ -35,18 +34,14 @@ import type {
   VariableNode,
   VariantDefinitionNode,
 } from '../types/ast';
-import {  IrisKind, TokenKind } from '../types/kinds';
+import { IrisKind, TokenKind } from '../types/kinds';
 import { instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 
-
-function parseValue(
-  source: string | Source,
-  options?: ParseOptions,
-): ConstValueNode {
-  const parser = new Parser(source, options);
+function parseValue(source: string | Source): ConstValueNode {
+  const parser = new Parser(source);
   parser.expectToken(TokenKind.SOF);
   const value = parser.parseConstValueLiteral();
   parser.expectToken(TokenKind.EOF);
@@ -63,8 +58,8 @@ function parseValue(
  *
  * Consider providing the results to the utility function: typeFromAST().
  */
-function parseType(source: string | Source, options?: ParseOptions): TypeNode {
-  const parser = new Parser(source, options);
+function parseType(source: string | Source): TypeNode {
+  const parser = new Parser(source);
   parser.expectToken(TokenKind.SOF);
   const type = parser.parseTypeReference();
   parser.expectToken(TokenKind.EOF);
@@ -89,13 +84,9 @@ function isSource(source: unknown): source is Source {
 class Parser {
   _lexer: Lexer;
 
-  protected _options: Maybe<ParseOptions>;
-
-  constructor(source: string | Source, options?: ParseOptions) {
+  constructor(source: string | Source) {
     const sourceObj = isSource(source) ? source : new Source(source);
-
     this._lexer = new Lexer(sourceObj);
-    this._options = options;
   }
 
   /**
@@ -444,7 +435,6 @@ class Parser {
     });
   }
 
-
   // Core parsing utility functions
 
   /**
@@ -453,13 +443,11 @@ class Parser {
    * given parsed object.
    */
   node<T extends { loc?: Location }>(startToken: Token, node: T): T {
-    if (this._options?.noLocation !== true) {
-      node.loc = new Location(
-        startToken,
-        this._lexer.lastToken,
-        this._lexer.source,
-      );
-    }
+    node.loc = new Location(
+      startToken,
+      this._lexer.lastToken,
+      this._lexer.source,
+    );
     return node;
   }
 
@@ -640,8 +628,8 @@ function getTokenKindDesc(kind: TokenKind): string {
   return isPunctuatorTokenKind(kind) ? `"${kind}"` : kind;
 }
 
-const parse = (source: string | Source, options?: ParseOptions): DocumentNode =>
-  parseDocument(new Parser(source, options));
+const parse = (source: string | Source): DocumentNode =>
+  parseDocument(new Parser(source));
 
 type FParser<T> = (parser: Parser) => T;
 
