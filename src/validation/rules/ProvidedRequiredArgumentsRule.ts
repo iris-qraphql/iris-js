@@ -1,6 +1,6 @@
 import { irisError } from '../../error';
 import type { ArgumentDefinitionNode } from '../../types/ast';
-import { isRequiredArgument ,specifiedDirectives} from '../../types/ast';
+import { isRequiredArgument, specifiedDirectives } from '../../types/ast';
 import { inspect } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 import { keyMap } from '../../utils/ObjMap';
@@ -48,4 +48,3 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
     },
   };
 }
-

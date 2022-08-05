@@ -1,30 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`toGQLSchema hello world App 1`] = `
-"type Query {
-  hello: String!
+"type Query = {
+  __typename: \\"Query\\"
+  hello: String
 }"
 `;
 
 exports[`toGQLSchema hello world App 2`] = `
-"\\"\\"\\"
-@typedef {{ __typename: \\"Limited\\", max: ?Int }} Lifespan_Limited
-@type {(\\"Immortal\\" | Lifespan_Limited)}
-\\"\\"\\"
-scalar Lifespan
-
-type God {
-  name: String!
-  lifespan: Lifespan!
+"type Lifespan = {
+  __typename: \\"Immortal\\"
+} | {
+  __typename: \\"Limited\\"
+  max: Maybe<Int>
 }
 
-union Deity = God | Deity_Titan
-
-type Deity_Titan {
-  name: String!
+type God = {
+  __typename: \\"God\\"
+  name: String
+  lifespan: Lifespan
 }
 
-type Query {
-  deities(lifespan: Lifespan): [Deity!]!
+type Deity = God | {
+  __typename: \\"Titan\\"
+  name: String
 }"
 `;

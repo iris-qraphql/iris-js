@@ -69,6 +69,6 @@ export function UniqueNamesRule(context: IrisValidationContext): ASTVisitor {
 
         uniq(fields, (name) => `Field "${variantName}.${name}"`);
       }
-    }
+    },
   };
 }

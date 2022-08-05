@@ -14,7 +14,7 @@ type IrisSchema = {
   readonly document: DocumentNode;
 };
 
-export const buildSchema = (source: string,): IrisSchema => {
+export const buildSchema = (source: string): IrisSchema => {
   const document = parse(source);
   const errors = validateSDL(document);
 

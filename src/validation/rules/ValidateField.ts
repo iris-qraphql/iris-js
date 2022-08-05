@@ -19,6 +19,6 @@ export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
       }
 
       return false;
-    }
+    },
   };
 }

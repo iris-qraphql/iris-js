@@ -52,7 +52,7 @@ export class IrisError extends Error {
     const nodePositions = positions ?? nodeLocations?.map((loc) => loc.start);
 
     this.source = source ?? nodeLocations?.[0]?.source;
-    
+
     this.locations =
       nodePositions && source
         ? nodePositions.map((pos) => getLocation(source, pos))

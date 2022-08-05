@@ -1,5 +1,5 @@
 import { getDeprecationReason, getVariant } from '../../types/ast';
-import { buildSchema,  getType } from '../../types/schema';
+import { buildSchema, getType } from '../../types/schema';
 import { dedent } from '../../utils/dedent';
 
 import { print } from '../printer';
@@ -85,7 +85,6 @@ describe('Schema Builder', () => {
     expect(getType(schema, 'ID')).toEqual(undefined);
   });
 
-
   it('Supports descriptions', () => {
     const sdl = dedent`
       """This is a data type"""
@@ -102,8 +101,6 @@ describe('Schema Builder', () => {
     `;
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
-
-
 
   it('Type modifiers', () => {
     const sdl = dedent`
