@@ -64,10 +64,9 @@ describe('Validate: Known type names', () => {
         data SomeUnion = F | G
 
         data SomeInput = {
-          j: J
+          j: J,
+          k: K
         }
-
-        directive @SomeDirective(k: K) on QUERY
       `),
       ).toMatchSnapshot();
     });

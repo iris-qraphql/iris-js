@@ -1,8 +1,6 @@
 import { irisError } from '../../error';
 import type { ArgumentDefinitionNode } from '../../types/ast';
-import { isRequiredArgument } from '../../types/ast';
-import { specifiedDirectives } from '../../types/directives';
-import { IrisKind } from '../../types/kinds';
+import { isRequiredArgument ,specifiedDirectives} from '../../types/ast';
 import { inspect } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 import { keyMap } from '../../utils/ObjMap';
@@ -23,18 +21,6 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
       directive.args.filter(isRequiredArgument),
       (arg) => arg.name.value,
     );
-  }
-
-  const astDefinitions = context.getDocument().definitions;
-  for (const def of astDefinitions) {
-    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
-      const argNodes = def.arguments ?? [];
-
-      requiredArgsMap[def.name.value] = keyMap(
-        argNodes.filter(isRequiredArgumentNode),
-        (arg) => arg.name.value,
-      );
-    }
   }
 
   return {
@@ -63,6 +49,3 @@ export function ProvidedRequiredArgumentsOnDirectivesRule(
   };
 }
 
-function isRequiredArgumentNode(arg: ArgumentDefinitionNode): boolean {
-  return arg.type.kind !== IrisKind.MAYBE_TYPE && arg.defaultValue == null;
-}

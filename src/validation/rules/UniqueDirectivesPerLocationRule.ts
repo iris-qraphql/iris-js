@@ -1,7 +1,5 @@
 import { irisError } from '../../error';
-import { isTypeDefinitionNode } from '../../types/ast';
-import { specifiedDirectives } from '../../types/directives';
-import { IrisKind } from '../../types/kinds';
+import { isTypeDefinitionNode, specifiedDirectives } from '../../types/ast';
 import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
@@ -21,13 +19,6 @@ export function UniqueDirectivesPerLocationRule(
 
   for (const directive of specifiedDirectives) {
     uniqueDirectiveMap[directive.name] = true;
-  }
-
-  const astDefinitions = context.getDocument().definitions;
-  for (const def of astDefinitions) {
-    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
-      uniqueDirectiveMap[def.name.value] = !def.repeatable;
-    }
   }
 
   const typeDirectivesMap = Object.create(null);

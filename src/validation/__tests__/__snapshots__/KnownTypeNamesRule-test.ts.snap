@@ -50,8 +50,8 @@ Array [
   Object {
     "locations": Array [
       Object {
-        "column": 37,
-        "line": 16,
+        "column": 14,
+        "line": 14,
       },
     ],
     "message": "Unknown type \\"K\\". Did you mean \\"A\\" or \\"B\\"?",

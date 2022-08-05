@@ -1,6 +1,5 @@
-import { Kind } from 'graphql';
-
 import type { ObjectFieldNode } from '../types/ast';
+import { GQLKind } from '../types/kinds';
 
 import type { ObjMap } from './ObjMap';
 
@@ -17,7 +16,7 @@ export const lookupObjectTypename = (
   obj: ObjMap<ObjectFieldNode>,
 ): string | undefined => {
   const variantType = obj.__typename?.value;
-  return variantType?.kind === Kind.STRING ? variantType.value : undefined;
+  return variantType?.kind === GQLKind.STRING ? variantType.value : undefined;
 };
 
 export const notNill = <T>(x: Maybe<T>): x is T => Boolean(x);

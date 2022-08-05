@@ -1,9 +1,6 @@
 import { irisError } from '../../error';
 import type { ASTNode } from '../../types/ast';
-import {
-  isDirectiveDefinitionNode,
-  isTypeDefinitionNode,
-} from '../../types/ast';
+import { isTypeDefinitionNode } from '../../types/ast';
 import { scalarNames } from '../../types/kinds';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 import type { ASTVisitor } from '../../utils/visitor';
@@ -82,8 +79,5 @@ export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
 }
 
 function isSDLNode(value: ASTNode | ReadonlyArray<ASTNode>): boolean {
-  return (
-    'kind' in value &&
-    (isDirectiveDefinitionNode(value) || isTypeDefinitionNode(value))
-  );
+  return 'kind' in value && isTypeDefinitionNode(value);
 }

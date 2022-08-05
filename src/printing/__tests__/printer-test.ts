@@ -85,23 +85,9 @@ describe('Schema Builder', () => {
     expect(getType(schema, 'ID')).toEqual(undefined);
   });
 
-  it('With directives', () => {
-    const sdl = dedent`
-      directive @foo(arg: Int) on FIELD
-
-      directive @repeatableFoo(arg: Int) repeatable on FIELD
-    `;
-    expect(cycleSDL(sdl)).toEqual(sdl);
-  });
 
   it('Supports descriptions', () => {
     const sdl = dedent`
-      """This is a directive"""
-      directive @foo(
-        """It has an argument"""
-        arg: Int
-      ) on FIELD
-
       """This is a data type"""
       data Foo = Foo {
         """It has a field"""

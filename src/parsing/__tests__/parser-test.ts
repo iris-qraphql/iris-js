@@ -1,5 +1,4 @@
-import { Kind } from 'graphql';
-
+import { GQLKind } from '../../types/kinds';
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
 import { parse } from '../index';
@@ -51,7 +50,7 @@ describe('Parser', () => {
     it('parses null value', () => {
       const result = parseValue('null');
       expectJSON(result).toEqual({
-        kind: Kind.NULL,
+        kind: GQLKind.NULL,
         loc: { start: 0, end: 4 },
       });
     });
@@ -59,16 +58,16 @@ describe('Parser', () => {
     it('parses list values', () => {
       const result = parseValue('[123 "abc"]');
       expectJSON(result).toEqual({
-        kind: Kind.LIST,
+        kind: GQLKind.LIST,
         loc: { start: 0, end: 11 },
         values: [
           {
-            kind: Kind.INT,
+            kind: GQLKind.INT,
             loc: { start: 1, end: 4 },
             value: '123',
           },
           {
-            kind: Kind.STRING,
+            kind: GQLKind.STRING,
             loc: { start: 5, end: 10 },
             value: 'abc',
             block: false,
@@ -80,17 +79,17 @@ describe('Parser', () => {
     it('parses block strings', () => {
       const result = parseValue('["""long""" "short"]');
       expectJSON(result).toEqual({
-        kind: Kind.LIST,
+        kind: GQLKind.LIST,
         loc: { start: 0, end: 20 },
         values: [
           {
-            kind: Kind.STRING,
+            kind: GQLKind.STRING,
             loc: { start: 1, end: 11 },
             value: 'long',
             block: true,
           },
           {
-            kind: Kind.STRING,
+            kind: GQLKind.STRING,
             loc: { start: 12, end: 19 },
             value: 'short',
             block: false,
@@ -102,22 +101,22 @@ describe('Parser', () => {
     it('allows variables', () => {
       const result = parseValue('{ field: $var }');
       expectJSON(result).toEqual({
-        kind: Kind.OBJECT,
+        kind: GQLKind.OBJECT,
         loc: { start: 0, end: 15 },
         fields: [
           {
-            kind: Kind.OBJECT_FIELD,
+            kind: GQLKind.OBJECT_FIELD,
             loc: { start: 2, end: 13 },
             name: {
-              kind: Kind.NAME,
+              kind: GQLKind.NAME,
               loc: { start: 2, end: 7 },
               value: 'field',
             },
             value: {
-              kind: Kind.VARIABLE,
+              kind: GQLKind.VARIABLE,
               loc: { start: 9, end: 13 },
               name: {
-                kind: Kind.NAME,
+                kind: GQLKind.NAME,
                 loc: { start: 10, end: 13 },
                 value: 'var',
               },
@@ -148,16 +147,16 @@ describe('Parser', () => {
     it('parses values', () => {
       const result = parseConstValue('[123 "abc"]');
       expectJSON(result).toEqual({
-        kind: Kind.LIST,
+        kind: GQLKind.LIST,
         loc: { start: 0, end: 11 },
         values: [
           {
-            kind: Kind.INT,
+            kind: GQLKind.INT,
             loc: { start: 1, end: 4 },
             value: '123',
           },
           {
-            kind: Kind.STRING,
+            kind: GQLKind.STRING,
             loc: { start: 5, end: 10 },
             value: 'abc',
             block: false,
@@ -178,10 +177,10 @@ describe('Parser', () => {
     it('parses well known types', () => {
       const result = parseType('String');
       expectJSON(result).toEqual({
-        kind: Kind.NAMED_TYPE,
+        kind: GQLKind.NAMED_TYPE,
         loc: { start: 0, end: 6 },
         name: {
-          kind: Kind.NAME,
+          kind: GQLKind.NAME,
           loc: { start: 0, end: 6 },
           value: 'String',
         },
@@ -191,10 +190,10 @@ describe('Parser', () => {
     it('parses custom types', () => {
       const result = parseType('MyType');
       expectJSON(result).toEqual({
-        kind: Kind.NAMED_TYPE,
+        kind: GQLKind.NAMED_TYPE,
         loc: { start: 0, end: 6 },
         name: {
-          kind: Kind.NAME,
+          kind: GQLKind.NAME,
           loc: { start: 0, end: 6 },
           value: 'MyType',
         },
@@ -204,13 +203,13 @@ describe('Parser', () => {
     it('parses list types', () => {
       const result = parseType('[MyType]');
       expectJSON(result).toEqual({
-        kind: Kind.LIST_TYPE,
+        kind: GQLKind.LIST_TYPE,
         loc: { start: 0, end: 8 },
         type: {
-          kind: Kind.NAMED_TYPE,
+          kind: GQLKind.NAMED_TYPE,
           loc: { start: 1, end: 7 },
           name: {
-            kind: Kind.NAME,
+            kind: GQLKind.NAME,
             loc: { start: 1, end: 7 },
             value: 'MyType',
           },

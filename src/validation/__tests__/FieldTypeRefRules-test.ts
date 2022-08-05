@@ -22,7 +22,6 @@ const resolverField = (name: string) =>
   data SomeUnion = SomeObject
   data SomeEnum = ONLY {}
   data SomeInputObject = { val: String }
-  directive @SomeDirective on QUERY
 
   data BadObject = {
       badField: ${name}

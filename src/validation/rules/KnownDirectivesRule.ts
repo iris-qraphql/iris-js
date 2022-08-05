@@ -1,8 +1,7 @@
-import type { Kind } from 'graphql';
-
 import { irisError } from '../../error';
 import type { ASTNode } from '../../types/ast';
-import { specifiedDirectives } from '../../types/directives';
+import { specifiedDirectives } from '../../types/ast';
+import type { GQLKind } from '../../types/kinds';
 import { IrisDirectiveLocation, IrisKind } from '../../types/kinds';
 import { inspect, invariant } from '../../utils/legacy';
 import type { ASTVisitor } from '../../utils/visitor';
@@ -24,13 +23,6 @@ export function KnownDirectivesRule(
 
   for (const directive of specifiedDirectives) {
     locationsMap[directive.name] = directive.locations;
-  }
-
-  const astDefinitions = context.getDocument().definitions;
-  for (const def of astDefinitions) {
-    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
-      locationsMap[def.name.value] = def.locations.map((name) => name.value);
-    }
   }
 
   return {
@@ -74,7 +66,7 @@ function getDirectiveLocationForASTPath(
     case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);
-      const kinds: ReadonlyArray<IrisKind | Kind> = [
+      const kinds: ReadonlyArray<IrisKind | GQLKind> = [
         IrisKind.TYPE_DEFINITION,
         IrisKind.VARIANT_DEFINITION,
       ];

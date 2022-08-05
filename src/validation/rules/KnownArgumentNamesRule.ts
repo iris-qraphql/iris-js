@@ -1,6 +1,5 @@
 import { irisError } from '../../error';
-import { specifiedDirectives } from '../../types/directives';
-import { IrisKind } from '../../types/kinds';
+import { specifiedDirectives } from '../../types/ast';
 import { didYouMean, suggestionList } from '../../utils/legacy';
 import type { ASTVisitor } from '../../utils/visitor';
 
@@ -17,15 +16,6 @@ export function KnownArgumentNamesOnDirectivesRule(
   const definedDirectives = specifiedDirectives;
   for (const directive of definedDirectives) {
     directiveArgs[directive.name] = directive.args.map((arg) => arg.name.value);
-  }
-
-  const astDefinitions = context.getDocument().definitions;
-  for (const def of astDefinitions) {
-    if (def.kind === IrisKind.DIRECTIVE_DEFINITION) {
-      const argsNodes = def.arguments ?? [];
-
-      directiveArgs[def.name.value] = argsNodes.map((arg) => arg.name.value);
-    }
   }
 
   return {

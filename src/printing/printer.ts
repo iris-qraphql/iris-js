@@ -14,7 +14,6 @@ import { visit } from '../utils/visitor';
 
 const printDocASTReducer: ASTReducer<string> = {
   Name: { leave: (node) => node.value },
-  Variable: { leave: (node) => '$' + node.name },
   Document: {
     leave: (node) => join(node.definitions, '\n\n'),
   },
@@ -89,19 +88,6 @@ const printDocASTReducer: ASTReducer<string> = {
           wrap('', join(directives, ' '), ' ') +
           block(fields),
   },
-
-  DirectiveDefinition: {
-    leave: ({ description, name, arguments: args, repeatable, locations }) =>
-      wrap('', description, '\n') +
-      'directive @' +
-      name +
-      (hasMultilineItems(args)
-        ? wrap('(\n', indent(join(args, '\n')), '\n)')
-        : wrap('(', join(args, ', '), ')')) +
-      (repeatable ? ' repeatable' : '') +
-      ' on ' +
-      join(locations, ' | '),
-  },
 };
 
 /**
@@ -136,11 +122,6 @@ function wrap(
 
 function indent(str: string): string {
   return wrap('  ', str.replace(/\n/g, '\n  '));
-}
-
-function hasMultilineItems(maybeArray: Maybe<ReadonlyArray<string>>): boolean {
-  /* c8 ignore next */
-  return maybeArray?.some((str) => str.includes('\n')) ?? false;
 }
 
 export const print = (ast: IrisSchema): string =>

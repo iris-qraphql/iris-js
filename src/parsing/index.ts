@@ -2,7 +2,6 @@ import type { ParseOptions, Source } from 'graphql';
 import { syntaxError, TokenKind } from 'graphql';
 
 import type {
-  DefinitionNode,
   DocumentNode,
   FieldDefinitionNode,
   NameNode,
@@ -30,7 +29,7 @@ export const parseDocument: FParser<DocumentNode> = (parser) =>
     ),
   });
 
-export const parseDefinition: FParser<DefinitionNode> = (parser) => {
+export const parseDefinition: FParser<TypeDefinitionNode> = (parser) => {
   // Many definitions begin with a description and require a lookahead.
   const hasDescription = parser.peekDescription();
   const keywordToken = hasDescription
@@ -58,14 +57,11 @@ export const parseDefinition: FParser<DefinitionNode> = (parser) => {
 export const parseDefinitions = (
   parser: Parser,
   keywordToken: string,
-): DefinitionNode | undefined => {
+): TypeDefinitionNode | undefined => {
   switch (keywordToken) {
     case 'data':
       return parseTypeDefinition(parser);
-    case 'directive':
-      return parser.parseDirectiveDefinition();
   }
-
   return undefined;
 };
 

@@ -19,28 +19,6 @@ export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
       }
 
       return false;
-    },
-
-    DirectiveDefinition(directive) {
-      // const directiveName = directive.name.value;
-      for (const arg of directive.arguments ?? []) {
-        // const argName = arg.name.value;
-        const argTypeName = getRefTypeName(arg.type).value;
-        const argType = doc.find((x) => x.name.value === argTypeName);
-
-        if (!argType || !isTypeDefinitionNode(argType)) {
-          return undefined;
-        }
-
-        // TODO:
-        // if (isRequiredArgument(arg) && arg.deprecationReason != null) {
-        //   context.reportError(
-        //     `Required argument @${directive.name}(${arg.name}:) cannot be deprecated.`,
-        //     [getDeprecatedDirectiveNode(arg.astNode), arg.astNode?.type],
-        //   );
-        // }
-      }
-      return undefined;
-    },
+    }
   };
 }

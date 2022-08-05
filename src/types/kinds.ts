@@ -1,3 +1,5 @@
+export { Kind as GQLKind } from 'graphql';
+
 export enum IrisKind {
   ARGUMENT_DEFINITION = 'InputValueDefinition',
   NAMED_TYPE = 'NamedType',

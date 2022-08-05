@@ -50,7 +50,6 @@ const registerUniq = (context: IrisValidationContext, kind: string) => {
 export function UniqueNamesRule(context: IrisValidationContext): ASTVisitor {
   const uniq = checkUniquenessBy(context);
   const registerType = registerUniq(context, 'type');
-  const registerDirective = registerUniq(context, 'directive');
 
   return {
     TypeDefinition(type: TypeDefinitionNode) {
@@ -70,16 +69,6 @@ export function UniqueNamesRule(context: IrisValidationContext): ASTVisitor {
 
         uniq(fields, (name) => `Field "${variantName}.${name}"`);
       }
-    },
-    DirectiveDefinition(node) {
-      const directiveName = node.name.value;
-      const args = node.arguments ?? [];
-
-      registerDirective(node.name);
-      uniq(args, (name) => `Argument "@${directiveName}(${name}:)"`);
-    },
-    Directive(node) {
-      checkUniquenessBy(context, 'argument')(node.arguments ?? []);
-    },
+    }
   };
 }

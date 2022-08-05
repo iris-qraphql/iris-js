@@ -25,12 +25,11 @@ import type {
 
 import type { Maybe } from '../utils/type-level';
 
-import { IrisKind } from './kinds';
+import { GQLKind, IrisDirectiveLocation, IrisKind } from './kinds';
 
 export type ASTNode =
   | NameNode
   | DocumentNode
-  | VariableNode
   | ArgumentNode
   | IntValueNode
   | FloatValueNode
@@ -47,7 +46,6 @@ export type ASTNode =
   | FieldDefinitionNode
   | ArgumentDefinitionNode
   | TypeDefinitionNode
-  | DirectiveDefinitionNode
   | VariantDefinitionNode
   | MaybeTypeNode;
 
@@ -59,7 +57,6 @@ export const QueryDocumentKeys: {
 } = {
   Name: [],
   Document: ['definitions'],
-  Variable: ['name'],
   Argument: ['name', 'value'],
   IntValue: [],
   FloatValue: [],
@@ -84,7 +81,6 @@ export const QueryDocumentKeys: {
   ],
   TypeDefinition: ['description', 'name', 'directives', 'variants'],
   VariantDefinition: ['description', 'name', 'fields', 'directives'],
-  DirectiveDefinition: ['description', 'name', 'arguments', 'locations'],
 };
 
 const kindValues = new Set<string>(Object.keys(QueryDocumentKeys));
@@ -109,7 +105,7 @@ export type NameNode = {
 export type DocumentNode = {
   readonly kind: IrisKind.DOCUMENT;
   readonly loc?: Location;
-  readonly definitions: ReadonlyArray<DefinitionNode>;
+  readonly definitions: ReadonlyArray<TypeDefinitionNode>;
 };
 
 export type {
@@ -160,10 +156,6 @@ export type MaybeTypeNode = {
   readonly type: NamedTypeNode | ListTypeNode;
 };
 
-/** Type Definition */
-
-export type DefinitionNode = TypeDefinitionNode | DirectiveDefinitionNode;
-
 export type ArgumentDefinitionNode = {
   readonly kind: IrisKind.ARGUMENT_DEFINITION;
   readonly loc?: Location;
@@ -212,11 +204,6 @@ export interface DirectiveDefinitionNode {
   readonly locations: ReadonlyArray<NameNode>;
 }
 
-export const isDirectiveDefinitionNode = (
-  node: ASTNode,
-): node is DirectiveDefinitionNode =>
-  node.kind === IrisKind.DIRECTIVE_DEFINITION;
-
 export const isTypeDefinitionNode = (
   node: ASTNode,
 ): node is TypeDefinitionNode => node.kind === IrisKind.TYPE_DEFINITION;
@@ -254,7 +241,7 @@ export const getVariant = (
   name ? variants.find((v) => v.name.value === name) : variants[0];
 
 export const isRequiredArgument = (arg: ArgumentDefinitionNode) =>
-  arg.type.kind !== IrisKind.MAYBE_TYPE && !arg.defaultValue;
+  arg.type.kind !== IrisKind.MAYBE_TYPE && arg.defaultValue === undefined;
 
 export const getDeprecationReason = (
   node: ASTNode & Pick<TypeDefinitionNode, 'directives'>,
@@ -270,3 +257,39 @@ export const getDeprecationReason = (
   const reason = deprecated.arguments?.[0]?.value as Maybe<StringValueNode>;
   return reason?.value ?? '';
 };
+
+type IrisDirective = {
+  name: string;
+  description?: string;
+  locations: ReadonlyArray<IrisDirectiveLocation>;
+  args: ReadonlyArray<ArgumentDefinitionNode>;
+  astNode?: DirectiveDefinitionNode;
+};
+
+export const specifiedDirectives: ReadonlyArray<IrisDirective> = Object.freeze([
+  {
+    name: 'deprecated',
+    description: 'Marks an element of a GraphQL schema as no longer supported.',
+    locations: [
+      IrisDirectiveLocation.FIELD_DEFINITION,
+      IrisDirectiveLocation.ARGUMENT_DEFINITION,
+      IrisDirectiveLocation.VARIANT_DEFINITION,
+    ],
+    args: [
+      {
+        kind: IrisKind.ARGUMENT_DEFINITION,
+        name: { value: 'reason', kind: GQLKind.NAME },
+        description: {
+          kind: GQLKind.STRING,
+          value:
+            'Explains why this element was deprecated, usually also including a suggestion for how to access supported similar data. Formatted using the Markdown syntax, as specified by [CommonMark](https://commonmark.org/).',
+        },
+        defaultValue: { value: '', kind: GQLKind.STRING },
+        type: {
+          kind: IrisKind.NAMED_TYPE,
+          name: { value: 'string', kind: GQLKind.NAME },
+        },
+      },
+    ],
+  },
+]);

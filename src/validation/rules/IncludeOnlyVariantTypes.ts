@@ -1,19 +1,17 @@
-import { Kind } from 'graphql';
-
 import { irisError } from '../../error';
 import type {
   TypeDefinitionNode,
   VariantDefinitionNode,
 } from '../../types/ast';
 import { isTypeVariantNode } from '../../types/ast';
-import { IrisKind, scalarNames } from '../../types/kinds';
+import { GQLKind, IrisKind, scalarNames } from '../../types/kinds';
 import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 
 const makeScalar = (name: string): TypeDefinitionNode => ({
   kind: IrisKind.TYPE_DEFINITION,
-  name: { kind: Kind.NAME, value: name },
+  name: { kind: GQLKind.NAME, value: name },
   variants: [],
 });
 
