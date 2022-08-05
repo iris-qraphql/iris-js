@@ -32,7 +32,7 @@ import type {
   ValueNode,
   VariableNode,
 } from '../types/ast';
-import { IrisDirectiveLocation,IrisKind, TokenKind  } from '../types/kinds';
+import { IrisDirectiveLocation, IrisKind, TokenKind } from '../types/kinds';
 import { instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 

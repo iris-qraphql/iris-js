@@ -1,6 +1,6 @@
 import type { IrisError } from '../error';
 import type { DocumentNode } from '../types/ast';
-import { visit, visitInParallel } from '../types/visitor';
+import { visit, visitInParallel } from '../utils/visitor';
 
 import { IncludeOnlyVariantTypes } from './rules/IncludeOnlyVariantTypes';
 import { KnownArgumentNamesOnDirectivesRule } from './rules/KnownArgumentNamesRule';

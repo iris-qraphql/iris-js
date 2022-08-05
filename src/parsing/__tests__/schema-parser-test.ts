@@ -72,15 +72,15 @@ describe('Schema Parser', () => {
   });
 
   it('Union fails with no resolvers', () => {
-    expectSyntaxError('data Hello =  ').toMatchSnapshot()
+    expectSyntaxError('data Hello =  ').toMatchSnapshot();
   });
 
   it('Union fails with leading pipe', () => {
-    expectSyntaxError('data Hello = | Wo | Rld').toMatchSnapshot()
+    expectSyntaxError('data Hello = | Wo | Rld').toMatchSnapshot();
   });
 
   it('Union fails with double pipe', () => {
-    expectSyntaxError('data Hello = Wo || Rld').toMatchSnapshot()
+    expectSyntaxError('data Hello = Wo || Rld').toMatchSnapshot();
   });
 
   it('Union fails with trailing pipe', () => {

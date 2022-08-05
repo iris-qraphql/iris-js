@@ -1,8 +1,8 @@
 import { irisError } from '../../error';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
-import type { ASTVisitor } from '../../types/visitor';
 import { didYouMean, suggestionList } from '../../utils/legacy';
+import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 

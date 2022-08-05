@@ -1,5 +1,5 @@
 import { getRefTypeName, isTypeDefinitionNode } from '../../types/ast';
-import type { ASTVisitor } from '../../types/visitor';
+import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 

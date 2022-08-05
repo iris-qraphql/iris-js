@@ -7,7 +7,6 @@ const expectSDLErrors = (sdlStr: string) =>
 
 describe('VariantType Rules', () => {
   it('rejects a Union type with non-Object members types', () => {
-
     expectSDLErrors(`
       data A = {
         field: String

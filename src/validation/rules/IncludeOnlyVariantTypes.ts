@@ -3,12 +3,11 @@ import { Kind } from 'graphql';
 import { irisError } from '../../error';
 import type {
   TypeDefinitionNode,
-  VariantDefinitionNode} from '../../types/ast';
-import {
-  isTypeVariantNode
+  VariantDefinitionNode,
 } from '../../types/ast';
+import { isTypeVariantNode } from '../../types/ast';
 import { IrisKind, scalarNames } from '../../types/kinds';
-import type { ASTVisitor } from '../../types/visitor';
+import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 
@@ -35,7 +34,9 @@ export function IncludeOnlyVariantTypes(
     type.variants.forEach((v: VariantDefinitionNode) => {
       const name = v.name.value;
 
-      const member = !v.fields ? defaultTypes[name] ?? doc.find((x) => x.name.value === name) : undefined;
+      const member = !v.fields
+        ? defaultTypes[name] ?? doc.find((x) => x.name.value === name)
+        : undefined;
 
       if (!member) {
         return;

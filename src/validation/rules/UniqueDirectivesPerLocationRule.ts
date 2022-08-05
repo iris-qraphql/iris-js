@@ -2,7 +2,7 @@ import { irisError } from '../../error';
 import { isTypeDefinitionNode } from '../../types/ast';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
-import type { ASTVisitor } from '../../types/visitor';
+import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 

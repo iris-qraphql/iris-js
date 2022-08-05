@@ -1,12 +1,12 @@
 import { irisError } from '../../error';
-import type { ArgumentDefinitionNode} from '../../types/ast';
+import type { ArgumentDefinitionNode } from '../../types/ast';
 import { isRequiredArgument } from '../../types/ast';
 import { specifiedDirectives } from '../../types/directives';
 import { IrisKind } from '../../types/kinds';
-import type { ASTVisitor } from '../../types/visitor';
 import { inspect } from '../../utils/legacy';
 import type { ObjMap } from '../../utils/ObjMap';
 import { keyMap } from '../../utils/ObjMap';
+import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 
@@ -16,8 +16,7 @@ import type { IrisValidationContext } from '../ValidationContext';
 export function ProvidedRequiredArgumentsOnDirectivesRule(
   context: IrisValidationContext,
 ): ASTVisitor {
-  const requiredArgsMap: ObjMap<ObjMap<ArgumentDefinitionNode>> =
-    {};
+  const requiredArgsMap: ObjMap<ObjMap<ArgumentDefinitionNode>> = {};
 
   for (const directive of specifiedDirectives) {
     requiredArgsMap[directive.name] = keyMap(

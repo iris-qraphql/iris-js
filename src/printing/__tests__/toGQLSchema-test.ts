@@ -1,4 +1,3 @@
-
 import { buildSchema } from '../../types/schema';
 
 import { toTSDefinitions } from '../toTSDefinitions';

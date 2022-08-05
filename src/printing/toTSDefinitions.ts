@@ -1,11 +1,7 @@
-
 import type { TypeDefinitionNode } from '../types/ast';
 import type { IrisSchema } from '../types/schema';
 
-export const toTSDefinitions = (
-  schema: IrisSchema,
-): string => {
-
+export const toTSDefinitions = (schema: IrisSchema): string => {
   // const transpileField =
   //   (resolvers: any) =>
   //   (
@@ -34,15 +30,11 @@ export const toTSDefinitions = (
   //   }
   // };
 
-
-  const transpileTypeDefinition = (
-    type: TypeDefinitionNode,
-  ): string => {
+  const transpileTypeDefinition = (type: TypeDefinitionNode): string => {
     const { name } = type;
 
     return `type ${name.value} = {}`;
   };
 
-
-  return Object.values(schema.types).map(transpileTypeDefinition).join('\n'); 
+  return Object.values(schema.types).map(transpileTypeDefinition).join('\n');
 };

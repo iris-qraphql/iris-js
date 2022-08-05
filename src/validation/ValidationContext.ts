@@ -1,6 +1,6 @@
 import type { IrisError } from '../error';
 import type { DocumentNode } from '../types/ast';
-import type { ASTVisitor } from '../types/visitor';
+import type { ASTVisitor } from '../utils/visitor';
 
 export class IrisValidationContext {
   errors: Array<IrisError> = [];

@@ -3,9 +3,9 @@ import type { Kind } from 'graphql';
 import { irisError } from '../../error';
 import type { ASTNode } from '../../types/ast';
 import { specifiedDirectives } from '../../types/directives';
-import { IrisDirectiveLocation,IrisKind } from '../../types/kinds';
-import type { ASTVisitor } from '../../types/visitor';
+import { IrisDirectiveLocation, IrisKind } from '../../types/kinds';
 import { inspect, invariant } from '../../utils/legacy';
+import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 

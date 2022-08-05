@@ -111,7 +111,7 @@ describe('unique type names', () => {
     it('rejects a Schema which redefines a built-in type', () => {
       expectSDLErrors(`
         data String
-      `).toMatchSnapshot()
+      `).toMatchSnapshot();
     });
 
     it('rejects a Schema which defines an object type twice', () => {

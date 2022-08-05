@@ -5,8 +5,8 @@ import {
   isTypeDefinitionNode,
 } from '../../types/ast';
 import { scalarNames } from '../../types/kinds';
-import type { ASTVisitor } from '../../types/visitor';
 import { didYouMean, suggestionList } from '../../utils/legacy';
+import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 
@@ -75,7 +75,6 @@ export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
             { nodes: node },
           ),
         );
-
       }
       return undefined;
     },
@@ -83,5 +82,8 @@ export function KnownTypeNamesRule(context: IrisValidationContext): ASTVisitor {
 }
 
 function isSDLNode(value: ASTNode | ReadonlyArray<ASTNode>): boolean {
-  return 'kind' in value && (isDirectiveDefinitionNode(value) || isTypeDefinitionNode(value)); 
+  return (
+    'kind' in value &&
+    (isDirectiveDefinitionNode(value) || isTypeDefinitionNode(value))
+  );
 }

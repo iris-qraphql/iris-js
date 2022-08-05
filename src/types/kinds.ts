@@ -38,7 +38,6 @@ export enum TokenKind {
 
 export const scalarNames = ['String', 'Int', 'Float', 'ID', 'Boolean'];
 
-
 export enum IrisDirectiveLocation {
   // LEGACY
   QUERY = 'QUERY',

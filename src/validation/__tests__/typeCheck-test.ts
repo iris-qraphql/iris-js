@@ -8,7 +8,7 @@ const serializeWith = (
   value: unknown,
   typeRef: string,
   schema: IrisSchema = buildSchema('data test = {}'),
-) =>  typeCheckValue(schema, value, parseType(typeRef));
+) => typeCheckValue(schema, value, parseType(typeRef));
 
 describe('serializeValue', () => {
   it('converts boolean values to ASTs', () => {
@@ -114,8 +114,12 @@ describe('serializeValue', () => {
   it('converts string values to Enum ASTs if possible', () => {
     expect(serializeWith('HELLO', 'MyEnum', schema)).toEqual('HELLO');
 
-    expect(() => serializeWith('hello', 'MyEnum', schema)).toThrowErrorMatchingSnapshot()
-    expect(() => serializeWith('UNKNOWN_VALUE', 'MyEnum', schema)).toThrowErrorMatchingSnapshot()
+    expect(() =>
+      serializeWith('hello', 'MyEnum', schema),
+    ).toThrowErrorMatchingSnapshot();
+    expect(() =>
+      serializeWith('UNKNOWN_VALUE', 'MyEnum', schema),
+    ).toThrowErrorMatchingSnapshot();
   });
 
   it('converts array values to List ASTs', () => {

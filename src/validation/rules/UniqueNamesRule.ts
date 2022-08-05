@@ -3,7 +3,7 @@ import { forEachObjIndexed, groupBy } from 'ramda';
 import { irisError } from '../../error';
 import type { NameNode, TypeDefinitionNode } from '../../types/ast';
 import { scalarNames } from '../../types/kinds';
-import type { ASTVisitor } from '../../types/visitor';
+import type { ASTVisitor } from '../../utils/visitor';
 
 import type { IrisValidationContext } from '../ValidationContext';
 
@@ -56,9 +56,9 @@ export function UniqueNamesRule(context: IrisValidationContext): ASTVisitor {
     TypeDefinition(type: TypeDefinitionNode) {
       const typeName = type.name.value;
 
-      if(scalarNames.includes(typeName)){
-        const message =  `built-in type ${typeName} can't be overridden.`;
-        context.reportError(irisError(message, {nodes: type.name}));
+      if (scalarNames.includes(typeName)) {
+        const message = `built-in type ${typeName} can't be overridden.`;
+        context.reportError(irisError(message, { nodes: type.name }));
       }
 
       registerType(type.name);

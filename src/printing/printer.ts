@@ -3,9 +3,9 @@ import { printString } from 'graphql/language/printString';
 
 import type { ASTNode } from '../types/ast';
 import type { IrisSchema } from '../types/schema';
-import type { ASTReducer } from '../types/visitor';
-import { visit } from '../types/visitor';
 import type { Maybe } from '../utils/type-level';
+import type { ASTReducer } from '../utils/visitor';
+import { visit } from '../utils/visitor';
 
 /**
  * Converts an AST into a string, using one set of reasonable
