@@ -20,7 +20,7 @@ export function UniqueDirectivesPerLocationRule(
   const uniqueDirectiveMap = Object.create(null);
 
   for (const directive of specifiedDirectives) {
-    uniqueDirectiveMap[directive.name] = !directive.isRepeatable;
+    uniqueDirectiveMap[directive.name] = true;
   }
 
   const astDefinitions = context.getDocument().definitions;

@@ -1,6 +1,5 @@
 import { getDeprecationReason, getVariant } from '../../types/ast';
-import { GraphQLDeprecatedDirective } from '../../types/directives';
-import { buildSchema, getDirective, getType } from '../../types/schema';
+import { buildSchema,  getType } from '../../types/schema';
 import { dedent } from '../../utils/dedent';
 
 import { print } from '../printer';
@@ -118,19 +117,7 @@ describe('Schema Builder', () => {
     expect(cycleSDL(sdl)).toEqual(sdl);
   });
 
-  it('Overriding directives excludes specified', () => {
-    const schema = buildSchema(`
-      directive @skip on FIELD
-      directive @include on FIELD
-      directive @deprecated on FIELD_DEFINITION
-      directive @specifiedBy on FIELD_DEFINITION
-    `);
 
-    expect(Object.values(schema.directives)).toHaveLength(4);
-    expect(getDirective(schema, 'deprecated')).not.toEqual(
-      GraphQLDeprecatedDirective,
-    );
-  });
 
   it('Type modifiers', () => {
     const sdl = dedent`
