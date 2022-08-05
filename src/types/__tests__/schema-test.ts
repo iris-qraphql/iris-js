@@ -50,31 +50,4 @@ describe('Type System: Schema', () => {
       );
     });
   });
-
-  describe('Validity', () => {
-    describe('A Schema must contain uniquely named types', () => {
-
-      it('rejects a Schema which redefines a built-in type', () => {
-        const schema = buildSchema(`
-            data String
-            data Query = {
-              fakeString: String
-            }
-        `);
-
-        expect(schema).toEqual(
-          'Schema must contain uniquely named types but contains multiple types named "String".',
-        );
-      });
-
-      it('rejects a Schema which defines an object type twice', () => {
-        expect(() =>
-          buildSchema(`
-            data SameName
-            data SameName
-          `),
-        ).toThrowErrorMatchingSnapshot();
-      });
-    });
-  });
 });

@@ -82,10 +82,12 @@ const printDocASTReducer: ASTReducer<string> = {
   },
 
   VariantDefinition: {
-    leave: ({ name, fields, isTypeVariantNode }) =>
+    leave: ({ name, fields, isTypeVariantNode, directives }) =>
       fields === undefined
         ? name
-        : (isTypeVariantNode ? '' : name + ' ') + block(fields),
+        : (isTypeVariantNode ? '' : name + ' ') +
+          wrap('', join(directives, ' '), ' ') +
+          block(fields),
   },
 
   DirectiveDefinition: {

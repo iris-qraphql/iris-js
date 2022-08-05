@@ -70,6 +70,8 @@ function getDirectiveLocationForASTPath(
       return IrisDirectiveLocation.FIELD_DEFINITION;
     case IrisKind.TYPE_DEFINITION:
       return IrisDirectiveLocation.DATA_DEFINITION;
+    case IrisKind.VARIANT_DEFINITION:
+      return IrisDirectiveLocation.VARIANT_DEFINITION;
     case IrisKind.ARGUMENT_DEFINITION: {
       const parentNode = ancestors[ancestors.length - 3];
       invariant('kind' in parentNode);

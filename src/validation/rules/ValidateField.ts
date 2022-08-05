@@ -40,6 +40,7 @@ export function ValidateField(ctx: IrisValidationContext): ASTVisitor {
         //   );
         // }
       }
+      return undefined;
     },
   };
 }

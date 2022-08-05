@@ -76,6 +76,7 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     locations: [
       IrisDirectiveLocation.FIELD_DEFINITION,
       IrisDirectiveLocation.ARGUMENT_DEFINITION,
+      IrisDirectiveLocation.VARIANT_DEFINITION
     ],
     args: [
       {

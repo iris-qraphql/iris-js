@@ -105,3 +105,20 @@ describe('Validate: Unique variant definition names', () => {
     `).toMatchSnapshot();
   });
 });
+
+describe('unique type names', () => {
+  describe('A Schema must contain uniquely named types', () => {
+    it('rejects a Schema which redefines a built-in type', () => {
+      expectSDLErrors(`
+        data String
+      `).toMatchSnapshot()
+    });
+
+    it('rejects a Schema which defines an object type twice', () => {
+      expectSDLErrors(`
+          data SameName
+          data SameName
+        `).toMatchSnapshot();
+    });
+  });
+});

@@ -83,7 +83,7 @@ export const QueryDocumentKeys: {
     'directives',
   ],
   TypeDefinition: ['description', 'name', 'directives', 'variants'],
-  VariantDefinition: ['name', 'fields'],
+  VariantDefinition: ['description', 'name', 'fields', 'directives'],
   DirectiveDefinition: ['description', 'name', 'arguments', 'locations'],
 };
 
@@ -258,4 +258,4 @@ export const getField = (name: string, v: Maybe<VariantDefinitionNode>) =>
   v?.fields?.find((f) => f.name.value === name);
 
 export const isRequiredArgument = (arg: ArgumentDefinitionNode) =>
-  arg.type.kind !== IrisKind.MAYBE_TYPE;
+  arg.type.kind !== IrisKind.MAYBE_TYPE && !arg.defaultValue;

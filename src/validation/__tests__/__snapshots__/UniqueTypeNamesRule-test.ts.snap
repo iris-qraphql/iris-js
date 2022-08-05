@@ -92,3 +92,35 @@ Array [
   },
 ]
 `;
+
+exports[`unique type names A Schema must contain uniquely named types rejects a Schema which defines an object type twice 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 16,
+        "line": 2,
+      },
+      Object {
+        "column": 16,
+        "line": 3,
+      },
+    ],
+    "message": "There can be only one type named \\"SameName\\".",
+  },
+]
+`;
+
+exports[`unique type names A Schema must contain uniquely named types rejects a Schema which redefines a built-in type 1`] = `
+Array [
+  Object {
+    "locations": Array [
+      Object {
+        "column": 14,
+        "line": 2,
+      },
+    ],
+    "message": "built-in type String can't be overridden.",
+  },
+]
+`;
