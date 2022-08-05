@@ -39,7 +39,8 @@ export const toTSDefinitions = (
     type: TypeDefinitionNode,
   ): string => {
     const { name } = type;
-    return name.value;
+
+    return `type ${name.value} = {}`;
   };
 
 

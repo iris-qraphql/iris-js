@@ -1,0 +1,39 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Schema Builder Supports @deprecated 1`] = `
+Array [
+  Object {
+    "deprecation": undefined,
+    "name": Object {
+      "kind": "Name",
+      "loc": Object {
+        "end": 19,
+        "start": 14,
+      },
+      "value": "VALUE",
+    },
+  },
+  Object {
+    "deprecation": undefined,
+    "name": Object {
+      "kind": "Name",
+      "loc": Object {
+        "end": 34,
+        "start": 25,
+      },
+      "value": "OLD_VALUE",
+    },
+  },
+  Object {
+    "deprecation": undefined,
+    "name": Object {
+      "kind": "Name",
+      "loc": Object {
+        "end": 63,
+        "start": 52,
+      },
+      "value": "OTHER_VALUE",
+    },
+  },
+]
+`;

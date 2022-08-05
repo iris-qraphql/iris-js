@@ -1,7 +1,7 @@
 import { print } from '../../printing/printer';
 import { dedent } from '../../utils/dedent';
 
-import { getField,getVariant} from '../ast';
+import { getField, getVariant } from '../ast';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { buildSchema, getDirective, getType } from '../schema';
 
@@ -218,40 +218,31 @@ describe('Schema Builder', () => {
         newInput: String
       }
 
-      data Query = {
+      data Type = {
         field1: String @deprecated
         field2: Int @deprecated(reason: "Because I said so")
         enum: MyEnum
         field5: String
       }
     `;
+
     expect(cycleSDL(sdl)).toEqual(sdl);
 
     const schema = buildSchema(sdl);
 
     expect(
-      getType(schema, 'MyEnum')?.variants.map(({ name, deprecation }) => ({ name, deprecation })),
-    ).toEqual([
-      { name: 'VALUE', deprecation: undefined },
-      { name: 'OLD_VALUE', deprecation: '' },
-      { name: 'OTHER_VALUE', deprecation: 'Terrible reasons' },
-    ]);
+      getType(schema, 'MyEnum')?.variants.map(({ name, deprecation }) => ({
+        name,
+        deprecation,
+      })),
+    ).toMatchSnapshot();
 
-    const rootType = getType(schema, 'Query');
-    const variant = rootType ? getVariant(rootType): undefined;
-    
-    expect(getField('field1',variant)).toEqual(
-      expect.objectContaining({
-        deprecationReason: '',
-      }),
-    );
-    expect(getField('field2',variant)).toEqual(
-      expect.objectContaining({
-        deprecationReason: 'Because I said so',
-      }),
-    );
+    const rootType = getType(schema, 'Type');
+    const variant = rootType ? getVariant(rootType) : undefined;
+
+    expect(getField('field1', variant)?.description).toEqual('');
+    expect(getField('field2', variant)?.description).toEqual('Because I said so' );
   });
-
 
   it('Rejects invalid SDL', () => {
     const sdl = `
