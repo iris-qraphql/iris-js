@@ -13,9 +13,10 @@ import type {
   ConstObjectFieldNode,
   ConstObjectValueNode,
   ConstValueNode,
-  DirectiveDefinitionNode,
   DirectiveNode,
+  DocumentNode,
   EnumValueNode,
+  FieldDefinitionNode,
   FloatValueNode,
   IntValueNode,
   ListTypeNode,
@@ -28,45 +29,20 @@ import type {
   ObjectValueNode,
   StringValueNode,
   Token,
+  TypeDefinitionNode,
   TypeNode,
   ValueNode,
   VariableNode,
+  VariantDefinitionNode,
 } from '../types/ast';
-import { IrisDirectiveLocation, IrisKind, TokenKind } from '../types/kinds';
+import {  IrisKind, TokenKind } from '../types/kinds';
 import { instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 
-/**
- * Given a GraphQL source, parses it into a Document.
- * Throws IrisError if a syntax error is encountered.
- */
 
-/**
- * Given a string containing a GraphQL value (ex. `[42]`), parse the AST for
- * that value.
- * Throws IrisError if a syntax error is encountered.
- *
- * This is useful within tools that operate upon GraphQL Values directly and
- * in isolation of complete GraphQL documents.
- */
-export function parseValue(
-  source: string | Source,
-  options?: ParseOptions,
-): ValueNode {
-  const parser = new Parser(source, options);
-  parser.expectToken(TokenKind.SOF);
-  const value = parser.parseValueLiteral(false);
-  parser.expectToken(TokenKind.EOF);
-  return value;
-}
-
-/**
- * Similar to parseValue(), but raises a parse error if it encounters a
- * variable. The return type will be a constant value.
- */
-export function parseConstValue(
+function parseValue(
   source: string | Source,
   options?: ParseOptions,
 ): ConstValueNode {
@@ -87,10 +63,7 @@ export function parseConstValue(
  *
  * Consider providing the results to the utility function: typeFromAST().
  */
-export function parseType(
-  source: string | Source,
-  options?: ParseOptions,
-): TypeNode {
+function parseType(source: string | Source, options?: ParseOptions): TypeNode {
   const parser = new Parser(source, options);
   parser.expectToken(TokenKind.SOF);
   const type = parser.parseTypeReference();
@@ -98,7 +71,7 @@ export function parseType(
   return type;
 }
 
-export function isSource(source: unknown): source is Source {
+function isSource(source: unknown): source is Source {
   return instanceOf(source, Source);
 }
 
@@ -113,7 +86,7 @@ export function isSource(source: unknown): source is Source {
  *
  * @internal
  */
-export class Parser {
+class Parser {
   _lexer: Lexer;
 
   protected _options: Maybe<ParseOptions>;
@@ -471,75 +444,6 @@ export class Parser {
     });
   }
 
-  /**
-   * ```
-   * DirectiveDefinition :
-   *   - Description? directive @ Name ArgumentsDefinition? `repeatable`? on DirectiveLocations
-   * ```
-   */
-  parseDirectiveDefinition(): DirectiveDefinitionNode {
-    const start = this._lexer.token;
-    const description = this.parseDescription();
-    this.expectKeyword('directive');
-    this.expectToken(TokenKind.AT);
-    const name = this.parseName();
-    const args = this.parseArgumentDefs();
-    const repeatable = this.expectOptionalKeyword('repeatable');
-    this.expectKeyword('on');
-    const locations = this.parseDirectiveLocations();
-    return this.node<DirectiveDefinitionNode>(start, {
-      kind: IrisKind.DIRECTIVE_DEFINITION,
-      description,
-      name,
-      arguments: args,
-      repeatable,
-      locations,
-    });
-  }
-
-  /**
-   * DirectiveLocations :
-   *   - `|`? DirectiveLocation
-   *   - DirectiveLocations | DirectiveLocation
-   */
-  parseDirectiveLocations(): Array<NameNode> {
-    return this.delimitedMany(TokenKind.PIPE, this.parseDirectiveLocation);
-  }
-
-  /*
-   * DirectiveLocation :
-   *   - ExecutableDirectiveLocation
-   *   - TypeSystemDirectiveLocation
-   *
-   * ExecutableDirectiveLocation : one of
-   *   `QUERY`
-   *   `MUTATION`
-   *   `SUBSCRIPTION`
-   *   `FIELD`
-   *   `FRAGMENT_DEFINITION`
-   *   `FRAGMENT_SPREAD`
-   *   `INLINE_FRAGMENT`
-   *
-   * TypeSystemDirectiveLocation : one of
-   *   `FIELD_DEFINITION`
-   *   `ARGUMENT_DEFINITION`
-   *   `UNION`
-   *   `ENUM`
-   *   `ENUM_VALUE`
-   *   `INPUT_OBJECT`
-   *   `INPUT_FIELD_DEFINITION`
-   */
-  parseDirectiveLocation(): NameNode {
-    const start = this._lexer.token;
-    const name = this.parseName();
-
-    if (
-      Object.prototype.hasOwnProperty.call(IrisDirectiveLocation, name.value)
-    ) {
-      return name;
-    }
-    throw this.unexpected(start);
-  }
 
   // Core parsing utility functions
 
@@ -735,3 +639,151 @@ function getTokenDesc(token: Token): string {
 function getTokenKindDesc(kind: TokenKind): string {
   return isPunctuatorTokenKind(kind) ? `"${kind}"` : kind;
 }
+
+const parse = (source: string | Source, options?: ParseOptions): DocumentNode =>
+  parseDocument(new Parser(source, options));
+
+type FParser<T> = (parser: Parser) => T;
+
+const parseDocument: FParser<DocumentNode> = (parser) =>
+  parser.node<DocumentNode>(parser._lexer.token, {
+    kind: IrisKind.DOCUMENT,
+    definitions: parser.many(
+      TokenKind.SOF,
+      () => parseDefinition(parser),
+      TokenKind.EOF,
+    ),
+  });
+
+const parseDefinition: FParser<TypeDefinitionNode> = (parser) => {
+  // Many definitions begin with a description and require a lookahead.
+  const hasDescription = parser.peekDescription();
+  const keywordToken = hasDescription
+    ? parser._lexer.lookahead()
+    : parser._lexer.token;
+
+  if (keywordToken.kind === TokenKind.NAME) {
+    const x = parseDefinitions(parser, keywordToken.value);
+    if (x) {
+      return x;
+    }
+
+    if (hasDescription) {
+      throw syntaxError(
+        parser._lexer.source,
+        parser._lexer.token.start,
+        'Unexpected description, descriptions are supported only on type definitions.',
+      );
+    }
+  }
+
+  throw parser.unexpected(keywordToken);
+};
+
+const parseDefinitions = (
+  parser: Parser,
+  keywordToken: string,
+): TypeDefinitionNode | undefined => {
+  switch (keywordToken) {
+    case 'data':
+      return parseTypeDefinition(parser);
+  }
+  return undefined;
+};
+
+const parseTypeDefinition = (parser: Parser): TypeDefinitionNode => {
+  const start = parser.lookAhead();
+  const description = parser.parseDescription();
+  parser.expectKeyword('data');
+  const name = parser.parseName();
+  const directives = parser.parseConstDirectives();
+  const variants: ReadonlyArray<VariantDefinitionNode> =
+    parseVariantsDefinition(name, parser);
+  return parser.node<TypeDefinitionNode>(start, {
+    kind: IrisKind.TYPE_DEFINITION,
+    description,
+    name,
+    directives,
+    variants,
+  });
+};
+
+const parseVariantsDefinition = (
+  name: NameNode,
+  parser: Parser,
+): ReadonlyArray<VariantDefinitionNode> => {
+  const equal = parser.expectOptionalToken(TokenKind.EQUALS);
+  if (!equal) {
+    return [];
+  }
+
+  switch (parser.lookAhead().kind) {
+    case TokenKind.NAME:
+      return parser.delimitedMany(TokenKind.PIPE, () =>
+        parseVariantDefinition(parser),
+      );
+    case TokenKind.BRACE_L:
+      return [parseVariantDefinition(parser, name)];
+    default:
+      parser.throwExpected('Variant');
+      return [];
+  }
+};
+
+const parseVariantDefinition = (
+  parser: Parser,
+  typeName?: NameNode,
+): VariantDefinitionNode => {
+  const start = parser.lookAhead();
+  const description = parser.parseDescription();
+  const name = typeName ?? parseVariantName(parser);
+  const directives = parser.parseConstDirectives();
+  const fields = parseFieldsDefinition(parser);
+  return parser.node<VariantDefinitionNode>(start, {
+    kind: IrisKind.VARIANT_DEFINITION,
+    description,
+    name,
+    directives,
+    fields,
+    isTypeVariantNode: Boolean(typeName),
+  });
+};
+
+const parseVariantName = (parser: Parser): NameNode => {
+  const { value } = parser.lookAhead();
+  if (value === 'true' || value === 'false' || value === 'null') {
+    parser.invalidToken('is reserved and cannot be used for an enum value');
+  }
+  return parser.parseName();
+};
+
+const parseFieldsDefinition = (
+  parser: Parser,
+): ReadonlyArray<FieldDefinitionNode> | undefined => {
+  const nodes = [];
+  if (parser.expectOptionalToken(TokenKind.BRACE_L)) {
+    while (!parser.expectOptionalToken(TokenKind.BRACE_R)) {
+      nodes.push(parseFieldDefinition(parser)());
+    }
+    return nodes;
+  }
+  return undefined;
+};
+
+const parseFieldDefinition = (parser: Parser) => (): FieldDefinitionNode => {
+  const start = parser.lookAhead();
+  const description = parser.parseDescription();
+  const name = parser.parseName();
+  parser.expectToken(TokenKind.COLON);
+  const type = parser.parseTypeReference();
+  const directives = parser.parseConstDirectives();
+  return parser.node<FieldDefinitionNode>(start, {
+    kind: IrisKind.FIELD_DEFINITION,
+    description,
+    name,
+    type,
+    directives,
+  });
+};
+
+export { parse, parseType, parseValue };

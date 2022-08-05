@@ -1,7 +1,7 @@
 import { dedent } from '../../utils/dedent';
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
-import { parse } from '../index';
+import { parse } from '../parser';
 
 function expectSyntaxError(text: string) {
   return expect(toJSONError(() => parse(text)));

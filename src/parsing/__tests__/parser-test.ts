@@ -1,8 +1,7 @@
 import { GQLKind } from '../../types/kinds';
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
-import { parse } from '../index';
-import { parseConstValue, parseType, parseValue } from '../parser';
+import { parse, parseType, parseValue } from '../parser';
 
 export function expectJSON(actual: unknown) {
   const actualJSON = toJSONDeep(actual);
@@ -98,34 +97,6 @@ describe('Parser', () => {
       });
     });
 
-    it('allows variables', () => {
-      const result = parseValue('{ field: $var }');
-      expectJSON(result).toEqual({
-        kind: GQLKind.OBJECT,
-        loc: { start: 0, end: 15 },
-        fields: [
-          {
-            kind: GQLKind.OBJECT_FIELD,
-            loc: { start: 2, end: 13 },
-            name: {
-              kind: GQLKind.NAME,
-              loc: { start: 2, end: 7 },
-              value: 'field',
-            },
-            value: {
-              kind: GQLKind.VARIABLE,
-              loc: { start: 9, end: 13 },
-              name: {
-                kind: GQLKind.NAME,
-                loc: { start: 10, end: 13 },
-                value: 'var',
-              },
-            },
-          },
-        ],
-      });
-    });
-
     it('correct message for incomplete variable', () => {
       expect(() => parseValue('$')).toThrow();
       // .to.deep.include({
@@ -145,7 +116,7 @@ describe('Parser', () => {
 
   describe('parseConstValue', () => {
     it('parses values', () => {
-      const result = parseConstValue('[123 "abc"]');
+      const result = parseValue('[123 "abc"]');
       expectJSON(result).toEqual({
         kind: GQLKind.LIST,
         loc: { start: 0, end: 11 },
@@ -166,7 +137,7 @@ describe('Parser', () => {
     });
 
     it('correct message for unexpected token', () => {
-      expect(toJSONError(() => parseConstValue('$'))).toEqual({
+      expect(toJSONError(() => parseValue('$'))).toEqual({
         message: 'Syntax Error: Unexpected "$".',
         locations: [{ line: 1, column: 1 }],
       });

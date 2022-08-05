@@ -1,7 +1,7 @@
 import { validateSDL } from '../validation/validate';
 import type { SDLValidationRule } from '../validation/ValidationContext';
 
-import { parse } from '../parsing';
+import { parse } from '../parsing/parser';
 
 import { isObjectLike, mapValue } from './ObjMap';
 
