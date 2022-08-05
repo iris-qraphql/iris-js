@@ -2,9 +2,8 @@ import type { Kind } from 'graphql';
 
 import { irisError } from '../../error';
 import type { ASTNode } from '../../types/ast';
-import { IrisDirectiveLocation } from '../../types/directiveLocation';
 import { specifiedDirectives } from '../../types/directives';
-import { IrisKind } from '../../types/kinds';
+import { IrisDirectiveLocation,IrisKind } from '../../types/kinds';
 import type { ASTVisitor } from '../../types/visitor';
 import { inspect, invariant } from '../../utils/legacy';
 

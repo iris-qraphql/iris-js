@@ -1,5 +1,5 @@
-import { IrisDirectiveLocation } from '../directiveLocation';
 import { GraphQLDirective } from '../directives';
+import { IrisDirectiveLocation } from '../kinds';
 
 describe('Type System: Directive', () => {
   it('defines a directive with no args', () => {

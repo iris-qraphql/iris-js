@@ -4,8 +4,7 @@ import { inspect, instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
 import type { ArgumentDefinitionNode, DirectiveDefinitionNode } from './ast';
-import { IrisDirectiveLocation } from './directiveLocation';
-import { IrisKind } from './kinds';
+import { IrisDirectiveLocation, IrisKind } from './kinds';
 
 /**
  * Test if the given value is a GraphQL directive.
@@ -76,7 +75,7 @@ export const GraphQLDeprecatedDirective: GraphQLDirective =
     locations: [
       IrisDirectiveLocation.FIELD_DEFINITION,
       IrisDirectiveLocation.ARGUMENT_DEFINITION,
-      IrisDirectiveLocation.VARIANT_DEFINITION
+      IrisDirectiveLocation.VARIANT_DEFINITION,
     ],
     args: [
       {
