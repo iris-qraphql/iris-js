@@ -1,4 +1,3 @@
-import { specifiedScalarTypes } from 'graphql';
 import { isNil } from 'ramda';
 
 import { irisError } from '../error';
@@ -8,7 +7,7 @@ import type {
   TypeNode,
   VariantDefinitionNode,
 } from '../types/ast';
-import { getVariant } from '../types/ast';
+import { getVariant, specifiedScalarTypes } from '../types/ast';
 import { IrisKind } from '../types/kinds';
 import type { IrisSchema } from '../types/schema';
 import { inspect } from '../utils/legacy';

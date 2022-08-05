@@ -1,6 +1,5 @@
-import { Source } from 'graphql';
-
 import { isPunctuatorTokenKind, Lexer } from '../lexer';
+import { Source } from '../source';
 
 function lexOne(str: string) {
   const lexer = new Lexer(new Source(str));

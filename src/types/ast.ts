@@ -13,7 +13,6 @@ import type {
   IntValueNode,
   Kind,
   ListValueNode,
-  Location,
   NullValueNode,
   ObjectFieldNode,
   ObjectValueNode,
@@ -23,9 +22,12 @@ import type {
   VariableNode,
 } from 'graphql';
 
+import type { Source } from '../parsing/source';
 import type { Maybe } from '../utils/type-level';
 
 import { GQLKind, IrisDirectiveLocation, IrisKind } from './kinds';
+
+export { specifiedScalarTypes } from 'graphql';
 
 export type ASTNode =
   | NameNode
@@ -92,6 +94,49 @@ export function isNode(maybeNode: any): maybeNode is ASTNode {
   return typeof maybeKind === 'string' && kindValues.has(maybeKind);
 }
 
+export class Location {
+  /**
+   * The character offset at which this Node begins.
+   */
+  readonly start: number;
+
+  /**
+   * The character offset at which this Node ends.
+   */
+  readonly end: number;
+
+  /**
+   * The Token at which this Node begins.
+   */
+  readonly startToken: Token;
+
+  /**
+   * The Token at which this Node ends.
+   */
+  readonly endToken: Token;
+
+  /**
+   * The Source document the AST represents.
+   */
+  readonly source: Source;
+
+  constructor(startToken: Token, endToken: Token, source: Source) {
+    this.start = startToken.start;
+    this.end = endToken.end;
+    this.startToken = startToken;
+    this.endToken = endToken;
+    this.source = source;
+  }
+
+  get [Symbol.toStringTag]() {
+    return 'Location';
+  }
+
+  toJSON(): { start: number; end: number } {
+    return { start: this.start, end: this.end };
+  }
+}
+
 /** Name */
 
 export type NameNode = {
@@ -128,7 +173,6 @@ export type {
   DirectiveNode,
   ValueNode,
   ConstValueNode,
-  Location,
   Token,
 };
 

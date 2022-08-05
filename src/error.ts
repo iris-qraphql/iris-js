@@ -1,7 +1,7 @@
-import type { Location, Source, SourceLocation } from 'graphql';
-import { getLocation, printLocation, printSourceLocation } from 'graphql';
-
-import type { ASTNode } from './types/ast';
+import type { SourceLocation } from './parsing/location';
+import { getLocation } from './parsing/location';
+import type { Source } from './parsing/source';
+import type { ASTNode, Location } from './types/ast';
 import { omitNil } from './utils/type-level';
 
 type ErrorNode = ReadonlyArray<ASTNode> | ASTNode;
@@ -51,31 +51,13 @@ export class IrisError extends Error {
       .filter((loc): loc is Location => loc != null);
     const nodePositions = positions ?? nodeLocations?.map((loc) => loc.start);
 
-    this.source = source ?? nodeLocations?.[0]?.source;
-
     this.locations =
       nodePositions && source
         ? nodePositions.map((pos) => getLocation(source, pos))
         : nodeLocations?.map((loc) => getLocation(loc.source, loc.start));
   }
 
-  override toString(): string {
-    let output = this.message;
-
-    if (this.nodes) {
-      for (const node of this.nodes) {
-        if (node.loc) {
-          output += '\n\n' + printLocation(node.loc);
-        }
-      }
-    } else if (this.source && this.locations) {
-      for (const location of this.locations) {
-        output += '\n\n' + printSourceLocation(this.source, location);
-      }
-    }
-
-    return output;
-  }
+  override toString = (): string => JSON.stringify(this.toJSON());
 
   toJSON = (): JSONError =>
     omitNil({

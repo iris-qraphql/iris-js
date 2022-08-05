@@ -1,4 +1,3 @@
-import { Kind, Location, Source } from 'graphql';
 
 import type { IrisError } from '../error';
 import { syntaxError } from '../error';
@@ -32,13 +31,14 @@ import type {
   TypeNode,
   ValueNode,
   VariableNode,
-  VariantDefinitionNode,
-} from '../types/ast';
-import { IrisKind, TokenKind } from '../types/kinds';
+  VariantDefinitionNode} from '../types/ast';
+import { Location } from '../types/ast';
+import { GQLKind as Kind,IrisKind, TokenKind } from '../types/kinds';
 import { instanceOf } from '../utils/legacy';
 import type { Maybe } from '../utils/type-level';
 
 import { isPunctuatorTokenKind, Lexer } from './lexer';
+import { Source } from './source';
 
 function parseValue(source: string | Source): ConstValueNode {
   const parser = new Parser(source);

@@ -1,15 +1,15 @@
-import { BREAK, Kind } from 'graphql';
-
 import type { ASTNode } from '../types/ast';
 import { isNode, QueryDocumentKeys } from '../types/ast';
-import { IrisKind } from '../types/kinds';
+import { GQLKind, IrisKind } from '../types/kinds';
 
-type KIND = Kind | IrisKind;
+type KIND = GQLKind | IrisKind;
 
 const KINDS: ReadonlyArray<KIND> = Object.values({
-  ...Kind,
+  ...GQLKind,
   ...IrisKind,
 });
+
+const BREAK: unknown = Object.freeze({});
 
 /**
  * A visitor is provided to visit, it contains the collection of
