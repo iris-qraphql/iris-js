@@ -1,3 +1,4 @@
+import { specifiedScalarTypes } from 'graphql';
 import { isNil } from 'ramda';
 
 import { irisError } from '../error';
@@ -55,26 +56,28 @@ export type IrisVariantValue = {
   fields: Record<string, unknown>;
 };
 
-const parseDataType: Serializer<string> = (schema, value, type) => {
+const parseDataType: Serializer<string> = (schema, value, typeName) => {
   if (isNil(value)) {
-    throw cannotRepresent(value, type);
+    throw cannotRepresent(value, typeName);
   }
 
-  // if (type.boxedScalar) {
-  //   const serialized = type.boxedScalar.serialize(value);
+  const scalar = specifiedScalarTypes.find((x) => x.name === typeName);
 
-  //   if (typeof serialized === 'number' && !Number.isFinite(serialized)) {
-  //     throw cannotRepresent(value, type);
-  //   }
+  if (scalar) {
+    const serialized = scalar.serialize(value);
 
-  //   return serialized;
-  // }
+    if (typeof serialized === 'number' && !Number.isFinite(serialized)) {
+      throw cannotRepresent(value, typeName);
+    }
+
+    return serialized;
+  }
 
   return parseVariantWith(
     schema,
     (x, y) => parseVariantValue(schema, x, y),
     value,
-    type,
+    typeName,
   );
 };
 
@@ -86,15 +89,22 @@ export const parseVariantWith = <T>(
 ): T => {
   const type = schema.types[typeName];
   const object = toVariantObject(value, type.name.value);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const variant = getVariant(type, object.name)!;
+
+  const variant = getVariant(type, object.name);
+
+  if (!variant) {
+    throw cannotRepresent(value, typeName);
+  }
 
   const variantType = variant.fields
     ? variant
     : getVariant(schema.types[variant.name.value]);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return f(object, variantType!);
+  if (!variantType) {
+    throw cannotRepresent(value, typeName);
+  }
+
+  return f(object, variantType);
 };
 
 const toVariantObject = (

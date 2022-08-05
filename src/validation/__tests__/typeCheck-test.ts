@@ -114,15 +114,8 @@ describe('serializeValue', () => {
   it('converts string values to Enum ASTs if possible', () => {
     expect(serializeWith('HELLO', 'MyEnum', schema)).toEqual('HELLO');
 
-    // Note: case sensitive
-    expect(() => serializeWith('hello', 'MyEnum', schema)).toThrow(
-      'Data "MyEnum" cannot represent value: "hello"',
-    );
-
-    // Note: Not a valid enum value
-    expect(() => serializeWith('UNKNOWN_VALUE', 'MyEnum', schema)).toThrow(
-      'Data "MyEnum" cannot represent value: "UNKNOWN_VALUE"',
-    );
+    expect(() => serializeWith('hello', 'MyEnum', schema)).toThrowErrorMatchingSnapshot()
+    expect(() => serializeWith('UNKNOWN_VALUE', 'MyEnum', schema)).toThrowErrorMatchingSnapshot()
   });
 
   it('converts array values to List ASTs', () => {
