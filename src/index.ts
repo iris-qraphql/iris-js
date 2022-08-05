@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { toTSDefinitions } from './transpiling/toTSDefinitions';
+import { toTSDefinitions } from './printing/toTSDefinitions';
 import { buildSchema } from './types/schema';
 
 export { graphql } from 'graphql';

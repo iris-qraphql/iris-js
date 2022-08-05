@@ -4,36 +4,36 @@ exports[`Schema Builder Supports @deprecated 1`] = `
 Array [
   Object {
     "deprecation": undefined,
-    "name": Object {
-      "kind": "Name",
-      "loc": Object {
-        "end": 19,
-        "start": 14,
-      },
-      "value": "VALUE",
-    },
+    "name": "VALUE",
+  },
+  Object {
+    "deprecation": "",
+    "name": "OLD_VALUE",
+  },
+  Object {
+    "deprecation": "Terrible reasons",
+    "name": "OTHER_VALUE",
+  },
+]
+`;
+
+exports[`Schema Builder Supports @deprecated 2`] = `
+Array [
+  Object {
+    "deprecation": "",
+    "name": "field1",
+  },
+  Object {
+    "deprecation": "Because I said so",
+    "name": "field2",
   },
   Object {
     "deprecation": undefined,
-    "name": Object {
-      "kind": "Name",
-      "loc": Object {
-        "end": 34,
-        "start": 25,
-      },
-      "value": "OLD_VALUE",
-    },
+    "name": "enum",
   },
   Object {
     "deprecation": undefined,
-    "name": Object {
-      "kind": "Name",
-      "loc": Object {
-        "end": 63,
-        "start": 52,
-      },
-      "value": "OTHER_VALUE",
-    },
+    "name": "field5",
   },
 ]
 `;

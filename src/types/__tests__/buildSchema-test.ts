@@ -1,7 +1,7 @@
 import { print } from '../../printing/printer';
 import { dedent } from '../../utils/dedent';
 
-import { getField, getVariant } from '../ast';
+import { getDeprecationReason, getVariant } from '../ast';
 import { GraphQLDeprecatedDirective } from '../directives';
 import { buildSchema, getDirective, getType } from '../schema';
 
@@ -231,17 +231,21 @@ describe('Schema Builder', () => {
     const schema = buildSchema(sdl);
 
     expect(
-      getType(schema, 'MyEnum')?.variants.map(({ name, deprecation }) => ({
-        name,
-        deprecation,
+      getType(schema, 'MyEnum')?.variants.map((variant) => ({
+        name: variant.name.value,
+        deprecation: getDeprecationReason(variant),
       })),
     ).toMatchSnapshot();
 
     const rootType = getType(schema, 'Type');
     const variant = rootType ? getVariant(rootType) : undefined;
 
-    expect(getField('field1', variant)?.description).toEqual('');
-    expect(getField('field2', variant)?.description).toEqual('Because I said so' );
+    expect(
+      variant?.fields?.map((f) => ({
+        name: f.name.value,
+        deprecation: getDeprecationReason(f),
+      })),
+    ).toMatchSnapshot();
   });
 
   it('Rejects invalid SDL', () => {

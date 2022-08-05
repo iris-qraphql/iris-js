@@ -191,7 +191,6 @@ export type VariantDefinitionNode = {
   readonly isTypeVariantNode: boolean;
   readonly name: NameNode;
   readonly fields?: ReadonlyArray<FieldDefinitionNode>;
-  readonly deprecation?: string;
 };
 
 export type TypeDefinitionNode = {
@@ -254,8 +253,20 @@ export const getVariant = (
 ): Maybe<VariantDefinitionNode> =>
   name ? variants.find((v) => v.name.value === name) : variants[0];
 
-export const getField = (name: string, v: Maybe<VariantDefinitionNode>) =>
-  v?.fields?.find((f) => f.name.value === name);
-
 export const isRequiredArgument = (arg: ArgumentDefinitionNode) =>
   arg.type.kind !== IrisKind.MAYBE_TYPE && !arg.defaultValue;
+
+export const getDeprecationReason = (
+  node: ASTNode & Pick<TypeDefinitionNode, 'directives'>,
+): Maybe<string> => {
+  const deprecated = node.directives?.find(
+    (d) => d.name.value === 'deprecated',
+  );
+
+  if (!deprecated) {
+    return undefined;
+  }
+
+  const reason = deprecated.arguments?.[0]?.value as Maybe<StringValueNode>;
+  return reason?.value ?? '';
+};
