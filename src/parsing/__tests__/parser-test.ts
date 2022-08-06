@@ -54,47 +54,8 @@ describe('Parser', () => {
       });
     });
 
-    it('parses list values', () => {
-      const result = parseValue('[123 "abc"]');
-      expectJSON(result).toEqual({
-        kind: GQLKind.LIST,
-        loc: { start: 0, end: 11 },
-        values: [
-          {
-            kind: GQLKind.INT,
-            loc: { start: 1, end: 4 },
-            value: '123',
-          },
-          {
-            kind: GQLKind.STRING,
-            loc: { start: 5, end: 10 },
-            value: 'abc',
-            block: false,
-          },
-        ],
-      });
-    });
-
     it('parses block strings', () => {
-      const result = parseValue('["""long""" "short"]');
-      expectJSON(result).toEqual({
-        kind: GQLKind.LIST,
-        loc: { start: 0, end: 20 },
-        values: [
-          {
-            kind: GQLKind.STRING,
-            loc: { start: 1, end: 11 },
-            value: 'long',
-            block: true,
-          },
-          {
-            kind: GQLKind.STRING,
-            loc: { start: 12, end: 19 },
-            value: 'short',
-            block: false,
-          },
-        ],
-      });
+      expectJSON(parseValue('"""long"""')).toMatchSnapshot();
     });
 
     it('correct message for incomplete variable', () => {
@@ -115,27 +76,6 @@ describe('Parser', () => {
   });
 
   describe('parseConstValue', () => {
-    it('parses values', () => {
-      const result = parseValue('[123 "abc"]');
-      expectJSON(result).toEqual({
-        kind: GQLKind.LIST,
-        loc: { start: 0, end: 11 },
-        values: [
-          {
-            kind: GQLKind.INT,
-            loc: { start: 1, end: 4 },
-            value: '123',
-          },
-          {
-            kind: GQLKind.STRING,
-            loc: { start: 5, end: 10 },
-            value: 'abc',
-            block: false,
-          },
-        ],
-      });
-    });
-
     it('correct message for unexpected token', () => {
       expect(toJSONError(() => parseValue('$'))).toEqual({
         message: 'Syntax Error: Unexpected "$".',

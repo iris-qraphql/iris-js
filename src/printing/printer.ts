@@ -18,21 +18,11 @@ const printDocASTReducer: ASTReducer<string> = {
     leave: (node) => join(node.definitions, '\n\n'),
   },
   Argument: { leave: ({ name, value }) => name + ': ' + value },
-  IntValue: { leave: ({ value }) => value },
-  FloatValue: { leave: ({ value }) => value },
   StringValue: {
     leave: ({ value, block: isBlockString }) =>
       isBlockString ? printBlockString(value) : printString(value),
   },
-  BooleanValue: { leave: ({ value }) => (value ? 'true' : 'false') },
   NullValue: { leave: () => 'null' },
-  EnumValue: {
-    leave: ({ value }) => value,
-  },
-  ListValue: { leave: ({ values }) => '[' + join(values, ', ') + ']' },
-  ObjectValue: { leave: ({ fields }) => '{' + join(fields, ', ') + '}' },
-  ObjectField: { leave: ({ name, value }) => name + ': ' + value },
-
   // Directive
 
   Directive: {

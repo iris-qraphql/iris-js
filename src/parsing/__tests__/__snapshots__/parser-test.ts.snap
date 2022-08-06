@@ -56,3 +56,15 @@ Object {
   },
 }
 `;
+
+exports[`Parser parseValue parses block strings 1`] = `
+Object {
+  "block": true,
+  "kind": "StringValue",
+  "loc": Object {
+    "end": 10,
+    "start": 0,
+  },
+  "value": "long",
+}
+`;

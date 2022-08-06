@@ -1,26 +1,4 @@
-import type {
-  ArgumentNode,
-  BooleanValueNode,
-  ConstArgumentNode,
-  ConstDirectiveNode,
-  ConstListValueNode,
-  ConstObjectFieldNode,
-  ConstObjectValueNode,
-  ConstValueNode,
-  DirectiveNode,
-  EnumValueNode,
-  FloatValueNode,
-  IntValueNode,
-  Kind,
-  ListValueNode,
-  NullValueNode,
-  ObjectFieldNode,
-  ObjectValueNode,
-  StringValueNode,
-  Token,
-  ValueNode,
-  VariableNode,
-} from 'graphql';
+import type { Kind, Token } from 'graphql';
 
 import type { Source } from '../parsing/source';
 import type { Maybe } from '../utils/type-level';
@@ -33,15 +11,8 @@ export type ASTNode =
   | NameNode
   | DocumentNode
   | ArgumentNode
-  | IntValueNode
-  | FloatValueNode
   | StringValueNode
-  | BooleanValueNode
   | NullValueNode
-  | EnumValueNode
-  | ListValueNode
-  | ObjectValueNode
-  | ObjectFieldNode
   | DirectiveNode
   | NamedTypeNode
   | ListTypeNode
@@ -50,6 +21,8 @@ export type ASTNode =
   | TypeDefinitionNode
   | VariantDefinitionNode
   | MaybeTypeNode;
+
+export type ValueNode = NullValueNode | StringValueNode;
 
 /**
  * @internal
@@ -60,15 +33,8 @@ export const QueryDocumentKeys: {
   Name: [],
   Document: ['definitions'],
   Argument: ['name', 'value'],
-  IntValue: [],
-  FloatValue: [],
   StringValue: [],
-  BooleanValue: [],
   NullValue: [],
-  EnumValue: [],
-  ListValue: ['values'],
-  ObjectValue: ['fields'],
-  ObjectField: ['name', 'value'],
   Directive: ['name', 'arguments'],
   NamedType: ['name'],
   ListType: ['type'],
@@ -137,6 +103,33 @@ export class Location {
   }
 }
 
+// VALUE
+export type StringValueNode = {
+  readonly kind: Kind.STRING;
+  readonly loc?: Location;
+  readonly value: string;
+  readonly block?: boolean;
+};
+
+export type NullValueNode = {
+  readonly kind: Kind.NULL;
+  readonly loc?: Location;
+};
+
+export type ArgumentNode = {
+  readonly kind: Kind.ARGUMENT;
+  readonly loc?: Location;
+  readonly name: NameNode;
+  readonly value: ValueNode;
+};
+
+export type DirectiveNode = {
+  readonly kind: Kind.DIRECTIVE;
+  readonly loc?: Location;
+  readonly name: NameNode;
+  readonly arguments?: ReadonlyArray<ArgumentNode>;
+};
+
 /** Name */
 
 export type NameNode = {
@@ -153,28 +146,7 @@ export type DocumentNode = {
   readonly definitions: ReadonlyArray<TypeDefinitionNode>;
 };
 
-export type {
-  VariableNode,
-  IntValueNode,
-  FloatValueNode,
-  StringValueNode,
-  BooleanValueNode,
-  NullValueNode,
-  EnumValueNode,
-  ListValueNode,
-  ConstListValueNode,
-  ObjectValueNode,
-  ConstObjectValueNode,
-  ObjectFieldNode,
-  ConstObjectFieldNode,
-  ArgumentNode,
-  ConstArgumentNode,
-  ConstDirectiveNode,
-  DirectiveNode,
-  ValueNode,
-  ConstValueNode,
-  Token,
-};
+export type { Token };
 
 /** Type Reference */
 
@@ -206,8 +178,8 @@ export type ArgumentDefinitionNode = {
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly type: TypeNode;
-  readonly defaultValue?: ConstValueNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly defaultValue?: ValueNode;
+  readonly directives?: ReadonlyArray<DirectiveNode>;
 };
 
 export type FieldDefinitionNode = {
@@ -216,14 +188,14 @@ export type FieldDefinitionNode = {
   readonly description?: StringValueNode;
   readonly name: NameNode;
   readonly type: TypeNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly directives?: ReadonlyArray<DirectiveNode>;
 };
 
 export type VariantDefinitionNode = {
   readonly kind: IrisKind.VARIANT_DEFINITION;
   readonly loc?: Location;
   readonly description?: StringValueNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly directives?: ReadonlyArray<DirectiveNode>;
   readonly isTypeVariantNode: boolean;
   readonly name: NameNode;
   readonly fields?: ReadonlyArray<FieldDefinitionNode>;
@@ -234,7 +206,7 @@ export type TypeDefinitionNode = {
   readonly loc?: Location;
   readonly description?: StringValueNode;
   readonly name: NameNode;
-  readonly directives?: ReadonlyArray<ConstDirectiveNode>;
+  readonly directives?: ReadonlyArray<DirectiveNode>;
   readonly variants: ReadonlyArray<VariantDefinitionNode>;
 };
 

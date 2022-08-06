@@ -1,49 +1,33 @@
-
 import type { IrisError } from '../error';
 import { syntaxError } from '../error';
 import type {
-  ArgumentDefinitionNode,
   ArgumentNode,
-  BooleanValueNode,
-  ConstArgumentNode,
-  ConstDirectiveNode,
-  ConstListValueNode,
-  ConstObjectFieldNode,
-  ConstObjectValueNode,
-  ConstValueNode,
   DirectiveNode,
   DocumentNode,
-  EnumValueNode,
   FieldDefinitionNode,
-  FloatValueNode,
-  IntValueNode,
   ListTypeNode,
-  ListValueNode,
   MaybeTypeNode,
   NamedTypeNode,
   NameNode,
   NullValueNode,
-  ObjectFieldNode,
-  ObjectValueNode,
   StringValueNode,
   Token,
   TypeDefinitionNode,
   TypeNode,
   ValueNode,
-  VariableNode,
-  VariantDefinitionNode} from '../types/ast';
+  VariantDefinitionNode,
+} from '../types/ast';
 import { Location } from '../types/ast';
-import { GQLKind as Kind,IrisKind, TokenKind } from '../types/kinds';
-import { instanceOf } from '../utils/legacy';
+import { GQLKind as Kind, IrisKind, TokenKind } from '../types/kinds';
 import type { Maybe } from '../utils/type-level';
 
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { Source } from './source';
 
-function parseValue(source: string | Source): ConstValueNode {
+function parseValue(source: string): ValueNode {
   const parser = new Parser(source);
   parser.expectToken(TokenKind.SOF);
-  const value = parser.parseConstValueLiteral();
+  const value = parser.parseValueLiteral();
   parser.expectToken(TokenKind.EOF);
   return value;
 }
@@ -58,16 +42,12 @@ function parseValue(source: string | Source): ConstValueNode {
  *
  * Consider providing the results to the utility function: typeFromAST().
  */
-function parseType(source: string | Source): TypeNode {
+function parseType(source: string): TypeNode {
   const parser = new Parser(source);
   parser.expectToken(TokenKind.SOF);
   const type = parser.parseTypeReference();
   parser.expectToken(TokenKind.EOF);
   return type;
-}
-
-function isSource(source: unknown): source is Source {
-  return instanceOf(source, Source);
 }
 
 /**
@@ -84,9 +64,8 @@ function isSource(source: unknown): source is Source {
 class Parser {
   _lexer: Lexer;
 
-  constructor(source: string | Source) {
-    const sourceObj = isSource(source) ? source : new Source(source);
-    this._lexer = new Lexer(sourceObj);
+  constructor(source: string) {
+    this._lexer = new Lexer(new Source(source));
   }
 
   /**
@@ -119,34 +98,12 @@ class Parser {
     );
   }
 
-  /**
-   * Variable : $ Name
-   */
-  parseVariable(): VariableNode {
-    const start = this._lexer.token;
-    this.expectToken(TokenKind.DOLLAR);
-    return this.node<VariableNode>(start, {
-      kind: Kind.VARIABLE,
-      name: this.parseName(),
-    });
-  }
-
-  /**
-   * Arguments[Const] : ( Argument[?Const]+ )
-   */
-  parseArguments(isConst: true): Array<ConstArgumentNode>;
-  parseArguments(isConst: boolean): Array<ArgumentNode>;
-  parseArguments(isConst: boolean): Array<ArgumentNode> {
-    const item = isConst ? this.parseConstArgument : this.parseArgument;
+  parseArguments(): Array<ArgumentNode> {
+    const item = this.parseArgument;
     return this.optionalMany(TokenKind.PAREN_L, item, TokenKind.PAREN_R);
   }
 
-  /**
-   * Argument[Const] : Name : Value[?Const]
-   */
-  parseArgument(isConst: true): ConstArgumentNode;
-  parseArgument(isConst?: boolean): ArgumentNode;
-  parseArgument(isConst: boolean = false): ArgumentNode {
+  parseArgument(): ArgumentNode {
     const start = this._lexer.token;
     const name = this.parseName();
 
@@ -154,101 +111,27 @@ class Parser {
     return this.node<ArgumentNode>(start, {
       kind: Kind.ARGUMENT,
       name,
-      value: this.parseValueLiteral(isConst),
+      value: this.parseValueLiteral(),
     });
   }
 
-  parseConstArgument(): ConstArgumentNode {
-    return this.parseArgument(true);
-  }
-
-  // Implements the parsing rules in the Values section.
-
-  /**
-   * Value[Const] :
-   *   - [~Const] Variable
-   *   - IntValue
-   *   - FloatValue
-   *   - StringValue
-   *   - BooleanValue
-   *   - NullValue
-   *   - EnumValue
-   *   - ListValue[?Const]
-   *   - ObjectValue[?Const]
-   *
-   * BooleanValue : one of `true` `false`
-   *
-   * NullValue : `null`
-   *
-   * EnumValue : Name but not `true`, `false` or `null`
-   */
-  parseValueLiteral(isConst: true): ConstValueNode;
-  parseValueLiteral(isConst: boolean): ValueNode;
-  parseValueLiteral(isConst: boolean): ValueNode {
+  parseValueLiteral(): ValueNode {
     const token = this._lexer.token;
     switch (token.kind) {
-      case TokenKind.BRACKET_L:
-        return this.parseList(isConst);
-      case TokenKind.BRACE_L:
-        return this.parseObject(isConst);
-      case TokenKind.INT:
-        this._lexer.advance();
-        return this.node<IntValueNode>(token, {
-          kind: Kind.INT,
-          value: token.value,
-        });
-      case TokenKind.FLOAT:
-        this._lexer.advance();
-        return this.node<FloatValueNode>(token, {
-          kind: Kind.FLOAT,
-          value: token.value,
-        });
       case TokenKind.STRING:
       case TokenKind.BLOCK_STRING:
         return this.parseStringLiteral();
       case TokenKind.NAME:
         this._lexer.advance();
         switch (token.value) {
-          case 'true':
-            return this.node<BooleanValueNode>(token, {
-              kind: Kind.BOOLEAN,
-              value: true,
-            });
-          case 'false':
-            return this.node<BooleanValueNode>(token, {
-              kind: Kind.BOOLEAN,
-              value: false,
-            });
           case 'null':
             return this.node<NullValueNode>(token, { kind: Kind.NULL });
           default:
-            return this.node<EnumValueNode>(token, {
-              kind: Kind.ENUM,
-              value: token.value,
-            });
+            throw this.unexpected();
         }
-      case TokenKind.DOLLAR:
-        if (isConst) {
-          this.expectToken(TokenKind.DOLLAR);
-          if (this._lexer.token.kind === TokenKind.NAME) {
-            const varName = this._lexer.token.value;
-            throw syntaxError(
-              this._lexer.source,
-              token.start,
-              `Unexpected variable "$${varName}" in constant value.`,
-            );
-          } else {
-            throw this.unexpected(token);
-          }
-        }
-        return this.parseVariable();
       default:
         throw this.unexpected();
     }
-  }
-
-  parseConstValueLiteral(): ConstValueNode {
-    return this.parseValueLiteral(true);
   }
 
   parseStringLiteral(): StringValueNode {
@@ -262,70 +145,14 @@ class Parser {
   }
 
   /**
-   * ListValue[Const] :
-   *   - [ ]
-   *   - [ Value[?Const]+ ]
-   */
-  parseList(isConst: true): ConstListValueNode;
-  parseList(isConst: boolean): ListValueNode;
-  parseList(isConst: boolean): ListValueNode {
-    const item = () => this.parseValueLiteral(isConst);
-    return this.node<ListValueNode>(this._lexer.token, {
-      kind: Kind.LIST,
-      values: this.any(TokenKind.BRACKET_L, item, TokenKind.BRACKET_R),
-    });
-  }
-
-  /**
-   * ```
-   * ObjectValue[Const] :
-   *   - { }
-   *   - { ObjectField[?Const]+ }
-   * ```
-   */
-  parseObject(isConst: true): ConstObjectValueNode;
-  parseObject(isConst: boolean): ObjectValueNode;
-  parseObject(isConst: boolean): ObjectValueNode {
-    const item = () => this.parseObjectField(isConst);
-    return this.node<ObjectValueNode>(this._lexer.token, {
-      kind: Kind.OBJECT,
-      fields: this.any(TokenKind.BRACE_L, item, TokenKind.BRACE_R),
-    });
-  }
-
-  /**
-   * ObjectField[Const] : Name : Value[?Const]
-   */
-  parseObjectField(isConst: true): ConstObjectFieldNode;
-  parseObjectField(isConst: boolean): ObjectFieldNode;
-  parseObjectField(isConst: boolean): ObjectFieldNode {
-    const start = this._lexer.token;
-    const name = this.parseName();
-    this.expectToken(TokenKind.COLON);
-    return this.node<ObjectFieldNode>(start, {
-      kind: Kind.OBJECT_FIELD,
-      name,
-      value: this.parseValueLiteral(isConst),
-    });
-  }
-
-  // Implements the parsing rules in the Directives section.
-
-  /**
    * Directives[Const] : Directive[?Const]+
    */
-  parseDirectives(isConst: true): Array<ConstDirectiveNode>;
-  parseDirectives(isConst: boolean): Array<DirectiveNode>;
-  parseDirectives(isConst: boolean): Array<DirectiveNode> {
+  parseDirectives(): Array<DirectiveNode> {
     const directives = [];
     while (this.peek(TokenKind.AT)) {
-      directives.push(this.parseDirective(isConst));
+      directives.push(this.parseDirective());
     }
     return directives;
-  }
-
-  parseConstDirectives(): Array<ConstDirectiveNode> {
-    return this.parseDirectives(true);
   }
 
   /**
@@ -333,26 +160,16 @@ class Parser {
    * Directive[Const] : @ Name Arguments[?Const]?
    * ```
    */
-  parseDirective(isConst: true): ConstDirectiveNode;
-  parseDirective(isConst: boolean): DirectiveNode;
-  parseDirective(isConst: boolean): DirectiveNode {
+  parseDirective(): DirectiveNode {
     const start = this._lexer.token;
     this.expectToken(TokenKind.AT);
     return this.node<DirectiveNode>(start, {
       kind: Kind.DIRECTIVE,
       name: this.parseName(),
-      arguments: this.parseArguments(isConst),
+      arguments: this.parseArguments(),
     });
   }
 
-  // Implements the parsing rules in the Types section.
-
-  /**
-   * Type :
-   *   - NamedType
-   *   - ListType
-   *   - NonNullType
-   */
   parseTypeReference(): TypeNode {
     const start = this._lexer.token;
     let type;
@@ -364,7 +181,10 @@ class Parser {
         type: innerType,
       });
     } else {
-      type = this.parseNamedType();
+      type = this.node<NamedTypeNode>(this._lexer.token, {
+        kind: IrisKind.NAMED_TYPE,
+        name: this.parseName(),
+      });
     }
 
     if (this.expectOptionalToken(TokenKind.QUESTION_MARK)) {
@@ -377,18 +197,6 @@ class Parser {
     return type;
   }
 
-  /**
-   * NamedType : Name
-   */
-  parseNamedType(): NamedTypeNode {
-    return this.node<NamedTypeNode>(this._lexer.token, {
-      kind: IrisKind.NAMED_TYPE,
-      name: this.parseName(),
-    });
-  }
-
-  // Implements the parsing rules in the Type Definition section.
-
   peekDescription(): boolean {
     return this.peek(TokenKind.STRING) || this.peek(TokenKind.BLOCK_STRING);
   }
@@ -397,42 +205,7 @@ class Parser {
    * Description : StringValue
    */
   parseDescription(): undefined | StringValueNode {
-    if (this.peekDescription()) {
-      return this.parseStringLiteral();
-    }
-  }
-
-  parseArgumentDefs(): Array<ArgumentDefinitionNode> {
-    return this.optionalMany(
-      TokenKind.PAREN_L,
-      this.parseInputValueDef,
-      TokenKind.PAREN_R,
-    );
-  }
-
-  /**
-   * InputValueDefinition :
-   *   - Description? Name : Type DefaultValue? Directives[Const]?
-   */
-  parseInputValueDef(): ArgumentDefinitionNode {
-    const start = this._lexer.token;
-    const description = this.parseDescription();
-    const name = this.parseName();
-    this.expectToken(TokenKind.COLON);
-    const type = this.parseTypeReference();
-    let defaultValue;
-    if (this.expectOptionalToken(TokenKind.EQUALS)) {
-      defaultValue = this.parseConstValueLiteral();
-    }
-    const directives = this.parseConstDirectives();
-    return this.node<ArgumentDefinitionNode>(start, {
-      kind: IrisKind.ARGUMENT_DEFINITION,
-      description,
-      name,
-      type,
-      defaultValue,
-      directives,
-    });
+    return this.peekDescription() ? this.parseStringLiteral() : undefined;
   }
 
   // Core parsing utility functions
@@ -628,7 +401,7 @@ function getTokenKindDesc(kind: TokenKind): string {
   return isPunctuatorTokenKind(kind) ? `"${kind}"` : kind;
 }
 
-const parse = (source: string | Source): DocumentNode =>
+const parse = (source: string): DocumentNode =>
   parseDocument(new Parser(source));
 
 type FParser<T> = (parser: Parser) => T;
@@ -684,7 +457,7 @@ const parseTypeDefinition = (parser: Parser): TypeDefinitionNode => {
   const description = parser.parseDescription();
   parser.expectKeyword('data');
   const name = parser.parseName();
-  const directives = parser.parseConstDirectives();
+  const directives = parser.parseDirectives();
   const variants: ReadonlyArray<VariantDefinitionNode> =
     parseVariantsDefinition(name, parser);
   return parser.node<TypeDefinitionNode>(start, {
@@ -725,7 +498,7 @@ const parseVariantDefinition = (
   const start = parser.lookAhead();
   const description = parser.parseDescription();
   const name = typeName ?? parseVariantName(parser);
-  const directives = parser.parseConstDirectives();
+  const directives = parser.parseDirectives();
   const fields = parseFieldsDefinition(parser);
   return parser.node<VariantDefinitionNode>(start, {
     kind: IrisKind.VARIANT_DEFINITION,
@@ -764,7 +537,7 @@ const parseFieldDefinition = (parser: Parser) => (): FieldDefinitionNode => {
   const name = parser.parseName();
   parser.expectToken(TokenKind.COLON);
   const type = parser.parseTypeReference();
-  const directives = parser.parseConstDirectives();
+  const directives = parser.parseDirectives();
   return parser.node<FieldDefinitionNode>(start, {
     kind: IrisKind.FIELD_DEFINITION,
     description,

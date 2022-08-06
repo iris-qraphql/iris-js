@@ -77,19 +77,6 @@ Array [
     ],
     "message": "Variant \\"SomData.A\\" can only be defined once.",
   },
-  Object {
-    "locations": Array [
-      Object {
-        "column": 11,
-        "line": 9,
-      },
-      Object {
-        "column": 11,
-        "line": 10,
-      },
-    ],
-    "message": "Variant \\"Somedata.D\\" can only be defined once.",
-  },
 ]
 `;
 

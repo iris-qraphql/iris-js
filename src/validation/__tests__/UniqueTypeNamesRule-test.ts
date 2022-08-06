@@ -87,7 +87,6 @@ describe('Validate: Unique variant definition names', () => {
   it('multiple variants', () => {
     expectValidSDL(`
       data SomData = A {} | B {}
-      data Somedata = A {} | B {}
     `);
   });
 
@@ -97,11 +96,6 @@ describe('Validate: Unique variant definition names', () => {
         = A {} 
         | B {}
         | A {}
-
-      data Somedata 
-        = C {} 
-        | D {}
-        | D {}
     `).toMatchSnapshot();
   });
 });
