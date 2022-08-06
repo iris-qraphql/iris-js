@@ -3,9 +3,10 @@ import { printString } from 'graphql/language/printString';
 
 import type { ASTNode } from '../types/ast';
 import type { IrisSchema } from '../types/schema';
-import type { Maybe } from '../utils/type-level';
 import type { ASTReducer } from '../utils/visitor';
 import { visit } from '../utils/visitor';
+
+import { block, join, wrap } from './utils';
 
 /**
  * Converts an AST into a string, using one set of reasonable
@@ -80,39 +81,7 @@ const printDocASTReducer: ASTReducer<string> = {
   },
 };
 
-/**
- * Given maybeArray, print an empty string if it is null or empty, otherwise
- * print all items together separated by separator if provided
- */
-function join(
-  maybeArray: Maybe<ReadonlyArray<string | undefined>>,
-  separator = '',
-): string {
-  return maybeArray?.filter((x) => x).join(separator) ?? '';
-}
 
-/**
- * Given array, print each item on its own line, wrapped in an indented `{ }` block.
- */
-const block = (array: ReadonlyArray<string | undefined>) =>
-  array.length > 0 ? `{\n${indent(join(array, '\n'))}\n}` : '{}';
-
-/**
- * If maybeString is not null or empty, then wrap with start and end, otherwise print an empty string.
- */
-function wrap(
-  start: string,
-  maybeString: Maybe<string>,
-  end: string = '',
-): string {
-  return maybeString != null && maybeString !== ''
-    ? start + maybeString + end
-    : '';
-}
-
-function indent(str: string): string {
-  return wrap('  ', str.replace(/\n/g, '\n  '));
-}
 
 export const print = (ast: IrisSchema): string =>
   visit(ast.document, printDocASTReducer);

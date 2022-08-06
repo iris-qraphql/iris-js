@@ -1,28 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`toGQLSchema hello world App 1`] = `
-"type Query = {
-  __typename: \\"Query\\"
+"export type Query = {
+  __typename: 'Query'
   hello: String
 }"
 `;
 
 exports[`toGQLSchema hello world App 2`] = `
-"type Lifespan = {
-  __typename: \\"Immortal\\"
+"export type Lifespan = {
+  __typename: 'Immortal'
 } | {
-  __typename: \\"Limited\\"
-  max: Maybe<Int>
+  __typename: 'Limited'
+  max: (Int | undefined)
 }
 
-type God = {
-  __typename: \\"God\\"
+export type God = {
+  __typename: 'God'
   name: String
   lifespan: Lifespan
 }
 
-type Deity = God | {
-  __typename: \\"Titan\\"
+export type Deity = God | {
+  __typename: 'Titan'
   name: String
 }"
 `;
