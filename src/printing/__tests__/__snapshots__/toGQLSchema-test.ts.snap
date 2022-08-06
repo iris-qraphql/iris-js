@@ -4,7 +4,42 @@ exports[`toGQLSchema hello world App 1`] = `
 "export type Query = {
   __typename: 'Query'
   hello: String
-}"
+}
+
+export const oneOf =
+  <T>(r: [(v: unknown) => T]) =>
+  (v: unknown): T | undefined => {
+    const res = r.find(f => f(v));
+
+    if (res === undefined) {
+      throw new Error('');
+    }
+
+    return res(v);
+  };
+
+export const parseVariant =
+  <O extends Record<string, unknown>>(pattern: {
+    [K in keyof O]: (f: unknown) => O[K];
+  }) =>
+  (v: unknown): O | undefined => {
+    const result = {} as O;
+    const keys: ReadonlyArray<keyof O> = Object.keys(pattern);
+
+    if (typeof v !== 'object' || !v) {
+      return undefined;
+    }
+
+    for (const key of keys) {
+      result[key] = pattern[key]((v as Record<keyof O, unknown>)[key]);
+    }
+
+    return result;
+  };
+export const parseQuery = oneOf<Query>([parseVariant({
+  __typename: 'Query',
+  hello: String
+})])"
 `;
 
 exports[`toGQLSchema hello world App 2`] = `
@@ -24,5 +59,57 @@ export type God = {
 export type Deity = God | {
   __typename: 'Titan'
   name: String
-}"
+}
+
+export const oneOf =
+  <T>(r: [(v: unknown) => T]) =>
+  (v: unknown): T | undefined => {
+    const res = r.find(f => f(v));
+
+    if (res === undefined) {
+      throw new Error('');
+    }
+
+    return res(v);
+  };
+
+export const parseVariant =
+  <O extends Record<string, unknown>>(pattern: {
+    [K in keyof O]: (f: unknown) => O[K];
+  }) =>
+  (v: unknown): O | undefined => {
+    const result = {} as O;
+    const keys: ReadonlyArray<keyof O> = Object.keys(pattern);
+
+    if (typeof v !== 'object' || !v) {
+      return undefined;
+    }
+
+    for (const key of keys) {
+      result[key] = pattern[key]((v as Record<keyof O, unknown>)[key]);
+    }
+
+    return result;
+  };
+export const parseLifespan = oneOf<Lifespan>([parseVariant({
+  __typename: 'Immortal'
+}),
+parseVariant({
+  __typename: 'Limited',
+  max: (Int | undefined)
+})])
+
+export const parseGod = oneOf<God>([parseVariant({
+  __typename: 'God',
+  name: String,
+  lifespan: Lifespan
+})])
+
+export const parseDeity = oneOf<Deity>([parseVariant({
+  __typename: 'God'
+}),
+parseVariant({
+  __typename: 'Titan',
+  name: String
+})])"
 `;
