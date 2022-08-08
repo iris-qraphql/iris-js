@@ -1,115 +1,73 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`toGQLSchema hello world App 1`] = `
-"export type Query = {
+"
+import type { Maybe } from '../scripts/utils';
+import {
+  irisFloat,
+  irisInt,
+  irisMaybe,
+  irisString,
+  irisVariant,
+  oneOf,
+} from '../scripts/utils';
+
+
+export type Query = {
   __typename: 'Query'
-  hello: String
+  hello: string
 }
 
-export const oneOf =
-  <T>(r: [(v: unknown) => T]) =>
-  (v: unknown): T | undefined => {
-    const res = r.find(f => f(v));
-
-    if (res === undefined) {
-      throw new Error('');
-    }
-
-    return res(v);
-  };
-
-export const parseVariant =
-  <O extends Record<string, unknown>>(pattern: {
-    [K in keyof O]: (f: unknown) => O[K];
-  }) =>
-  (v: unknown): O | undefined => {
-    const result = {} as O;
-    const keys: ReadonlyArray<keyof O> = Object.keys(pattern);
-
-    if (typeof v !== 'object' || !v) {
-      return undefined;
-    }
-
-    for (const key of keys) {
-      result[key] = pattern[key]((v as Record<keyof O, unknown>)[key]);
-    }
-
-    return result;
-  };
-export const parseQuery = oneOf<Query>([parseVariant({
-  __typename: 'Query',
-  hello: String
+export const irisQuery = oneOf<Query>([irisVariant('Query',{
+  hello: irisString
 })])"
 `;
 
 exports[`toGQLSchema hello world App 2`] = `
-"export type Lifespan = {
+"
+import type { Maybe } from '../scripts/utils';
+import {
+  irisFloat,
+  irisInt,
+  irisMaybe,
+  irisString,
+  irisVariant,
+  oneOf,
+} from '../scripts/utils';
+
+
+export type Lifespan = {
   __typename: 'Immortal'
 } | {
   __typename: 'Limited'
-  max: (Int | undefined)
+  max: Maybe<number>
 }
 
 export type God = {
   __typename: 'God'
-  name: String
+  name: string
   lifespan: Lifespan
 }
 
 export type Deity = God | {
   __typename: 'Titan'
-  name: String
+  name: string
 }
 
-export const oneOf =
-  <T>(r: [(v: unknown) => T]) =>
-  (v: unknown): T | undefined => {
-    const res = r.find(f => f(v));
+export const irisLifespan = oneOf<Lifespan>([irisVariant('Immortal',{
 
-    if (res === undefined) {
-      throw new Error('');
-    }
-
-    return res(v);
-  };
-
-export const parseVariant =
-  <O extends Record<string, unknown>>(pattern: {
-    [K in keyof O]: (f: unknown) => O[K];
-  }) =>
-  (v: unknown): O | undefined => {
-    const result = {} as O;
-    const keys: ReadonlyArray<keyof O> = Object.keys(pattern);
-
-    if (typeof v !== 'object' || !v) {
-      return undefined;
-    }
-
-    for (const key of keys) {
-      result[key] = pattern[key]((v as Record<keyof O, unknown>)[key]);
-    }
-
-    return result;
-  };
-export const parseLifespan = oneOf<Lifespan>([parseVariant({
-  __typename: 'Immortal'
 }),
-parseVariant({
-  __typename: 'Limited',
-  max: (Int | undefined)
+irisVariant('Limited',{
+  max: irisMaybe(irisInt)
 })])
 
-export const parseGod = oneOf<God>([parseVariant({
-  __typename: 'God',
-  name: String,
-  lifespan: Lifespan
+export const irisGod = oneOf<God>([irisVariant('God',{
+  name: irisString,
+  lifespan: irisLifespan
 })])
 
-export const parseDeity = oneOf<Deity>([parseVariant({
-  __typename: 'God'
-}),
-parseVariant({
-  __typename: 'Titan',
-  name: String
+export const irisDeity = oneOf<Deity>([irisGod,
+irisVariant('Titan',{
+  name: irisString
 })])"
 `;

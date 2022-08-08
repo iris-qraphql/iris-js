@@ -1,15 +1,23 @@
+import type { Maybe } from 'graphql/jsutils/Maybe';
+
 import type { IrisSchema } from '../types/schema';
 import type { ASTReducer } from '../utils/visitor';
 import { visit } from '../utils/visitor';
 
 import { block, join, wrap } from './utils';
 
+const mapping: Record<string, Maybe<string>> = {
+  String: 'string',
+  Int: 'number',
+  Float: 'number',
+};
+
 const printTypesASTReducer: ASTReducer<string> = {
   Name: { leave: (node) => node.value },
   Document: { leave: (node) => join(node.definitions, '\n\n') },
-  NamedType: { leave: ({ name }) => name },
+  NamedType: { leave: ({ name }) => mapping[name] ?? name },
   ListType: { leave: ({ type }) => '[' + type + ']' },
-  MaybeType: { leave: ({ type }) => `(${type} | undefined)` },
+  MaybeType: { leave: ({ type }) => `Maybe<${type}>` },
   FieldDefinition: {
     leave: ({ description, name, type, directives }) =>
       wrap('', description, '\n') +
@@ -17,14 +25,6 @@ const printTypesASTReducer: ASTReducer<string> = {
       ': ' +
       type +
       wrap(' ', join(directives, ' ')),
-  },
-  InputValueDefinition: {
-    leave: ({ description, name, type, defaultValue, directives }) =>
-      wrap('', description, '\n') +
-      join(
-        [name + ': ' + type, wrap('= ', defaultValue), join(directives, ' ')],
-        ' ',
-      ),
   },
   TypeDefinition: {
     leave: ({ description, name, directives, variants }) =>
@@ -48,9 +48,9 @@ const printTypesASTReducer: ASTReducer<string> = {
 const printFunctionsASTReducer: ASTReducer<string> = {
   Name: { leave: (node) => node.value },
   Document: { leave: (node) => join(node.definitions, '\n\n') },
-  NamedType: { leave: ({ name }) => name },
+  NamedType: { leave: ({ name }) => `iris${name}` },
   ListType: { leave: ({ type }) => '[' + type + ']' },
-  MaybeType: { leave: ({ type }) => `(${type} | undefined)` },
+  MaybeType: { leave: ({ type }) => `irisMaybe(${type})` },
   FieldDefinition: {
     leave: ({ description, name, type, directives }) =>
       wrap('', description, '\n') +
@@ -59,64 +59,39 @@ const printFunctionsASTReducer: ASTReducer<string> = {
       type +
       wrap(' ', join(directives, ' ')),
   },
-  InputValueDefinition: {
-    leave: ({ description, name, type, defaultValue, directives }) =>
-      wrap('', description, '\n') +
-      join(
-        [name + ': ' + type, wrap('= ', defaultValue), join(directives, ' ')],
-        ' ',
-      ),
-  },
   TypeDefinition: {
     leave: ({ description, name, variants }) =>
       wrap('', description, '\n') +
       join([
-        `export const parse${name} = oneOf<${name}>([${join(variants, ',\n')}])`,
+        `export const iris${name} = oneOf<${name}>([${join(
+          variants,
+          ',\n',
+        )}])`,
       ]),
   },
   VariantDefinition: {
     leave: ({ name, fields }) =>
-      `parseVariant(${block([
-        join([`__typename: '${name}'`, ...(fields ?? [])], ',\n'),
-      ])})`,
+      fields
+        ? `irisVariant('${name}',${block([join(fields, ',\n')])})`
+        : `iris${name}`,
   },
 };
 
 const inlineUtils = `
-export const oneOf =
-  <T>(r: [(v: unknown) => T]) =>
-  (v: unknown): T | undefined => {
-    const res = r.find(f => f(v));
-
-    if (res === undefined) {
-      throw new Error('');
-    }
-
-    return res(v);
-  };
-
-export const parseVariant =
-  <O extends Record<string, unknown>>(pattern: {
-    [K in keyof O]: (f: unknown) => O[K];
-  }) =>
-  (v: unknown): O | undefined => {
-    const result = {} as O;
-    const keys: ReadonlyArray<keyof O> = Object.keys(pattern);
-
-    if (typeof v !== 'object' || !v) {
-      return undefined;
-    }
-
-    for (const key of keys) {
-      result[key] = pattern[key]((v as Record<keyof O, unknown>)[key]);
-    }
-
-    return result;
-  };
+import type { Maybe } from '../scripts/utils';
+import {
+  irisFloat,
+  irisInt,
+  irisMaybe,
+  irisString,
+  irisVariant,
+  oneOf,
+} from '../scripts/utils';
 `;
 
 export const toTSDefinitions = (ast: IrisSchema): string =>
-  visit(ast.document, printTypesASTReducer) +
-  '\n' +
   inlineUtils +
+  '\n\n' +
+  visit(ast.document, printTypesASTReducer) +
+  '\n\n' +
   visit(ast.document, printFunctionsASTReducer);

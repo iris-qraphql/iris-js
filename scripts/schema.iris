@@ -1,0 +1,15 @@
+data Lifespan
+  = Immortal {}
+  | Limited { max: Int? }
+
+data God = {
+  name: String
+  lifespan: Lifespan
+}
+
+data Deity
+  = God
+  | Titan { 
+    name: String 
+    power: Float
+  }
