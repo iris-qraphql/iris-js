@@ -4,7 +4,7 @@ import type { IrisSchema } from '../types/schema';
 import type { ASTReducer } from '../utils/visitor';
 import { visit } from '../utils/visitor';
 
-import { block, join, wrap } from './utils';
+import { block, indent, join, wrap } from './utils';
 
 const mapping: Record<string, Maybe<string>> = {
   String: 'string',
@@ -34,14 +34,16 @@ const printTypesASTReducer: ASTReducer<string> = {
           'export type',
           name,
           join(directives, ' '),
-          wrap('= ', join(variants, ' | ')),
+          wrap('=\n', indent(join(variants, '\n| ')), ';'),
         ],
         ' ',
       ),
   },
   VariantDefinition: {
     leave: ({ name, fields }) =>
-      fields === undefined ? name : block([`__typename: '${name}'`, ...fields]),
+      fields === undefined
+        ? name
+        : block([`__typename: '${name}'`, ...fields].map((x) => `${x};`)),
   },
 };
 
@@ -63,16 +65,15 @@ const printFunctionsASTReducer: ASTReducer<string> = {
     leave: ({ description, name, variants }) =>
       wrap('', description, '\n') +
       join([
-        `export const iris${name} = oneOf<${name}>([${join(
-          variants,
-          ',\n',
-        )}])`,
+        `export const iris${name} = oneOf<${name}>([\n${indent(
+          join(variants, ',\n'),
+        )}\n]);`,
       ]),
   },
   VariantDefinition: {
     leave: ({ name, fields }) =>
       fields
-        ? `irisVariant('${name}',${block([join(fields, ',\n')])})`
+        ? `irisVariant('${name}', ${block(fields.map((x) => x + ','))})`
         : `iris${name}`,
   },
 };
@@ -91,7 +92,7 @@ import {
 
 export const toTSDefinitions = (ast: IrisSchema): string =>
   inlineUtils +
-  '\n\n' +
+  '\n' +
   visit(ast.document, printTypesASTReducer) +
   '\n\n' +
   visit(ast.document, printFunctionsASTReducer);
