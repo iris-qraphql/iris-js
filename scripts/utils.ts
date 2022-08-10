@@ -60,26 +60,28 @@ export const irisVariant =
     return { __typename: undefined, ...result };
   };
 
+const typeError = (typeName: string, value: unknown) =>
+  new TypeError(`expected "${typeName}" found ${value}`);
+
 export const irisString = (value: unknown): string => {
   if (typeof value !== 'string') {
-    throw new Error(`expected string! found ${value}`);
+    throw typeError('string', value);
   }
   return value;
 };
 
-export const irisFloat = (x: unknown): number => {
-  if (typeof x !== 'number') {
-    throw new Error('Expected number!');
+export const irisFloat = (value: unknown): number => {
+  if (typeof value !== 'number') {
+    throw typeError('number', value);
   }
-  return x;
+  return value;
 };
 
-export const irisInt = (x: unknown): number => {
-  const float = irisFloat(x);
-  if (Number.isInteger(float)) {
-    throw new Error('expected Integer');
+export const irisInt = (value: unknown): number => {
+  const float = irisFloat(value);
+  if (!Number.isInteger(float)) {
+    throw typeError('int', value);
   }
-
   return float;
 };
 
@@ -87,3 +89,13 @@ export const irisMaybe =
   <T>(f: Validator<T>) =>
   (v: unknown): Maybe<T> =>
     v === undefined || v === null ? undefined : f(v);
+
+export const debug =
+  <T>(f: Validator<T>) =>
+  (v: unknown): T | string => {
+    try {
+      return f(v);
+    } catch (e) {
+      return e.message;
+    }
+  };
