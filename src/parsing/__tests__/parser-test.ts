@@ -1,7 +1,7 @@
 import { GQLKind } from '../../types/kinds';
 import { toJSONDeep, toJSONError } from '../../utils/toJSONDeep';
 
-import { parse, parseType, parseValue } from '../parser';
+import { parse, parseType, parseValue } from '../index';
 
 export function expectJSON(actual: unknown) {
   const actualJSON = toJSONDeep(actual);
@@ -26,23 +26,9 @@ describe('Parser', () => {
   });
 
   it('does not allow "true", "false", or "null" as Enum value', () => {
-    expectSyntaxError('data Test = VALID | true ').toEqual({
-      message:
-        'Syntax Error: Name "true" is reserved and cannot be used for an enum value.',
-      locations: [{ line: 1, column: 21 }],
-    });
-
-    expectSyntaxError('data Test = VALID | false').toEqual({
-      message:
-        'Syntax Error: Name "false" is reserved and cannot be used for an enum value.',
-      locations: [{ line: 1, column: 21 }],
-    });
-
-    expectSyntaxError('data Test = VALID | null').toEqual({
-      message:
-        'Syntax Error: Name "null" is reserved and cannot be used for an enum value.',
-      locations: [{ line: 1, column: 21 }],
-    });
+    expectSyntaxError('data Test = VALID | true ').toMatchSnapshot();
+    expectSyntaxError('data Test = VALID | false').toMatchSnapshot();
+    expectSyntaxError('data Test = VALID | null').toMatchSnapshot();
   });
 
   describe('parseValue', () => {

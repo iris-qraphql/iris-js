@@ -1,6 +1,5 @@
-import type { SourceLocation } from './parsing/location';
-import { getLocation } from './parsing/location';
-import type { Source } from './parsing/source';
+import type { Source, SourceLocation } from './parsing/source';
+import { getLocation } from './parsing/source';
 import type { ASTNode, Location } from './types/ast';
 import { omitNil } from './utils/type-level';
 

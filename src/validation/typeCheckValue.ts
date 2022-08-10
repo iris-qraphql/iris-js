@@ -1,7 +1,7 @@
 import { isNil } from 'ramda';
 
 import { irisError } from '../error';
-import { printNode } from '../printing/printer';
+import { printNode } from '../printing/print-iris';
 import type {
   FieldDefinitionNode,
   TypeNode,

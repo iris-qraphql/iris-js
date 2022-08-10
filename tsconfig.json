@@ -1,6 +1,6 @@
 {
   "testEnvironment": "node",
-  "include": ["src/**/*", "scripts/**/*","generated/*"],
+  "include": ["src/**/*", "scripts/**/*", "generated/*"],
   "compilerOptions": {
     "types": ["node", "jest"],
     "module": "commonjs",

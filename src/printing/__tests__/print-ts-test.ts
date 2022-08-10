@@ -1,6 +1,6 @@
 import { buildSchema } from '../../types/schema';
 
-import { toTSDefinitions } from '../toTSDefinitions';
+import { toTSDefinitions } from '../print-ts';
 
 const matchGQLSnapshot = (src: string) =>
   expect(toTSDefinitions(buildSchema(src))).toMatchSnapshot();

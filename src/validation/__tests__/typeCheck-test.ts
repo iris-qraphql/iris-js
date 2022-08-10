@@ -1,4 +1,4 @@
-import { parseType } from '../../parsing/parser';
+import { parseType } from '../../parsing';
 import type { IrisSchema } from '../../types/schema';
 import { buildSchema } from '../../types/schema';
 

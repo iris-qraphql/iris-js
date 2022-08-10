@@ -3,7 +3,7 @@ import type { ObjMap } from 'graphql/jsutils/ObjMap';
 
 import { validateSDL } from '../validation/validate';
 
-import { parse } from '../parsing/parser';
+import { parse } from '../parsing';
 import { keyMap } from '../utils/ObjMap';
 
 import type { DocumentNode, TypeDefinitionNode } from './ast';

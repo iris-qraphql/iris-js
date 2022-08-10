@@ -1,5 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Parser does not allow "true", "false", or "null" as Enum value 1`] = `
+Object {
+  "locations": Array [
+    Object {
+      "column": 21,
+      "line": 1,
+    },
+  ],
+  "message": "Syntax Error: Expected is reserved and cannot be used for an enum value, found Name \\"true\\".",
+}
+`;
+
+exports[`Parser does not allow "true", "false", or "null" as Enum value 2`] = `
+Object {
+  "locations": Array [
+    Object {
+      "column": 21,
+      "line": 1,
+    },
+  ],
+  "message": "Syntax Error: Expected is reserved and cannot be used for an enum value, found Name \\"false\\".",
+}
+`;
+
+exports[`Parser does not allow "true", "false", or "null" as Enum value 3`] = `
+Object {
+  "locations": Array [
+    Object {
+      "column": 21,
+      "line": 1,
+    },
+  ],
+  "message": "Syntax Error: Expected is reserved and cannot be used for an enum value, found Name \\"null\\".",
+}
+`;
+
 exports[`Parser parseType parses nested types 1`] = `
 Object {
   "kind": "ListType",

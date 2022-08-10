@@ -12,7 +12,6 @@ import { block, join, wrap } from './utils';
  * Converts an AST into a string, using one set of reasonable
  * formatting rules.
  */
-
 const printDocASTReducer: ASTReducer<string> = {
   Name: { leave: (node) => node.value },
   Document: {
@@ -25,20 +24,16 @@ const printDocASTReducer: ASTReducer<string> = {
   },
   NullValue: { leave: () => 'null' },
   // Directive
-
   Directive: {
     leave: ({ name, arguments: args }) =>
       '@' + name + wrap('(', join(args, ', '), ')'),
   },
-
   // Type
-
   NamedType: { leave: ({ name }) => name },
   ListType: { leave: ({ type }) => '[' + type + ']' },
   MaybeType: { leave: ({ type }) => type + '?' },
 
   // Type System Definitions
-
   FieldDefinition: {
     leave: ({ description, name, type, directives }) =>
       wrap('', description, '\n') +
@@ -47,7 +42,6 @@ const printDocASTReducer: ASTReducer<string> = {
       type +
       wrap(' ', join(directives, ' ')),
   },
-
   InputValueDefinition: {
     leave: ({ description, name, type, defaultValue, directives }) =>
       wrap('', description, '\n') +
@@ -56,7 +50,6 @@ const printDocASTReducer: ASTReducer<string> = {
         ' ',
       ),
   },
-
   TypeDefinition: {
     leave: ({ description, name, directives, variants }) =>
       wrap('', description, '\n') +
@@ -70,7 +63,6 @@ const printDocASTReducer: ASTReducer<string> = {
         ' ',
       ),
   },
-
   VariantDefinition: {
     leave: ({ name, fields, isTypeVariantNode, directives }) =>
       fields === undefined
@@ -80,8 +72,6 @@ const printDocASTReducer: ASTReducer<string> = {
           block(fields),
   },
 };
-
-
 
 export const print = (ast: IrisSchema): string =>
   visit(ast.document, printDocASTReducer);

@@ -21,6 +21,7 @@ const gods = [
   { __typename: 'Titan' },
   { __typename: 'God' },
   { __typename: 'God', name: 5 },
+  { __typename: 'God', name: 'Iris' },
 ].map(debug(irisGod));
 
 const lifespans = [
@@ -31,6 +32,6 @@ const lifespans = [
   { __typename: 'unknown' },
 ].map(debug(irisLifespan));
 
-console.log('DEITIES', deities);
-console.log('GODS', gods);
-console.log('LIFESPANS', lifespans);
+console.log('\nDEITIES::', deities);
+console.log('\nGODS::', gods);
+console.log('\nLIFESPANS::', lifespans);

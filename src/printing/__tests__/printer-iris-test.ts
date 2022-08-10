@@ -2,7 +2,7 @@ import { getDeprecationReason, getVariant } from '../../types/ast';
 import { buildSchema, getType } from '../../types/schema';
 import { dedent } from '../../utils/dedent';
 
-import { print } from '../printer';
+import { print } from '../print-iris';
 
 const cycle = (src: string) =>
   expect(print(buildSchema(src))).toEqual(dedent([src]));

@@ -76,7 +76,7 @@ export class Lexer {
           // Read the next token and form a link in the token linked-list.
           const nextToken = readNextToken(this, token.end);
           //  next and prev are mutable during parsing.
-          (token.next as Maybe<Token>) = nextToken;
+          (token.next as Maybe<Token> | null) = nextToken;
           (nextToken.prev as Maybe<Token>) = token;
           token = nextToken;
         }
