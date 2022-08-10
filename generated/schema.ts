@@ -31,24 +31,24 @@ export type Deity =
       power: number;
     };
 
-export const irisLifespan = oneOf<Lifespan>([
-  irisVariant('Immortal', {}),
-  irisVariant('Limited', {
+export const irisLifespan = oneOf<Lifespan>({
+  Immortal: irisVariant({}),
+  Limited: irisVariant({
     max: irisMaybe(irisInt),
   }),
-]);
+});
 
-export const irisGod = oneOf<God>([
-  irisVariant('God', {
+export const irisGod = oneOf<God>({
+  God: irisVariant({
     name: irisString,
     lifespan: irisLifespan,
   }),
-]);
+});
 
-export const irisDeity = oneOf<Deity>([
-  irisGod,
-  irisVariant('Titan', {
+export const irisDeity = oneOf<Deity>({
+  God: irisGod,
+  Titan: irisVariant({
     name: irisString,
     power: irisFloat,
   }),
-]);
+});

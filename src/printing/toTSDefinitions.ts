@@ -49,7 +49,7 @@ const printTypesASTReducer: ASTReducer<string> = {
 
 const printFunctionsASTReducer: ASTReducer<string> = {
   Name: { leave: (node) => node.value },
-  Document: { leave: (node) => join(node.definitions, '\n\n') },
+  Document: { leave: (node) => join(node.definitions, '\n\n') + '\n' },
   NamedType: { leave: ({ name }) => `iris${name}` },
   ListType: { leave: ({ type }) => '[' + type + ']' },
   MaybeType: { leave: ({ type }) => `irisMaybe(${type})` },
@@ -66,7 +66,7 @@ const printFunctionsASTReducer: ASTReducer<string> = {
       wrap('', description, '\n') +
       join([
         `export const iris${name} = oneOf<${name}>([\n${indent(
-          join(variants, ',\n'),
+          variants.map( x => x + ',').join('\n')
         )}\n]);`,
       ]),
   },

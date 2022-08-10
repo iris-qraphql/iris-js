@@ -12,15 +12,18 @@ import {
   oneOf,
 } from '../scripts/utils';
 
+export type Query =
+  {
+    __typename: 'Query';
+    hello: string;
+  };
 
-export type Query = {
-  __typename: 'Query'
-  hello: string
-}
-
-export const irisQuery = oneOf<Query>([irisVariant('Query',{
-  hello: irisString
-})])"
+export const irisQuery = oneOf<Query>([
+  irisVariant('Query', {
+    hello: irisString,
+  }),
+]);
+"
 `;
 
 exports[`toGQLSchema hello world App 2`] = `
@@ -35,39 +38,48 @@ import {
   oneOf,
 } from '../scripts/utils';
 
+export type Lifespan =
+  {
+    __typename: 'Immortal';
+  }
+  | {
+    __typename: 'Limited';
+    max: Maybe<number>;
+  };
 
-export type Lifespan = {
-  __typename: 'Immortal'
-} | {
-  __typename: 'Limited'
-  max: Maybe<number>
-}
+export type God =
+  {
+    __typename: 'God';
+    name: string;
+    lifespan: Lifespan;
+  };
 
-export type God = {
-  __typename: 'God'
-  name: string
-  lifespan: Lifespan
-}
+export type Deity =
+  God
+  | {
+    __typename: 'Titan';
+    name: string;
+  };
 
-export type Deity = God | {
-  __typename: 'Titan'
-  name: string
-}
+export const irisLifespan = oneOf<Lifespan>([
+  irisVariant('Immortal', {}),
+  irisVariant('Limited', {
+    max: irisMaybe(irisInt),
+  }),
+]);
 
-export const irisLifespan = oneOf<Lifespan>([irisVariant('Immortal',{
+export const irisGod = oneOf<God>([
+  irisVariant('God', {
+    name: irisString,
+    lifespan: irisLifespan,
+  }),
+]);
 
-}),
-irisVariant('Limited',{
-  max: irisMaybe(irisInt)
-})])
-
-export const irisGod = oneOf<God>([irisVariant('God',{
-  name: irisString,
-  lifespan: irisLifespan
-})])
-
-export const irisDeity = oneOf<Deity>([irisGod,
-irisVariant('Titan',{
-  name: irisString
-})])"
+export const irisDeity = oneOf<Deity>([
+  irisGod,
+  irisVariant('Titan', {
+    name: irisString,
+  }),
+]);
+"
 `;

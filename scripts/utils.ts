@@ -1,64 +1,70 @@
 // UTILS
 export type Maybe<T> = T | undefined;
-
-export type Validator<T> = (_: unknown) => T;
-
-export const oneOf =
-  <T>(r: ReadonlyArray<(v: unknown) => Maybe<T>>) =>
-  (v: unknown): T => {
-    const res = r.find((f) => f(v))?.(v);
-
-    if (res === undefined) {
-      throw new Error('');
-    }
-
-    return res;
-  };
-
 type ObjectLike = Record<string, unknown>;
+
 type Keys<O> = Exclude<keyof O, '__typename'>;
 
 type Pattern<O, T> = O extends { __typename: T }
   ? { [K in Keys<O>]: (f: unknown) => O[K] }
   : never;
 
-type Input<O, T> = O extends { __typename: T }
-  ? { [K in keyof Keys<T>]: unknown }
-  : never;
+export type Validator<T> = (_: unknown) => T;
+
+const isTagged = (v: unknown): v is { __typename: string } & ObjectLike =>
+  Boolean(
+    v &&
+      typeof v === 'object' &&
+      '__typename' in v &&
+      typeof (v as ObjectLike).__typename === 'string',
+  );
+
+export const oneOf =
+  <T extends ObjectLike & { __typename: string }>(patterns: {
+    [K in T['__typename']]: (v: unknown) => T;
+  }) =>
+  (v: unknown): T => {
+    if (!isTagged(v)) {
+      throw new Error(`value ${JSON.stringify(v)} should be tagged object`);
+    }
+
+    const { __typename } = v;
+
+    const f = patterns[__typename as T['__typename']];
+
+    if (!f) {
+      throw new Error(
+        `no matching variant fround for value ${JSON.stringify(v)}`,
+      );
+    }
+
+    return { ...f(v), __typename };
+  };
 
 export const irisVariant =
-  <O extends ObjectLike, T extends string>(name: T, pattern: Pattern<O, T>) =>
-  (target: unknown): Maybe<O> => {
+  <O extends ObjectLike, T extends string>(pattern: Pattern<O, T>) =>
+  (target: unknown): O => {
     const result: O = Object.create(null);
     const keys = Object.keys(pattern) as any as ReadonlyArray<
       keyof Pattern<O, T>
     >;
 
-    if (!isVariant<O, T>(target, name)) {
-      return undefined;
-    }
-
     for (const key of keys) {
-      // @ts-expect-error
-      result[key] = pattern[key](target[key]);
+      try {
+        // @ts-expect-error
+        result[key] = pattern[key](target[key]);
+      } catch (e) {
+        throw Error(`cant parse field "${key.toString()}". ${e.message}`);
+      }
     }
 
-    return { __typename: name, ...result };
+    return { __typename: undefined, ...result };
   };
 
-const isVariant = <T, K>(v: unknown, t: K): v is Input<T, K> =>
-  Boolean(
-    v &&
-      typeof v === 'object' &&
-      '__typename' in v &&
-      (v as any).__typename === t,
-  );
-
-export const irisString = (x: unknown): string => {
-  if (typeof x !== 'string') {
-    throw new Error('expected string!');
+export const irisString = (value: unknown): string => {
+  if (typeof value !== 'string') {
+    throw new Error(`expected string! found ${value}`);
   }
-  return x;
+  return value;
 };
 
 export const irisFloat = (x: unknown): number => {
@@ -80,4 +86,4 @@ export const irisInt = (x: unknown): number => {
 export const irisMaybe =
   <T>(f: Validator<T>) =>
   (v: unknown): Maybe<T> =>
-    f(v);
+    v === undefined || v === null ? undefined : f(v);
