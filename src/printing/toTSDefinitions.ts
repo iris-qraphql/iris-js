@@ -34,16 +34,29 @@ const printTypesASTReducer: ASTReducer<string> = {
           'export type',
           name,
           join(directives, ' '),
-          wrap('=\n', indent(join(variants, '\n| ')), ';'),
+          variants.length === 1
+            ? `= ${variants[0]};`
+            : wrap(
+                '=\n',
+                indent(variants.map((x) => `| ${x}`).join('\n')),
+                ';',
+              ),
         ],
         ' ',
       ),
   },
   VariantDefinition: {
-    leave: ({ name, fields }) =>
-      fields === undefined
-        ? name
-        : block([`__typename: '${name}'`, ...fields].map((x) => `${x};`)),
+    leave: ({ name, fields, isTypeVariantNode }) => {
+      if (!fields) {
+        return name;
+      }
+
+      const rendering = block(
+        [`__typename: '${name}'`, ...fields].map((x) => `${x};`),
+      );
+
+      return isTypeVariantNode ? rendering : indent(rendering).trimStart();
+    },
   },
 };
 
@@ -65,16 +78,18 @@ const printFunctionsASTReducer: ASTReducer<string> = {
     leave: ({ description, name, variants }) =>
       wrap('', description, '\n') +
       join([
-        `export const iris${name} = oneOf<${name}>([\n${indent(
-          variants.map( x => x + ',').join('\n')
-        )}\n]);`,
+        `export const iris${name} = oneOf<${name}>({\n${indent(
+          variants.map((x) => x + ',').join('\n'),
+        )}\n});`,
       ]),
   },
   VariantDefinition: {
     leave: ({ name, fields }) =>
-      fields
-        ? `irisVariant('${name}', ${block(fields.map((x) => x + ','))})`
-        : `iris${name}`,
+      `${name}: ${
+        fields
+          ? `irisVariant(${block(fields.map((x) => `${x},`))})`
+          : `iris${name}`
+      }`,
   },
 };
 
@@ -91,7 +106,7 @@ import {
 `;
 
 export const toTSDefinitions = (ast: IrisSchema): string =>
-  inlineUtils +
+  inlineUtils.trimStart() +
   '\n' +
   visit(ast.document, printTypesASTReducer) +
   '\n\n' +

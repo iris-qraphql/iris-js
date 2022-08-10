@@ -32,7 +32,7 @@
     "prettier": "prettier --write --list-different .",
     "prettier:check": "prettier --check .",
     "check:spelling": "cspell --cache --no-progress '**/*'",
-    "demo": "ts-node scripts/demo.ts"
+    "demo": "ts-node scripts/demo.ts && ts-node generated/demo.ts"
   },
   "devDependencies": {
     "@types/jest": "^27.4.0",
