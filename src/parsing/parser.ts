@@ -1,13 +1,15 @@
-import type { IrisError } from '../error';
 import { syntaxError } from '../error';
-import type { Token } from '../types/ast';
-import { Location } from '../types/ast';
+import { Location, Token } from '../types/ast';
 import { TokenKind } from '../types/kinds';
-import type { Maybe } from '../utils/type-level';
+import { optional } from '../utils/type-level';
 
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { Source } from './source';
 
+type FailOptions = {
+  expected?: InspectValue;
+  unexpected?: Token;
+};
 export class Parser {
   _lexer: Lexer;
 
@@ -15,68 +17,52 @@ export class Parser {
     this._lexer = new Lexer(new Source(source));
   }
 
-  node<T extends { loc?: Location }>(startToken: Token, node: T): T {
-    node.loc = new Location(
-      startToken,
-      this._lexer.lastToken,
-      this._lexer.source,
-    );
-    return node;
-  }
+  node = <T extends { loc?: Location }>(startToken: Token, node: T): T => ({
+    ...node,
+    loc: new Location(startToken, this._lexer.lastToken, this._lexer.source),
+  });
 
   peek = (kind: TokenKind): boolean => this._lexer.token.kind === kind;
 
   lookAhead = (): Token => this._lexer.token;
 
-  fail<T>(kind: string): T {
-    const token = this._lexer.token;
+  fail = <T>(options: FailOptions = {}): T => {
+    const token = options.unexpected ?? this.lookAhead();
     throw syntaxError(
       this._lexer.source,
       token.start,
-      `Expected ${kind}, found ${getTokenDesc(token)}.`,
+      options.expected
+        ? `Expected ${inspect(options.expected)}, found ${inspect(token)}.`
+        : `Unexpected ${inspect(token)}.`,
     );
-  }
+  };
 
-  expectToken(kind: TokenKind): Token {
-    const token = this.token(kind);
-    return token ? token : this.fail(getTokenKindDesc(kind));
-  }
+  satisfy = (f: (t: Token) => boolean, expected: InspectValue): Token => {
+    const token = this.lookAhead();
 
-  token(kind: TokenKind): Maybe<Token> {
-    const token = this._lexer.token;
-
-    if (token.kind !== kind) {
-      return undefined;
+    if (!f(token)) {
+      return this.fail({ expected });
     }
 
     this._lexer.advance();
     return token;
-  }
+  };
 
-  keyword(value: string): void {
-    const token = this.lookAhead();
+  token = (kind: TokenKind) =>
+    this.satisfy((token) => token.kind === kind, kind);
 
-    if (token.kind === TokenKind.NAME && token.value === value) {
-      this._lexer.advance();
-    } else {
-      this.fail(value);
-    }
-  }
-
-  unexpected(atToken?: Maybe<Token>): IrisError {
-    const token = atToken ?? this._lexer.token;
-    return syntaxError(
-      this._lexer.source,
-      token.start,
-      `Unexpected ${getTokenDesc(token)}.`,
+  keyword = (value: string): void => {
+    this.satisfy(
+      (token) => token.kind === TokenKind.NAME && token.value === value,
+      value,
     );
-  }
+  };
 
   manyTill = <T>(f: () => T, closeKind: TokenKind): Array<T> => {
     const nodes = [];
     do {
       nodes.push(f.call(this));
-    } while (!this.token(closeKind));
+    } while (!optional(this.token, closeKind));
     return nodes;
   };
 
@@ -85,26 +71,28 @@ export class Parser {
     f: () => T,
     closeKind: TokenKind,
   ): ReadonlyArray<T> {
-    this.expectToken(openKind);
+    this.token(openKind);
     return this.manyTill(f, closeKind);
   }
 
-  delimitedMany<T>(delimiterKind: TokenKind, parseFn: () => T): Array<T> {
-    this.token(delimiterKind);
-
+  separatedBy = <T>(delimiter: TokenKind, f: () => T): Array<T> => {
     const nodes = [];
     do {
-      nodes.push(parseFn.call(this));
-    } while (this.token(delimiterKind));
+      nodes.push(f.call(this));
+    } while (optional(this.token, delimiter));
     return nodes;
-  }
+  };
 }
 
-const getTokenDesc = (token: Token): string =>
-  getTokenKindDesc(token.kind) +
-  (token.value != null ? ` "${token.value}"` : '');
+type InspectValue = Token | TokenKind | string;
 
-const getTokenKindDesc = (kind: TokenKind): string =>
-  isPunctuatorTokenKind(kind) ? `"${kind}"` : kind;
+const inspect = (input: InspectValue): string => {
+  if (input instanceof Token) {
+    return (
+      inspect(input.kind) + (input.value != null ? ` "${input.value}"` : '')
+    );
+  }
+  return isPunctuatorTokenKind(input as TokenKind) ? `"${input}"` : input;
+};
 
 export type FParser<T> = (parser: Parser) => T;

@@ -15,3 +15,11 @@ export const omitNil = <O extends Record<string, unknown>>(o: O): O =>
   Object.fromEntries(
     Object.entries(o).filter(([_, v]) => v !== undefined),
   ) as O;
+
+export const optional = <I, O>(f: (i: I) => O, i: I): Maybe<O> => {
+  try {
+    return f(i);
+  } catch {
+    return undefined;
+  }
+};

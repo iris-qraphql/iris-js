@@ -17,6 +17,7 @@ import type {
 } from '../types/ast';
 import { GQLKind as Kind, IrisKind, TokenKind } from '../types/kinds';
 import type { Maybe } from '../utils/type-level';
+import { optional } from '../utils/type-level';
 
 import type { FParser } from './parser';
 import { Parser } from './parser';
@@ -25,7 +26,7 @@ const parse = (source: string): DocumentNode =>
   parseDocument(new Parser(source));
 
 const parseDocument: FParser<DocumentNode> = (parser) =>
-  parser.node<DocumentNode>(parser._lexer.token, {
+  parser.node<DocumentNode>(parser.lookAhead(), {
     kind: IrisKind.DOCUMENT,
     definitions: parser.many(
       TokenKind.SOF,
@@ -59,7 +60,7 @@ const parseDefinition: FParser<TypeDefinitionNode> = (parser) => {
     }
   }
 
-  throw parser.unexpected(keywordToken);
+  throw parser.fail({ unexpected: keywordToken });
 };
 
 const parseDefinitions = (
@@ -74,7 +75,7 @@ const parseDefinitions = (
 };
 
 const parseName: FParser<NameNode> = (p): NameNode => {
-  const token = p.expectToken(TokenKind.NAME);
+  const token = p.token(TokenKind.NAME);
 
   if (token.value.startsWith('__')) {
     throw syntaxError(
@@ -91,7 +92,7 @@ const parseName: FParser<NameNode> = (p): NameNode => {
 };
 
 const parseValueLiteral: FParser<ValueNode> = (p) => {
-  const token = p._lexer.token;
+  const token = p.lookAhead();
   switch (token.kind) {
     case TokenKind.STRING:
     case TokenKind.BLOCK_STRING:
@@ -102,14 +103,14 @@ const parseValueLiteral: FParser<ValueNode> = (p) => {
         case 'null':
           return p.node<NullValueNode>(token, { kind: Kind.NULL });
         default:
-          throw p.unexpected();
+          throw p.fail();
       }
     default:
-      throw p.unexpected();
+      throw p.fail();
   }
 };
 const parseStringLiteral: FParser<StringValueNode> = (p) => {
-  const token = p._lexer.token;
+  const token = p.lookAhead();
   p._lexer.advance();
   return p.node<StringValueNode>(token, {
     kind: Kind.STRING,
@@ -119,10 +120,10 @@ const parseStringLiteral: FParser<StringValueNode> = (p) => {
 };
 
 const parseArgument: FParser<ArgumentNode> = (p) => {
-  const start = p._lexer.token;
+  const start = p.lookAhead();
   const name = parseName(p);
 
-  p.expectToken(TokenKind.COLON);
+  p.token(TokenKind.COLON);
   return p.node<ArgumentNode>(start, {
     kind: Kind.ARGUMENT,
     name,
@@ -131,13 +132,13 @@ const parseArgument: FParser<ArgumentNode> = (p) => {
 };
 
 const parseArguments: FParser<ReadonlyArray<ArgumentNode>> = (p) =>
-  p.token(TokenKind.PAREN_L)
+  optional(p.token, TokenKind.PAREN_L)
     ? p.manyTill(() => parseArgument(p), TokenKind.PAREN_R)
     : [];
 
 const parseDirective: FParser<DirectiveNode> = (p) => {
-  const start = p._lexer.token;
-  p.expectToken(TokenKind.AT);
+  const start = p.lookAhead();
+  p.token(TokenKind.AT);
   return p.node<DirectiveNode>(start, {
     kind: Kind.DIRECTIVE,
     name: parseName(p),
@@ -179,20 +180,20 @@ const parseVariantsDefinition = (
   name: NameNode,
   parser: Parser,
 ): ReadonlyArray<VariantDefinitionNode> => {
-  const equal = parser.token(TokenKind.EQUALS);
+  const equal = optional(parser.token, TokenKind.EQUALS);
   if (!equal) {
     return [];
   }
 
   switch (parser.lookAhead().kind) {
     case TokenKind.NAME:
-      return parser.delimitedMany(TokenKind.PIPE, () =>
+      return parser.separatedBy(TokenKind.PIPE, () =>
         parseVariantDefinition(parser),
       );
     case TokenKind.BRACE_L:
       return [parseVariantDefinition(parser, name)];
     default:
-      parser.fail('Variant');
+      parser.fail({ expected: 'Variant' });
       return [];
   }
 };
@@ -219,7 +220,7 @@ const parseVariantDefinition = (
 const parseVariantName: FParser<NameNode> = (p) => {
   const { value } = p.lookAhead();
   if (value === 'true' || value === 'false' || value === 'null') {
-    p.fail('is reserved and cannot be used for an enum value');
+    p.fail({ expected: 'is reserved and cannot be used for an enum value' });
   }
   return parseName(p);
 };
@@ -228,8 +229,8 @@ const parseFieldsDefinition: FParser<
   Maybe<ReadonlyArray<FieldDefinitionNode>>
 > = (parser) => {
   const nodes = [];
-  if (parser.token(TokenKind.BRACE_L)) {
-    while (!parser.token(TokenKind.BRACE_R)) {
+  if (optional(parser.token, TokenKind.BRACE_L)) {
+    while (!optional(parser.token, TokenKind.BRACE_R)) {
       nodes.push(parseFieldDefinition(parser));
     }
     return nodes;
@@ -238,23 +239,23 @@ const parseFieldsDefinition: FParser<
 };
 
 const parseTypeReference: FParser<TypeNode> = (parser) => {
-  const start = parser._lexer.token;
+  const start = parser.lookAhead();
   let type;
-  if (parser.token(TokenKind.BRACKET_L)) {
+  if (optional(parser.token, TokenKind.BRACKET_L)) {
     const innerType = parseTypeReference(parser);
-    parser.expectToken(TokenKind.BRACKET_R);
+    parser.token(TokenKind.BRACKET_R);
     type = parser.node<ListTypeNode>(start, {
       kind: IrisKind.LIST_TYPE,
       type: innerType,
     });
   } else {
-    type = parser.node<NamedTypeNode>(parser._lexer.token, {
+    type = parser.node<NamedTypeNode>(parser.lookAhead(), {
       kind: IrisKind.NAMED_TYPE,
       name: parseName(parser),
     });
   }
 
-  if (parser.token(TokenKind.QUESTION_MARK)) {
+  if (optional(parser.token, TokenKind.QUESTION_MARK)) {
     return parser.node<MaybeTypeNode>(start, {
       kind: IrisKind.MAYBE_TYPE,
       type,
@@ -268,7 +269,7 @@ const parseFieldDefinition: FParser<FieldDefinitionNode> = (parser) => {
   const start = parser.lookAhead();
   const description = parseDescription(parser);
   const name = parseName(parser);
-  parser.expectToken(TokenKind.COLON);
+  parser.token(TokenKind.COLON);
   const type = parseTypeReference(parser);
   const directives = parseDirectives(parser);
   return parser.node<FieldDefinitionNode>(start, {
@@ -282,17 +283,17 @@ const parseFieldDefinition: FParser<FieldDefinitionNode> = (parser) => {
 
 const parseValue = (source: string): ValueNode => {
   const parser = new Parser(source);
-  parser.expectToken(TokenKind.SOF);
+  parser.token(TokenKind.SOF);
   const value = parseValueLiteral(parser);
-  parser.expectToken(TokenKind.EOF);
+  parser.token(TokenKind.EOF);
   return value;
 };
 
 const parseType = (source: string): TypeNode => {
   const parser = new Parser(source);
-  parser.expectToken(TokenKind.SOF);
+  parser.token(TokenKind.SOF);
   const type = parseTypeReference(parser);
-  parser.expectToken(TokenKind.EOF);
+  parser.token(TokenKind.EOF);
   return type;
 };
 

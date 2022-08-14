@@ -1,4 +1,5 @@
-import type { Kind, Token } from 'graphql';
+import type { Kind } from 'graphql';
+import { Token } from 'graphql';
 
 import type { Source } from '../parsing/source';
 import type { Maybe } from '../utils/type-level';
@@ -146,7 +147,7 @@ export type DocumentNode = {
   readonly definitions: ReadonlyArray<TypeDefinitionNode>;
 };
 
-export type { Token };
+export { Token };
 
 /** Type Reference */
 
