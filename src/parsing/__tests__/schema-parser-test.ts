@@ -106,14 +106,6 @@ describe('Schema Parser', () => {
         `).toMatchSnapshot();
     });
 
-    it('rejects field arg with invalid names', () => {
-      expectSyntaxError(`
-        data SomeObject = {
-          badField(__badName: String): String
-        }
-      `).toMatchSnapshot();
-    });
-
     it('rejects an Object type with incorrectly named fields', () => {
       expectSyntaxError(`
         data SomeObject = {

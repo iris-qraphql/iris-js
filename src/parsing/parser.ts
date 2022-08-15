@@ -1,21 +1,35 @@
+import type { Maybe } from 'graphql/jsutils/Maybe';
+
 import { syntaxError } from '../error';
 import { Location, Token } from '../types/ast';
 import { TokenKind } from '../types/kinds';
-import { optional } from '../utils/type-level';
 
 import { isPunctuatorTokenKind, Lexer } from './lexer';
 import { Source } from './source';
 
 type FailOptions = {
-  expected?: InspectValue;
+  expected?: Value;
   unexpected?: Token;
 };
+
 export class Parser {
   _lexer: Lexer;
 
   constructor(source: string) {
     this._lexer = new Lexer(new Source(source));
   }
+
+  optional = <I, O>(f: (i: I) => O, i: I): Maybe<O> => {
+    const initial = this._lexer.token.start;
+    try {
+      return f(i);
+    } catch (e) {
+      if (initial === this._lexer.token.start) {
+        return undefined;
+      }
+      throw e;
+    }
+  };
 
   node = <T extends { loc?: Location }>(startToken: Token, node: T): T => ({
     ...node,
@@ -26,18 +40,18 @@ export class Parser {
 
   lookAhead = (): Token => this._lexer.token;
 
-  fail = <T>(options: FailOptions = {}): T => {
-    const token = options.unexpected ?? this.lookAhead();
+  fail = <T>({ unexpected, expected }: FailOptions = {}): T => {
+    const token = unexpected ?? this.lookAhead();
     throw syntaxError(
       this._lexer.source,
       token.start,
-      options.expected
-        ? `Expected ${inspect(options.expected)}, found ${inspect(token)}.`
+      expected
+        ? `Expected ${inspect(expected)}, found ${inspect(token)}.`
         : `Unexpected ${inspect(token)}.`,
     );
   };
 
-  satisfy = (f: (t: Token) => boolean, expected: InspectValue): Token => {
+  satisfy = (f: (t: Token) => boolean, expected: Value): Token => {
     const token = this.lookAhead();
 
     if (!f(token)) {
@@ -58,35 +72,28 @@ export class Parser {
     );
   };
 
-  manyTill = <T>(f: () => T, closeKind: TokenKind): Array<T> => {
+  many = <T>(open: TokenKind, f: () => T, close: TokenKind): Array<T> => {
+    this.token(open);
+
     const nodes = [];
     do {
       nodes.push(f.call(this));
-    } while (!optional(this.token, closeKind));
+    } while (!this.optional(this.token, close));
     return nodes;
   };
 
-  many<T>(
-    openKind: TokenKind,
-    f: () => T,
-    closeKind: TokenKind,
-  ): ReadonlyArray<T> {
-    this.token(openKind);
-    return this.manyTill(f, closeKind);
-  }
-
-  separatedBy = <T>(delimiter: TokenKind, f: () => T): Array<T> => {
+  separatedBy = <T>(separator: TokenKind, f: () => T): Array<T> => {
     const nodes = [];
     do {
       nodes.push(f.call(this));
-    } while (optional(this.token, delimiter));
+    } while (this.optional(this.token, separator));
     return nodes;
   };
 }
 
-type InspectValue = Token | TokenKind | string;
+type Value = Token | TokenKind | string;
 
-const inspect = (input: InspectValue): string => {
+const inspect = (input: Value): string => {
   if (input instanceof Token) {
     return (
       inspect(input.kind) + (input.value != null ? ` "${input.value}"` : '')

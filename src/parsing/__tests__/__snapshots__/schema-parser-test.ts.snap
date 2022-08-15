@@ -790,15 +790,3 @@ Object {
   "message": "Syntax Error: Name \\"__badName\\" must not begin with \\"__\\", which is reserved by GraphQL introspection.",
 }
 `;
-
-exports[`Schema Parser reject reserved names rejects field arg with invalid names 1`] = `
-Object {
-  "locations": Array [
-    Object {
-      "column": 19,
-      "line": 3,
-    },
-  ],
-  "message": "Syntax Error: Expected \\":\\", found \\"(\\".",
-}
-`;

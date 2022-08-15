@@ -17,7 +17,6 @@ import type {
 } from '../types/ast';
 import { GQLKind as Kind, IrisKind, TokenKind } from '../types/kinds';
 import type { Maybe } from '../utils/type-level';
-import { optional } from '../utils/type-level';
 
 import type { FParser } from './parser';
 import { Parser } from './parser';
@@ -132,9 +131,10 @@ const parseArgument: FParser<ArgumentNode> = (p) => {
 };
 
 const parseArguments: FParser<ReadonlyArray<ArgumentNode>> = (p) =>
-  optional(p.token, TokenKind.PAREN_L)
-    ? p.manyTill(() => parseArgument(p), TokenKind.PAREN_R)
-    : [];
+  p.optional(
+    () => p.many(TokenKind.PAREN_L, () => parseArgument(p), TokenKind.PAREN_R),
+    undefined,
+  ) ?? [];
 
 const parseDirective: FParser<DirectiveNode> = (p) => {
   const start = p.lookAhead();
@@ -178,22 +178,20 @@ const parseTypeDefinition: FParser<TypeDefinitionNode> = (
 
 const parseVariantsDefinition = (
   name: NameNode,
-  parser: Parser,
+  p: Parser,
 ): ReadonlyArray<VariantDefinitionNode> => {
-  const equal = optional(parser.token, TokenKind.EQUALS);
+  const equal = p.optional(p.token, TokenKind.EQUALS);
   if (!equal) {
     return [];
   }
 
-  switch (parser.lookAhead().kind) {
+  switch (p.lookAhead().kind) {
     case TokenKind.NAME:
-      return parser.separatedBy(TokenKind.PIPE, () =>
-        parseVariantDefinition(parser),
-      );
+      return p.separatedBy(TokenKind.PIPE, () => parseVariantDefinition(p));
     case TokenKind.BRACE_L:
-      return [parseVariantDefinition(parser, name)];
+      return [parseVariantDefinition(p, name)];
     default:
-      parser.fail({ expected: 'Variant' });
+      p.fail({ expected: 'Variant' });
       return [];
   }
 };
@@ -227,36 +225,36 @@ const parseVariantName: FParser<NameNode> = (p) => {
 
 const parseFieldsDefinition: FParser<
   Maybe<ReadonlyArray<FieldDefinitionNode>>
-> = (parser) => {
+> = (p) => {
   const nodes = [];
-  if (optional(parser.token, TokenKind.BRACE_L)) {
-    while (!optional(parser.token, TokenKind.BRACE_R)) {
-      nodes.push(parseFieldDefinition(parser));
+  if (p.optional(p.token, TokenKind.BRACE_L)) {
+    while (!p.optional(p.token, TokenKind.BRACE_R)) {
+      nodes.push(parseFieldDefinition(p));
     }
     return nodes;
   }
   return undefined;
 };
 
-const parseTypeReference: FParser<TypeNode> = (parser) => {
-  const start = parser.lookAhead();
+const parseTypeReference: FParser<TypeNode> = (p) => {
+  const start = p.lookAhead();
   let type;
-  if (optional(parser.token, TokenKind.BRACKET_L)) {
-    const innerType = parseTypeReference(parser);
-    parser.token(TokenKind.BRACKET_R);
-    type = parser.node<ListTypeNode>(start, {
+  if (p.optional(p.token, TokenKind.BRACKET_L)) {
+    const innerType = parseTypeReference(p);
+    p.token(TokenKind.BRACKET_R);
+    type = p.node<ListTypeNode>(start, {
       kind: IrisKind.LIST_TYPE,
       type: innerType,
     });
   } else {
-    type = parser.node<NamedTypeNode>(parser.lookAhead(), {
+    type = p.node<NamedTypeNode>(p.lookAhead(), {
       kind: IrisKind.NAMED_TYPE,
-      name: parseName(parser),
+      name: parseName(p),
     });
   }
 
-  if (optional(parser.token, TokenKind.QUESTION_MARK)) {
-    return parser.node<MaybeTypeNode>(start, {
+  if (p.optional(p.token, TokenKind.QUESTION_MARK)) {
+    return p.node<MaybeTypeNode>(start, {
       kind: IrisKind.MAYBE_TYPE,
       type,
     });
